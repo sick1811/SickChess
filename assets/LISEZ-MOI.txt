@@ -1,0 +1,2 @@
+Images du jeu (pieces, logo, fonds).
+Chaque fichier ajoute ici doit etre note dans docs/CREDITS.md avec sa licence.

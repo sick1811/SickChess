@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.pyc
+
+# Compilation (se refait avec PyInstaller)
+build/
+dist/
+*.spec.bak
+
+# Gros fichiers, a recuperer a part (voir moteur/LISEZ-MOI.txt)
+moteur/*.exe
+syzygy/
+puzzles/
+
+# Donnees du joueur, creees par le jeu
+parties/
+profil.json
+statistiques.json
+sauvegarde*.json
+*.log
+game_full_logs*.txt
+
+# Captures produites par les tests
+tests/*.png

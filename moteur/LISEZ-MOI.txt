@@ -1,0 +1,18 @@
+MOTEUR D'ECHECS : STOCKFISH
+===========================
+
+SickChess utilise Stockfish (https://stockfishchess.org), un moteur d'echecs
+libre distribue sous licence GNU GPL version 3 (texte complet : COPYING-Stockfish.txt).
+
+Le fichier stockfish.exe n'est PAS envoye sur GitHub (114 Mo, au-dessus de la
+limite de 100 Mo). Pour l'obtenir sur un nouvel ordinateur :
+  1. Telecharger Stockfish pour Windows sur https://stockfishchess.org/download/
+  2. Renommer le fichier en stockfish.exe
+  3. Le placer dans ce dossier moteur/
+
+OBLIGATIONS DE LA LICENCE GPL QUAND LE JEU SERA DISTRIBUE (Steam, itch.io) :
+  - livrer ce fichier COPYING-Stockfish.txt avec le jeu ;
+  - indiquer d'ou vient Stockfish et ou trouver son code source
+    (https://github.com/official-stockfish/Stockfish), dans les credits du jeu ;
+  - Stockfish reste un programme separe, lance par le jeu : le code de
+    SickChess n'a pas a etre publie pour autant.
