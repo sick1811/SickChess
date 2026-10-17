@@ -17,22 +17,36 @@
 #   Toutes les evaluations sont en pions, du point de vue des BLANCS.
 
 import math
+import os
 import threading
+import time
 
 import chess
 
 import annotations
 
 # nom -> (profondeur de la passe fine, temps maximum par position en ms)
+# SickChess 17/10 (remarque de Julien : "trop imprecis, il faut un moteur tres
+# puissant, rapide et surtout precis, c'est un jeu ultra competitif") : une
+# marche de plus partout. L'analyse suit maintenant la partie en direct (voir
+# ajouter_coups), donc la profondeur ne se paie plus a la fin.
 PUISSANCES = {
-    "rapide": (14, 1000),
-    "normale": (18, 3000),
-    "forte": (22, 6000),
+    "rapide": (16, 1500),
+    "normale": (20, 4000),
+    "forte": (24, 8000),
 }
 PUISSANCE_PAR_DEFAUT = "normale"
 
-PROFONDEUR_SURVOL = 10
-TEMPS_SURVOL_MS = 400
+PROFONDEUR_SURVOL = 12
+TEMPS_SURVOL_MS = 500
+
+# Taille de la table de hachage du moteur d'analyse (Mo). Plus grande = les
+# positions deja vues ne sont pas recalculees.
+HASH_ANALYSE_MB = 1024
+
+# Pour juger un coup en pions, une evaluation est bornee a +/- 15 : au-dela, la
+# partie est jouee, et un mat (20) ne doit pas compter comme "15 pions de plus".
+BORNE_PIONS = 15.0
 
 # Au survol on calcule toujours deux lignes (c'est presque gratuit a faible
 # profondeur). A la passe fine, seulement si le meilleur coup devancait
@@ -96,8 +110,13 @@ class AnalyseurPartie:
     """Analyse une partie en tache de fond, en commencant par le coup regarde."""
 
     def __init__(self, fen_initiale, coups_uci, chemin_stockfish=None,
-                 puissance=None, moteur=None):
+                 puissance=None, moteur=None, suivi=False, threads=None):
         self.chemin = chemin_stockfish
+        # suivi = l'analyse accompagne une partie EN COURS : elle ne s'arrete
+        # pas quand elle a tout vu, elle attend les coups suivants
+        # (ajouter_coups). finir_le_suivi() la laisse terminer normalement.
+        self.suivi = bool(suivi)
+        self.threads = threads
         nom = str(puissance or PUISSANCE_PAR_DEFAUT).strip().lower()
         self.puissance = nom if nom in PUISSANCES else PUISSANCE_PAR_DEFAUT
         self.profondeur, self.temps_max_ms = PUISSANCES[self.puissance]
@@ -148,10 +167,43 @@ class AnalyseurPartie:
     def nombre_de_coups(self):
         return len(self.coups)
 
+    def ajouter_coups(self, coups_uci):
+        """Ajoute les coups joues depuis le dernier appel (analyse en direct).
+
+        On ajoute d'abord les cases des tableaux, puis les positions : le fil
+        d'analyse ne voit jamais une position sans sa case."""
+        plateau = chess.Board(self.fens[-1])
+        for uci in coups_uci:
+            uci = str(uci)
+            try:
+                coup = chess.Move.from_uci(uci)
+            except ValueError:
+                break
+            if coup not in plateau.legal_moves:
+                break
+            for tableau, vide in ((self.evaluations, None), (self.mats, None),
+                                  (self.meilleurs, None), (self.premiers, None),
+                                  (self.seconds, None), (self.niveau, 0)):
+                tableau.append(vide)
+            self.sans.append(plateau.san(coup))
+            self.coups.append(uci)
+            plateau.push(coup)
+            self.trait.append(plateau.turn == chess.WHITE)
+            self.finie.append(plateau.is_game_over())
+            self.fens.append(plateau.fen())
+        if not self.en_cours and not self._stop:
+            self.demarrer()
+
+    def finir_le_suivi(self):
+        """La partie est finie : l'analyse se termine quand tout est vu."""
+        self.suivi = False
+        if not self.en_cours and not self.terminee():
+            self.demarrer()
+
     # ------------------------------------------------------------------ pilotage
 
     def demarrer(self):
-        if self.en_cours or self.terminee():
+        if self.en_cours or (self.terminee() and not self.suivi):
             return False
         self._stop = False
         self.en_cours = True
@@ -178,7 +230,7 @@ class AnalyseurPartie:
                 if 0 <= k < n and self.niveau[k] < 2:
                     return k, self.niveau[k] + 1
         for niveau in (1, 2):
-            for k in range(n):
+            for k in range(min(n, len(self.niveau))):
                 if self.niveau[k] < niveau:
                     return k, niveau
         return None
@@ -187,7 +239,8 @@ class AnalyseurPartie:
         if self._moteur_fourni is not None:
             return self._moteur_fourni
         import moteurs
-        return moteurs.moteur_d_analyse(self.chemin, threads=None, hash_mb=256)
+        return moteurs.moteur_d_analyse(self.chemin, threads=self.threads,
+                                        hash_mb=HASH_ANALYSE_MB)
 
     def _travailler(self):
         try:
@@ -197,6 +250,9 @@ class AnalyseurPartie:
             while not self._stop:
                 suivant = self._prochaine()
                 if suivant is None:
+                    if self.suivi:
+                        time.sleep(0.15)      # on attend le coup suivant
+                        continue
                     break
                 self._analyser(moteur, *suivant)
         except Exception as e:
@@ -344,6 +400,13 @@ class AnalyseurPartie:
 
         chances_avant, chances_apres = du_joueur(avant), du_joueur(apres)
         perte = max(0.0, chances_avant - chances_apres)
+        # La meme perte, en PIONS (point de vue du joueur, bornee a 15) : une
+        # dame donnee reste une gaffe meme quand les chances de gagner
+        # bougeaient peu (position deja tres desequilibree).
+        signe = 1.0 if blancs else -1.0
+        borne = lambda v: max(-BORNE_PIONS, min(BORNE_PIONS, signe * v))
+        perte_pions = max(0.0, borne(avant) - borne(apres))
+        apres_pions = borne(apres)
         ecart = None
         if self.premiers[i] is not None and self.seconds[i] is not None:
             ecart = max(0.0, du_joueur(self.premiers[i])
@@ -361,7 +424,8 @@ class AnalyseurPartie:
             theorique=theorique, chances_avant=chances_avant,
             chances_apres=chances_apres, ecart_second=ecart,
             evident=annotations.coup_evident(plateau, coup, dernier),
-            meilleur_connu=bool(meilleur))
+            meilleur_connu=bool(meilleur),
+            perte_pions=perte_pions, apres_pions=apres_pions)
         return {"pret": True, "note": note, "perte": perte,
                 "chances_avant": chances_avant,
                 "est_le_meilleur": est_le_meilleur}

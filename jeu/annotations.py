@@ -244,9 +244,57 @@ def coup_evident(plateau_avant, coup, dernier_coup=None):
     return False
 
 
+# ---------------------------------------------------------------------------
+# SICKCHESS 17/10 - LE MATERIEL COMPTE AUSSI (remarque de Julien : "le bot a
+# donne une dame, ca a compte comme une imprecision").
+#
+# Les chances de gagner (methode lichess) ecrasent les fautes quand la position
+# est deja tres desequilibree : de 15 % a 3 %, donner sa dame ne "coute" que
+# 12 points, donc une imprecision. Pour un jeu de competition, ce n'est pas ce
+# qu'on attend. On regarde donc AUSSI la perte en pions (evaluation bornee a
+# 15) : la pastille prend la plus severe des deux lectures.
+#   perte >= 1 pion  -> au moins Imprecision
+#   perte >= 2 pions -> au moins Erreur
+#   perte >= 4 pions -> Gaffe
+# Exception : si la position reste ECRASANTE apres le coup (+5 ou plus pour le
+# joueur), on ne monte pas au-dela d'Imprecision : rendre un peu de son
+# avance quand on gagne largement n'est pas une gaffe.
+PIONS_IMPRECISION = 1.0
+PIONS_ERREUR = 2.0
+PIONS_GAFFE = 4.0
+TOUJOURS_ECRASANT = 5.0
+GRAVITE = {"imprecision": 1, "erreur": 2, "manque": 3, "gaffe": 4}
+
+
 def classer(perte, est_le_meilleur=False, sacrifice=False,
             theorique=False, chances_avant=None, chances_apres=None,
-            ecart_second=None, evident=False, meilleur_connu=None):
+            ecart_second=None, evident=False, meilleur_connu=None,
+            perte_pions=None, apres_pions=None):
+    """Pastille d'un coup : chances de gagner ET materiel (voir plus haut)."""
+    note = _classer_chances(perte, est_le_meilleur, sacrifice, theorique,
+                            chances_avant, chances_apres, ecart_second,
+                            evident, meilleur_connu)
+    if note is None or perte_pions is None or note == "theorique" \
+            or est_le_meilleur:
+        return note
+    if perte_pions >= PIONS_GAFFE:
+        selon_pions = "gaffe"
+    elif perte_pions >= PIONS_ERREUR:
+        selon_pions = "erreur"
+    elif perte_pions >= PIONS_IMPRECISION:
+        selon_pions = "imprecision"
+    else:
+        return note
+    if apres_pions is not None and apres_pions >= TOUJOURS_ECRASANT:
+        selon_pions = "imprecision"
+    if GRAVITE.get(selon_pions, 0) > GRAVITE.get(note, 0):
+        return selon_pions
+    return note
+
+
+def _classer_chances(perte, est_le_meilleur=False, sacrifice=False,
+                     theorique=False, chances_avant=None, chances_apres=None,
+                     ecart_second=None, evident=False, meilleur_connu=None):
     """Nom de la pastille pour un coup. perte = points de chances perdus.
 
     V7.2 : deux entrees de plus, toutes optionnelles, donc les anciens appels

@@ -518,7 +518,8 @@ class BoardRender:
                     break
                 x = zone.x + ui.t(8, ech) + largeur_num + demi * colonne
                 dernier = index == len(sans) - 1
-                ui.texte(plateau.screen, sans[index], x, y, taille,
+                import notation
+                ui.texte(plateau.screen, notation.afficher(sans[index]), x, y, taille,
                          t["accent"] if dernier else t["texte"],
                          gras=dernier, largeur_max=colonne - ui.t(6, ech))
                 self._zones_coups.append(

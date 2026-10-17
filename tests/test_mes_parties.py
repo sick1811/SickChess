@@ -184,7 +184,7 @@ capture("capture_mes_parties_vide.png")
 print("8. Relecture coup par coup")
 ecran = pygame.display.set_mode((1024, 640))
 rv = EcranRevoir(ecran, r["partie"], Disposition(1024, 640))
-verifier(rv.index == 7 and rv.plateau.board.is_checkmate(), "s'ouvre sur le mat final")
+verifier(rv.index == 0 and rv.plateau.board.fen() == chess.STARTING_FEN, "s'ouvre sur la position de depart")
 rv.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_HOME, mod=0, unicode=""))
 verifier(rv.plateau.board.fen() == chess.STARTING_FEN, "Debut = position initiale")
 for _ in range(3):

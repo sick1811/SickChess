@@ -56,7 +56,8 @@ def avec_article(piece, possessif=False):
 def _san(plateau, coup):
     """La notation courte d'un coup, sans jamais lever d'exception."""
     try:
-        return plateau.san(coup)
+        import notation
+        return notation.afficher(plateau.san(coup))
     except Exception:
         try:
             return coup.uci()

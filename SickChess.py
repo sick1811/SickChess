@@ -33,6 +33,48 @@ if getattr(sys, "frozen", False):
 else:
     RACINE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(RACINE)
+
+
+class _Journal:
+    """Recopie tout ce que le jeu affiche dans journal_du_jeu.txt (a la racine).
+
+    Le fichier est remis a zero a chaque lancement. Apres un test, Claude peut
+    le lire pour voir les erreurs, meme si la console s'est refermee.
+    """
+
+    def __init__(self, flux, fichier):
+        self.flux = flux
+        self.fichier = fichier
+
+    def write(self, texte):
+        try:
+            self.fichier.write(texte)
+            self.fichier.flush()
+        except Exception:
+            pass
+        try:
+            return self.flux.write(texte)
+        except Exception:
+            return len(texte)
+
+    def flush(self):
+        try:
+            self.flux.flush()
+        except Exception:
+            pass
+
+    def isatty(self):
+        return False
+
+
+try:
+    _fichier_journal = open(os.path.join(RACINE, "journal_du_jeu.txt"), "w",
+                            encoding="utf-8", errors="replace")
+    sys.stdout = _Journal(sys.stdout, _fichier_journal)
+    sys.stderr = _Journal(sys.stderr, _fichier_journal)
+except OSError:
+    pass
+
 DOSSIER_CODE = os.path.join(RACINE, "jeu")
 for chemin in (DOSSIER_CODE, getattr(sys, "_MEIPASS", None)):
     if chemin and chemin not in sys.path:

@@ -15,6 +15,7 @@ import pygame
 import apparence
 import historique_parties
 import retournement
+import notation
 import ui
 from board import ChessBoard
 
@@ -69,7 +70,7 @@ class EcranRevoir:
         self.btn_retour = ui.Bouton((0, 0, 10, 10), "Retour", "retour")
         self.boutons = self.boutons_nav + [self.btn_retourner, self.btn_retour]
         self._placer()
-        self.aller_a(len(self.coups), son=False)     # on ouvre sur la fin
+        self.aller_a(0, son=False)     # SickChess 17/10 : on ouvre sur le depart
 
     # ------------------------------------------------------------- position
 
@@ -279,7 +280,7 @@ class EcranRevoir:
                 if courant:
                     pygame.draw.rect(ecran, t["accent"], rect,
                                      border_radius=int(6 * ech))
-                ui.texte(ecran, self.sans[index], rect.x + int(4 * ech), y, taille,
+                ui.texte(ecran, notation.afficher(self.sans[index]), rect.x + int(4 * ech), y, taille,
                          t["fond"] if courant else t["texte"], gras=courant,
                          largeur_max=rect.width - int(6 * ech))
                 self.rects_coups.append((rect, index))

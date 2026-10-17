@@ -22,6 +22,7 @@ import annotations
 import apparence
 import board_geometry as geo
 import retournement
+import notation
 import ui
 from board import ChessBoard
 from layout import MARGE, Disposition
@@ -104,7 +105,9 @@ class EcranRevue:
         self.boutons = self.boutons_nav + [self.btn_retourner, self.btn_retour]
         self._placer()
         self.analyseur.demarrer()
-        self.aller_a(len(self.coups), son=False)    # on ouvre sur la fin
+        # SickChess 17/10 (remarque de Julien) : la revue s'ouvre sur la
+        # position de depart ; la fleche droite montre le coup 1.
+        self.aller_a(0, son=False)
 
     # ------------------------------------------------------------- position
 
@@ -389,7 +392,7 @@ class EcranRevue:
             return "Coup de théorie (ouverture connue)"
         if cle in NOTES_A_CORRIGER:
             meilleur = infos.get("meilleur_san")
-            return ("%s. Il fallait jouer %s" % (nom, meilleur)) if meilleur else nom
+            return ("%s. Il fallait jouer %s" % (nom, notation.afficher(meilleur))) if meilleur else nom
         if infos.get("est_le_meilleur"):
             return "%s : le coup de Stockfish" % nom
         return nom
@@ -419,7 +422,7 @@ class EcranRevue:
             decalage = 2 * rayon + int(8 * ech)
         trait = "." if infos["par_les_blancs"] else "..."
         titre = "%d%s %s" % (infos["numero"] + self.numero_depart - 1, trait,
-                             infos["san"])
+                             notation.afficher(infos["san"]))
         r = ui.texte(ecran, titre, x + decalage, y, grande, t["texte"], gras=True,
                      largeur_max=l - decalage)
         ui.texte(ecran, infos["texte_evaluation"], zone.right - int(10 * ech), y,
@@ -437,7 +440,7 @@ class EcranRevue:
         suivant = self.analyseur.san_du_meilleur(self.index)
         if suivant and self.index < len(self.coups) + 1 \
                 and not self.plateau.board.is_game_over():
-            ui.texte(ecran, "Meilleur coup maintenant : %s" % suivant, x, y,
+            ui.texte(ecran, "Meilleur coup maintenant : %s" % notation.afficher(suivant), x, y,
                      petite, t["texte_discret"], largeur_max=l)
 
     # --- la courbe : position 0 a gauche, derniere position a droite.
@@ -517,7 +520,7 @@ class EcranRevue:
                                                   ui.police(max(9, rayon + 2), True))
                 else:
                     annotations.dessiner_pastille_en_attente(ecran, centre, rayon - 1)
-                ui.texte(ecran, self.sans[index],
+                ui.texte(ecran, notation.afficher(self.sans[index]),
                          centre[0] + rayon + int(5 * ech), y, taille,
                          t["fond"] if courant else t["texte"], gras=courant,
                          largeur_max=rect.right - centre[0] - rayon - int(6 * ech))

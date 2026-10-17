@@ -8,6 +8,12 @@
   fonction est réintégrée une par une dans SickChess, nettoyée et testée, le jeu
   restant jouable après chaque étape.
 - **Aucune ressource sans licence vérifiée** (voir docs/CREDITS.md).
+- **Les vérifications de Julien se cochent dans la page « SickChess – À faire »**
+  (https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5, collection `taches`) : y ajouter les
+  nouvelles tâches à tester au lieu de cases `- [ ]` ici, et la relire pour savoir ce qui est fait.
+- **Règle de Julien (17/10) : à CHAQUE séance de code, ajouter dans cette page les tests de la
+  séance** (statut Fonctionne / Ne fonctionne pas + commentaire, champ `etape` = date · sujet).
+  Le jeu écrit `journal_du_jeu.txt` à chaque lancement : le lire après ses tests.
 
 ## 16/10/2026 – Étape 1 : le noyau (version 0.1.0)
 Fait :
@@ -178,6 +184,9 @@ Fait :
 - [ ] Menu → Problèmes → Mode classé : en faire une dizaine (glisser, clic-clic, H).
 - [ ] Écouter les deux nouveaux sons (trouvé / pas le bon coup).
 - [ ] Dire si l'enchaînement automatique après une réussite (0,9 s) est trop rapide.
+- 17/10 – **Bug corrigé : promotion impossible dans les problèmes.** Le choix de la pièce
+  (Dame / Tour / Fou / Cavalier) s'ouvrait mais n'était pas dessiné sur cet écran, et le
+  clic suivant l'annulait. Testé (glisser et clic-clic) dans `tests/test_problemes.py`.
 
 ## 16/10/2026 – Étape 3 : direction artistique « Onyx & Or » (conversation graphisme)
 Choix de Julien dans les deux pages « Atelier SickChess » (voir `assets_src/atelier/`) :
@@ -243,10 +252,44 @@ Question ouverte : les coups sont écrits en notation anglaise (Nf3, Bc4, Qh5) a
 est en français. Trois choix : notation française (Cf3, Fc4, Dh5), notation par figurines
 (petite icône de pièce + case, lisible dans toutes les langues, comme chess.com), ou garder l'anglais.
 
+## 17/10/2026 – Retours de Julien (page de test) : son, revue, notation
+Retours lus dans la page « SickChess – À faire » et traités :
+- **Son (aucun son chez Julien)** : le code charge bien les sons (déjà vrai en V8 : « 19/19
+  bruitages chargés ») mais rien ne sort, donc la cause est probablement côté Windows (sortie
+  audio, mélangeur de volume). Ajouts : `TESTER_LE_SON.bat` + `outils/diagnostic_son.py`
+  (joue 3 sons, écrit `diagnostic_son.txt`) ; tampon audio 1024 au lieu de 512 et nouvel essai
+  si le lecteur audio ne démarre pas (`game_manager._verifier_le_son`) ; **journal automatique**
+  `journal_du_jeu.txt` (tout ce que le jeu affiche, remis à zéro à chaque lancement).
+- **Revue « trop imprécise » (une dame donnée comptée comme imprécision)** :
+  - le jugement tient compte du **matériel** en plus des chances de gagner
+    (`annotations.classer`) : ≥ 1 pion perdu = au moins imprécision, ≥ 2 = erreur, ≥ 4 = gaffe,
+    sauf si la position reste écrasante (+5) ; le coup du moteur n'est jamais puni ;
+  - **moteur plus fort** : profondeurs 16 / 20 / 24 (normale = 20 par défaut), survol à 12,
+    table de hachage 1 Go ;
+  - **tables de finales Syzygy** copiées dans `syzygy/` (379 Mo, hors GitHub) : le moteur
+    d'analyse les branche tout seul ;
+  - **analyse pendant la partie** (demande de Julien) : Stockfish analyse en tâche de fond, sur la
+    moitié des cœurs, sans rien afficher ; la carte de fin et la revue reprennent ce travail
+    (`game_manager._suivre_analyse`, `AnalyseurPartie(suivi=True).ajouter_coups`).
+    `"analyse_pendant_partie": false` dans config.json la coupe.
+- **Revue et relecture s'ouvrent sur la position de départ** (et non plus sur le dernier coup).
+- **Notation des coups au choix** : Options → Partie → Notation des coups, **anglaise par défaut**,
+  française (Cf3, Fc4, Dh5) en option. Nouveau `jeu/notation.py`, appliqué à la liste des coups,
+  la revue, la relecture, les problèmes et les explications. PGN et analyse restent en anglais.
+- **Problèmes – promotion** : pas reproduit. Nouveau test avec les Noirs qui promeuvent (plateau
+  retourné), en glissant et en cliquant : ça fonctionne. Julien précisera s'il revoit le bug.
+- Décisions notées : garder Syzygy ; jeu « ultra compétitif » → analyse puissante et précise.
+- Tests : nouveau `tests/test_analyse_directe.py` (22 contrôles, avec un vrai Stockfish) ;
+  `test_problemes.py` + promotion des Noirs ; 234 contrôles au vert au total.
+
+Tests ajoutés pour Julien dans la page (étapes « 17/10 · … ») : test du son, son en partie,
+précision immédiate en fin de partie, gaffes justes, revue au début, notation, vitesse de
+l'adversaire, promotion.
+
 ## Bugs connus (repris de « a debug.txt »)
 - [x] Pendule ne clignote pas à 30 s → fonctionne (testé).
 - [x] Fin de partie à 00:00 → corrigé (affichage du temps final).
-- [ ] Son « coupé » : à confirmer à l'oreille avec les nouveaux sons.
+- [ ] Son : aucun son chez Julien → diagnostic `TESTER_LE_SON.bat` (17/10).
 - [ ] Animation lente (réglable : `vitesse_animation` dans config.json, 0.18 s).
 - [ ] Temps de réflexion de Stockfish pas assez humain.
 - [x] Organisation de la fenêtre de jeu : disposition « Classique » retenue (plateau à gauche, panneau à droite).

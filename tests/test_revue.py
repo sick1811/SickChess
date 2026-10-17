@@ -100,7 +100,7 @@ verifier(annotations.est_un_sacrifice(p2, p2.parse_san("Bxf7+")),
 
 print("4. Ecran de revue")
 r = EcranRevue(ecran, a, {"theme_plateau": "marron"}, ("Toi", "Ordinateur"), "0-1")
-verifier(r.index == len(PARTIE), "s'ouvre sur la fin de la partie")
+verifier(r.index == 0, "s'ouvre sur la position de depart")
 for touche in (pygame.K_HOME, pygame.K_RIGHT, pygame.K_RIGHT, pygame.K_LEFT):
     r.handle_event(pygame.event.Event(pygame.KEYDOWN, key=touche))
 verifier(r.index == 1, "fleches et Debut : coup 1 (%d)" % r.index)

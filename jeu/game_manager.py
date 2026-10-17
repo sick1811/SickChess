@@ -34,8 +34,11 @@ TAILLE_MINI = ui.TAILLE_MINI
 
 class GameManager:
     def __init__(self, version=""):
-        pygame.mixer.pre_init(44100, -16, 2, 512)
+        # Tampon de 1024 (et non 512) : sur certaines cartes son Windows, un
+        # tampon trop petit donne un jeu muet sans aucune erreur.
+        pygame.mixer.pre_init(44100, -16, 2, 1024)
         pygame.init()
+        self._verifier_le_son()
         self.version = version
 
         self.plein_ecran = False
@@ -66,6 +69,23 @@ class GameManager:
             self.screen = ui.basculer_plein_ecran()
             self.plein_ecran = True
             self._appliquer_taille(*self.screen.get_size())
+
+    def _verifier_le_son(self):
+        """Si le lecteur audio n'a pas demarre avec pygame.init(), on reessaie
+        avec les reglages par defaut de la carte son, et on l'ecrit au journal."""
+        if not pygame.mixer.get_init():
+            for essai in ({"frequency": 48000, "size": -16, "channels": 2, "buffer": 2048}, {}):
+                try:
+                    pygame.mixer.init(**essai)
+                    break
+                except pygame.error as e:
+                    print("[SONS] demarrage audio rate (%s) : %s" % (essai or "defaut", e))
+        print("[SONS] lecteur audio : %s" % (pygame.mixer.get_init(),))
+        try:
+            from pygame._sdl2 import audio as sdl_audio
+            print("[SONS] sorties audio : %s" % sdl_audio.get_audio_device_names(False))
+        except Exception:
+            pass
 
     def _poser_icone(self):
         """L'icone Onyx & Or (assets/icone.png, fabriquee par outils/generer_logo.py)."""
@@ -382,6 +402,7 @@ class GameManager:
                 self._partie_terminee()
             else:
                 self.sauvegardeur.peut_etre(self.board, self.game_mode, self.reglages)
+                self._suivre_analyse()
 
             self.board.draw()
             self.aide.draw(self.screen, self.board.theme_plateau)
@@ -400,13 +421,60 @@ class GameManager:
             print("[PROFIL] partie non enregistree : %s" % e)
             infos = None
         self.board.end_screen.ligne_classement = texte_classement(infos)
-        # La revue de partie : l'analyse demarre tout de suite, en tache de
-        # fond, pour que la precision s'affiche sur la carte de fin.
+        # La revue de partie : l'analyse faite PENDANT la partie est reprise
+        # telle quelle (rien a recalculer) ; sinon elle demarre maintenant.
+        direct = getattr(self, "analyse_en_direct", None)
+        if direct is not None and getattr(direct, "plateau_id", None) == id(self.board):
+            self._suivre_analyse(force=True)
+            direct.finir_le_suivi()
+            self.board.end_screen.analyseur = direct
+            self.analyse_en_direct = None
         try:
             self.board.end_screen.lancer_analyse(
                 self.stockfish_path, self.config.get("analyse_puissance"))
         except Exception as e:
             print("[ANALYSE] non lancee : %s" % e)
+
+    # ---------------------------------------------------- analyse en direct
+
+    def _suivre_analyse(self, force=False):
+        """SickChess 17/10 (demande de Julien) : Stockfish analyse la partie
+        PENDANT qu'on joue, sans rien afficher. A la fin, la precision et la
+        revue sont pretes tout de suite. Moitie des coeurs seulement, pour ne
+        pas ralentir l'adversaire. "analyse_pendant_partie": false la coupe."""
+        if self.game_mode not in ("stockfish", "hotseat"):
+            return
+        if not self.config.get("analyse_pendant_partie", True):
+            return
+        historique = getattr(self.board, "move_history", None)
+        if historique is None:
+            return
+        maintenant = pygame.time.get_ticks()
+        if not force and maintenant < getattr(self, "_prochain_suivi", 0):
+            return
+        self._prochain_suivi = maintenant + 250
+        coups = list(historique.moves)
+        a = getattr(self, "analyse_en_direct", None)
+        if a is not None and (getattr(a, "plateau_id", None) != id(self.board)
+                              or a.nombre_de_coups() > len(coups)):
+            a.arreter()
+            a = None
+        if a is None:
+            if not coups:
+                return
+            from analyse_partie import AnalyseurPartie
+            try:
+                coeurs = os.cpu_count() or 2
+            except Exception:
+                coeurs = 2
+            a = AnalyseurPartie(historique.fen_initiale, coups, self.stockfish_path,
+                                self.config.get("analyse_puissance"), suivi=True,
+                                threads=max(1, coeurs // 2))
+            a.plateau_id = id(self.board)
+            a.demarrer()
+            self.analyse_en_direct = a
+        elif len(coups) > a.nombre_de_coups():
+            a.ajouter_coups(coups[a.nombre_de_coups():])
 
     # ------------------------------------------------------------------ revue
 
@@ -438,6 +506,10 @@ class GameManager:
     # ------------------------------------------------------------------ arret
 
     def cleanup_game(self):
+        direct = getattr(self, "analyse_en_direct", None)
+        if direct is not None:
+            direct.arreter()
+            self.analyse_en_direct = None
         fin = getattr(self.board, "end_screen", None) if self.board else None
         if fin is not None and getattr(fin, "analyseur", None) is not None:
             fin.analyseur.arreter()

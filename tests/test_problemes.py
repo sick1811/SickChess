@@ -214,6 +214,72 @@ charger(e, mat)
 avancer(e)
 verifier(p.make_move(coup("a1a8")) and e.fini, "Ta8# accepte alors que la base attend Tb8#")
 
+print("== Promotion")
+promo = {"id": "test_promo", "classement": 1000, "themes": ["promotion"],
+         "fen": "7k/P7/8/8/8/8/6p1/K7 b - - 0 1", "coups": ["h8g8", "a7a8q"]}
+for maniere in ("glisser", "clic"):
+    charger(e, promo)
+    avancer(e)
+    e.fondu_debut = -100000
+    import board_geometry as geo
+    def centre(case):
+        x, y = geo.case_vers_pixel(case, p.SQ_SIZE, p.flipped)
+        return (x + p.SQ_SIZE // 2, y + p.SQ_SIZE // 2)
+    E = pygame.event.Event
+    e.handle_event(E(pygame.MOUSEBUTTONDOWN, button=1, pos=centre(chess.A7)))
+    if maniere == "glisser":
+        e.handle_event(E(pygame.MOUSEMOTION, pos=centre(chess.A8), rel=(0, 0), buttons=(1, 0, 0)))
+        e.handle_event(E(pygame.MOUSEBUTTONUP, button=1, pos=centre(chess.A8)))
+    else:
+        e.handle_event(E(pygame.MOUSEBUTTONUP, button=1, pos=centre(chess.A7)))
+        e.handle_event(E(pygame.MOUSEBUTTONDOWN, button=1, pos=centre(chess.A8)))
+        e.handle_event(E(pygame.MOUSEBUTTONUP, button=1, pos=centre(chess.A8)))
+    verifier(p.promotion.est_actif(), "%s : le choix de la piece s'ouvre" % maniere)
+    ecran.fill((0, 0, 0))
+    e.draw()
+    rect_dame = p.promotion.cases[0][0]
+    if maniere == "glisser":
+        pygame.image.save(ecran, "tests/capture_problemes_promotion.png")
+    visible = tuple(ecran.get_at((rect_dame.x + 2, rect_dame.y + 2)))[:3]
+    verifier(visible in ((248, 246, 242), (255, 232, 170), (60, 48, 36)),
+             "%s : le choix est dessine a l'ecran %s" % (maniere, visible))
+    e.handle_event(E(pygame.MOUSEBUTTONDOWN, button=1, pos=rect_dame.center))
+    e.handle_event(E(pygame.MOUSEBUTTONUP, button=1, pos=rect_dame.center))
+    verifier(e.fini and e.reussi and p.board.piece_at(chess.A8) == chess.Piece(chess.QUEEN, chess.WHITE),
+             "%s : a8=D accepte, probleme reussi" % maniere)
+charger(e, promo)
+avancer(e)
+verifier(not e.juger(coup("a7a8r")), "sous-promotion en tour refusee (la base attend la dame)")
+
+# SickChess 17/10 (remarque de Julien : "probleme de promotion du pion") :
+# meme chose avec les NOIRS qui promeuvent, plateau retourne.
+promo_noirs = {"id": "test_promo_noirs", "classement": 1000, "themes": ["promotion"],
+               "fen": "k7/8/8/8/8/8/p6P/7K w - - 0 1", "coups": ["h2h3", "a2a1q"]}
+for maniere in ("glisser", "clic"):
+    charger(e, promo_noirs)
+    avancer(e)
+    e.fondu_debut = -100000
+    E = pygame.event.Event
+    verifier(p.flipped, "%s (Noirs) : plateau retourne" % maniere)
+    e.handle_event(E(pygame.MOUSEBUTTONDOWN, button=1, pos=centre(chess.A2)))
+    if maniere == "glisser":
+        e.handle_event(E(pygame.MOUSEMOTION, pos=centre(chess.A1), rel=(0, 0), buttons=(1, 0, 0)))
+        e.handle_event(E(pygame.MOUSEBUTTONUP, button=1, pos=centre(chess.A1)))
+    else:
+        e.handle_event(E(pygame.MOUSEBUTTONUP, button=1, pos=centre(chess.A2)))
+        e.handle_event(E(pygame.MOUSEBUTTONDOWN, button=1, pos=centre(chess.A1)))
+        e.handle_event(E(pygame.MOUSEBUTTONUP, button=1, pos=centre(chess.A1)))
+    verifier(p.promotion.est_actif(), "%s (Noirs) : le choix de la piece s'ouvre" % maniere)
+    ecran.fill((0, 0, 0))
+    e.draw()
+    if maniere == "glisser":
+        pygame.image.save(ecran, "tests/capture_problemes_promotion_noirs.png")
+    rect_dame = p.promotion.cases[0][0]
+    e.handle_event(E(pygame.MOUSEBUTTONDOWN, button=1, pos=rect_dame.center))
+    e.handle_event(E(pygame.MOUSEBUTTONUP, button=1, pos=rect_dame.center))
+    verifier(e.fini and e.reussi and p.board.piece_at(chess.A1) == chess.Piece(chess.QUEEN, chess.BLACK),
+             "%s (Noirs) : a1=D accepte, probleme reussi" % maniere)
+
 print("== Dessin a plusieurs tailles")
 charger(e, probleme)
 avancer(e)

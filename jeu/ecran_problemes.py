@@ -27,6 +27,7 @@ import pygame
 import apparence
 import explication_puzzle
 import puzzles
+import notation
 import ui
 from board import ChessBoard
 from layout import Disposition
@@ -446,7 +447,7 @@ class EcranProblemes:
 
     def solution_lisible(self):
         """'Dxh7+ Rxh7 Th3#' (sans le coup d'ouverture de l'adversaire)."""
-        return " ".join(san for san, _ in self.solution[1:])
+        return " ".join(notation.afficher(san) for san, _ in self.solution[1:])
 
     # ---------------------------------------------------------------- navigation
 
@@ -505,6 +506,10 @@ class EcranProblemes:
 
     def _evenement_jeu(self, event):
         p = self.plateau
+        # Le choix de la piece de promotion capte tout tant qu'il est ouvert.
+        if p.promotion.est_actif():
+            p.handle_event(event)
+            return None
         action = None
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -653,6 +658,10 @@ class EcranProblemes:
         if age < DUREE_FONDU:
             ui.voile(ecran, rect_plateau, int(255 * (1 - age / float(DUREE_FONDU))),
                      t["fond"])
+        # Le choix de la piece de promotion : dessiner_plateau() ne le fait pas
+        # (c'est draw() de la partie qui s'en charge) - sans cette ligne il
+        # etait invisible ici et le clic suivant l'annulait.
+        p.promotion.draw(ecran)
         self._dessiner_panneau(t)
 
     def _dessiner_panneau(self, t):
@@ -743,6 +752,7 @@ class EcranProblemes:
         numero = depart.fullmove_number
         trait = depart.turn
         for i, (san, _uci) in enumerate(self.solution):
+            san = notation.afficher(san)
             libelle = ("%d. %s" % (numero, san)) if trait == chess.WHITE \
                 else ("%d... %s" % (numero, san) if i == 0 else san)
             if trait == chess.BLACK:

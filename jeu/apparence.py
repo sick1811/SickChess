@@ -371,6 +371,7 @@ DEFAUTS = {
     "timbre_voix": "naturelle",     # dix timbres, voir explication_puzzle.py
     "premouvement": True,
     "volume_sons": 0.6,
+    "notation": "anglaise",         # ou "francaise" (Cf3, Fc4...) : notation.py
 }
 
 _PREFERENCES = None

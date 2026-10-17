@@ -30,3 +30,8 @@ tests/ecrans/
 
 # Restes de tests
 *.test_bak
+
+# Journaux de test (lus par Claude, pas envoyes sur GitHub)
+journal_du_jeu.txt
+diagnostic_son.txt
+partie_en_cours.json
