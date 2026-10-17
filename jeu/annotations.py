@@ -46,9 +46,9 @@ PASTILLES = {
     "excellent":  ("Excellent",      (149, 191, 96), "coche"),
     "theorique":  ("Theorique",      (166, 138, 100), "livre"),
     "meilleur":   ("Meilleur",       (106, 173, 48), "etoile"),
-    "tres_bon":   ("Tres bien",      (92, 155, 214), "!"),
+    "tres_bon":   ("Très bien",      (92, 155, 214), "!"),
     "bon":        ("Bon",            (168, 173, 148), "rond"),
-    "imprecision": ("Imprecision",   (247, 198, 49), "?!"),
+    "imprecision": ("Imprécision",   (247, 198, 49), "?!"),
     "erreur":     ("Erreur",         (229, 143, 42), "?"),
     "manque":     ("Manque",         (214, 84, 92), "X"),
     "gaffe":      ("Gaffe",          (202, 52, 49), "??"),
@@ -166,7 +166,14 @@ def perte_en_chances(eval_avant, eval_apres, joue_par_les_blancs):
 
 
 def est_un_sacrifice(plateau_avant, coup):
-    """Le coup abandonne-t-il du materiel ? (pour reperer les coups brillants)"""
+    """Le coup abandonne-t-il vraiment du materiel ? (coups brillants)
+
+    SickChess : la piece doit etre REELLEMENT en prise apres le coup - soit
+    elle n'est pas defendue, soit l'adversaire peut la prendre avec une piece
+    nettement moins chere. Avant, une piece simplement attaquee comptait comme
+    un sacrifice, meme defendue par un pion (Cc3 dans le Fegatello etait note
+    "Brillant").
+    """
     if plateau_avant is None or coup is None:
         return False
     try:
@@ -176,10 +183,20 @@ def est_un_sacrifice(plateau_avant, coup):
         prise = plateau_avant.piece_at(coup.to_square)
         gain = VALEUR_PIECE.get(prise.piece_type, 0) if prise else 0
         risque = VALEUR_PIECE.get(deplacee.piece_type, 0)
+        if coup.promotion:
+            risque = VALEUR_PIECE.get(coup.promotion, 0)
         if risque - gain < 2:
             return False
-        # La case d'arrivee est-elle defendue par l'adversaire ?
-        return plateau_avant.is_attacked_by(not deplacee.color, coup.to_square)
+        apres = plateau_avant.copy(stack=False)
+        apres.push(coup)
+        attaquants = apres.attackers(not deplacee.color, coup.to_square)
+        if not attaquants:
+            return False
+        if not apres.attackers(deplacee.color, coup.to_square):
+            return True                     # en prise, et personne ne defend
+        moins_chere = min(VALEUR_PIECE.get(apres.piece_at(case).piece_type, 0)
+                          or 100 for case in attaquants)   # le roi : 100
+        return risque - moins_chere >= 2
     except Exception:
         return False
 

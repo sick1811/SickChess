@@ -98,6 +98,12 @@ def main():
                                          note(392, 1.0, 3))), 0.7)
     for nom in ("stalemate", "repetition", "fifty_moves"):
         ecrire(nom, suite(note(659, 0.2, 8), note(587, 0.6, 4)), 0.55)
+    # Problemes : trouve (deux notes qui montent) / pas le bon coup (une note
+    # grave qui descend, douce : on se trompe souvent, ca ne doit pas agacer).
+    ecrire("puzzle_reussi", suite(note(784, 0.09, 16),
+                                  superposer(note(1175, 0.32, 8),
+                                             note(1568, 0.32, 9) * 0.4)), 0.55)
+    ecrire("puzzle_faux", suite(note(330, 0.1, 14), note(262, 0.22, 10)), 0.5)
     print("Sons ecrits dans", DOSSIER)
 
 

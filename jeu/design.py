@@ -42,23 +42,26 @@ import pygame
 # L'ARDOISE, du plus sombre au plus clair. Chaque cran est un pas visible : on
 # peut poser deux surfaces voisines et voir la limite sans bordure.
 ARDOISE = {
-    950: (18, 20, 25),      # le fond de la fenetre
-    900: (24, 27, 33),      # les grandes zones
-    850: (30, 34, 42),      # les panneaux
-    800: (38, 43, 52),      # les panneaux poses SUR un panneau
-    700: (52, 58, 70),      # les bordures
-    600: (74, 82, 96),      # les bordures qui doivent se voir
-    500: (110, 119, 136),   # le texte secondaire sombre
-    400: (147, 156, 172),   # le texte secondaire
-    300: (186, 193, 205),   # le texte courant sur fond clair
-    200: (214, 219, 227),   # les cases claires du plateau
-    100: (233, 236, 241),   # le texte principal
+    # SickChess - direction artistique « Onyx & Or » (choix de Julien, 16/10) :
+    # des noirs d'onyx a peine chauds au lieu des gris bleutes de la V8.
+    950: (11, 11, 12),      # le fond de la fenetre
+    900: (17, 17, 19),      # les grandes zones
+    850: (24, 24, 27),      # les panneaux
+    800: (33, 33, 37),      # les panneaux poses SUR un panneau
+    700: (48, 47, 52),      # les bordures
+    600: (72, 70, 74),      # les bordures qui doivent se voir
+    500: (112, 108, 104),   # le texte secondaire sombre
+    400: (152, 146, 138),   # le texte secondaire
+    300: (192, 186, 176),   # le texte courant sur fond clair
+    200: (222, 217, 208),   # les cases claires du plateau
+    100: (243, 240, 232),   # le texte principal
 }
 
 # LES ACCENTS. Un seul est actif a la fois - c'est le point 1 des trois regles.
 # Ils sont choisis pour rester lisibles sur ARDOISE[850] : un accent qu'il faut
 # plisser les yeux pour lire n'est pas un accent, c'est une decoration.
 ACCENTS = {
+    "or":     {"nom": "Or",     "vif": (214, 176, 74),  "doux": (150, 120, 48)},
     "vert":   {"nom": "Vert",   "vif": (122, 178, 62),  "doux": (86, 128, 44)},
     "ambre":  {"nom": "Ambre",  "vif": (232, 176, 74),  "doux": (168, 124, 46)},
     "bleu":   {"nom": "Bleu",   "vif": (96, 165, 232),  "doux": (58, 112, 168)},
@@ -66,8 +69,8 @@ ACCENTS = {
     "rouge":  {"nom": "Rouge",  "vif": (226, 106, 96),  "doux": (162, 70, 62)},
     "menthe": {"nom": "Menthe", "vif": (86, 196, 168),  "doux": (52, 138, 118)},
 }
-ACCENT_PAR_DEFAUT = "vert"
-ORDRE_ACCENTS = ["vert", "ambre", "bleu", "violet", "rouge", "menthe"]
+ACCENT_PAR_DEFAUT = "or"
+ORDRE_ACCENTS = ["or", "vert", "ambre", "bleu", "violet", "rouge", "menthe"]
 
 # LES COULEURS DE SENS. Elles ne changent JAMAIS avec l'accent : le rouge d'une
 # gaffe doit vouloir dire "gaffe" quel que soit le reglage.
@@ -81,9 +84,17 @@ INFO = (96, 165, 232)
 # Les cases. Le contraste entre clair et sombre est volontairement MODERE : sur
 # un fond d'ecran sombre, un damier tres contraste fatigue au bout d'une heure.
 PLATEAUX = {
+    # SickChess : les unis d'abord (le plus lisible en competition), puis les
+    # matieres. Une matiere = une image 1024 x 1024 dans assets/plateaux/ ; ses
+    # couleurs "clair"/"sombre" sont la teinte moyenne, utilisee pour les
+    # coordonnees, les pastilles du menu Options, et si l'image manque.
+    "tournoi": {"nom": "Tournoi", "clair": (236, 237, 209),
+                "sombre": (120, 150, 90)},
+    "marbre_uni": {"nom": "Marbre", "clair": (235, 232, 227),
+                   "sombre": (159, 154, 146)},
     "ardoise": {"nom": "Ardoise", "clair": (214, 219, 227),
                 "sombre": (114, 130, 150)},
-    "foret":   {"nom": "Foret",   "clair": (233, 237, 208),
+    "foret":   {"nom": "Forêt",   "clair": (233, 237, 208),
                 "sombre": (112, 146, 84)},
     "noyer":   {"nom": "Noyer",   "clair": (232, 214, 186),
                 "sombre": (156, 118, 82)},
@@ -93,9 +104,16 @@ PLATEAUX = {
                 "sombre": (168, 152, 124)},
     "acier":   {"nom": "Acier",   "clair": (206, 214, 220),
                 "sombre": (122, 140, 152)},
+    "mat_marbre":  {"nom": "Marbre veiné", "clair": (226, 222, 214),
+                    "sombre": (156, 150, 141), "texture": "plateau_marbre.png"},
+    "mat_onyx_or": {"nom": "Onyx et or", "clair": (213, 205, 189),
+                    "sombre": (36, 34, 33), "texture": "plateau_onyx_or.png"},
+    "mat_noyer":   {"nom": "Noyer et érable", "clair": (222, 192, 150),
+                    "sombre": (104, 68, 40), "texture": "plateau_noyer.png"},
 }
-PLATEAU_PAR_DEFAUT = "ardoise"
-ORDRE_PLATEAUX = ["ardoise", "foret", "noyer", "encre", "sable", "acier"]
+PLATEAU_PAR_DEFAUT = "tournoi"
+ORDRE_PLATEAUX = ["tournoi", "marbre_uni", "ardoise", "foret", "noyer", "encre",
+                  "sable", "acier", "mat_marbre", "mat_onyx_or", "mat_noyer"]
 
 # La duree du retournement de l'echiquier, en secondes. Ici parce que c'est un
 # reglage d'apparence comme un autre, et que l'ecran d'apparence doit pouvoir la
@@ -178,6 +196,7 @@ def construire_theme(accent=ACCENT_PAR_DEFAUT, plateau=PLATEAU_PAR_DEFAUT,
         # Le damier.
         "clair": cases["clair"],
         "sombre": cases["sombre"],
+        "texture": cases.get("texture"),
         "bord": ARDOISE[700],
 
         # Les surfaces, de la plus basse a la plus haute.

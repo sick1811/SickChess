@@ -4,6 +4,8 @@
 # noyau : menu -> reglages -> partie (contre Stockfish ou a deux sur ce PC) ->
 # fin de partie -> menu. Les autres ecrans (problemes, historique, revue,
 # en ligne...) seront rebranches ici un par un, chacun dans sa propre methode.
+# Deja rebranches : Options, Mes parties et profil, reprise de partie,
+# revue de partie, problemes.
 
 import json
 import os
@@ -12,9 +14,13 @@ import sys
 import pygame
 
 import apparence
+import sauvegarde
+import partie_en_ligne
 import ui
 from board import ChessBoard
+from ecran_options import EcranOptions
 from ecran_fin import EcranFin
+from enregistrement import enregistrer_la_partie, texte_classement
 from layout import Disposition
 from menu_principal import MainMenu
 from mode_hotseat import ModeHotseat
@@ -36,6 +42,7 @@ class GameManager:
         ui.memoriser_taille(LARGEUR, HAUTEUR, False)
         self.screen = pygame.display.set_mode((LARGEUR, HAUTEUR), pygame.RESIZABLE)
         pygame.display.set_caption("SickChess")
+        self._poser_icone()
 
         self.clock = pygame.time.Clock()
         self.disposition = Disposition(LARGEUR, HAUTEUR)
@@ -50,6 +57,25 @@ class GameManager:
         self.board = None
         self.engine = None
         self.reglages = {}
+        self.reprise = None                   # partie sauvegardee a reprendre
+        self.sauvegardeur = sauvegarde.Sauvegardeur()
+        self.menu.annoncer_reprise(sauvegarde.lire() is not None,
+                                   sauvegarde.resume(sauvegarde.lire()))
+
+        if self.config.get("plein_ecran"):       # reglage de l'ecran Options
+            self.screen = ui.basculer_plein_ecran()
+            self.plein_ecran = True
+            self._appliquer_taille(*self.screen.get_size())
+
+    def _poser_icone(self):
+        """L'icone Onyx & Or (assets/icone.png, fabriquee par outils/generer_logo.py)."""
+        try:
+            from asset_manager import chemin_ressource
+            chemin = chemin_ressource("assets", "icone.png")
+            if os.path.exists(chemin):
+                pygame.display.set_icon(pygame.image.load(chemin))
+        except Exception as e:
+            print("[ICONE] %s" % e)
 
     # ------------------------------------------------------------------ config
 
@@ -96,6 +122,10 @@ class GameManager:
     def show_menu(self):
         """Boucle du menu. Renvoie 'stockfish' ou 'hotseat'."""
         while True:
+            # Invitation Steam acceptee (ou jeu lance par une invitation) :
+            # on file directement au salon de l'ami.
+            if partie_en_ligne.invitation_en_attente():
+                self.ouvrir_en_ligne()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.quitter()
@@ -104,6 +134,26 @@ class GameManager:
                 choix = self.menu.handle_event(event)
                 if choix == "quitter":
                     self.quitter()
+                if choix == "en_ligne":
+                    self.ouvrir_en_ligne()
+                    continue
+                if choix == "options":
+                    self.ouvrir_options()
+                    continue
+                if choix == "historique":
+                    self.ouvrir_mes_parties()
+                    continue
+                if choix == "puzzles":
+                    self.ouvrir_problemes()
+                    continue
+                if choix == "reprendre":
+                    donnees = sauvegarde.lire()
+                    if donnees is None:
+                        self.menu.annoncer_reprise(False)
+                        continue
+                    self.reprise = donnees
+                    self.game_mode = donnees["mode"]
+                    return choix
                 if choix in ("stockfish", "hotseat"):
                     self.game_mode = choix
                     return choix
@@ -111,6 +161,82 @@ class GameManager:
             self.aide.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(60)
+
+    def ouvrir_options(self):
+        """Ecran Options. Au retour : config relue, fenetre remise a jour."""
+        if EcranOptions(self.screen).run(self.clock) == "quitter":
+            self.quitter()
+        self.config = self._charger_config()
+        self.screen = pygame.display.get_surface()
+        self.plein_ecran = ui.est_plein_ecran()
+        self._appliquer_taille(*self.screen.get_size())
+        self.menu.redimensionner(*self.screen.get_size())
+
+    # ------------------------------------------------------------------ problemes
+
+    def ouvrir_problemes(self):
+        """Ecran des problemes (ecran_problemes.py)."""
+        from ecran_problemes import EcranProblemes
+        try:
+            ecran = EcranProblemes(self.screen, self.config)
+        except Exception as e:
+            print("[PROBLEMES] ouverture impossible : %s" % e)
+            self.afficher_erreur("Les problèmes n'ont pas pu s'ouvrir.", str(e)[:80])
+            return
+        if ecran.run(self.clock, self.evenement_fenetre, self._dessiner_aide) == "quitter":
+            self.quitter()
+        self.screen = pygame.display.get_surface()
+        self._appliquer_taille(*self.screen.get_size())
+
+    # ------------------------------------------------------------------ mes parties
+
+    def ouvrir_mes_parties(self):
+        """Ecran "Mes parties et profil", et la relecture d'une partie."""
+        from ecran_mes_parties import EcranMesParties
+        from ecran_revoir import EcranRevoir
+        theme = self.config.get("theme_plateau")
+        while True:
+            ecran = EcranMesParties(self.screen, theme)
+            reponse = ecran.run(self.clock, self.evenement_fenetre, self._dessiner_aide)
+            if reponse == "quitter":
+                self.quitter()
+            if not isinstance(reponse, dict):
+                break
+            relecture = self._revue_d_une_partie_enregistree(reponse["partie"]) \
+                or EcranRevoir(self.screen, reponse["partie"],
+                               self.disposition, self.config)
+            reponse = relecture.run(self.clock, self.evenement_fenetre,
+                                    self._dessiner_aide)
+            if getattr(relecture, "analyseur", None) is not None:
+                relecture.analyseur.arreter()      # inutile de continuer
+            if reponse == "quitter":
+                self.quitter()
+        self.menu.redimensionner(*self.screen.get_size())
+
+    def _revue_d_une_partie_enregistree(self, partie):
+        """La revue (avec analyse) d'une partie de "Mes parties".
+
+        None si le fichier ne se relit pas : la relecture simple (ecran_revoir)
+        prend alors le relais et affiche l'erreur.
+        """
+        import historique_parties
+        from analyse_partie import AnalyseurPartie
+        from ecran_revue import EcranRevue
+        donnees, erreur = historique_parties.lire_partie(partie.get("chemin", ""))
+        if erreur or not donnees:
+            return None
+        analyseur = AnalyseurPartie(donnees["fen"], donnees["coups"],
+                                    self.stockfish_path,
+                                    self.config.get("analyse_puissance"))
+        resultat = " ".join(m for m in (partie.get("resultat", ""),
+                                        partie.get("date", "")) if m)
+        return EcranRevue(self.screen, analyseur, self.config,
+                          (partie.get("blancs", "Blancs"), partie.get("noirs", "Noirs")),
+                          resultat, partie.get("raison", ""),
+                          partie.get("camp") == "noir")
+
+    def _dessiner_aide(self, ecran):
+        self.aide.draw(ecran)
 
     # ------------------------------------------------------------------ partie
 
@@ -145,15 +271,25 @@ class GameManager:
         self._appliquer_preferences(self.board)
         self.board.competitive = False
         self.board.end_screen = EcranFin(self.board, self.game_mode)
+        self.partie_enregistree = False
+
+        reprise, self.reprise = self.reprise, None
+        if reprise is not None:
+            sauvegarde.appliquer(self.board, reprise)
 
         if self.game_mode == "stockfish":
             self.engine = self.demarrer_moteur()
             if self.engine is None:
                 return False
-            self.current_mode = ModeStockfish(self.board, self.engine, self.reglages)
+            reglages = dict(self.reglages)
+            if reprise is not None:
+                reglages["ia_joue_blancs"] = bool(reprise.get("ia_joue_blancs"))
+            self.current_mode = ModeStockfish(self.board, self.engine, reglages)
         else:
             self.current_mode = ModeHotseat(self.board,
                                             self.reglages.get("retourner_plateau"))
+        if reprise is not None:
+            self.board.flipped = bool(reprise.get("flipped"))
         return True
 
     def demarrer_moteur(self):
@@ -162,11 +298,11 @@ class GameManager:
             moteur = moteurs.moteur_de_jeu(self.stockfish_path)
             if moteur is not None:
                 return moteur
-            raise RuntimeError("le processus ne repond pas")
+            raise RuntimeError("le processus ne répond pas")
         except Exception as e:
             print("[ERREUR] Stockfish n'a pas pu demarrer : %s" % e)
             self.afficher_erreur("Stockfish n'a pas pu demarrer.",
-                                 "Le moteur doit etre dans le dossier moteur/",
+                                 "Le moteur doit être dans le dossier moteur/",
                                  "(voir moteur/LISEZ-MOI.txt).")
             return None
 
@@ -193,10 +329,18 @@ class GameManager:
 
     # ------------------------------------------------------------------ boucles
 
+    def ouvrir_en_ligne(self):
+        """Jouer en ligne par Steam : salon, partie, revanche.
+        Tout le parcours vit dans partie_en_ligne.py."""
+        partie_en_ligne.lancer(self)
+        self.board = None
+        self._appliquer_taille(*self.screen.get_size())
+
     def run(self):
         while True:
-            self.show_menu()
-            if not self.demander_reglages():
+            if self.show_menu() == "reprendre":
+                self.reglages = dict(self.reprise.get("reglages") or {})
+            elif not self.demander_reglages():
                 continue
             rejouer = True
             while rejouer:
@@ -204,6 +348,8 @@ class GameManager:
                 if self.preparer_partie():
                     rejouer = self.boucle_de_partie() == "rejouer"
                 self.cleanup_game()
+            self.menu.annoncer_reprise(sauvegarde.lire() is not None,
+                                       sauvegarde.resume(sauvegarde.lire()))
 
     def boucle_de_partie(self):
         """Joue la partie. Renvoie 'menu' ou 'rejouer'."""
@@ -217,8 +363,14 @@ class GameManager:
                     action = self.board.end_screen.handle_event(event)
                     if action in ("menu", "rejouer"):
                         return action
+                    if action == "revue":
+                        self.ouvrir_revue()
+                        continue
                 action = self.board.game_buttons.handle_event(event)
                 if action == "return_to_menu":
+                    # Partie pas finie : on la garde, le menu proposera de la
+                    # reprendre.
+                    sauvegarde.enregistrer(self.board, self.game_mode, self.reglages)
                     return "menu"
                 self.board.handle_event(event, self.engine)
 
@@ -226,14 +378,69 @@ class GameManager:
                 self.current_mode.update()
             self.board.update()
 
+            if self.board.game_over:
+                self._partie_terminee()
+            else:
+                self.sauvegardeur.peut_etre(self.board, self.game_mode, self.reglages)
+
             self.board.draw()
             self.aide.draw(self.screen, self.board.theme_plateau)
             pygame.display.flip()
             self.clock.tick(60)
 
+    def _partie_terminee(self):
+        """Une seule fois par partie : profil, PGN, et plus rien a reprendre."""
+        if self.partie_enregistree:
+            return
+        self.partie_enregistree = True
+        sauvegarde.effacer()
+        try:
+            infos = enregistrer_la_partie(self.board, self.game_mode)
+        except Exception as e:
+            print("[PROFIL] partie non enregistree : %s" % e)
+            infos = None
+        self.board.end_screen.ligne_classement = texte_classement(infos)
+        # La revue de partie : l'analyse demarre tout de suite, en tache de
+        # fond, pour que la precision s'affiche sur la carte de fin.
+        try:
+            self.board.end_screen.lancer_analyse(
+                self.stockfish_path, self.config.get("analyse_puissance"))
+        except Exception as e:
+            print("[ANALYSE] non lancee : %s" % e)
+
+    # ------------------------------------------------------------------ revue
+
+    def ouvrir_revue(self):
+        """Revue de la partie qui vient de finir (ecran_revue.py)."""
+        from ecran_revue import EcranRevue
+        fin = self.board.end_screen
+        analyseur = fin.lancer_analyse(self.stockfish_path,
+                                       self.config.get("analyse_puissance"))
+        if analyseur is None:
+            return
+        cote_noir = False
+        noms = ("Blancs", "Noirs")
+        if self.game_mode == "stockfish":
+            cote_noir = bool(getattr(self.board, "ia_joue_blancs", False))
+            ia = "Ordinateur (%s)" % self.reglages.get("elo", "?")
+            noms = (ia, "Toi") if cote_noir else ("Toi", ia)
+        revue = EcranRevue(self.screen, analyseur, self.config, noms,
+                           getattr(self.board, "result", "") or "",
+                           getattr(self.board, "game_over_reason", "") or "",
+                           cote_noir)
+        if revue.run(self.clock, self.evenement_fenetre,
+                     self._dessiner_aide) == "quitter":
+            self.quitter()
+        # On rend a la partie sa geometrie (la revue a la sienne).
+        self.screen = pygame.display.get_surface()
+        self._appliquer_taille(*self.screen.get_size())
+
     # ------------------------------------------------------------------ arret
 
     def cleanup_game(self):
+        fin = getattr(self.board, "end_screen", None) if self.board else None
+        if fin is not None and getattr(fin, "analyseur", None) is not None:
+            fin.analyseur.arreter()
         if self.current_mode is not None and hasattr(self.current_mode, "arreter"):
             try:
                 self.current_mode.arreter()
@@ -250,6 +457,8 @@ class GameManager:
         self.current_mode = None
 
     def quitter(self):
+        if self.board is not None and not self.board.game_over:
+            sauvegarde.enregistrer(self.board, self.game_mode, self.reglages)
         self.cleanup_game()
         self.cleanup()
         sys.exit()
@@ -258,6 +467,10 @@ class GameManager:
         try:
             import moteurs
             moteurs.tout_fermer()
+        except Exception:
+            pass
+        try:
+            partie_en_ligne.arreter()
         except Exception:
             pass
         try:

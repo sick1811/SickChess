@@ -18,6 +18,15 @@ if sys.stdout is None:          # lance sans console (pythonw ou .exe fenetre)
         def isatty(self): return False
     sys.stdout = _Poubelle()
     sys.stderr = _Poubelle()
+else:
+    # Une console Windows en cp1252 plantait sur un caractere qu'elle ne sait
+    # pas afficher (V8 retirait donc tous les accents du jeu). On lui demande
+    # de remplacer ce caractere par "?" au lieu de s'arreter.
+    for _flux in (sys.stdout, sys.stderr):
+        try:
+            _flux.reconfigure(errors="replace")
+        except Exception:
+            pass
 
 if getattr(sys, "frozen", False):
     RACINE = os.path.dirname(os.path.abspath(sys.executable))

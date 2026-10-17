@@ -6,7 +6,8 @@ Python + Pygame, moteur Stockfish.
 ## Lancer le jeu
 1. Installer Python 3 (cocher « Add Python to PATH »).
 2. Placer `stockfish.exe` dans `moteur/` (voir `moteur/LISEZ-MOI.txt`).
-3. Double-cliquer sur `LANCER.bat`.
+3. Pour les problèmes : copier le dossier `puzzles/` (223 Mo, hors GitHub) à la racine.
+4. Double-cliquer sur `LANCER.bat`.
 
 ## Organisation
 - `SickChess.py` – le lanceur

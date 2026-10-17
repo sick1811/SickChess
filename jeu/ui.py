@@ -161,8 +161,10 @@ _NOMS_EMOJI = ("Segoe UI Emoji", "seguiemj", "Segoe UI Symbol", "Apple Color Emo
 # Si les fichiers manquent, on retombe exactement sur le comportement de la
 # v7.2 - le jeu ne depend donc pas d'eux pour demarrer.
 _FICHIERS_POLICES = {
-    (False, False): "Outfit-Regular.ttf",
-    (True, False): "Outfit-Bold.ttf",
+    # SickChess : Barlow Semi Condensed (OFL), choisie dans l'atelier graphique.
+    # Etroite et nette, style tableau de score. Outfit reste dans polices/.
+    (False, False): "BarlowSemiCondensed-Regular.ttf",
+    (True, False): "BarlowSemiCondensed-SemiBold.ttf",
     (False, True): "JetBrainsMono-Regular.ttf",
     (True, True): "JetBrainsMono-Bold.ttf",
 }
@@ -200,7 +202,10 @@ def police(taille, gras=False, mono=False):
                           _FICHIERS_POLICES[(bool(gras), bool(mono))])
     if os.path.exists(chemin) and _police_livree_voulue():
         try:
-            _POLICES[cle] = pygame.font.Font(chemin, taille)
+            # Barlow est plus petite qu'Outfit a taille egale : on compense
+            # pour que les mises en page calibrees sur Outfit restent justes.
+            reelle = taille if mono else int(round(taille * 1.10))
+            _POLICES[cle] = pygame.font.Font(chemin, reelle)
             return _POLICES[cle]
         except Exception as souci:
             print("[UI] police %s illisible : %s" % (chemin, souci))

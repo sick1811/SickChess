@@ -1,6 +1,6 @@
 # tests/test_noyau.py - verifie le noyau sans ouvrir de fenetre.
 #     python tests/test_noyau.py
-# Teste : chargement des 19 sons, alerte des 30 secondes (son + clignotement),
+# Teste : chargement des 21 sons, alerte des 30 secondes (son + clignotement),
 # fin de partie a 00:00, et une partie a deux jusqu'au mat.
 
 import os
@@ -50,7 +50,7 @@ def nouvelle_partie(minutes=1):
 
 print("1. Sons")
 plateau = nouvelle_partie()
-verifier(len(plateau.sounds.sounds) == 19, "19 bruitages charges (%d)" % len(plateau.sounds.sounds))
+verifier(len(plateau.sounds.sounds) == 21, "21 bruitages charges (%d)" % len(plateau.sounds.sounds))
 verifier(set(plateau.sounds.formats.values()) == {".wav"}, "tous en .wav")
 joues = []
 plateau.sounds.play = lambda nom, _o=plateau.sounds.play: joues.append(nom) or _o(nom)

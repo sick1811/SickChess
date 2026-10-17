@@ -30,7 +30,7 @@ SOUND_KEYS = [
     "move", "knight_move", "bishop_move", "rook_move", "queen_move", "king_move",
     "capture", "illegal", "check", "checkmate", "stalemate",
     "en_passant", "castling", "promotion", "low_time", "game_start", "game_end",
-    "fifty_moves", "repetition",
+    "fifty_moves", "repetition", "puzzle_reussi", "puzzle_faux",
 ]
 
 

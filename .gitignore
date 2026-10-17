@@ -15,6 +15,7 @@ puzzles/
 # Donnees du joueur, creees par le jeu
 parties/
 profil.json
+puzzles_score.json
 statistiques.json
 sauvegarde*.json
 *.log
@@ -22,3 +23,10 @@ game_full_logs*.txt
 
 # Captures produites par les tests
 tests/*.png
+
+# Steamworks SDK (a prendre dans son propre SDK, voir docs/MULTIJOUEUR_STEAM.md)
+steam_api64.dll
+tests/ecrans/
+
+# Restes de tests
+*.test_bak

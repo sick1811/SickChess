@@ -113,7 +113,9 @@ class ChessBoard:
 
         self.piece_images = {}
         self.load_piece_images()
-        self.sounds.play("game_start")
+        # La relecture d'une partie (ecran_revoir.py) cree un plateau muet.
+        if self.reglages.get("son_de_depart", True):
+            self.sounds.play("game_start")
 
     # ------------------------------------------------------------------ visuel
 
@@ -178,7 +180,7 @@ class ChessBoard:
                     gagnant = "0-1" if perdant == chess.WHITE else "1-0"
                     camp = "BLANCS" if perdant == chess.WHITE else "NOIRS"
                     self.terminer_partie(
-                        "TEMPS ECOULE - les %s perdent au temps" % camp, gagnant)
+                        "TEMPS ÉCOULÉ - les %s perdent au temps" % camp, gagnant)
                     return
 
         if not self.game_over and self.board.is_check():
@@ -244,8 +246,8 @@ class ChessBoard:
         # joue pas avec le moteur qui souffle les coups.
         if getattr(self, "competitive", False):
             self.indice = None
-            self.message_competitif = ("Partie competitive : l'indice est "
-                                       "desactive pour les deux joueurs.")
+            self.message_competitif = ("Partie compétitive : l'indice est "
+                                       "désactivé pour les deux joueurs.")
             print("[INDICE] refuse : partie competitive")
             return None
         moteur = engine or self.engine

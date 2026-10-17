@@ -64,10 +64,14 @@ class BoardRender:
         plateau = self.chessboard
         t = self.theme()
         sq = plateau.SQ_SIZE
-        for square in chess.SQUARES:
-            couleur = t["clair"] if geo.case_claire(square) else t["sombre"]
-            x, y = geo.case_vers_pixel(square, sq, plateau.flipped)
-            pygame.draw.rect(plateau.screen, couleur, pygame.Rect(x, y, sq, sq))
+        matiere = apparence.damier_texture(t, 8 * sq)
+        if matiere is not None:          # plateau en marbre, en bois...
+            plateau.screen.blit(matiere, (geo.ORIGINE_X, geo.ORIGINE_Y))
+        else:
+            for square in chess.SQUARES:
+                couleur = t["clair"] if geo.case_claire(square) else t["sombre"]
+                x, y = geo.case_vers_pixel(square, sq, plateau.flipped)
+                pygame.draw.rect(plateau.screen, couleur, pygame.Rect(x, y, sq, sq))
         pygame.draw.rect(plateau.screen, t["bord"],
                          pygame.Rect(geo.ORIGINE_X - 2, geo.ORIGINE_Y - 2,
                                      8 * sq + 4, 8 * sq + 4), 2)
@@ -362,7 +366,7 @@ class BoardRender:
         self.rect_onglets = []
 
         if chat is None:
-            ui.texte(plateau.screen, "COUPS JOUES", x + ui.t(8, ech), y + 4,
+            ui.texte(plateau.screen, "COUPS JOUÉS", x + ui.t(8, ech), y + 4,
                      taille, t["texte_discret"], gras=True, largeur_max=largeur - 16)
             return hauteur
 
@@ -442,7 +446,7 @@ class BoardRender:
         else:
             # On est sorti : on dit quand, une bonne fois. C'est l'information
             # qui manque le plus quand on relit ses parties.
-            texte = "%s  -  hors theorie depuis le coup %d" % (
+            texte = "%s  -  hors théorie depuis le coup %d" % (
                 nom, combien // 2 + 1)
             couleur = t.get("texte_discret", (150, 150, 150))
         taille = ui.t(12, ech)

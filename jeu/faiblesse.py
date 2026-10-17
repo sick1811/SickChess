@@ -557,8 +557,8 @@ def perte_moyenne(coups, elo, tirages=400, hasard=None):
 def description(elo):
     """Une phrase pour le journal : ce que le bot va faire a ce niveau."""
     if not doit_brider(elo):
-        return "Stockfish se bride lui-meme (UCI_Elo %d)" % int(elo)
+        return "Stockfish se bride lui-même (UCI_Elo %d)" % int(elo)
     impr, err, gaf = fautes_par_partie(elo)
     return ("choix maison : profondeur %d, %d coups classes, par partie "
-            "environ %.1f imprecision(s), %.1f erreur(s), %.1f gaffe(s)"
+            "environ %.1f imprécision(s), %.1f erreur(s), %.1f gaffe(s)"
             % (profondeur(elo), multipv(elo), impr, err, gaf))
