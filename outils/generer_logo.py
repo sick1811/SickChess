@@ -1,4 +1,9 @@
-"""Fabrique l'icone et le logo de SickChess (Onyx & Or).
+"""ANCIENNE VERSION - NE PLUS LANCER (elle ecraserait le logo officiel).
+Le logo officiel choisi par Julien le 17/10 (cavalier or sur damier gris et noir,
+devise ENTRAINE · ANALYSE · GAGNE) vient de outils/blender/gen_logo.py ; ses
+fichiers sont dans assets/ (icone.png, icone.ico, logo.png, logo_fond.png).
+
+Fabrique l'icone et le logo de SickChess (Onyx & Or).
 
     python outils/generer_logo.py
 

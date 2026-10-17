@@ -60,7 +60,7 @@ class EcranFin:
         a = self.analyseur
         if a is None:
             return ""
-        if a.erreur or not a.survol_fini():
+        if a.erreur or not a.terminee():
             return a.texte_avancement()
         rapport = a.rapport()
         blancs, noirs = rapport["blancs"]["precision"], rapport["noirs"]["precision"]

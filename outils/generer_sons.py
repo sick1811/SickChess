@@ -1,5 +1,11 @@
 # outils/generer_sons.py - fabrique les bruitages de SickChess.
 #
+# 17/10 (remarque de Julien : "les sons ne sont pas super") : les coups, prises
+# et roques utilisent maintenant de VRAIS chocs de bois enregistres, tires du
+# pack "Impact Sounds" de Kenney (licence CC0 : libre, meme pour un jeu vendu ;
+# copie dans assets_src/sons_kenney/ avec sa licence). Les carillons (echec,
+# mat, debut et fin de partie, problemes) restent synthetises ci-dessous.
+#
 # Tous les sons du jeu sont SYNTHETISES ici, a partir de rien (bruit filtre et
 # sinusoides amorties). Ils appartiennent donc au projet : aucune licence a
 # verifier. Pour les modifier, change les reglages ci-dessous et relance :
@@ -41,6 +47,32 @@ def note(freq, duree, amorti=6.0, attaque=0.004):
     return son * env
 
 
+KENNEY = os.path.join(os.path.dirname(DOSSIER), "assets_src", "sons_kenney")
+
+
+def kenney(nom, garder=None):
+    """Un enregistrement du pack Kenney, en mono -1..1 (None s'il manque)."""
+    chemin = os.path.join(KENNEY, nom + ".ogg")
+    if not os.path.exists(chemin):
+        return None
+    os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
+    import pygame
+    if not pygame.mixer.get_init():
+        pygame.mixer.init(FREQ, -16, 2, 1024)
+    a = pygame.sndarray.array(pygame.mixer.Sound(chemin)).astype(np.float64)
+    a = a.mean(axis=1) if a.ndim == 2 else a
+    a /= (np.max(np.abs(a)) or 1.0)
+    if garder:
+        a = a[:int(FREQ * garder)]
+    return a
+
+
+def bois(nom, defaut, garder=None):
+    """Le choc enregistre s'il est la, sinon le son synthetise."""
+    a = kenney(nom, garder)
+    return a if a is not None else defaut
+
+
 def silence(duree):
     return np.zeros(int(FREQ * duree))
 
@@ -72,22 +104,31 @@ def ecrire(nom, signal, volume=0.8):
 
 def main():
     os.makedirs(DOSSIER, exist_ok=True)
-    ecrire("move", clic_bois(1.0), 0.70)
-    ecrire("knight_move", clic_bois(0.93), 0.70)
-    ecrire("bishop_move", clic_bois(1.04), 0.70)
-    ecrire("rook_move", clic_bois(0.88, duree=0.14), 0.72)
-    ecrire("queen_move", clic_bois(1.08), 0.70)
-    ecrire("king_move", clic_bois(0.84, duree=0.15), 0.72)
-    ecrire("capture", superposer(clic_bois(0.78, 1.0, 0.16),
-                                 suite(silence(0.035), clic_bois(1.12, 0.8))), 0.85)
-    ecrire("en_passant", superposer(clic_bois(0.8, 1.0, 0.16),
-                                    suite(silence(0.05), clic_bois(1.2, 0.7))), 0.85)
-    ecrire("castling", suite(clic_bois(0.9), silence(0.05), clic_bois(0.95)), 0.75)
-    ecrire("check", superposer(clic_bois(1.0), suite(silence(0.02),
-                                                     note(988, 0.35, 9) * 0.5)), 0.85)
-    ecrire("promotion", suite(note(660, 0.09, 14), note(880, 0.09, 14),
-                              note(1320, 0.3, 7)), 0.7)
-    ecrire("illegal", note(150, 0.18, 14) + 0.4 * note(155, 0.18, 14), 0.6)
+    # Coups : un choc de bois leger, une prise different par piece pour varier.
+    ecrire("move", bois("impactWood_light_000", clic_bois(1.0)), 0.62)
+    ecrire("knight_move", bois("impactWood_light_001", clic_bois(0.93)), 0.62)
+    ecrire("bishop_move", bois("impactWood_light_002", clic_bois(1.04)), 0.62)
+    ecrire("rook_move", bois("impactWood_light_003", clic_bois(0.88, duree=0.14)), 0.62)
+    ecrire("queen_move", bois("impactWood_light_004", clic_bois(1.08)), 0.62)
+    ecrire("king_move", bois("impactWood_medium_000", clic_bois(0.84, duree=0.15)), 0.62)
+    # Prise : plus lourde, avec la piece prise qui claque juste apres.
+    lourd = bois("impactWood_heavy_000", clic_bois(0.78, 1.0, 0.16))
+    leger = bois("impactWood_light_002", clic_bois(1.12, 0.8))
+    ecrire("capture", superposer(lourd, suite(silence(0.04), leger * 0.45)), 0.80)
+    ecrire("en_passant", superposer(bois("impactWood_heavy_001", clic_bois(0.8, 1.0, 0.16)),
+                                    suite(silence(0.05), leger * 0.4)), 0.80)
+    # Roque : le roi puis la tour.
+    ecrire("castling", superposer(bois("impactWood_medium_001", clic_bois(0.9)),
+                                  suite(silence(0.11),
+                                        bois("impactWood_light_003", clic_bois(0.95)) * 0.85)),
+           0.72)
+    ecrire("check", superposer(bois("impactWood_medium_002", clic_bois(1.0)),
+                               suite(silence(0.03), note(988, 0.35, 9) * 0.35)), 0.80)
+    ecrire("promotion", superposer(bois("impactWood_medium_003", clic_bois(1.0)) * 0.7,
+                                   suite(silence(0.05), note(660, 0.09, 14), note(880, 0.09, 14),
+                                         note(1320, 0.3, 7))), 0.7)
+    ecrire("illegal", bois("impactSoft_medium_000",
+                           note(150, 0.18, 14) + 0.4 * note(155, 0.18, 14)), 0.5)
     ecrire("low_time", suite(note(1760, 0.07, 30), silence(0.07),
                              note(1760, 0.07, 30)), 0.55)
     ecrire("game_start", suite(note(523, 0.14, 10), note(784, 0.4, 5)), 0.6)

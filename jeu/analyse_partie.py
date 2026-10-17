@@ -110,7 +110,8 @@ class AnalyseurPartie:
     """Analyse une partie en tache de fond, en commencant par le coup regarde."""
 
     def __init__(self, fen_initiale, coups_uci, chemin_stockfish=None,
-                 puissance=None, moteur=None, suivi=False, threads=None):
+                 puissance=None, moteur=None, suivi=False, threads=None,
+                 fichier_cache=None):
         self.chemin = chemin_stockfish
         # suivi = l'analyse accompagne une partie EN COURS : elle ne s'arrete
         # pas quand elle a tout vu, elle attend les coups suivants
@@ -143,6 +144,12 @@ class AnalyseurPartie:
         self._fil = None
         self._priorite = None
         self._cache = {}
+        # SickChess 17/10 (remarque de Julien : "les analyses ne sont pas bien
+        # enregistrees, une nouvelle evaluation commence a chaque revue") :
+        # l'analyse terminee est ecrite a cote du PGN et relue a l'ouverture.
+        self.fichier_cache = None
+        if fichier_cache:
+            self.definir_fichier_cache(fichier_cache)
 
     def _construire_positions(self, coups):
         plateau = chess.Board(self.fen_initiale)
@@ -166,6 +173,58 @@ class AnalyseurPartie:
 
     def nombre_de_coups(self):
         return len(self.coups)
+
+    # ------------------------------------------------------------------ cache
+
+    CHAMPS_CACHE = ("evaluations", "mats", "meilleurs", "premiers", "seconds")
+
+    def definir_fichier_cache(self, chemin):
+        """Ou garder l'analyse. Relit le fichier s'il existe deja ; ecrit tout
+        de suite si l'analyse est deja terminee."""
+        self.fichier_cache = chemin
+        if not chemin:
+            return
+        if os.path.exists(chemin) and not self.terminee():
+            self._relire_cache(chemin)
+        if self.terminee() and not self.suivi:
+            self._ecrire_cache()
+
+    def _relire_cache(self, chemin):
+        import json
+        try:
+            with open(chemin, "r", encoding="utf-8") as f:
+                d = json.load(f)
+        except (OSError, ValueError):
+            return False
+        if not isinstance(d, dict) or d.get("fen") != self.fen_initiale \
+                or d.get("coups") != self.coups \
+                or int(d.get("profondeur") or 0) < self.profondeur:
+            return False
+        n = len(self.fens)
+        if any(len(d.get(c) or []) != n for c in self.CHAMPS_CACHE):
+            return False
+        for champ in self.CHAMPS_CACHE:
+            setattr(self, champ, list(d[champ]))
+        self.niveau = [2] * n
+        self._cache = {}
+        print("[ANALYSE] analyse relue (%s)" % os.path.basename(chemin))
+        return True
+
+    def _ecrire_cache(self):
+        if not self.fichier_cache or not self.terminee():
+            return False
+        import json
+        d = {"fen": self.fen_initiale, "coups": list(self.coups),
+             "profondeur": self.profondeur, "version": 1}
+        for champ in self.CHAMPS_CACHE:
+            d[champ] = list(getattr(self, champ))
+        try:
+            with open(self.fichier_cache, "w", encoding="utf-8") as f:
+                json.dump(d, f)
+            return True
+        except OSError as e:
+            print("[ANALYSE] analyse non enregistree : %s" % e)
+            return False
 
     def ajouter_coups(self, coups_uci):
         """Ajoute les coups joues depuis le dernier appel (analyse en direct).
@@ -260,6 +319,8 @@ class AnalyseurPartie:
             print("[ANALYSE] impossible : %s" % e)
         finally:
             self.en_cours = False
+            if not self._stop and not self.suivi:
+                self._ecrire_cache()
 
     def _lignes_pour(self, k):
         premier = annotations.chances_de_gagner(self.premiers[k])
@@ -383,7 +444,12 @@ class AnalyseurPartie:
             "texte_evaluation": self.texte_evaluation(i + 1),
         }
         avant, apres = self.evaluations[i], self.evaluations[i + 1]
-        if avant is not None and apres is not None:
+        # SickChess 17/10 (remarque de Julien : "les pastilles doivent etre
+        # justes et pas modifiees") : une pastille ne s'affiche qu'une fois les
+        # deux positions analysees en profondeur. Le survol rapide sert a la
+        # courbe et a la barre, plus aux pastilles : elles ne changent plus.
+        if avant is not None and apres is not None \
+                and self.niveau[i] >= 2 and self.niveau[i + 1] >= 2:
             infos.update(self._juger(i, avant, apres, blancs))
         self._cache[i] = infos
         return infos

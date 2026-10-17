@@ -70,3 +70,46 @@ def svg_logo(k, h=200):
 json.dump({k: {"nom": v["nom"], "desc": v["desc"], "icone": svg_icone(k), "logo": svg_logo(k)} for k, v in V.items()},
           open("logos.json", "w"))
 print(list(V))
+
+# ---- mélanges 3 + 5, avec la devise
+DEVISE = (f'<text x="126" y="84" style="{FONT};font-weight:500;font-size:15px;letter-spacing:6px" fill="#8f8a80">'
+          'ENTRAÎNE · ANALYSE · GAGNE</text>')
+CLIPS = ('<defs><clipPath id="c5"><polygon points="0,100 100,8 100,100"/></clipPath>'
+         '<clipPath id="h5"><polygon points="0,0 100,0 100,8 0,100"/></clipPath></defs>')
+def cav_eclat(contour=None):
+    k = dict(stroke=contour, sw=3) if contour else {}
+    return (CLIPS + f'<g clip-path="url(#h5)">{cavalier(IVOIRE, ONYX, 7, 3.6, 0.86, **k)}</g>'
+            f'<g clip-path="url(#c5)">{cavalier(OR, ONYX, 7, 3.6, 0.86, **k)}</g>')
+def damier_sombre():
+    return ('<clipPath id="arr6"><rect x="4" y="4" width="92" height="92" rx="20"/></clipPath>'
+            f'<g clip-path="url(#arr6)"><rect x="4" y="4" width="92" height="92" fill="{ONYX}"/>'
+            '<rect x="4" y="4" width="46" height="46" fill="#26262a"/><rect x="50" y="50" width="46" height="46" fill="#26262a"/></g>')
+M = {
+ "A": dict(nom="A. Damier + devise", desc="Le 3 tel quel, avec la devise sous le nom.",
+           icone=V["damier"]["icone"],
+           logo=damier() + cavalier(OR, ONYX, 7, 3.6, 0.86, stroke=ONYX, sw=3) + mot(124, 52, 48, IVOIRE, OR) + DEVISE),
+ "B": dict(nom="B. Damier éclaté", desc="Le damier du 3, avec le cavalier coupé ivoire et or du 5.",
+           icone=damier() + cav_eclat(ONYX),
+           logo=damier() + cav_eclat(ONYX) + mot(124, 52, 48, IVOIRE, OR) + DEVISE),
+ "C": dict(nom="C. Éclat sur damier sombre", desc="Le 5, posé sur un damier discret noir sur noir. Le plus lisible en petit.",
+           icone=damier_sombre() + cav_eclat(),
+           logo=damier_sombre() + cav_eclat() + mot(124, 52, 48, IVOIRE, OR) + DEVISE),
+}
+json.dump({k: {"nom": v["nom"], "desc": v["desc"],
+               "icone": f'<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 100 100">{v["icone"]}</svg>',
+               "logo": f'<svg xmlns="http://www.w3.org/2000/svg" height="200" width="920" viewBox="0 0 460 100">{v["logo"]}</svg>'}
+           for k, v in M.items()}, open("melanges.json", "w"))
+
+# ---- LOGO OFFICIEL (17/10) : cavalier or (A) sur damier gris et noir (C), avec la devise
+GRIS = "#3a3a40"
+def damier_gris():
+    return ('<clipPath id="arrF"><rect x="4" y="4" width="92" height="92" rx="20"/></clipPath>'
+            f'<g clip-path="url(#arrF)"><rect x="4" y="4" width="92" height="92" fill="{ONYX}"/>'
+            f'<rect x="4" y="4" width="46" height="46" fill="{GRIS}"/><rect x="50" y="50" width="46" height="46" fill="{GRIS}"/></g>')
+OFFICIEL_ICONE = damier_gris() + cavalier(OR, ONYX, 7, 3.6, 0.86, stroke=ONYX, sw=3)
+OFFICIEL = {
+ "icone": f'<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 100 100">{OFFICIEL_ICONE}</svg>',
+ "logo": f'<svg xmlns="http://www.w3.org/2000/svg" height="200" width="920" viewBox="0 0 460 100">{OFFICIEL_ICONE}{mot(124, 52, 48, IVOIRE, OR)}{DEVISE}</svg>',
+ "nom": "officiel", "desc": "",
+}
+json.dump({"officiel": OFFICIEL}, open("officiel.json", "w"))

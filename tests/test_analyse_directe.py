@@ -49,6 +49,16 @@ verifier(annotations.classer(0.0, est_le_meilleur=True, perte_pions=5.0, apres_p
          "le coup du moteur n'est jamais puni")
 verifier(annotations.classer(4.0, perte_pions=0.4, apres_pions=0.0, **base) == "bon",
          "petite perte : reste bon")
+# Un sacrifice que le moteur approuve : on donne une piece, mais l'evaluation
+# ne baisse pas (perte_pions ~ 0). Il ne doit JAMAIS etre puni.
+verifier(annotations.classer(0.5, sacrifice=True, perte_pions=0.1, apres_pions=1.5,
+                             chances_avant=55.0, chances_apres=54.5,
+                             meilleur_connu=True) in ("brillant", "excellent", "tres_bon"),
+         "sacrifice juste (piece donnee, evaluation intacte) : bon coup, pas puni")
+verifier(annotations.classer(0.0, est_le_meilleur=True, sacrifice=True, perte_pions=0.0,
+                             apres_pions=2.0, chances_avant=60.0, chances_apres=60.0,
+                             meilleur_connu=True) == "brillant",
+         "sacrifice du moteur : brillant")
 
 print("2. Notation au choix")
 # (comme l'ecran Options : on modifie les preferences en memoire)
@@ -126,6 +136,24 @@ else:
     verifier(fin.ligne_analyse().startswith("Précision"), "precision affichee : %s" % fin.ligne_analyse())
     gm.cleanup_game()
     verifier(getattr(gm, "analyse_en_direct", None) is None, "rien ne tourne apres la partie")
+
+    print("4. Analyse enregistree et relue (plus de recalcul a chaque revue)")
+    import tempfile
+    from analyse_partie import AnalyseurPartie
+    cache = os.path.join(tempfile.mkdtemp(), "partie.analyse.json")
+    a1 = AnalyseurPartie(None, BERGER, sf, "rapide", fichier_cache=cache)
+    verifier(a1.detail(0)["pret"] is False, "pas de pastille avant l'analyse")
+    a1.demarrer()
+    attente = time.time() + 90
+    while a1.en_cours and time.time() < attente:
+        time.sleep(0.2)
+    verifier(os.path.exists(cache), "analyse ecrite a cote de la partie")
+    a2 = AnalyseurPartie(None, BERGER, sf, "rapide", fichier_cache=cache)
+    verifier(a2.terminee(), "a la reouverture : analyse deja complete, rien a recalculer")
+    verifier(a2.notes() == a1.notes(), "memes pastilles qu'a la premiere analyse")
+    verifier(not a2.demarrer(), "aucun moteur relance")
+    a3 = AnalyseurPartie(None, BERGER[:5], sf, "rapide", fichier_cache=cache)
+    verifier(not a3.terminee(), "une autre partie ne reprend pas ce fichier")
 
 print()
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))

@@ -202,6 +202,12 @@ Choix de Julien dans les deux pages « Atelier SickChess » (voir `assets_src/at
   puis `python finir_sprites.py <dossier> assets/pieces/relief_prisme`.
 - 17/10 : Julien choisit les pièces **Tournoi plat** comme jeu par défaut (en tête de la
   liste dans Options) ; les Relief restent au choix.
+- 17/10 : **logo officiel** choisi par Julien parmi 5 propositions + 3 mélanges : cavalier or
+  (pièces Tournoi plat) sur un damier gris et noir, nom SICK**CHESS**, devise
+  « ENTRAÎNE · ANALYSE · GAGNE ». Fichiers : `assets/icone.png`, `assets/icone.ico`
+  (16 à 256 px, pour la fenêtre et le futur .exe), `assets/logo.png`, `assets/logo_fond.png`.
+  Source : `outils/blender/gen_logo.py` ; `outils/generer_logo.py` (ancienne icône) ne doit
+  plus être lancé. L'icône est aussi dessinée devant le titre du menu.
 - **Plateaux** : défaut **Tournoi** (uni crème et vert, le plus lisible) ; 8 unis + 3 matières
   (marbre veiné, onyx et or, noyer et érable : images dans `assets/plateaux/`). Les 6 damiers
   de la v7 ne sont plus listés (toujours lus si un vieux config.json les nomme).
@@ -252,6 +258,26 @@ Question ouverte : les coups sont écrits en notation anglaise (Nf3, Bc4, Qh5) a
 est en français. Trois choix : notation française (Cf3, Fc4, Dh5), notation par figurines
 (petite icône de pièce + case, lisible dans toutes les langues, comme chess.com), ou garder l'anglais.
 
+## 17/10/2026 (2) – Pastilles stables, analyse enregistrée, vrais sons de bois
+Retours de Julien sur la séance précédente : le son marche (tampon audio 1024), la précision
+arrive tout de suite, la notation et la revue au début fonctionnent. Traité ensuite :
+- **« Les analyses ne sont pas enregistrées, une nouvelle évaluation commence à chaque revue »** :
+  l'analyse terminée est écrite à côté du PGN (`parties/<partie>.analyse.json`) et relue à
+  l'ouverture (`AnalyseurPartie(fichier_cache=...)`) : plus aucun recalcul, mêmes pastilles. Le
+  fichier est ignoré s'il ne correspond pas exactement à la partie ou s'il a été fait moins
+  profond. Le ménage des vieilles parties efface aussi leur analyse.
+- **« Les pastilles doivent être justes et pas modifiées »** : une pastille ne s'affiche qu'une fois
+  les deux positions analysées en profondeur (rond d'attente avant). Le survol rapide ne sert plus
+  qu'à la courbe et à la barre. La carte de fin attend l'analyse complète pour la précision.
+- **« Un sacrifice n'est pas forcément un mauvais coup »** : c'était déjà le cas, le jugement compte
+  la perte d'ÉVALUATION de Stockfish, pas les pièces données ; deux contrôles le prouvent
+  maintenant (sacrifice juste = bon coup, sacrifice du moteur = Brillant).
+- **« Les sons ne sont pas super »** : coups, prises, roque et coup illégal utilisent de vrais chocs
+  de bois enregistrés (pack « Impact Sounds » de Kenney, CC0, sources et licence dans
+  `assets_src/sons_kenney/`), assemblés par `outils/generer_sons.py`. Les carillons restent
+  synthétisés. CREDITS.md à jour.
+- Tests : `test_analyse_directe.py` passe à 28 contrôles ; tout au vert (247 contrôles).
+
 ## 17/10/2026 – Retours de Julien (page de test) : son, revue, notation
 Retours lus dans la page « SickChess – À faire » et traités :
 - **Son (aucun son chez Julien)** : le code charge bien les sons (déjà vrai en V8 : « 19/19
@@ -289,7 +315,7 @@ l'adversaire, promotion.
 ## Bugs connus (repris de « a debug.txt »)
 - [x] Pendule ne clignote pas à 30 s → fonctionne (testé).
 - [x] Fin de partie à 00:00 → corrigé (affichage du temps final).
-- [ ] Son : aucun son chez Julien → diagnostic `TESTER_LE_SON.bat` (17/10).
+- [x] Son : réglé le 17/10 (tampon audio) ; sons de bois enregistrés à juger.
 - [ ] Animation lente (réglable : `vitesse_animation` dans config.json, 0.18 s).
 - [ ] Temps de réflexion de Stockfish pas assez humain.
 - [x] Organisation de la fenêtre de jeu : disposition « Classique » retenue (plateau à gauche, panneau à droite).

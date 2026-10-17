@@ -150,6 +150,11 @@ class MainMenu:
         police = ui.police(taille_titre, True)
         sick = police.render("SICK", True, t["texte"])
         chess_ = police.render("CHESS", True, t["accent"])
+        # Logo officiel (17/10) : l'icone cavalier sur damier, puis SICKCHESS
+        icone = _icone(int(sick.get_height() * 1.05))
+        if icone is not None:
+            ecran.blit(icone, (x, y_titre + (sick.get_height() - icone.get_height()) // 2 + 2))
+            x += icone.get_width() + int(sick.get_height() * 0.22)
         ecran.blit(sick, (x, y_titre))
         ecran.blit(chess_, (x + sick.get_width(), y_titre))
         ui.texte(ecran, "ENTRA\u00ceNE  \u00b7  ANALYSE  \u00b7  GAGNE", x + 4,
@@ -169,6 +174,27 @@ class MainMenu:
 
 
 _IMAGE_FOND = []
+_ICONE = {}
+
+
+def _icone(cote):
+    """L'icone du jeu (assets/icone.png) a la taille demandee ; None si absente."""
+    if "source" not in _ICONE:
+        try:
+            from asset_manager import dossier_ressources
+            racine = dossier_ressources()
+        except Exception:
+            racine = os.getcwd()
+        try:
+            _ICONE["source"] = pygame.image.load(
+                os.path.join(racine, "assets", "icone.png")).convert_alpha()
+        except Exception:
+            _ICONE["source"] = None
+    if _ICONE["source"] is None or cote < 8:
+        return None
+    if cote not in _ICONE:
+        _ICONE[cote] = pygame.transform.smoothscale(_ICONE["source"], (cote, cote))
+    return _ICONE[cote]
 
 
 def _image_fond():

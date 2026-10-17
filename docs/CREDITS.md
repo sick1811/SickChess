@@ -6,7 +6,8 @@ Rien de copié d'un autre jeu ou d'un site sans licence claire.
 | Ressource | Dossier | Origine | Licence |
 |---|---|---|---|
 | Code du jeu | `jeu/` | Julien (sick1811), avec Claude | Propriété du projet |
-| Bruitages (21 sons) | `sounds/` | Synthétisés par `outils/generer_sons.py` | Propriété du projet |
+| Bruitages – carillons (échec, mat, début/fin, problèmes) | `sounds/` | Synthétisés par `outils/generer_sons.py` | Propriété du projet |
+| Bruitages – chocs de bois (coups, prises, roque) | `sounds/`, sources dans `assets_src/sons_kenney/` | Pack « Impact Sounds » de Kenney (kenney.nl), assemblé par `outils/generer_sons.py` | CC0 (domaine public, `assets_src/sons_kenney/License.txt`) – mention de Kenney conseillée |
 | Pièces « Classique » | `jeu/pieces_vectorielles.py` | Contours inspirés des pièces « Cburnett » (Wikimedia Commons) | **À vérifier** avant la sortie : licence d'origine + mention de l'auteur, ou redessiner nos propres pièces |
 | Pièces Relief (Prisme, Arène, Tournoi) | `assets/pieces/relief_*` | Modèles 3D créés pour SickChess (`outils/blender/sick3d.py`), rendus dans Blender, retouchés par `outils/retoucher_pieces.py` (originaux : `assets_src/pieces_relief_origine/`) | Propriété du projet |
 | Pièces plates (Arène, Tournoi) | `assets/pieces/plat_*` | Tirées des mêmes profils (`outils/blender/gen_2d.py`) | Propriété du projet |

@@ -245,9 +245,12 @@ class GameManager:
         donnees, erreur = historique_parties.lire_partie(partie.get("chemin", ""))
         if erreur or not donnees:
             return None
+        chemin_pgn = partie.get("chemin", "")
         analyseur = AnalyseurPartie(donnees["fen"], donnees["coups"],
                                     self.stockfish_path,
-                                    self.config.get("analyse_puissance"))
+                                    self.config.get("analyse_puissance"),
+                                    fichier_cache=os.path.splitext(chemin_pgn)[0]
+                                    + ".analyse.json" if chemin_pgn else None)
         resultat = " ".join(m for m in (partie.get("resultat", ""),
                                         partie.get("date", "")) if m)
         return EcranRevue(self.screen, analyseur, self.config,
@@ -421,6 +424,9 @@ class GameManager:
             print("[PROFIL] partie non enregistree : %s" % e)
             infos = None
         self.board.end_screen.ligne_classement = texte_classement(infos)
+        self._fichier_analyse = None
+        if infos and infos.get("pgn"):
+            self._fichier_analyse = os.path.splitext(infos["pgn"])[0] + ".analyse.json"
         # La revue de partie : l'analyse faite PENDANT la partie est reprise
         # telle quelle (rien a recalculer) ; sinon elle demarre maintenant.
         direct = getattr(self, "analyse_en_direct", None)
@@ -430,8 +436,10 @@ class GameManager:
             self.board.end_screen.analyseur = direct
             self.analyse_en_direct = None
         try:
-            self.board.end_screen.lancer_analyse(
+            analyseur = self.board.end_screen.lancer_analyse(
                 self.stockfish_path, self.config.get("analyse_puissance"))
+            if analyseur is not None and self._fichier_analyse:
+                analyseur.definir_fichier_cache(self._fichier_analyse)
         except Exception as e:
             print("[ANALYSE] non lancee : %s" % e)
 

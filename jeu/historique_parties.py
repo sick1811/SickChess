@@ -139,6 +139,10 @@ def _faire_le_menage():
             efface += 1
         except OSError:
             pass
+        try:                    # l'analyse enregistree de cette partie
+            os.remove(os.path.splitext(chemin)[0] + ".analyse.json")
+        except OSError:
+            pass
     return efface
 
 

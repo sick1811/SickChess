@@ -25,7 +25,7 @@
     "taux_de_gaffe": 1.0,
     "ouvertures_en_francais": true,
     "bot_livre_ouvertures": true,
-    "accent": "violet",
+    "accent": "bleu",
     "surbrillance_dernier_coup": true,
     "points_coups_possibles": true,
     "duree_retournement": 0.5,
@@ -34,5 +34,6 @@
     "police_livree": true,
     "echelle_interface": 0.88,
     "fleche_cavalier_en_L": true,
-    "plein_ecran": false
+    "plein_ecran": false,
+    "notation": "anglaise"
 }

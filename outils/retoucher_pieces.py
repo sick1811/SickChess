@@ -1,4 +1,9 @@
-"""Retouche des pieces "Relief" (rendus Blender) pour la lisibilite en jeu.
+"""ATTENTION (17/10, conversation graphisme) : Julien a choisi les pieces Relief
+VUES DE FACE (sans perspective ni ombre au sol). assets_src/pieces_relief_origine/
+contient maintenant ces versions-la, et assets/pieces/relief_* aussi. Ne relancer ce
+script qu'apres avoir verifie le resultat (il ajoute une ombre de contact).
+
+Retouche des pieces "Relief" (rendus Blender) pour la lisibilite en jeu.
 
 Part des images d'origine gardees dans assets_src/pieces_relief_origine/ et
 ecrit le resultat dans assets/pieces/. On peut donc le relancer sans risque :
