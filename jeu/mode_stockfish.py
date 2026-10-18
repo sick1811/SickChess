@@ -65,9 +65,13 @@ class ModeStockfish:
             if reglages and cle in reglages:
                 self.reglages[cle] = reglages[cle]
 
-        self.ia_joue_blancs = random.choice([True, False])
+        if reglages and "ia_joue_blancs" in reglages:
+            # Partie reprise (sauvegarde.py) : chacun garde sa couleur.
+            self.ia_joue_blancs = bool(reglages["ia_joue_blancs"])
+        else:
+            self.ia_joue_blancs = random.choice([True, False])
+            self.board.flipped = self.ia_joue_blancs
         self.board.ia_joue_blancs = self.ia_joue_blancs
-        self.board.flipped = self.ia_joue_blancs
         self.board.hotseat_mode = False
         # Le plateau garde une reference au moteur : c'est ce qui permet
         # a la touche H de demander un indice sans passer par le mode.
@@ -101,9 +105,12 @@ class ModeStockfish:
                  self.reglages["ia_temps_max_ms"],
                  "" if self.reglages["ia_temps_humain"] else " (rythme humain desactive)"))
 
-        if self.ia_joue_blancs:
-            print("[INFO] Stockfish joue les BLANCS et commence la partie.")
+        if self.cest_le_tour_de_lia():
+            print("[INFO] Stockfish (%s) a le trait."
+                  % ("BLANCS" if self.ia_joue_blancs else "NOIRS"))
             self.ai_manager.start_thinking()
+        elif self.ia_joue_blancs:
+            print("[INFO] Stockfish joue les BLANCS.")
         else:
             print("[INFO] Stockfish joue les NOIRS. A toi de jouer !")
 

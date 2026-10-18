@@ -35,6 +35,13 @@ class GameButtons:
         self.abandon_button = WoodButton(20, 656, 280, 50, "ABANDONNER")
         # Bouton Retour au menu, visible seulement a la fin.
         self.retour_button = WoodButton(980, 656, 280, 50, "RETOUR AU MENU")
+        # 17/10 (recette R-051) : pendant la partie il n'y avait AUCUN moyen de
+        # revenir au menu sans abandonner. Petit bouton MENU a cote d'Abandonner :
+        # la partie est gardee et le menu propose de la reprendre.
+        self.menu_button = WoodButton(980, 656, 120, 50, "MENU")
+        # En ligne (17/10, p18) ce bouton devient NULLE : quitter une partie en
+        # ligne vaudrait abandon. (libelle, action rendue)
+        self.action_secondaire = "return_to_menu"
 
         self.confirmation = False
         self.confirmation_jusqu_a = 0
@@ -48,6 +55,11 @@ class GameButtons:
         x, y, largeur, hauteur = self.zone
         for bouton in (self.abandon_button, self.retour_button):
             bouton.rect = pygame.Rect(x, y, largeur, hauteur)
+        if not self.chessboard.game_over:
+            ecart = 8
+            l_menu = max(70, int(largeur * 0.32))
+            self.abandon_button.rect = pygame.Rect(x, y, largeur - l_menu - ecart, hauteur)
+            self.menu_button.rect = pygame.Rect(x + largeur - l_menu, y, l_menu, hauteur)
 
     # ------------------------------------------------------------------ etat
 
@@ -69,8 +81,10 @@ class GameButtons:
         self._placer()
         if self.chessboard.game_over:
             self.retour_button.draw(screen)
-        elif self._abandon_visible():
-            self.abandon_button.draw(screen)
+        else:
+            if self._abandon_visible():
+                self.abandon_button.draw(screen)
+            self.menu_button.draw(screen)
 
     # ------------------------------------------------------------------ souris
 
@@ -85,6 +99,10 @@ class GameButtons:
                 return "return_to_menu"
             return None
 
+        self.menu_button.update(souris)
+        if self.menu_button.handle_event(event):
+            return self.action_secondaire
+
         if not self._abandon_visible():
             return None
 
@@ -94,13 +112,18 @@ class GameButtons:
                 # Premier clic : on demande confirmation.
                 self.confirmation = True
                 self.confirmation_jusqu_a = pygame.time.get_ticks() + DELAI_CONFIRMATION
-                self.abandon_button.text = "SUR ? RECLIQUE"
+                self.abandon_button.text = "SÛR ? RECLIQUE"
                 return None
             self.confirmation = False
             self.abandon_button.text = "ABANDONNER"
             self._abandonner()
             return "abandon"
         return None
+
+    def bouton_nulle(self):
+        """Partie en ligne : le 2e bouton propose (ou accepte) la nulle."""
+        self.menu_button.text = "NULLE"
+        self.action_secondaire = "nulle"
 
     def _abandonner(self):
         plateau = self.chessboard

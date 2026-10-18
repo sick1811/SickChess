@@ -64,10 +64,14 @@ class BoardRender:
         plateau = self.chessboard
         t = self.theme()
         sq = plateau.SQ_SIZE
-        for square in chess.SQUARES:
-            couleur = t["clair"] if geo.case_claire(square) else t["sombre"]
-            x, y = geo.case_vers_pixel(square, sq, plateau.flipped)
-            pygame.draw.rect(plateau.screen, couleur, pygame.Rect(x, y, sq, sq))
+        matiere = apparence.damier_texture(t, 8 * sq)
+        if matiere is not None:          # plateau en marbre, en bois...
+            plateau.screen.blit(matiere, (geo.ORIGINE_X, geo.ORIGINE_Y))
+        else:
+            for square in chess.SQUARES:
+                couleur = t["clair"] if geo.case_claire(square) else t["sombre"]
+                x, y = geo.case_vers_pixel(square, sq, plateau.flipped)
+                pygame.draw.rect(plateau.screen, couleur, pygame.Rect(x, y, sq, sq))
         pygame.draw.rect(plateau.screen, t["bord"],
                          pygame.Rect(geo.ORIGINE_X - 2, geo.ORIGINE_Y - 2,
                                      8 * sq + 4, 8 * sq + 4), 2)
@@ -159,6 +163,14 @@ class BoardRender:
         indice = getattr(self.chessboard, "indice", None)
         if indice:
             self._fleche(indice[0], indice[1], (40, 190, 90, 200))
+
+    def _dessiner_fleches_conseil(self):
+        """17/10 : les meilleurs coups de Stockfish dans la revue
+        [(depart, arrivee, couleur, epaisseur), ...], le meilleur en dernier
+        (dessine par-dessus)."""
+        for depart, arrivee, couleur, epaisseur in reversed(
+                getattr(self.chessboard, "fleches_conseil", None) or []):
+            self._fleche(depart, arrivee, couleur, epaisseur)
 
     def _dessiner_coup_fantome(self):
         """Le meilleur coup de Stockfish, montre en transparence.
@@ -263,9 +275,14 @@ class BoardRender:
         # DEUX CAS. Le replay s'en sert maintenant (touche H et glisser-deposer)
         # et il n'y avait aucune raison de les reserver a la partie : ce ne sont
         # que deux dessins de plus, pilotes par les memes attributs du plateau.
+        self._dessiner_fleches_conseil()
         self._dessiner_piece_glissee()
         self._dessiner_indice()
         self._dessiner_pastille_du_coup()
+        effets = getattr(plateau, "effets", None)
+        if effets is not None:
+            effets.draw(plateau.screen, plateau.SQ_SIZE, plateau.flipped,
+                        plateau.disposition.rect_plateau())
 
     def _dessiner_selection_simple(self, case):
         """Case choisie + points sur les arrivees possibles, pour le replay."""
@@ -331,7 +348,7 @@ class BoardRender:
         lignes = []
         reglages = getattr(plateau, "reglages", None) or {}
         if plateau.ai_manager is not None and reglages.get("elo"):
-            lignes.append("Stockfish  %d Elo" % reglages["elo"])
+            lignes.append("Ordinateur  %d Elo" % reglages["elo"])
         elif getattr(plateau, "couleur_joueur", None) is not None:
             couleur = "Blancs" if plateau.couleur_joueur == chess.WHITE else "Noirs"
             lignes.append("En ligne - tu joues les %s" % couleur)
@@ -362,7 +379,7 @@ class BoardRender:
         self.rect_onglets = []
 
         if chat is None:
-            ui.texte(plateau.screen, "COUPS JOUES", x + ui.t(8, ech), y + 4,
+            ui.texte(plateau.screen, "COUPS JOUÉS", x + ui.t(8, ech), y + 4,
                      taille, t["texte_discret"], gras=True, largeur_max=largeur - 16)
             return hauteur
 
@@ -442,7 +459,7 @@ class BoardRender:
         else:
             # On est sorti : on dit quand, une bonne fois. C'est l'information
             # qui manque le plus quand on relit ses parties.
-            texte = "%s  -  hors theorie depuis le coup %d" % (
+            texte = "%s  -  hors théorie depuis le coup %d" % (
                 nom, combien // 2 + 1)
             couleur = t.get("texte_discret", (150, 150, 150))
         taille = ui.t(12, ech)
@@ -514,7 +531,8 @@ class BoardRender:
                     break
                 x = zone.x + ui.t(8, ech) + largeur_num + demi * colonne
                 dernier = index == len(sans) - 1
-                ui.texte(plateau.screen, sans[index], x, y, taille,
+                import notation
+                ui.texte(plateau.screen, notation.afficher(sans[index]), x, y, taille,
                          t["accent"] if dernier else t["texte"],
                          gras=dernier, largeur_max=colonne - ui.t(6, ech))
                 self._zones_coups.append(
@@ -566,3 +584,9 @@ class BoardRender:
         # 8. Ecran de fin de partie.
         if plateau.game_over and hasattr(plateau, "end_screen"):
             plateau.end_screen.draw(plateau.screen)
+
+        # 9. Fondu d'arrivee (17/10, p13).
+        import effets
+        effets.fondu(plateau.screen, "partie", t["fond"])
+        import succes
+        succes.dessiner_annonce(plateau.screen)

@@ -101,9 +101,12 @@ for _cle_plateau in design.ORDRE_PLATEAUX:
                                                    nom=design.PLATEAUX[
                                                        _cle_plateau]["nom"])
 
-THEME_PAR_DEFAUT = "ardoise"
-ORDRE_THEMES = list(design.ORDRE_PLATEAUX) + ["vert", "marron", "bleu",
-                                              "gris", "glace", "nuit"]
+THEME_PAR_DEFAUT = design.PLATEAU_PAR_DEFAUT
+# SickChess : seuls les damiers du systeme de design sont proposes. Les six de
+# la v7 restent dans THEMES (un ancien config.json qui en nomme un marche
+# toujours) mais ne sont plus listes : trop de choix voisins, et ils ne
+# suivaient pas la direction artistique.
+ORDRE_THEMES = list(design.ORDRE_PLATEAUX)
 # Les anciens themes restent accessibles par leur nom ; les nouveaux sont en
 # tete parce que ce sont eux qu'on propose d'abord.
 ACCENT_ACTUEL = design.ACCENT_PAR_DEFAUT
@@ -137,13 +140,26 @@ FICHIERS = {
 }
 
 JEUX = {
+    # SickChess : pieces originales, modelisees pour le jeu (outils/blender/).
+    # "Relief" = modeles 3D rendus dans Blender ; "plat" = silhouettes 2D tirees
+    # des memes profils. Douze PNG par jeu, meme cadrage pour toutes les pieces.
+    "relief_prisme": {"nom": "Relief Prisme", "type": "image",
+                      "dossier": ("assets", "pieces", "relief_prisme"), "extension": ".png"},
+    "relief_arene": {"nom": "Relief Arène", "type": "image",
+                     "dossier": ("assets", "pieces", "relief_arene"), "extension": ".png"},
+    "relief_tournoi": {"nom": "Relief Tournoi", "type": "image",
+                       "dossier": ("assets", "pieces", "relief_tournoi"), "extension": ".png"},
+    "plat_arene": {"nom": "Arène", "type": "image",
+                   "dossier": ("assets", "pieces", "plat_arene"), "extension": ".png"},
+    "plat_tournoi": {"nom": "Tournoi", "type": "image",
+                     "dossier": ("assets", "pieces", "plat_tournoi"), "extension": ".png"},
     "classique": {"nom": "Classique", "type": "vectoriel"},
-    # SickChess : les jeux "bois" et "pokemon" de V8_TURBO_3000 sont retires
-    # (droits d'auteur / origine inconnue). Les nouveaux jeux de pieces
-    # s'ajouteront ici, avec leur licence notee dans docs/CREDITS.md.
+    # Les jeux "bois" et "pokemon" de V8_TURBO_3000 sont retires (droits
+    # d'auteur / origine inconnue).
 }
-JEU_PAR_DEFAUT = "classique"
-ORDRE_JEUX = ["classique"]
+JEU_PAR_DEFAUT = "plat_tournoi"      # choix de Julien (17/10) : "la version E est incroyable"
+ORDRE_JEUX = ["plat_tournoi", "plat_arene", "relief_prisme", "relief_arene",
+              "relief_tournoi", "classique"]
 
 
 def _dossier_ressources():
@@ -254,6 +270,8 @@ def charger_jeu(cle, taille_case, epaisseur_contour=1.4):
     """
     taille = max(16, int(taille_case * 0.88))
     infos = JEUX.get(cle, JEUX[JEU_PAR_DEFAUT])
+    if not jeu_disponible(cle) and jeu_disponible(JEU_PAR_DEFAUT):
+        cle, infos = JEU_PAR_DEFAUT, JEUX[JEU_PAR_DEFAUT]
 
     if infos["type"] == "vectoriel" or not jeu_disponible(cle):
         if infos["type"] != "vectoriel":
@@ -278,8 +296,49 @@ def charger_jeu(cle, taille_case, epaisseur_contour=1.4):
     return images
 
 
+# ------------------------------------------------------- plateaux en matiere
+
+_TEXTURES = {}
+
+
+def damier_texture(theme_ou_cle, cote):
+    """L'image d'un plateau en matiere (marbre, bois...) a la taille demandee.
+
+    Renvoie None pour un damier uni, ou si l'image manque : l'appelant dessine
+    alors les cases avec theme["clair"] / theme["sombre"], comme avant.
+    La case en haut a gauche de l'image est claire, comme a8 vu des Blancs
+    et h1 vu des Noirs : l'image sert telle quelle dans les deux sens.
+    """
+    t = theme(theme_ou_cle) if isinstance(theme_ou_cle, str) or theme_ou_cle is None \
+        else theme_ou_cle
+    nom = t.get("texture")
+    if not nom or cote < 8:
+        return None
+    cle = (nom, int(cote))
+    if cle in _TEXTURES:
+        return _TEXTURES[cle]
+    image = None
+    chemin = os.path.join(_dossier_ressources(), "assets", "plateaux", nom)
+    try:
+        source = _TEXTURES.get((nom, "source"))
+        if source is None:
+            source = pygame.image.load(chemin)
+            try:
+                source = source.convert()
+            except pygame.error:
+                pass
+            _TEXTURES[(nom, "source")] = source
+        image = pygame.transform.smoothscale(source, (int(cote), int(cote)))
+    except Exception as e:
+        print("[APPARENCE] plateau %s illisible (%s)" % (chemin, e))
+    _TEXTURES[cle] = image
+    return image
+
+
 def vider_cache():
     vecto.vider_cache()
+    for cle in [c for c in _TEXTURES if c[1] != "source"]:
+        del _TEXTURES[cle]
 
 
 # ===========================================================================
@@ -312,6 +371,7 @@ DEFAUTS = {
     "timbre_voix": "naturelle",     # dix timbres, voir explication_puzzle.py
     "premouvement": True,
     "volume_sons": 0.6,
+    "notation": "anglaise",         # ou "francaise" (Cf3, Fc4...) : notation.py
 }
 
 _PREFERENCES = None

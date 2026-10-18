@@ -144,7 +144,7 @@ class Chat:
         self._dessiner_messages(surface, theme, ech)
         self._dessiner_emoji(surface, rect_emoji, theme, ech)
 
-        invite = "Ecris ton message  (Entree pour envoyer)" if self.actif \
+        invite = "Écris ton message  (Entrée pour envoyer)" if self.actif \
             else "Chat indisponible"
         self.champ.dessiner(surface, self.rect_saisie, theme, ui.t(15, ech), invite)
 

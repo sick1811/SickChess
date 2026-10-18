@@ -119,3 +119,52 @@ def description(temps_restant_s, increment_s=0):
     return ("pendule %.0f s + %d s : environ %.1f s par coup en ouverture, "
             "%.1f s au milieu" % (temps_restant_s, increment_s or 0, debut,
                                   milieu))
+
+
+# ---------------------------------------------------------------------------
+# SickChess 17/10 (travail p08, « un adversaire plus humain ») : ce qu'un
+# joueur VOIT avant de reflechir. Un humain reprend vite une piece qu'on vient
+# de lui prendre, mais s'arrete longtemps quand ses pieces sont menacees ou
+# quand il y a beaucoup de prises et d'echecs possibles. Ces deux fonctions ne
+# font que regarder la position (python-chess, pas de moteur).
+
+VALEUR = {1: 1, 2: 3, 3: 3, 4: 5, 5: 9, 6: 0}   # pion, cavalier, fou, tour, dame, roi
+
+
+def est_une_reprise_evidente(board):
+    """Le dernier coup adverse a pris une piece, et on peut reprendre sur la
+    meme case : un humain le voit tout de suite."""
+    if not board.move_stack:
+        return False
+    dernier = board.peek()
+    case = dernier.to_square
+    precedent = board.copy(stack=1)
+    try:
+        precedent.pop()
+    except IndexError:
+        return False
+    if precedent.piece_at(case) is None and not precedent.is_en_passant(dernier):
+        return False
+    return any(m.to_square == case for m in board.legal_moves if board.is_capture(m))
+
+
+def facteur_de_complexite(board):
+    """Multiplicateur du temps de reflexion (0.8 a 1.9) selon ce qui se passe
+    sur l'echiquier : pieces menacees, prises et echecs possibles."""
+    import chess
+    nous = board.turn
+    menaces = 0
+    for case, piece in board.piece_map().items():
+        if piece.color != nous or piece.piece_type == chess.KING:
+            continue
+        attaquants = board.attackers(not nous, case)
+        if not attaquants:
+            continue
+        defendue = bool(board.attackers(nous, case))
+        moins_cher = min(VALEUR[board.piece_at(a).piece_type] for a in attaquants)
+        if not defendue or moins_cher < VALEUR[piece.piece_type]:
+            menaces += 1
+    prises = sum(1 for m in board.legal_moves if board.is_capture(m))
+    echecs = sum(1 for m in board.legal_moves if board.gives_check(m))
+    facteur = 0.85 + 0.30 * min(menaces, 2) + 0.04 * min(prises, 6) + 0.05 * min(echecs, 3)
+    return max(0.8, min(1.9, facteur))

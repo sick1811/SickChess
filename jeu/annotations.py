@@ -46,9 +46,9 @@ PASTILLES = {
     "excellent":  ("Excellent",      (149, 191, 96), "coche"),
     "theorique":  ("Theorique",      (166, 138, 100), "livre"),
     "meilleur":   ("Meilleur",       (106, 173, 48), "etoile"),
-    "tres_bon":   ("Tres bien",      (92, 155, 214), "!"),
+    "tres_bon":   ("Très bien",      (92, 155, 214), "!"),
     "bon":        ("Bon",            (168, 173, 148), "rond"),
-    "imprecision": ("Imprecision",   (247, 198, 49), "?!"),
+    "imprecision": ("Imprécision",   (247, 198, 49), "?!"),
     "erreur":     ("Erreur",         (229, 143, 42), "?"),
     "manque":     ("Manque",         (214, 84, 92), "X"),
     "gaffe":      ("Gaffe",          (202, 52, 49), "??"),
@@ -96,9 +96,21 @@ REMARQUABLES = ["brillant", "tres_bon", "theorique", "imprecision", "erreur",
 # LA FORMULE DES CHANCES DE GAGNER ET CELLE DE LA PRECISION etaient DEJA celles
 # de lichess (constantes 0,00368208 et 103,1668 / 0,04354) : elles ne changent
 # pas. Seuls les seuils bougent.
-SEUIL_IMPRECISION = 10.0        # lichess : Inaccuracy
-SEUIL_ERREUR = 20.0             # lichess : Mistake
-SEUIL_GAFFE = 30.0              # lichess : Blunder
+#
+# 17/10 - CORRECTION (comparaison avec chess.com sur ta partie contre
+# dragondu5) : la lecture ci-dessus etait FAUSSE. Les chances de lichess vont
+# de -1 a +1 ; ici elles vont de 0 a 100 : 0,1 de lichess = 5 points ici, pas
+# 10. Les vrais seuils de lichess sont donc 5 / 10 / 15, et ceux que chess.com
+# publie (« points attendus » perdus : 0,05 / 0,10 / 0,20) sont 5 / 10 / 20.
+# On prend ceux de chess.com, puisque c'est a lui que tu compares.
+#   perte < 2   : Excellent (pas le coup du moteur, mais presque)
+#   perte < 5   : Bon
+#   perte < 10  : Imprecision
+#   perte < 20  : Erreur
+#   au-dela     : Gaffe
+SEUIL_IMPRECISION = 5.0         # chess.com : Inaccuracy (0,05)
+SEUIL_ERREUR = 10.0             # chess.com : Mistake (0,10)
+SEUIL_GAFFE = 20.0              # chess.com : Blunder (0,20)
 
 # Un coup MANQUE : on avait une position gagnante et on l'a laissee filer.
 # C'est le "Miss" de chess.com, que lichess n'a pas. Il se declenche au niveau
@@ -149,7 +161,8 @@ def chances_de_gagner(evaluation):
     """
     if evaluation is None:
         return None
-    centipions = max(-2000.0, min(2000.0, float(evaluation) * 100.0))
+    # 17/10 : bornee a +/- 10 pions, exactement comme lichess.
+    centipions = max(-1000.0, min(1000.0, float(evaluation) * 100.0))
     return 50.0 + 50.0 * (2.0 / (1.0 + math.exp(-0.00368208 * centipions)) - 1.0)
 
 
@@ -166,7 +179,14 @@ def perte_en_chances(eval_avant, eval_apres, joue_par_les_blancs):
 
 
 def est_un_sacrifice(plateau_avant, coup):
-    """Le coup abandonne-t-il du materiel ? (pour reperer les coups brillants)"""
+    """Le coup abandonne-t-il vraiment du materiel ? (coups brillants)
+
+    SickChess : la piece doit etre REELLEMENT en prise apres le coup - soit
+    elle n'est pas defendue, soit l'adversaire peut la prendre avec une piece
+    nettement moins chere. Avant, une piece simplement attaquee comptait comme
+    un sacrifice, meme defendue par un pion (Cc3 dans le Fegatello etait note
+    "Brillant").
+    """
     if plateau_avant is None or coup is None:
         return False
     try:
@@ -176,10 +196,20 @@ def est_un_sacrifice(plateau_avant, coup):
         prise = plateau_avant.piece_at(coup.to_square)
         gain = VALEUR_PIECE.get(prise.piece_type, 0) if prise else 0
         risque = VALEUR_PIECE.get(deplacee.piece_type, 0)
+        if coup.promotion:
+            risque = VALEUR_PIECE.get(coup.promotion, 0)
         if risque - gain < 2:
             return False
-        # La case d'arrivee est-elle defendue par l'adversaire ?
-        return plateau_avant.is_attacked_by(not deplacee.color, coup.to_square)
+        apres = plateau_avant.copy(stack=False)
+        apres.push(coup)
+        attaquants = apres.attackers(not deplacee.color, coup.to_square)
+        if not attaquants:
+            return False
+        if not apres.attackers(deplacee.color, coup.to_square):
+            return True                     # en prise, et personne ne defend
+        moins_chere = min(VALEUR_PIECE.get(apres.piece_at(case).piece_type, 0)
+                          or 100 for case in attaquants)   # le roi : 100
+        return risque - moins_chere >= 2
     except Exception:
         return False
 
@@ -227,9 +257,62 @@ def coup_evident(plateau_avant, coup, dernier_coup=None):
     return False
 
 
+# ---------------------------------------------------------------------------
+# SICKCHESS 17/10 - LE MATERIEL COMPTE AUSSI (remarque de Julien : "le bot a
+# donne une dame, ca a compte comme une imprecision").
+#
+# Les chances de gagner (methode lichess) ecrasent les fautes quand la position
+# est deja tres desequilibree : de 15 % a 3 %, donner sa dame ne "coute" que
+# 12 points, donc une imprecision. Pour un jeu de competition, ce n'est pas ce
+# qu'on attend. On regarde donc AUSSI la perte en pions (evaluation bornee a
+# 15) : la pastille prend la plus severe des deux lectures.
+#   perte >= 1 pion  -> au moins Imprecision
+#   perte >= 2 pions -> au moins Erreur
+#   perte >= 4 pions -> Gaffe
+# Exception : si la position reste ECRASANTE apres le coup (+5 ou plus pour le
+# joueur), on ne monte pas au-dela d'Imprecision : rendre un peu de son
+# avance quand on gagne largement n'est pas une gaffe.
+#
+# 17/10 - CORRECTION : cette regle faisait des GAFFES la ou chess.com voit des
+# erreurs (10. h3 contre dragondu5 : la partie etait deja perdue, chess.com dit
+# « Erreur », SickChess disait « Gaffe »). Le materiel ne fait donc plus monter
+# qu'a Erreur au maximum ; seule une vraie chute des chances fait une Gaffe.
+PIONS_IMPRECISION = 1.0
+PIONS_ERREUR = 3.0
+PIONS_GAFFE = 999.0             # jamais : la gaffe vient des chances seulement
+TOUJOURS_ECRASANT = 5.0
+GRAVITE = {"imprecision": 1, "erreur": 2, "manque": 3, "gaffe": 4}
+
+
 def classer(perte, est_le_meilleur=False, sacrifice=False,
             theorique=False, chances_avant=None, chances_apres=None,
-            ecart_second=None, evident=False, meilleur_connu=None):
+            ecart_second=None, evident=False, meilleur_connu=None,
+            perte_pions=None, apres_pions=None):
+    """Pastille d'un coup : chances de gagner ET materiel (voir plus haut)."""
+    note = _classer_chances(perte, est_le_meilleur, sacrifice, theorique,
+                            chances_avant, chances_apres, ecart_second,
+                            evident, meilleur_connu)
+    if note is None or perte_pions is None or note == "theorique" \
+            or est_le_meilleur:
+        return note
+    if perte_pions >= PIONS_GAFFE:
+        selon_pions = "gaffe"
+    elif perte_pions >= PIONS_ERREUR:
+        selon_pions = "erreur"
+    elif perte_pions >= PIONS_IMPRECISION:
+        selon_pions = "imprecision"
+    else:
+        return note
+    if apres_pions is not None and apres_pions >= TOUJOURS_ECRASANT:
+        selon_pions = "imprecision"
+    if GRAVITE.get(selon_pions, 0) > GRAVITE.get(note, 0):
+        return selon_pions
+    return note
+
+
+def _classer_chances(perte, est_le_meilleur=False, sacrifice=False,
+                     theorique=False, chances_avant=None, chances_apres=None,
+                     ecart_second=None, evident=False, meilleur_connu=None):
     """Nom de la pastille pour un coup. perte = points de chances perdus.
 
     V7.2 : deux entrees de plus, toutes optionnelles, donc les anciens appels

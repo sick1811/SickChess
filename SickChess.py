@@ -11,6 +11,11 @@ import traceback
 
 VERSION = "0.1.0"
 
+# 17/10 (recette R-002) : en plein ecran, SDL reduisait la fenetre des qu'une
+# autre fenetre prenait la main (notification, Alt+Tab rate...), et le jeu
+# revenait tout noir. On garde la fenetre affichee.
+os.environ.setdefault("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0")
+
 if sys.stdout is None:          # lance sans console (pythonw ou .exe fenetre)
     class _Poubelle:
         def write(self, _t): return 0
@@ -18,12 +23,63 @@ if sys.stdout is None:          # lance sans console (pythonw ou .exe fenetre)
         def isatty(self): return False
     sys.stdout = _Poubelle()
     sys.stderr = _Poubelle()
+else:
+    # Une console Windows en cp1252 plantait sur un caractere qu'elle ne sait
+    # pas afficher (V8 retirait donc tous les accents du jeu). On lui demande
+    # de remplacer ce caractere par "?" au lieu de s'arreter.
+    for _flux in (sys.stdout, sys.stderr):
+        try:
+            _flux.reconfigure(errors="replace")
+        except Exception:
+            pass
 
 if getattr(sys, "frozen", False):
     RACINE = os.path.dirname(os.path.abspath(sys.executable))
 else:
     RACINE = os.path.dirname(os.path.abspath(__file__))
 os.chdir(RACINE)
+
+
+class _Journal:
+    """Recopie tout ce que le jeu affiche dans journal_du_jeu.txt (a la racine).
+
+    Le fichier est remis a zero a chaque lancement. Apres un test, Claude peut
+    le lire pour voir les erreurs, meme si la console s'est refermee.
+    """
+
+    def __init__(self, flux, fichier):
+        self.flux = flux
+        self.fichier = fichier
+
+    def write(self, texte):
+        try:
+            self.fichier.write(texte)
+            self.fichier.flush()
+        except Exception:
+            pass
+        try:
+            return self.flux.write(texte)
+        except Exception:
+            return len(texte)
+
+    def flush(self):
+        try:
+            self.flux.flush()
+        except Exception:
+            pass
+
+    def isatty(self):
+        return False
+
+
+try:
+    _fichier_journal = open(os.path.join(RACINE, "journal_du_jeu.txt"), "w",
+                            encoding="utf-8", errors="replace")
+    sys.stdout = _Journal(sys.stdout, _fichier_journal)
+    sys.stderr = _Journal(sys.stderr, _fichier_journal)
+except OSError:
+    pass
+
 DOSSIER_CODE = os.path.join(RACINE, "jeu")
 for chemin in (DOSSIER_CODE, getattr(sys, "_MEIPASS", None)):
     if chemin and chemin not in sys.path:

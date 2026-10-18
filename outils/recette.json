@@ -1,0 +1,712 @@
+{
+ "version": "18/10/2026",
+ "tests": [
+  {
+   "id": "R-001",
+   "section": "Lancement et fenêtre",
+   "texte": "Double-clic sur LANCER.bat (ou SickChess.exe)",
+   "detail": "Le menu s'ouvre en quelques secondes, fond 3D, titre SICKCHESS, icône dorée dans la barre des tâches.",
+   "ordre": 10000
+  },
+  {
+   "id": "R-002",
+   "section": "Lancement et fenêtre",
+   "texte": "F11 dans le menu puis en partie",
+   "detail": "Plein écran puis retour en fenêtre, rien ne déborde ni ne se chevauche.",
+   "ordre": 10001
+  },
+  {
+   "id": "R-003",
+   "section": "Lancement et fenêtre",
+   "texte": "Agrandir / rétrécir la fenêtre à la souris pendant une partie",
+   "detail": "L'échiquier et le panneau se recalent, les textes restent lisibles.",
+   "ordre": 10002
+  },
+  {
+   "id": "R-004",
+   "section": "Lancement et fenêtre",
+   "texte": "F1 dans une partie",
+   "detail": "L'aide des raccourcis s'affiche par-dessus ; F1 ou Échap la ferme.",
+   "ordre": 10003
+  },
+  {
+   "id": "R-006",
+   "section": "Lancement et fenêtre",
+   "texte": "Premier lancement (dézipper la version amis dans un dossier neuf, ou renommer profil.json)",
+   "detail": "Accueil : ton nom, ton niveau (4 choix), puis « Trois choses à savoir » ; ensuite le menu ; il ne revient plus. (Remettre profil.json.)",
+   "ordre": 10004
+  },
+  {
+   "id": "R-005",
+   "section": "Lancement et fenêtre",
+   "texte": "Quitter par le bouton Quitter puis par la croix de la fenêtre",
+   "detail": "Le jeu se ferme sans message d'erreur ; journal_du_jeu.txt finit par « Fin normale ».",
+   "ordre": 10005
+  },
+  {
+   "id": "R-010",
+   "section": "Partie contre l'ordinateur",
+   "texte": "Menu → Jouer contre l'ordinateur : changer niveau (Débutant → Maximum), rythme, cadence, incrément",
+   "detail": "Les pastilles se sélectionnent en doré, le résumé « X minutes par joueur, +Y s » suit.",
+   "ordre": 10100
+  },
+  {
+   "id": "R-011",
+   "section": "Partie contre l'ordinateur",
+   "texte": "Cocher « Retenir ces réglages », lancer, revenir au menu, rouvrir l'écran",
+   "detail": "Les réglages choisis sont retrouvés.",
+   "ordre": 10101
+  },
+  {
+   "id": "R-012",
+   "section": "Partie contre l'ordinateur",
+   "texte": "Jouer une partie complète jusqu'au mat ou à l'abandon",
+   "detail": "L'ordinateur joue à son tour sans bloquer, à une vitesse humaine.",
+   "ordre": 10102
+  },
+  {
+   "id": "R-013",
+   "section": "Partie contre l'ordinateur",
+   "texte": "Jouer avec les Noirs (relancer jusqu'à les avoir)",
+   "detail": "Plateau retourné, l'ordinateur commence, ta pendule est en bas.",
+   "ordre": 10103
+  },
+  {
+   "id": "R-015",
+   "section": "Partie contre l'ordinateur",
+   "texte": "Regarder le rythme de l'ordinateur pendant une partie de 10 minutes",
+   "detail": "Il reprend vite une pièce qu'on vient de lui prendre, réfléchit plus longtemps quand ses pièces sont menacées, ne joue jamais en un éclair (sauf coup forcé).",
+   "ordre": 10104
+  },
+  {
+   "id": "R-014",
+   "section": "Partie contre l'ordinateur",
+   "texte": "Niveau Débutant puis Maximum",
+   "detail": "Débutant laisse des pièces en prise ; Maximum ne laisse rien passer.",
+   "ordre": 10105
+  },
+  {
+   "id": "R-020",
+   "section": "Partie à deux sur ce PC",
+   "texte": "Menu → Jouer à deux, plateau « Il tourne à chaque coup »",
+   "detail": "Le plateau se retourne vers le joueur qui a le trait.",
+   "ordre": 10200
+  },
+  {
+   "id": "R-021",
+   "section": "Partie à deux sur ce PC",
+   "texte": "Même chose avec « Plateau fixe »",
+   "detail": "Les Blancs restent en bas toute la partie.",
+   "ordre": 10201
+  },
+  {
+   "id": "R-030",
+   "section": "Échiquier et règles",
+   "texte": "Déplacer une pièce en la glissant, puis par clic-clic",
+   "detail": "Les deux manières marchent ; points sur les coups possibles ; dernier coup surligné.",
+   "ordre": 10300
+  },
+  {
+   "id": "R-031",
+   "section": "Échiquier et règles",
+   "texte": "Tenter un coup illégal",
+   "detail": "La pièce revient à sa place avec un petit son, rien n'est joué.",
+   "ordre": 10301
+  },
+  {
+   "id": "R-032",
+   "section": "Échiquier et règles",
+   "texte": "Petit roque et grand roque",
+   "detail": "Roi et tour se déplacent ensemble, son du roque.",
+   "ordre": 10302
+  },
+  {
+   "id": "R-033",
+   "section": "Échiquier et règles",
+   "texte": "Prise en passant",
+   "detail": "Le pion pris disparaît bien de sa case.",
+   "ordre": 10303
+  },
+  {
+   "id": "R-034",
+   "section": "Échiquier et règles",
+   "texte": "Promotion : amener un pion sur la dernière rangée, choisir dame puis une autre fois cavalier",
+   "detail": "Le choix de la pièce s'affiche, la pièce choisie apparaît (aussi avec les Noirs).",
+   "ordre": 10304
+  },
+  {
+   "id": "R-035",
+   "section": "Échiquier et règles",
+   "texte": "Mettre le roi adverse en échec",
+   "detail": "Case du roi en rouge, son d'échec.",
+   "ordre": 10305
+  },
+  {
+   "id": "R-036",
+   "section": "Échiquier et règles",
+   "texte": "Faire mat",
+   "detail": "Carte de fin « Victoire ! » ou « Les Blancs gagnent », son de mat.",
+   "ordre": 10306
+  },
+  {
+   "id": "R-037",
+   "section": "Échiquier et règles",
+   "texte": "Pat, répétition 3 fois, règle des 50 coups (partie à deux pour le provoquer)",
+   "detail": "Partie nulle annoncée avec la bonne raison.",
+   "ordre": 10307
+  },
+  {
+   "id": "R-038",
+   "section": "Échiquier et règles",
+   "texte": "Clic droit sur des cases / glisser au clic droit",
+   "detail": "Cases colorées et flèches ; clic gauche les efface.",
+   "ordre": 10308
+  },
+  {
+   "id": "R-039",
+   "section": "Échiquier et règles",
+   "texte": "Pré-mouvement : jouer pendant que l'ordinateur réfléchit",
+   "detail": "Le coup part tout seul dès que c'est ton tour ; Échap l'annule.",
+   "ordre": 10309
+  },
+  {
+   "id": "R-040",
+   "section": "Pendule",
+   "texte": "Partie 1 min, laisser descendre sous 30 s",
+   "detail": "Le chrono clignote en rouge, un bip d'alerte.",
+   "ordre": 10400
+  },
+  {
+   "id": "R-041",
+   "section": "Pendule",
+   "texte": "Laisser le temps tomber à 0",
+   "detail": "Partie perdue au temps, pendule affichée à 0:00.0.",
+   "ordre": 10401
+  },
+  {
+   "id": "R-042",
+   "section": "Pendule",
+   "texte": "Partie avec incrément (+3 s)",
+   "detail": "Le temps augmente de 3 s après chaque coup joué.",
+   "ordre": 10402
+  },
+  {
+   "id": "R-043",
+   "section": "Pendule",
+   "texte": "Partie « Sans limite »",
+   "detail": "Les pendules affichent « --:-- » et ne bougent pas.",
+   "ordre": 10403
+  },
+  {
+   "id": "R-050",
+   "section": "Pendant la partie",
+   "texte": "Bouton Abandonner (cliquer deux fois)",
+   "detail": "Confirmation « SÛR ? », puis la partie est perdue pour toi.",
+   "ordre": 10500
+  },
+  {
+   "id": "R-051",
+   "section": "Pendant la partie",
+   "texte": "Bouton MENU (à côté d'Abandonner) en pleine partie",
+   "detail": "Le menu propose « Reprendre la partie en cours ».",
+   "ordre": 10501
+  },
+  {
+   "id": "R-052",
+   "section": "Pendant la partie",
+   "texte": "Fermer le jeu en pleine partie, le relancer, Reprendre",
+   "detail": "Position, pendules, couleur et orientation retrouvées.",
+   "ordre": 10502
+  },
+  {
+   "id": "R-053",
+   "section": "Pendant la partie",
+   "texte": "Écouter : coup, prise, roque, échec, mat, promotion, coup illégal",
+   "detail": "Chaque situation a son son ; pas de son coupé ni en double.",
+   "ordre": 10503
+  },
+  {
+   "id": "R-055",
+   "section": "Pendant la partie",
+   "texte": "Échap en pleine partie (rien de sélectionné)",
+   "detail": "Menu Pause : la pendule s'arrête ; Reprendre la relance ; Options change le plateau sans quitter la partie.",
+   "ordre": 10504
+  },
+  {
+   "id": "R-056",
+   "section": "Pendant la partie",
+   "texte": "Pause → Proposer la nulle : à deux, puis contre l'ordinateur au début et vers le coup 25",
+   "detail": "À deux : nulle tout de suite. Ordinateur : refuse au début (« trop tôt »), accepte si la partie est égale.",
+   "ordre": 10505
+  },
+  {
+   "id": "R-057",
+   "section": "Pendant la partie",
+   "texte": "Pause → Abandonner (deux clics) et Pause → Retour au menu",
+   "detail": "Abandon demandé deux fois ; Retour au menu garde la partie (« Reprendre la partie en cours »).",
+   "ordre": 10506
+  },
+  {
+   "id": "R-054",
+   "section": "Pendant la partie",
+   "texte": "Panneau de droite pendant la partie",
+   "detail": "Nom de l'ouverture (avec accents), coups joués, matériel pris, pendules.",
+   "ordre": 10507
+  },
+  {
+   "id": "R-060",
+   "section": "Fin de partie et revue",
+   "texte": "Finir une partie contre l'ordinateur",
+   "detail": "Carte de fin : résultat, raison, Elo « 1200 -> 1215 (+15) », précision des deux joueurs presque tout de suite.",
+   "ordre": 10600
+  },
+  {
+   "id": "R-061",
+   "section": "Fin de partie et revue",
+   "texte": "Carte de fin → Rejouer, puis → Menu",
+   "detail": "Rejouer relance avec les mêmes réglages ; Menu revient au menu.",
+   "ordre": 10601
+  },
+  {
+   "id": "R-062",
+   "section": "Fin de partie et revue",
+   "texte": "Carte de fin → Revue de la partie",
+   "detail": "La revue s'ouvre sur la position de départ.",
+   "ordre": 10602
+  },
+  {
+   "id": "R-063",
+   "section": "Fin de partie et revue",
+   "texte": "Revue : flèches gauche/droite, Début/Fin, molette, clic sur un coup, clic sur la courbe",
+   "detail": "On se déplace dans la partie, l'échiquier suit, son à chaque coup en avant.",
+   "ordre": 10603
+  },
+  {
+   "id": "R-064",
+   "section": "Fin de partie et revue",
+   "texte": "Revue : pastilles des coups",
+   "detail": "Une pastille par coup (rond d'attente avant) ; elle ne change plus une fois affichée.",
+   "ordre": 10604
+  },
+  {
+   "id": "R-065",
+   "section": "Fin de partie et revue",
+   "texte": "Revue : un coup marqué Erreur ou Gaffe",
+   "detail": "Flèche verte vers le coup qu'il fallait jouer ; « Il fallait jouer … » dans le détail.",
+   "ordre": 10605
+  },
+  {
+   "id": "R-06A",
+   "section": "Fin de partie et revue",
+   "texte": "Revue : un coup marqué Gaffe / Erreur / Imprécision (ex. laisser une pièce en prise)",
+   "detail": "Sous la pastille, une phrase explique la faute (« Ce coup laisse ton cavalier sans défense », « Tu avais un mat en un coup »…) sans jamais écrire le coup.",
+   "ordre": 10606
+  },
+  {
+   "id": "R-066",
+   "section": "Fin de partie et revue",
+   "texte": "Revue : un bon sacrifice",
+   "detail": "Garde une bonne pastille (Brillant, Meilleur, Excellent…).",
+   "ordre": 10607
+  },
+  {
+   "id": "R-067",
+   "section": "Fin de partie et revue",
+   "texte": "Revue : jouer un autre coup sur l'échiquier, puis le coup de l'autre camp",
+   "detail": "Variante : TU joues les deux camps, Stockfish ne joue JAMAIS ; flèches bleues de ses meilleurs coups, évaluation et barre suivent ; flèche gauche annule un coup, Échap ramène à la partie.",
+   "ordre": 10608
+  },
+  {
+   "id": "R-06B",
+   "section": "Fin de partie et revue",
+   "texte": "Revue : regarder n'importe quelle position ; touche B",
+   "detail": "Flèche bleue = meilleur coup de Stockfish ici (plus claire : les coups aussi bons) ; « Meilleur ici : … » et la suite prévue dans le détail ; B cache / remet les flèches.",
+   "ordre": 10609
+  },
+  {
+   "id": "R-06C",
+   "section": "Fin de partie et revue",
+   "texte": "Revue : la feuille de coups",
+   "detail": "L'évaluation après chaque coup à droite, en couleur quand le coup a coûté (orange, rouge).",
+   "ordre": 10610
+  },
+  {
+   "id": "R-06D",
+   "section": "Fin de partie et revue",
+   "texte": "Revue : Exporter (ou touche E) une fois l'analyse terminée ; coller sur lichess.org/paste ou chess.com/analysis",
+   "detail": "PGN copié et enregistré dans exports/ ; lichess / chess.com relisent les évaluations et les pastilles. Précision : identique à la méthode lichess (chess.com a sa propre formule, secrète : écart de quelques points normal).",
+   "ordre": 10611
+  },
+  {
+   "id": "R-06E",
+   "section": "Fin de partie et revue",
+   "texte": "Revue d'une partie importée de chess.com (ex. contre dragondu5)",
+   "detail": "Mêmes moments forts que chess.com : 7.Qe2 gaffe, 10.h3 erreur, 15.Qb3 erreur, 7...Bxa1 Très bien.",
+   "ordre": 10612
+  },
+  {
+   "id": "R-06F",
+   "section": "Fin de partie et revue",
+   "texte": "Revue juste après une partie, pendant que l'analyse calcule (Options : Calcul fixe, Maximale)",
+   "detail": "En haut : « Analyse fine… 40 % · environ 3 min » ; le temps restant baisse régulièrement ; à la fin « Analyse terminée (profondeur X à Y) ».",
+   "ordre": 10613
+  },
+  {
+   "id": "R-06G",
+   "section": "Fin de partie et revue",
+   "texte": "Changer Options → Partie → Façon d'analyser, puis rouvrir la revue d'une partie déjà analysée",
+   "detail": "La revue s'affiche tout de suite, sans tout refaire (une analyse assez forte est gardée, quel que soit le mode).",
+   "ordre": 10614
+  },
+  {
+   "id": "R-068",
+   "section": "Fin de partie et revue",
+   "texte": "Revue : touche F",
+   "detail": "L'échiquier se retourne.",
+   "ordre": 10615
+  },
+  {
+   "id": "R-069",
+   "section": "Fin de partie et revue",
+   "texte": "Ressortir de la revue, la rouvrir",
+   "detail": "Tout s'affiche tout de suite, sans nouvelle analyse.",
+   "ordre": 10616
+  },
+  {
+   "id": "R-070",
+   "section": "Mes parties et profil",
+   "texte": "Menu → Mes parties et profil",
+   "detail": "Profil (nom, Elo, victoires/nulles/défaites, courbe) et liste des parties, la plus récente en haut.",
+   "ordre": 10700
+  },
+  {
+   "id": "R-071",
+   "section": "Mes parties et profil",
+   "texte": "Changer de nom, valider avec Entrée",
+   "detail": "Le nouveau nom s'affiche ici et dans les nouvelles parties.",
+   "ordre": 10701
+  },
+  {
+   "id": "R-072",
+   "section": "Mes parties et profil",
+   "texte": "Revoir une partie de la liste",
+   "detail": "La revue s'ouvre au début ; si elle a déjà été analysée, pas de nouvelle analyse.",
+   "ordre": 10702
+  },
+  {
+   "id": "R-075",
+   "section": "Mes parties et profil",
+   "texte": "Copier un PGN (lichess / chess.com) puis Mes parties → Importer (PGN)",
+   "detail": "La revue de la partie s'ouvre ; elle apparaît dans la liste avec la pastille PGN (ou V/N/D si ton nom y est) ; l'Elo ne bouge pas.",
+   "ordre": 10703
+  },
+  {
+   "id": "R-076",
+   "section": "Mes parties et profil",
+   "texte": "Copier un lien de partie lichess puis Importer ; glisser un fichier .pgn sur la fenêtre",
+   "detail": "La partie est téléchargée / importée et la revue s'ouvre.",
+   "ordre": 10704
+  },
+  {
+   "id": "R-077",
+   "section": "Mes parties et profil",
+   "texte": "Mes parties → Statistiques",
+   "detail": "Parties et score (Blancs / Noirs), précision moyenne et tendance, tes ouvertures avec leur score, tes fautes par phase, courbe de précision.",
+   "ordre": 10705
+  },
+  {
+   "id": "R-078",
+   "section": "Mes parties et profil",
+   "texte": "Battre l'ordinateur, puis Mes parties → Statistiques → Succès",
+   "detail": "Bandeau « Succès débloqué : Premier sang » en haut de l'écran ; la liste montre les 14 succès, ceux obtenus en couleur avec la date.",
+   "ordre": 10706
+  },
+  {
+   "id": "R-073",
+   "section": "Mes parties et profil",
+   "texte": "Bouton Ouvrir le dossier",
+   "detail": "L'explorateur Windows s'ouvre sur le dossier parties.",
+   "ordre": 10707
+  },
+  {
+   "id": "R-074",
+   "section": "Mes parties et profil",
+   "texte": "Partie à deux puis Mes parties",
+   "detail": "La partie apparaît avec la pastille « 2J » et ne change pas l'Elo.",
+   "ordre": 10708
+  },
+  {
+   "id": "R-080",
+   "section": "Problèmes",
+   "texte": "Menu → Problèmes → Mode classé : faire 10 problèmes",
+   "detail": "Coup adverse joué tout seul, chrono, classement qui monte ou descend, son de réussite.",
+   "ordre": 10800
+  },
+  {
+   "id": "R-081",
+   "section": "Problèmes",
+   "texte": "Jouer un mauvais coup",
+   "detail": "Plateau rouge, explication écrite sans donner la solution, on peut réessayer.",
+   "ordre": 10801
+  },
+  {
+   "id": "R-082",
+   "section": "Problèmes",
+   "texte": "Indice (H) puis Solution",
+   "detail": "L'indice montre la pièce à jouer ; la solution se rejoue avec les flèches.",
+   "ordre": 10802
+  },
+  {
+   "id": "R-083",
+   "section": "Problèmes",
+   "texte": "Passer un problème",
+   "detail": "Il compte comme raté, le suivant arrive.",
+   "ordre": 10803
+  },
+  {
+   "id": "R-084",
+   "section": "Problèmes",
+   "texte": "Mode libre avec un niveau (600 → 2500) et un thème (ex. Mat en 2)",
+   "detail": "Les problèmes sont du niveau et du thème choisis ; le classement n'est pas touché.",
+   "ordre": 10804
+  },
+  {
+   "id": "R-085",
+   "section": "Problèmes",
+   "texte": "Problème avec promotion (thème Promotion)",
+   "detail": "Le choix de la pièce s'affiche et la bonne pièce est acceptée.",
+   "ordre": 10805
+  },
+  {
+   "id": "R-087",
+   "section": "Problèmes",
+   "texte": "Problèmes → Contre la montre",
+   "detail": "3:00 qui descend ; les problèmes deviennent plus durs ; une faute = solution puis problème suivant ; à 0:00 « Temps écoulé ! », score et record ; « Rejouer le défi ».",
+   "ordre": 10806
+  },
+  {
+   "id": "R-088",
+   "section": "Problèmes",
+   "texte": "Problèmes → Survie",
+   "detail": "Vies 3/3 ; chaque faute en retire une ; à 0 : « Trois fautes : fini ! » et le record.",
+   "ordre": 10807
+  },
+  {
+   "id": "R-089",
+   "section": "Problèmes",
+   "texte": "Problèmes → Problème du jour, puis le rouvrir",
+   "detail": "Un seul essai ; ensuite « Tu as déjà fait le problème du jour. Reviens demain ! » ; le bouton affiche « fait ».",
+   "ordre": 10808
+  },
+  {
+   "id": "R-086",
+   "section": "Problèmes",
+   "texte": "Problèmes → Mes erreurs",
+   "detail": "Tes gaffes de parties analysées reviennent en problèmes ; « Ta partie du … » ; un autre très bon coup est accepté.",
+   "ordre": 10809
+  },
+  {
+   "id": "R-097",
+   "section": "Entraînement aux ouvertures",
+   "texte": "Menu → Entraînement aux ouvertures : choisir Blancs ou Noirs puis une ouverture",
+   "detail": "Le jeu joue les coups adverses de la théorie ; à toi de trouver les tiens ; un coup faux = rouge, on réessaie.",
+   "ordre": 10900
+  },
+  {
+   "id": "R-098",
+   "section": "Entraînement aux ouvertures",
+   "texte": "« Montrer le coup (H) », finir la ligne, « Ligne suivante »",
+   "detail": "Flèche du bon coup ; à la fin : score et nom exact de la variante ; la suivante est une autre variante ; le % s'affiche sur l'ouverture dans la liste.",
+   "ordre": 10901
+  },
+  {
+   "id": "R-095",
+   "section": "Signaler un problème",
+   "texte": "Menu → Signaler un problème / une idée : écrire un message, Envoyer",
+   "detail": "Sans adresse d'envoi réglée : « Message enregistré dans le dossier rapports et copié », le dossier rapports s'ouvre avec le fichier.",
+   "ordre": 11000
+  },
+  {
+   "id": "R-096",
+   "section": "Signaler un problème",
+   "texte": "Ouvrir le fichier du rapport",
+   "detail": "Ton message, la version, le système et (pour un problème) la fin du journal du jeu.",
+   "ordre": 11001
+  },
+  {
+   "id": "R-090",
+   "section": "Options",
+   "texte": "Options → Échiquier : changer damier, accent, pièces, coordonnées",
+   "detail": "L'aperçu change tout de suite ; Enregistrer garde, Annuler remet comme avant.",
+   "ordre": 11100
+  },
+  {
+   "id": "R-091",
+   "section": "Options",
+   "texte": "Options → Partie : vitesse des pièces, retournement, pré-mouvement, notation française",
+   "detail": "Les coups s'écrivent Cf3/Fc4 partout ; retour en anglais possible.",
+   "ordre": 11101
+  },
+  {
+   "id": "R-092",
+   "section": "Options",
+   "texte": "Options → Son : volume (cliquer pour entendre), Muet",
+   "detail": "Le volume change vraiment ; Muet coupe tout.",
+   "ordre": 11102
+  },
+  {
+   "id": "R-09A",
+   "section": "Options",
+   "texte": "Options → Son : Sons des pièces Bois / Feutre / Muet sauf alertes (cliquer pour entendre)",
+   "detail": "Feutre est plus doux ; « Muet sauf alertes » : plus de bruit de pièce, mais l'échec, le temps et la fin sonnent.",
+   "ordre": 11103
+  },
+  {
+   "id": "R-09B",
+   "section": "Options",
+   "texte": "Menu : la musique d'ambiance ; Options → Son → Musique Non ; touche M dans le menu",
+   "detail": "Musique douce dans le menu, les problèmes et l'entraînement, coupée en partie ; Non ou M la coupent ; le volume change.",
+   "ordre": 11104
+  },
+  {
+   "id": "R-09E",
+   "section": "Options",
+   "texte": "Options → Partie → Façon d'analyser (Calcul fixe / Profondeur / Temps) et Puissance (Rapide / Forte / Maximale)",
+   "detail": "Calcul fixe et Maximale par défaut ; Rapide = revue plus courte ; Profondeur Maximale = l'ancienne profondeur 30 ; Temps : chaque position prend le temps choisi (3 / 7 / 15 s).",
+   "ordre": 11105
+  },
+  {
+   "id": "R-093",
+   "section": "Options",
+   "texte": "Options → Affichage : taille des textes, police, plein écran",
+   "detail": "Tous les écrans suivent, rien ne déborde.",
+   "ordre": 11106
+  },
+  {
+   "id": "R-09C",
+   "section": "Options",
+   "texte": "Options → Affichage → Langue → English, puis Enregistrer ; parcourir menu, partie, revue, problèmes, aide F1",
+   "detail": "Tout est en anglais (boutons, explications, noms d'ouvertures), rien ne déborde ; revenir à Français remet tout.",
+   "ordre": 11107
+  },
+  {
+   "id": "R-094",
+   "section": "Options",
+   "texte": "Valeurs par défaut",
+   "detail": "Tout revient aux réglages d'origine (plateau Tournoi, accent Or).",
+   "ordre": 11108
+  },
+  {
+   "id": "R-100",
+   "section": "En ligne (Steam)",
+   "texte": "Jouer en ligne sans Steam lancé",
+   "detail": "Message clair « Ouvre Steam… », le jeu ne plante pas.",
+   "ordre": 11200
+  },
+  {
+   "id": "R-101",
+   "section": "En ligne (Steam)",
+   "texte": "Lancer le jeu deux fois : Test : héberger / Test : rejoindre",
+   "detail": "Les deux fenêtres se connectent, la partie démarre.",
+   "ordre": 11201
+  },
+  {
+   "id": "R-102",
+   "section": "En ligne (Steam)",
+   "texte": "Avec un ami (deux PC) : inviter, choisir cadence et couleur, jouer",
+   "detail": "Coups, pendules et chat synchronisés ; overlay Maj+Tab.",
+   "ordre": 11202
+  },
+  {
+   "id": "R-104",
+   "section": "En ligne (Steam)",
+   "texte": "En ligne : bouton NULLE (à la place de MENU), l'ami accepte avec son bouton NULLE",
+   "detail": "Partie nulle des deux côtés ; si l'ami joue un coup au lieu d'accepter, la proposition est oubliée.",
+   "ordre": 11203
+  },
+  {
+   "id": "R-105",
+   "section": "En ligne (Steam)",
+   "texte": "Après une partie en ligne : Mes parties",
+   "detail": "La partie y est (avec ton camp et le résultat) et se revoit avec l'analyse ; l'Elo ne bouge pas.",
+   "ordre": 11204
+  },
+  {
+   "id": "R-103",
+   "section": "En ligne (Steam)",
+   "texte": "Revanche, abandon, un joueur qui ferme le jeu",
+   "detail": "Revanche couleurs inversées ; abandon et départ donnent le bon résultat.",
+   "ordre": 11205
+  },
+  {
+   "id": "R-110",
+   "section": "Version amis et mises à jour",
+   "texte": "CONSTRUIRE_VERSION_AMIS.bat",
+   "detail": "Une version est fabriquée ; SickChess_amis.zip est le seul fichier à donner.",
+   "ordre": 11300
+  },
+  {
+   "id": "R-111",
+   "section": "Version amis et mises à jour",
+   "texte": "Sur un PC sans Python : dézipper, lancer SickChess.exe",
+   "detail": "Le jeu démarre ; Windows ne le bloque pas (ou propose « Exécuter quand même »).",
+   "ordre": 11301
+  },
+  {
+   "id": "R-112",
+   "section": "Version amis et mises à jour",
+   "texte": "Bouton Mise à jour après une nouvelle version",
+   "detail": "Il s'allume, ne télécharge que ce qui a changé, garde profil et réglages.",
+   "ordre": 11302
+  },
+  {
+   "id": "R-120",
+   "section": "Solidité",
+   "texte": "Renommer moteur/stockfish.exe puis lancer une partie contre l'ordinateur",
+   "detail": "Message clair, retour au menu ; la partie à deux et les problèmes marchent toujours. (Remettre le nom.)",
+   "ordre": 11400
+  },
+  {
+   "id": "R-121",
+   "section": "Solidité",
+   "texte": "Couper Internet",
+   "detail": "Tout marche sauf l'en ligne et la mise à jour, qui le disent clairement.",
+   "ordre": 11401
+  },
+  {
+   "id": "R-122",
+   "section": "Solidité",
+   "texte": "Jouer 5 parties à la suite sans relancer le jeu",
+   "detail": "Pas de ralentissement, pas de son qui disparaît, l'ordinateur reste rapide.",
+   "ordre": 11402
+  },
+  {
+   "id": "R-123",
+   "section": "Solidité",
+   "texte": "Après chaque test : ouvrir journal_du_jeu.txt",
+   "detail": "Aucune ligne « Traceback » ni « ERREUR ».",
+   "ordre": 11403
+  },
+  {
+   "id": "R-130",
+   "section": "Graphisme et textes",
+   "texte": "Passer sur tous les écrans (menu, réglages, partie, fin, revue, mes parties, problèmes, options, en ligne)",
+   "detail": "Style Onyx & Or partout, accents corrects, aucun texte coupé ou qui dépasse.",
+   "ordre": 11500
+  },
+  {
+   "id": "R-132",
+   "section": "Graphisme et textes",
+   "texte": "Prendre une pièce ; faire mat ; se faire mater ; ouvrir les écrans",
+   "detail": "Petite onde blanche sur la case de la prise ; au mat : halo rouge sur le roi maté et confettis si tu gagnes (pas si tu perds) ; chaque écran arrive en fondu.",
+   "ordre": 11501
+  },
+  {
+   "id": "R-131",
+   "section": "Graphisme et textes",
+   "texte": "Essayer les 6 jeux de pièces sur les damiers clairs et sombres",
+   "detail": "Toutes les pièces se lisent bien, blanches comme noires.",
+   "ordre": 11502
+  }
+ ]
+}

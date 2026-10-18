@@ -17,10 +17,10 @@ import os
 
 import pygame
 
-import fond_anime
+import apparence
+import design
 import mise_en_page as mep
 import ui
-from wood_button import WoodButton
 
 # ----------------------------------------------------------------- apparence
 FOND = (20, 18, 26)
@@ -36,10 +36,60 @@ CHIP_ACTIF_TEXTE = (26, 20, 14)
 PISTE = (56, 51, 66)
 CURSEUR = (240, 217, 181)
 
+
+def _appliquer_theme():
+    """SickChess : les couleurs viennent du theme (Onyx & Or par defaut).
+
+    Ces constantes etaient des couleurs ecrites en dur (titres jaune vif,
+    pastilles cuivre, fond violet) : l'ecran ne suivait ni la direction
+    artistique ni l'accent choisi dans Options. Elles sont recalculees a
+    chaque dessin a partir du theme courant.
+    """
+    global FOND, PANNEAU, BORDURE, TITRE, TEXTE, DISCRET, CHIP, CHIP_SURVOL
+    global CHIP_ACTIF, CHIP_ACTIF_TEXTE, PISTE, CURSEUR
+    t = apparence.theme()
+    FOND = t["fond"]
+    PANNEAU = t["panneau"]
+    BORDURE = t.get("trait", t["bord"])
+    TITRE = t["texte"]
+    TEXTE = t["texte"]
+    DISCRET = t["texte_discret"]
+    CHIP = t.get("panneau_haut", t["panneau"])
+    CHIP_SURVOL = design.eclaircir(CHIP, 0.08)
+    CHIP_ACTIF = t["accent"]
+    CHIP_ACTIF_TEXTE = t["fond"]
+    PISTE = design.eclaircir(t["panneau"], 0.10)
+    CURSEUR = design.eclaircir(t["accent"], 0.25)
+    return t
+
+
+class _Bouton:
+    """Bouton du bas de l'ecran, dessine comme ceux d'Options (ui.Bouton).
+    Meme interface que l'ancien WoodButton : rect, update, handle_event, draw."""
+
+    def __init__(self, libelle, primaire=False):
+        self.rect = pygame.Rect(0, 0, 10, 10)
+        self.libelle = libelle
+        self.primaire = primaire
+        self.survol = False
+
+    def update(self, souris):
+        self.survol = self.rect.collidepoint(souris)
+
+    def handle_event(self, event):
+        return (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1
+                and self.rect.collidepoint(event.pos))
+
+    def draw(self, ecran):
+        b = ui.Bouton(self.rect, self.libelle, taille=max(14, min(19, self.rect.height // 3)))
+        b.survol = self.survol
+        b.selectionne = self.primaire
+        b.dessiner(ecran, apparence.theme(), rayon=10)
+
 # ----------------------------------------------------------------- valeurs
 NIVEAUX = [
-    ("Debutant", 400), ("Facile", 800), ("Moyen", 1200), ("Club", 1600),
-    ("Fort", 2000), ("Tres fort", 2400), ("Maximum", 3000),
+    ("Débutant", 400), ("Facile", 800), ("Moyen", 1200), ("Club", 1600),
+    ("Fort", 2000), ("Très fort", 2400), ("Maximum", 3000),
 ]
 DUREES = [("1 min", 1), ("3 min", 3), ("5 min", 5), ("10 min", 10),
           ("15 min", 15), ("30 min", 30), ("Sans limite", 0)]
@@ -48,17 +98,17 @@ INCREMENTS = [("+0 s", 0), ("+1 s", 1), ("+2 s", 2), ("+3 s", 3),
 RYTHMES = [
     ("Rapide", "rapide", 200, 1500, 800),
     ("Humain", "humain", 700, 5000, 1500),
-    ("Pose", "pose", 1500, 9000, 2500),
+    ("Posé", "pose", 1500, 9000, 2500),
 ]
 
 DESCRIPTIONS = [
-    (600, "Laisse des pieces en prise. Pour apprendre les regles."),
+    (600, "Laisse des pièces en prise. Pour apprendre les règles."),
     (1000, "Joue des coups corrects mais rate les tactiques."),
-    (1400, "Niveau d'un joueur occasionnel regulier."),
+    (1400, "Niveau d'un joueur occasionnel régulier."),
     (1800, "Niveau d'un joueur de club. Punit les erreurs."),
-    (2200, "Tres solide. Il faut un vrai plan pour l'inquieter."),
-    (2600, "Niveau maitre. Aucune faute ne pardonne."),
-    (3300, "Pleine puissance. Aucun humain ne bat ca."),
+    (2200, "Très solide. Il faut un vrai plan pour l'inquiéter."),
+    (2600, "Niveau maître. Aucune faute ne pardonne."),
+    (3300, "Pleine puissance. Aucun humain ne bat ça."),
 ]
 
 
@@ -301,10 +351,10 @@ class SettingsScreen:
         self.chips_rythme = [Chip(0, 0, 10, 10, libelle, cle)
                              for libelle, cle, _, _, _ in RYTHMES]
         self.chips_plateau = [Chip(0, 0, 10, 10, "Plateau fixe", False),
-                              Chip(0, 0, 10, 10, "Il tourne a chaque coup", True)]
+                              Chip(0, 0, 10, 10, "Il tourne à chaque coup", True)]
         self.slider = Slider(0, 0, 100, 100, 3200, 25, self.elo)
-        self.btn_commencer = WoodButton(0, 0, 10, 10, "COMMENCER LA PARTIE")
-        self.btn_retour = WoodButton(0, 0, 10, 10, "RETOUR AU MENU")
+        self.btn_commencer = _Bouton("Commencer la partie", primaire=True)
+        self.btn_retour = _Bouton("Retour au menu")
         self.case_retenir = pygame.Rect(0, 0, 22, 22)
         self.case_position = pygame.Rect(0, 0, 22, 22)
         self.case_profil = pygame.Rect(0, 0, 22, 22)
@@ -357,7 +407,7 @@ class SettingsScreen:
         h_case = mep.pas(2.5, ech)
         taille_case_texte = ui.t(15, ech)
         besoin = (h_case + 12
-                  + ui.mesurer("Retenir ces reglages", taille_case_texte)[0]
+                  + ui.mesurer("Retenir ces réglages", taille_case_texte)[0]
                   + mep.xl(ech) + h_case + 12
                   + ui.mesurer("Partir d'une position chargee (FEN ou PGN)",
                                taille_case_texte)[0])
@@ -370,7 +420,7 @@ class SettingsScreen:
             droite_cases = self.largeur - marge
             y_haut_bande = y_cases - mep.m(ech)
         self.case_retenir = pygame.Rect(marge, y_cases, h_case, h_case)
-        largeur_libelle = ui.mesurer("Retenir ces reglages", taille_case_texte)[0]
+        largeur_libelle = ui.mesurer("Retenir ces réglages", taille_case_texte)[0]
         self.zone_retenir = pygame.Rect(self.case_retenir.x, y_cases - 4,
                                         h_case + 12 + largeur_libelle, h_case + 8)
         libelle_position = "Partir d'une position chargee (FEN ou PGN)"
@@ -599,9 +649,6 @@ class SettingsScreen:
             if self.zone_retenir.collidepoint(event.pos):
                 self.retenir = not self.retenir
                 return
-            if self.zone_position.collidepoint(event.pos):
-                self.charger_position = not self.charger_position
-                return
             if self.btn_commencer.handle_event(event):
                 if self.retenir:
                     enregistrer_config(self.reglages())
@@ -644,20 +691,20 @@ class SettingsScreen:
                  largeur_max=self.largeur - case.right - 20)
 
     def draw(self):
-        self.screen.fill(FOND)
-        # V7.2 : la poussiere doree de fond (ta demande). Elle passe DERRIERE
-        # tout le contenu : on la dessine juste apres avoir efface l'ecran.
-        fond_anime.dessiner_le_fond(self.screen, TITRE)
+        t = _appliquer_theme()
+        design.degrade_vertical(self.screen, self.screen.get_rect(),
+                                design.eclaircir(t["fond"], 0.06),
+                                design.assombrir(t["fond"], 0.10))
         ech = self.ech
 
-        titres = {"stockfish": "PARTIE CONTRE STOCKFISH",
-                  "hotseat": "PARTIE A DEUX SUR CE PC",
-                  "online": "PARTIE EN LIGNE"}
+        titres = {"stockfish": "Partie contre l'ordinateur",
+                  "hotseat": "Partie à deux sur ce PC",
+                  "online": "Partie en ligne"}
         # V7.2 : titre A GAUCHE, rappel des touches A DROITE, sur la MEME
         # ligne. Avant, le rappel occupait une ligne a lui tout seul sous le
         # titre : trois lignes de haut pour deux mots.
         marge = mep.l(ech)
-        rappel = ("Entree : commencer   -   Echap : menu   -   F11 : plein ecran")
+        rappel = ("Entrée : commencer   -   Échap : menu   -   F11 : plein écran")
         largeur_rappel = ui.mesurer(rappel, ui.t(13, ech))[0]
         ui.texte(self.screen, titres.get(self.mode, "REGLAGES"), marge,
                  self.y_titre, ui.t(30, ech), TITRE, gras=True,
@@ -671,7 +718,7 @@ class SettingsScreen:
 
         # ---- colonne de gauche
         if self.afficher_niveau:
-            self._panneau(self.panneau_niveau, "NIVEAU DE STOCKFISH",
+            self._panneau(self.panneau_niveau, "NIVEAU DE L'ORDINATEUR",
                           getattr(self, "titre_niveau", (0, 0)))
             if self.panneau_niveau is not None:
                 for chip in self.chips_niveau:
@@ -689,13 +736,13 @@ class SettingsScreen:
                     self.screen, self.case_profil, self.suivre_profil,
                     "Se caler sur mon classement (%d Elo)" % self.elo_profil,
                     theme_case, ui.t(15, ech), self.interieur)
-            self._panneau(self.panneau_rythme, "RYTHME DE L'IA",
+            self._panneau(self.panneau_rythme, "RYTHME DE L'ORDINATEUR",
                           getattr(self, "titre_rythme", (0, 0)))
             if self.panneau_rythme is not None:
                 for chip in self.chips_rythme:
                     chip.draw(self.screen)
         else:
-            titre = "PARTIE A DEUX SUR CE PC" if self.mode == "hotseat" \
+            titre = "PARTIE À DEUX SUR CE PC" if self.mode == "hotseat" \
                 else "PARTIE EN RESEAU"
             self._panneau(self.panneau_niveau, titre,
                           (self.x_int_g, (self.panneau_niveau.y + int(10 * ech))
@@ -705,12 +752,12 @@ class SettingsScreen:
                                    self.panneau_niveau.y + int(10 * ech) + self.h_section,
                                    self.interieur, self.h_ligne * 2)
                 if self.mode == "hotseat":
-                    ui.paragraphe(self.screen, "Deux joueurs sur le meme ordinateur, "
-                                               "chacun a son tour.", zone,
+                    ui.paragraphe(self.screen, "Deux joueurs sur le même ordinateur, "
+                                               "chacun à son tour.", zone,
                                   ui.t(15, ech), DISCRET)
                     for chip in self.chips_plateau:
                         chip.draw(self.screen)
-                    info = ("Le joueur au trait a toujours ses pieces en bas."
+                    info = ("Le joueur au trait a toujours ses pièces en bas."
                             if self.retourner_plateau
                             else "Les Blancs restent en bas toute la partie.")
                     ui.paragraphe(self.screen, info, self.pos_info_hotseat,
@@ -725,35 +772,35 @@ class SettingsScreen:
                     # que la cadence n'etait remplacee que "si tu rejoins",
                     # alors qu'elle l'etait dans tous les cas.
                     ui.paragraphe(self.screen,
-                                  "Tout se regle maintenant DANS LE SALON, une fois que "
-                                  "ton adversaire est arrive : la cadence, competitive "
+                                  "Tout se règle maintenant DANS LE SALON, une fois que "
+                                  "ton adversaire est arrive : la cadence, compétitive "
                                   "ou amicale, et les couleurs. Rien de ce qui est "
                                   "choisi ici n'est utilise pour une partie en ligne.",
                                   zone, ui.t(15, ech), DISCRET)
 
         # ---- colonne de droite
-        self._panneau(self.panneau_temps, "DUREE DE LA PARTIE",
+        self._panneau(self.panneau_temps, "DURÉE DE LA PARTIE",
                       getattr(self, "titre_temps", (0, 0)))
         if self.panneau_temps is not None:
             for chip in self.chips_duree:
                 chip.draw(self.screen)
-            ui.texte(self.screen, "Secondes ajoutees a chaque coup :",
+            ui.texte(self.screen, "Secondes ajoutées à chaque coup :",
                      self.pos_libelle_increment[0], self.pos_libelle_increment[1],
                      ui.t(15, ech), DISCRET, largeur_max=self.interieur)
             for chip in self.chips_increment:
                 chip.draw(self.screen)
             if self.minutes == 0:
-                info = "Aucune limite de temps : la pendule est desactivee."
+                info = "Aucune limite de temps : la pendule est désactivée."
             else:
-                info = "%d minutes par joueur, +%d s par coup." % (self.minutes,
+                info = "%d minute%s par joueur, +%d s par coup." % (self.minutes, "s" if self.minutes > 1 else "",
                                                                   self.increment)
             ui.paragraphe(self.screen, info, self.pos_resume_temps,
                           ui.t(15, ech), TEXTE)
 
         # ---- cases a cocher et boutons
-        self._case_a_cocher(self.case_retenir, self.retenir, "Retenir ces reglages")
-        self._case_a_cocher(self.case_position, self.charger_position,
-                            "Partir d'une position chargee (FEN ou PGN)")
+        self._case_a_cocher(self.case_retenir, self.retenir, "Retenir ces réglages")
+        # SickChess : "Partir d'une position chargee" n'est plus branche (le
+        # chargement de position reviendra avec son ecran) : case cachee.
         self.btn_commencer.draw(self.screen)
         self.btn_retour.draw(self.screen)
 

@@ -30,12 +30,22 @@ SOUND_KEYS = [
     "move", "knight_move", "bishop_move", "rook_move", "queen_move", "king_move",
     "capture", "illegal", "check", "checkmate", "stalemate",
     "en_passant", "castling", "promotion", "low_time", "game_start", "game_end",
-    "fifty_moves", "repetition",
+    "fifty_moves", "repetition", "puzzle_reussi", "puzzle_faux",
 ]
 
 
+# 17/10 (travail p15) : packs de sons au choix (Options -> Son).
+#   bois    : les chocs de bois (sounds/)
+#   feutre  : les memes, plus doux (sounds/feutre/)
+#   alertes : muet, sauf ce qui demande l'attention (echec, mat, temps, fin...)
+PACKS = ("bois", "feutre", "alertes")
+ALERTES = {"check", "checkmate", "stalemate", "low_time", "game_start", "game_end",
+           "fifty_moves", "repetition", "illegal", "puzzle_reussi", "puzzle_faux",
+           "promotion"}
+
+
 class SoundManager:
-    def __init__(self, volume=None):
+    def __init__(self, volume=None, pack=None):
         if not pygame.mixer.get_init():
             try:
                 pygame.mixer.init()
@@ -50,7 +60,10 @@ class SoundManager:
         self.formats = {}
         self.actif = True
         self.volume = 0.6 if volume is None else float(volume)
+        self.pack = "bois"
         self._charger_reglages()
+        if pack in PACKS:
+            self.pack = pack
         self.load_sounds()
 
     def _charger_reglages(self):
@@ -68,6 +81,8 @@ class SoundManager:
                         contenu = {}
                     self.volume = float(contenu.get("volume_sons", self.volume))
                     self.actif = bool(contenu.get("sons_actifs", True))
+                    if contenu.get("pack_sons") in PACKS:
+                        self.pack = contenu["pack_sons"]
                 except (ValueError, OSError, TypeError):
                     pass
                 break
@@ -76,7 +91,11 @@ class SoundManager:
 
     def _dossiers_de_recherche(self):
         ici = os.path.dirname(os.path.abspath(__file__))
-        return [os.path.join(os.getcwd(), "sounds"), os.path.join(ici, "sounds")]
+        bases = [os.path.join(os.getcwd(), "sounds"), os.path.join(ici, "sounds"),
+                 os.path.join(os.path.dirname(ici), "sounds")]
+        if self.pack == "feutre":
+            return [os.path.join(b, "feutre") for b in bases] + bases
+        return bases
 
     def _trouver_fichier(self, cle, config):
         # 1. Chemin explicite dans config.json (comportement V5 conserve).
@@ -134,6 +153,8 @@ class SoundManager:
     def play(self, name):
         if not self.actif:
             return False
+        if self.pack == "alertes" and name not in ALERTES:
+            return False
         son = self.sounds.get(name)
         if son is None:
             return False
@@ -152,6 +173,14 @@ class SoundManager:
                 son.set_volume(self.volume)
             except Exception:
                 pass
+
+    def changer_de_pack(self, pack):
+        """Recharge les sons d'un autre pack (Options -> Son)."""
+        if pack in PACKS and pack != self.pack:
+            self.pack = pack
+            self.sounds, self.formats = {}, {}
+            self.load_sounds()
+        return self.pack
 
     def couper(self, coupe=True):
         self.actif = not coupe

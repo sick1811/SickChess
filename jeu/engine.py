@@ -537,14 +537,10 @@ class StockfishEngine:
         # calculees ; comme on analyse les positions d'une partie DANS L'ORDRE,
         # chacune retrouve dedans presque tout le travail de la precedente.
         # Grosse table = meme force, beaucoup moins de temps.
-        # Stockfish arrondit lui-meme a la puissance de 2 inferieure : autant
-        # lui donner directement une puissance de 2, sinon on paie de la
-        # memoire pour rien.
+        # 18/10 (13) : plus d'arrondi a la puissance de 2. Les Stockfish
+        # recents (17.1, 19) prennent la taille exacte : 6 Go repartis en
+        # 3 x 2 Go, ou 2 x 3 Go sur un PC a 4 coeurs, tombent juste.
         hash_mb = max(16, int(hash_mb))
-        puissance_de_deux = 16
-        while puissance_de_deux * 2 <= hash_mb:
-            puissance_de_deux *= 2
-        hash_mb = puissance_de_deux
 
         # ELO MAXIMUM, et uniquement ici : le moteur qui JOUE garde ton niveau.
         # L'analyse tourne dans un processus Stockfish separe, donc regler
@@ -599,15 +595,16 @@ class StockfishEngine:
         return self
 
     def analyser_position(self, fen, profondeur=0, temps_max_ms=8000,
-                          lignes=None):
+                          lignes=None, noeuds=0):
         """Voir la vraie methode juste en dessous : 'lignes' est le nombre de
         coups a classer pour CETTE position (1 = le plus rapide, 2 = on veut
-        aussi le deuxieme meilleur coup)."""
+        aussi le deuxieme meilleur coup). 18/10 : 'noeuds' = quantite de
+        calcul fixe (comme lichess), voir analyse_partie.REGLAGES."""
         if lignes is not None:
             self._regler_multipv(max(1, int(lignes)))
-        return self._analyser_position(fen, profondeur, temps_max_ms)
+        return self._analyser_position(fen, profondeur, temps_max_ms, noeuds)
 
-    def _analyser_position(self, fen, profondeur=0, temps_max_ms=8000):
+    def _analyser_position(self, fen, profondeur=0, temps_max_ms=8000, noeuds=0):
         """Analyse une position. Deux facons de s'arreter, au choix :
 
         profondeur > 0 : le moteur s'arrete a cette profondeur. Le resultat est
@@ -620,27 +617,48 @@ class StockfishEngine:
         """
         profondeur = max(0, int(profondeur))
         temps_max_ms = max(50, int(temps_max_ms))
+        noeuds = max(0, int(noeuds or 0))
         with self._verrou:
             if not self.est_vivant():
                 return None
             try:
                 self._send_command("position fen " + fen)
+                # 18/10 : les limites se cumulent, Stockfish s'arrete a la
+                # premiere atteinte (le temps reste un garde-fou).
+                commande = "go"
                 if profondeur:
-                    self._send_command("go depth %d movetime %d"
-                                       % (profondeur, temps_max_ms))
-                else:
-                    self._send_command("go movetime %d" % temps_max_ms)
+                    commande += " depth %d" % profondeur
+                if noeuds:
+                    commande += " nodes %d" % noeuds
+                self._send_command("%s movetime %d" % (commande, temps_max_ms))
                 lignes = {}
                 atteinte = 0
+                calcules, duree = 0, 0
                 limite = time.time() + (temps_max_ms / 1000.0) + 8.0
                 while time.time() < limite:
                     ligne = self._lire_ligne()
                     if ligne is None:
                         return None
                     if ligne.startswith("info "):
+                        mots = ligne.split()
+                        try:
+                            if "nodes" in mots:
+                                calcules = int(mots[mots.index("nodes") + 1])
+                            if "time" in mots:
+                                duree = int(mots[mots.index("time") + 1])
+                        except (ValueError, IndexError):
+                            pass
                         entree = self._analyser_multipv(ligne)
                         if entree is not None:
                             rang, donnees = entree
+                            # 17/10 (« l'analyse doit etre tres precise ») :
+                            # une borne (lowerbound / upperbound, recherche en
+                            # cours d'ajustement) ne remplace jamais un score
+                            # exact ; elle ne sert que s'il n'y a rien d'autre.
+                            ancien = lignes.get(rang)
+                            if donnees.get("borne") and ancien is not None \
+                                    and not ancien.get("borne"):
+                                continue
                             lignes[rang] = donnees
                             atteinte = max(atteinte,
                                            donnees.get("profondeur", 0))
@@ -666,6 +684,14 @@ class StockfishEngine:
                                 if second and second.get("cp") is not None
                                 else None),
                             "second_mat": (second or {}).get("mat"),
+                            # 17/10 : toutes les lignes classees (MultiPV),
+                            # meilleure d'abord : la revue montre les coups
+                            # aussi bons que le meilleur.
+                            "lignes": [lignes[r] for r in sorted(lignes)],
+                            # 18/10 : le calcul vraiment fait (temps restant
+                            # de la revue, outil de mesure).
+                            "noeuds": calcules,
+                            "temps_ms": duree,
                         }
                 self._send_command("stop")
                 return None
@@ -901,8 +927,14 @@ class StockfishEngine:
                     mat = int(mots[i + 2])
             except (ValueError, IndexError):
                 pass
+        borne = "lowerbound" in mots or "upperbound" in mots
+        suite = []
+        for mot in mots[mots.index("pv") + 1:]:
+            if len(suite) >= 8 or not (4 <= len(mot) <= 5) or not mot[1].isdigit():
+                break
+            suite.append(mot)
         return rang, {"coup": coup, "cp": cp, "mat": mat,
-                      "profondeur": profondeur}
+                      "profondeur": profondeur, "borne": borne, "suite": suite}
 
     def _analyser_info(self, ligne):
         """Extrait score cp / score mate / depth d'une ligne 'info'."""

@@ -94,15 +94,15 @@ def lignes(board):
     if infos["alerte_repetition"]:
         vues = infos["repetitions"]
         if vues >= 3:
-            sortie.append(("Position vue 3 fois - nulle par repetition",
+            sortie.append(("Position vue 3 fois - nulle par répétition",
                            "attention"))
         else:
-            sortie.append(("Position deja vue 2 fois - au prochain retour, "
+            sortie.append(("Position déjà vue 2 fois - au prochain retour, "
                            "c'est nulle", "attention"))
 
     if infos["alerte_50"]:
         niveau = "attention" if infos["demi_coups"] >= ALERTE_50 else "info"
-        sortie.append(("Regle des 50 coups : %d / %d   (encore %d coups)"
+        sortie.append(("Règle des 50 coups : %d / %d   (encore %d coups)"
                        % (infos["demi_coups"], LIMITE_50,
                           infos["coups_restants"]), niveau))
     return sortie
