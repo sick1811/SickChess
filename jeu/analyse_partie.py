@@ -83,7 +83,7 @@ PUISSANCES = dict((nom, (r["profondeur"] or r["profondeur_min"], r["temps_ms"]))
                   for nom, r in REGLAGES.items())
 MODES = ("calcul", "profondeur", "temps")
 NIVEAUX = ("rapide", "forte", "maximale")
-PUISSANCE_PAR_DEFAUT = "calcul_maximale"
+PUISSANCE_PAR_DEFAUT = "calcul_forte"   # 18/10 (14) : Forte, choix de Julien
 TEMPS_LIGNES_MS = 6000
 
 
@@ -99,7 +99,7 @@ def puissance_de(config):
     niveau = config.get("analyse_niveau")
     if niveau not in NIVEAUX:
         niveau = {"rapide": "rapide", "normale": "rapide", "forte": "forte"}.get(
-            config.get("analyse_puissance"), "maximale")
+            config.get("analyse_puissance"), "forte")
     return "%s_%s" % (mode, niveau)
 
 

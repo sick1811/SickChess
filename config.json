@@ -40,5 +40,7 @@
     "musique": false,
     "volume_musique": 0.25,
     "langue": "fr",
-    "analyse_puissance": "maximale"
+    "analyse_puissance": "maximale",
+    "analyse_mode": "calcul",
+    "analyse_niveau": "forte"
 }

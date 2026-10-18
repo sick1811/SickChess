@@ -59,8 +59,8 @@ print("2. Profondeur 30 : trois coups a 22, puis le meilleur a 30")
 m = Factice()
 a = A.AnalyseurPartie(None, ["e2e4", "e7e5", "g1f3"], None, "maximale", moteur=m)
 verifier(a.profondeur == 30 and a.niveau_final == 3, "reglage par defaut : profondeur 30")
-verifier(A.PUISSANCE_PAR_DEFAUT == "calcul_maximale",
-         "18/10 : le calcul fixe maximal est le reglage par defaut")
+verifier(A.PUISSANCE_PAR_DEFAUT == "calcul_forte",
+         "18/10 (14) : le calcul fixe fort est le reglage par defaut")
 a._travailler()
 verifier(a.terminee(), "analyse terminee")
 verifier((10, 1) in m.appels and (22, 3) in m.appels and (30, 1) in m.appels,

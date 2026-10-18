@@ -34,7 +34,7 @@ DEFAUTS_EN_PLUS = {
     # 18/10 (13) : la facon d'analyser (choix de Julien : calcul fixe par
     # defaut, profondeur et temps au choix) et sa puissance.
     "analyse_mode": "calcul",
-    "analyse_niveau": "maximale",
+    "analyse_niveau": "forte",      # 18/10 (14) : Maximale = 17 min de revue
 }
 try:                              # 17/10, travail p12 : la langue de Windows par defaut
     import langue as _langue

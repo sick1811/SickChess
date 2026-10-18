@@ -642,3 +642,16 @@ vite en 1 × 12 (27 s contre 46 s). Revue estimée pour 80 positions : Rapide 3,
 Maximale 17,1 min (plus que les 6 à 10 min prévues). À décider : réglage par défaut Forte, ou 1 × 12.
 Tests : `python tests/lancer_tous.py` → 611 contrôles verts. Commit de la séance (13) fait.
 
+## 18/10/2026 (14) – Analyse « Forte » par défaut (Claude Code)
+Fait :
+- Décision de Julien après la mesure : **puissance Forte par défaut** (25 millions de nœuds par
+  position, revue d'environ 9 min au lieu de 17 pour 40 coups) et **répartition 3 × 4 gardée**.
+- `analyse_partie.py` (`PUISSANCE_PAR_DEFAUT`, `puissance_de`) et `ecran_options.py` : Forte par défaut.
+  L'ancien réglage seul (`analyse_puissance` « maximale », mis par défaut le 17/10) donne maintenant Forte.
+- `config.json` de Julien : `analyse_mode` calcul, `analyse_niveau` forte ajoutés.
+- Tests : `test_modes_analyse.py`, `test_analyse_profonde.py` mis à jour. Recette : R-09E modifié.
+
+À vérifier par Julien :
+- [ ] t67 : durée réelle d'une revue en Forte (environ 9 min prévues pour 40 coups).
+- [ ] t68 : Options → Partie → Puissance de l'analyse affiche « Forte ».
+

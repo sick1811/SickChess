@@ -46,13 +46,14 @@ page Steam, démarches Steamworks, licence des pièces Classique.
 
 ## À tester par Julien (sur son PC)
 - [ ] t64-t66 : revue – Stockfish ne joue plus, flèches bleues/vertes, export et comparaison chess.com.
-- [ ] t67 : temps réel d'une revue complète (Calcul fixe, Maximale) ; « environ X min » juste ?
-- [ ] t68 : Options → Partie → Façon d'analyser / Puissance ; partie déjà analysée pas refaite.
-- [ ] t69 (Claude Code, Windows) : `python outils/mesurer_stockfish.py` → `docs/MESURE_STOCKFISH.md`,
-      puis choisir la répartition (1 × 12, 3 × 4, 6 × 2, 12 × 1) d'après la mesure.
+- [ ] t67 : temps réel d'une revue complète (Calcul fixe, **Forte**, par défaut depuis le 18/10 (14)) ;
+      la mesure prévoit environ 9 min pour 40 coups. « environ X min » juste ?
+- [ ] t68 : Options → Partie → Façon d'analyser / Puissance ; « Forte » est sélectionné ; partie déjà
+      analysée pas refaite.
+- [x] t69 : mesure faite le 18/10 (`docs/MESURE_STOCKFISH.md`) ; décision de Julien : Forte et 3 × 4.
 - [ ] t70 : hachage 6 Go – les stockfish.exe prennent ~6 Go pendant une revue, le PC reste fluide ;
       noter la mémoire du PC (Gestionnaire des tâches → Performance → Mémoire).
-- [ ] Commit Git de la séance du 18/10 (13) par Claude Code.
+- [x] Commit Git de la séance du 18/10 (13) par Claude Code (fusionné sur GitHub, PR n° 1).
 - [ ] Problèmes → « Mes erreurs » : tes gaffes deviennent des problèmes (parties dont la revue a été ouverte).
 - [ ] Revue : jouer une variante sur l'échiquier, Stockfish répond ; Échap pour revenir.
 - [ ] Commit Git des séances du 17/10 (3) et (4) par Claude Code.

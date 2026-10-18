@@ -57,7 +57,9 @@ class Factice:
 COUPS = ["e2e4", "e7e5", "g1f3", "b8c6"]
 
 print("1. Le reglage choisi dans Options")
-verifier(A.puissance_de({}) == "calcul_maximale", "rien de regle : calcul fixe maximal")
+verifier(A.puissance_de({}) == "calcul_forte", "rien de regle : calcul fixe fort (18/10 (14))")
+verifier(A.puissance_de({"analyse_puissance": "maximale"}) == "calcul_forte",
+         "ancien defaut « maximale » seul : calcul fixe fort")
 verifier(A.puissance_de({"analyse_puissance": "forte"}) == "calcul_forte",
          "ancien reglage « forte » (26) : calcul fixe fort")
 verifier(A.puissance_de({"analyse_mode": "profondeur", "analyse_niveau": "maximale"})
@@ -65,7 +67,7 @@ verifier(A.puissance_de({"analyse_mode": "profondeur", "analyse_niveau": "maxima
 verifier(A.REGLAGES["profondeur_maximale"]["profondeur"] == 30, "profondeur 30")
 verifier(A.puissance_de({"analyse_mode": "temps", "analyse_niveau": "rapide"})
          == "temps_rapide", "temps rapide")
-verifier(A.puissance_de({"analyse_mode": "n'importe quoi"}) == "calcul_maximale",
+verifier(A.puissance_de({"analyse_mode": "n'importe quoi"}) == "calcul_forte",
          "valeur inconnue : retour au defaut")
 for nom in ("rapide", "normale", "forte", "maximale"):
     verifier(nom in A.REGLAGES, "ancien nom « %s » toujours accepte" % nom)

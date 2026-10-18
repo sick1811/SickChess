@@ -572,7 +572,7 @@
    "id": "R-09E",
    "section": "Options",
    "texte": "Options → Partie → Façon d'analyser (Calcul fixe / Profondeur / Temps) et Puissance (Rapide / Forte / Maximale)",
-   "detail": "Calcul fixe et Maximale par défaut ; Rapide = revue plus courte ; Profondeur Maximale = l'ancienne profondeur 30 ; Temps : chaque position prend le temps choisi (3 / 7 / 15 s).",
+   "detail": "Calcul fixe et Forte par défaut ; Rapide = revue plus courte ; Profondeur Maximale = l'ancienne profondeur 30 ; Temps : chaque position prend le temps choisi (3 / 7 / 15 s).",
    "ordre": 11105
   },
   {

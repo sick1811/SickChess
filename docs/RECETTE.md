@@ -207,7 +207,7 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 18/10
 - [ ] **R-09B** – Menu : la musique d'ambiance ; Options → Son → Musique Non ; touche M dans le menu  
   → Musique douce dans le menu, les problèmes et l'entraînement, coupée en partie ; Non ou M la coupent ; le volume change.
 - [ ] **R-09E** – Options → Partie → Façon d'analyser (Calcul fixe / Profondeur / Temps) et Puissance (Rapide / Forte / Maximale)  
-  → Calcul fixe et Maximale par défaut ; Rapide = revue plus courte ; Profondeur Maximale = l'ancienne profondeur 30 ; Temps : chaque position prend le temps choisi (3 / 7 / 15 s).
+  → Calcul fixe et Forte par défaut ; Rapide = revue plus courte ; Profondeur Maximale = l'ancienne profondeur 30 ; Temps : chaque position prend le temps choisi (3 / 7 / 15 s).
 - [ ] **R-093** – Options → Affichage : taille des textes, police, plein écran  
   → Tous les écrans suivent, rien ne déborde.
 - [ ] **R-09C** – Options → Affichage → Langue → English, puis Enregistrer ; parcourir menu, partie, revue, problèmes, aide F1  
