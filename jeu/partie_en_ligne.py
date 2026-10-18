@@ -186,6 +186,7 @@ def jouer_une_partie(manager, transport, reglages, numero=1):
     mode = ModeEnLigne(board, transport, reglages["couleur_locale"],
                        transport.nom_local, numero=numero)
     board.end_screen = EcranFinEnLigne(board, mode)
+    board.game_buttons.bouton_nulle()       # pas de MENU en ligne : NULLE
     if numero > 1:
         mode.afficher("Revanche ! Tu joues les %s."
                       % ("Blancs" if mode.couleur_locale == chess.WHITE else "Noirs"))
@@ -218,6 +219,9 @@ def _boucle(manager, board, mode):
                 return "menu"
             if action == "abandon":
                 mode.abandonner()
+                continue
+            if action == "nulle":
+                mode.nulle()
                 continue
             board.handle_event(event, None)
 

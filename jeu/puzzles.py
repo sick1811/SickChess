@@ -498,6 +498,13 @@ class Session:
                                       secondes=secondes, indice=indice)
         if self.classe:
             enregistrer_le_score(self.score)
+            try:
+                import succes
+                succes.verifier({"serie_10": self.serie() >= 10,
+                                 "problemes_100": self.reussis() >= 100,
+                                 "classement_1500": self.classement() >= 1500})
+            except Exception as e:
+                print("[SUCCES] %s" % e)
         return self.gain
 
     def payer_l_indice(self):

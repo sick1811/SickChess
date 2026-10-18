@@ -792,7 +792,7 @@ class SettingsScreen:
             if self.minutes == 0:
                 info = "Aucune limite de temps : la pendule est désactivée."
             else:
-                info = "%d minutes par joueur, +%d s par coup." % (self.minutes,
+                info = "%d minute%s par joueur, +%d s par coup." % (self.minutes, "s" if self.minutes > 1 else "",
                                                                   self.increment)
             ui.paragraphe(self.screen, info, self.pos_resume_temps,
                           ui.t(15, ech), TEXTE)

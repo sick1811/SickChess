@@ -211,7 +211,9 @@ def lister(nombre=200):
             "eco": e.get("ECO", ""),
             "ouverture": e.get("Opening", ""),
             "camp": camp,
-            "verdict": _verdict(e.get("Result", "*"), camp),
+            "verdict": _verdict(e.get("Result", "*"), camp)
+            or ("importee" if e.get("Importee") == "oui" else ""),
+            "importee": e.get("Importee") == "oui",
         })
     return parties
 
@@ -260,3 +262,88 @@ def lire_partie(chemin):
         return None, "Cette partie ne contient aucun coup à rejouer."
     return {"fen": fen, "coups": coups}, ""
 
+
+
+# ---------------------------------------------------------------------------
+# SickChess 17/10 (travail p18, demande de Julien : « importer aussi des
+# parties avec des codes PGN ») : une partie jouee ailleurs (lichess,
+# chess.com, un livre...) entre dans « Mes parties » pour etre revue et
+# analysee. Elle ne touche ni au profil ni a l'Elo.
+
+LIEN_LICHESS = re.compile(r"lichess\.org/([A-Za-z0-9]{8})(?:[A-Za-z0-9]{4})?\b")
+
+
+def telecharger_lichess(texte, delai=8, ouvrir=None):
+    """Si le texte est un lien de partie lichess, renvoie (pgn, '') ; sinon
+    (None, '') ; (None, erreur) si le telechargement rate."""
+    texte = (texte or "").strip()
+    # Un vrai PGN contient souvent le lien lichess dans [Site ...] : on ne
+    # telecharge que si le texte EST un lien (court, sans en-tetes ni coups).
+    if len(texte) > 200 or "[" in texte or re.search(r"\b1\.", texte):
+        return None, ""
+    trouve = LIEN_LICHESS.search(texte)
+    if not trouve:
+        return None, ""
+    import urllib.request
+    url = "https://lichess.org/game/export/%s?evals=0&clocks=0" % trouve.group(1)
+    try:
+        requete = urllib.request.Request(url, headers={"User-Agent": "SickChess",
+                                                       "Accept": "application/x-chess-pgn"})
+        ouvrir = ouvrir or urllib.request.urlopen
+        with ouvrir(requete, timeout=delai) as reponse:
+            return reponse.read().decode("utf-8", "replace"), ""
+    except Exception as e:
+        print("[IMPORT] lichess : %s" % e)
+        return None, "Impossible de télécharger la partie lichess (Internet ?)."
+
+
+def importer(texte, nom_du_joueur="", maintenant=None, ouvrir=None):
+    """Range une partie PGN (texte ou lien lichess) dans parties/.
+    Renvoie (chemin, '') ou ('', erreur lisible)."""
+    import chess.pgn
+    texte = (texte or "").strip()
+    if not texte:
+        return "", "Rien à importer : copie d'abord le PGN (ou un lien lichess)."
+    telecharge, erreur = telecharger_lichess(texte, ouvrir=ouvrir)
+    if erreur:
+        return "", erreur
+    if telecharge:
+        texte = telecharge
+    try:
+        jeu = chess.pgn.read_game(io.StringIO(texte))
+    except Exception:
+        jeu = None
+    if jeu is None or jeu.errors and not list(jeu.mainline_moves()):
+        return "", "Ce texte n'est pas une partie PGN."
+    coups = list(jeu.mainline_moves())
+    if not coups:
+        if "[" not in texte:
+            return "", "Ce texte n'est pas une partie PGN."
+        return "", "Cette partie ne contient aucun coup."
+    entetes = jeu.headers
+    blancs = entetes.get("White", "?") or "?"
+    noirs = entetes.get("Black", "?") or "?"
+    entetes["Importee"] = "oui"
+    nom = (nom_du_joueur or "").strip().lower()
+    if nom and blancs.lower() == nom:
+        entetes["Joueur"] = "blanc"
+    elif nom and noirs.lower() == nom:
+        entetes["Joueur"] = "noir"
+    maintenant = maintenant or datetime.datetime.now()
+    if entetes.get("Date", "????.??.??").startswith("?"):
+        entetes["Date"] = maintenant.strftime("%Y.%m.%d")
+    try:
+        os.makedirs(dossier_parties(), exist_ok=True)
+        chemin = os.path.join(dossier_parties(),
+                              _nom_de_fichier(blancs, noirs + "-import", maintenant))
+        with open(chemin, "w", encoding="utf-8") as f:
+            print(jeu, file=f, end="\n\n")
+    except OSError as e:
+        return "", "Impossible d'écrire la partie : %s" % e
+    print("[IMPORT] partie importee : %s (%d demi-coups)" % (os.path.basename(chemin), len(coups)))
+    try:
+        import succes
+        succes.debloquer("importer")
+    except Exception as e:
+        print("[SUCCES] %s" % e)
+    return chemin, ""

@@ -27,7 +27,20 @@ OUI_NON = [("Oui", True), ("Non", False)]
 DEFAUTS_EN_PLUS = {
     "hotseat_retourner_plateau": True,
     "plein_ecran": False,
+    "pack_sons": "bois",          # 17/10, travail p15
+    "musique": True,              # 17/10, travail p14
+    "volume_musique": 0.3,
+    "analyse_puissance": "maximale",   # 17/10 : profondeur 30 (ancien reglage)
+    # 18/10 (13) : la facon d'analyser (choix de Julien : calcul fixe par
+    # defaut, profondeur et temps au choix) et sa puissance.
+    "analyse_mode": "calcul",
+    "analyse_niveau": "maximale",
 }
+try:                              # 17/10, travail p12 : la langue de Windows par defaut
+    import langue as _langue
+    DEFAUTS_EN_PLUS["langue"] = _langue.langue()
+except Exception:
+    DEFAUTS_EN_PLUS["langue"] = "fr"
 
 POSITION_APERCU = "r1bqk2r/pppp1ppp/2n2n2/2b1p3/2B1P3/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 1"
 
@@ -99,6 +112,14 @@ def _onglets():
             Reglage("premouvement", "Pré-mouvement",
                     "Jouer d'avance pendant que l'adversaire reflechit",
                     OUI_NON, 2),
+            Reglage("analyse_mode", "Façon d'analyser",
+                    "Calcul fixe : même analyse sur tous les PC, durée prévisible",
+                    [("Calcul fixe", "calcul"), ("Profondeur", "profondeur"),
+                     ("Temps", "temps")], 3),
+            Reglage("analyse_niveau", "Puissance de l'analyse",
+                    "Calcul : 10 / 25 / 50 millions - profondeur : 22 / 26 / 30 - temps : 3 / 7 / 15 s",
+                    [("Rapide", "rapide"), ("Forte", "forte"),
+                     ("Maximale", "maximale")], 3),
             Reglage("hotseat_retourner_plateau", "Partie à deux",
                     "Tourner le plateau vers le joueur qui doit jouer",
                     OUI_NON, 2),
@@ -108,6 +129,15 @@ def _onglets():
                     "Pièces et pendule - clique pour entendre",
                     [("Muet", 0.0), ("25 %", 0.25), ("50 %", 0.5),
                      ("75 %", 0.75), ("100 %", 1.0)], 5),
+            Reglage("pack_sons", "Sons des pièces",
+                    "Clique pour entendre",
+                    [("Bois", "bois"), ("Feutre (plus doux)", "feutre"),
+                     ("Muet sauf alertes", "alertes")], 3),
+            Reglage("musique", "Musique d'ambiance",
+                    "Menu, problèmes et entraînement (jamais en partie)",
+                    OUI_NON, 2),
+            Reglage("volume_musique", "Volume de la musique", "",
+                    [("25 %", 0.25), ("50 %", 0.5), ("75 %", 0.75), ("100 %", 1.0)], 4),
         ]),
         ("affichage", "Affichage", [
             Reglage("plein_ecran", "Mode d'affichage", "Touche F11 en jeu",
@@ -119,6 +149,8 @@ def _onglets():
             Reglage("police_livree", "Police",
                     "Celle du jeu, ou celle de Windows",
                     [("SickChess", True), ("Système", False)], 2),
+            Reglage("langue", "Langue", "Les textes du jeu",
+                    [("Français", "fr"), ("English", "en")], 2),
         ]),
     ]
 
@@ -161,6 +193,11 @@ class EcranOptions:
                 if valeur is None:
                     valeur = defauts.get(r.cle)
                 self.valeurs[r.cle] = valeur
+        if "analyse_niveau" not in config:
+            # 18/10 : l'ancien reglage (profondeur 18/22/26/30) donne le niveau.
+            import analyse_partie
+            self.valeurs["analyse_niveau"] = analyse_partie.puissance_de(
+                config).split("_", 1)[1]
         self.valeurs["plein_ecran"] = ui.est_plein_ecran()
         self.avant = dict(self.valeurs)
 
@@ -193,20 +230,41 @@ class EcranOptions:
             self.screen = ui.basculer_plein_ecran()
         if cle in ("plein_ecran", "echelle_interface", "police_livree"):
             self._placer()
+        if cle == "langue":
+            import langue
+            langue.regler(self.valeurs["langue"])
 
     def _remettre_comme_avant(self):
         self.valeurs = dict(self.avant)
+        try:
+            import langue
+            langue.regler(self.avant.get("langue", langue.langue()))
+        except Exception:
+            pass
+        try:
+            import musique
+            if musique.en_cours() or self.avant.get("musique"):
+                musique.jouer(self.avant)
+        except Exception:
+            pass
         apparence.preferences(recharger=True)
         ui.vider_cache()
         design.vider_le_cache()
         if bool(self.avant["plein_ecran"]) != ui.est_plein_ecran():
             self.screen = ui.basculer_plein_ecran()
 
-    def _faire_entendre(self, volume):
+    def _faire_entendre(self, volume, pack=None):
         try:
             if self._sons is None:
                 import sounds
-                self._sons = sounds.SoundManager(volume)
+                self._sons = sounds.SoundManager(volume, self.valeurs.get("pack_sons"))
+            if pack:
+                self._sons.changer_de_pack(pack)
+                if pack == "alertes":
+                    self._sons.actif = volume > 0
+                    self._sons.set_volume(volume)
+                    self._sons.play("check")
+                    return
             self._sons.actif = volume > 0
             self._sons.set_volume(volume)
             self._sons.play("move")
@@ -323,6 +381,12 @@ class EcranOptions:
                         self._appliquer_en_direct(r.cle)
                         if r.cle == "volume_sons":
                             self._faire_entendre(float(valeur))
+                        elif r.cle == "pack_sons":
+                            self._faire_entendre(float(self.valeurs.get("volume_sons", 0.6)),
+                                                 valeur)
+                        elif r.cle in ("musique", "volume_musique"):
+                            import musique
+                            musique.jouer(self.valeurs)
                         return None
         return None
 
@@ -333,6 +397,14 @@ class EcranOptions:
     def _valider(self):
         a_ecrire = dict(self.valeurs)
         enregistrer(a_ecrire)
+        if a_ecrire.get("langue") != self.avant.get("langue"):
+            try:                       # les noms d'ouvertures changent de langue
+                import ouvertures
+                import entrainement
+                ouvertures.recharger()
+                entrainement._FAMILLES.clear()
+            except Exception as e:
+                print("[OPTIONS] langue : %s" % e)
         apparence.preferences(recharger=True)
         ui.vider_cache()
         design.vider_le_cache()
@@ -362,6 +434,8 @@ class EcranOptions:
         ui.texte(ecran, "Entrée : enregistrer   ·   Échap : annuler   ·   Tab : onglet suivant",
                  largeur // 2, hauteur - int(18 * ech), ui.t(11, ech),
                  t.get("texte_faible", t["texte_discret"]), ancre="centre")
+        import effets
+        effets.fondu(ecran, "options", t["fond"])
 
     def _dessiner_liste(self, t):
         ecran = self.screen

@@ -22,6 +22,10 @@ pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
 ecran = pygame.display.set_mode((1024, 640))
 
+import asset_manager
+import tempfile as _tf
+_DOSSIER = _tf.mkdtemp(prefix="sickchess_pb_ecriture_")
+asset_manager.dossier_ecriture = lambda: _DOSSIER     # jamais tes vraies parties
 import puzzles
 import explication_puzzle
 

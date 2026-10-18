@@ -23,7 +23,7 @@ VERT = (112, 188, 112)
 ROUGE = (222, 112, 100)
 
 ETIQUETTES = {"victoire": ("V", VERT), "defaite": ("D", ROUGE),
-              "nulle": ("N", None)}
+              "nulle": ("N", None), "importee": ("PGN", None)}
 
 
 class EcranMesParties:
@@ -45,7 +45,14 @@ class EcranMesParties:
                                      taille=16)
         self.btn_nom = ui.Bouton((0, 0, 10, 10), "Changer de nom", "nom",
                                  taille=14, gras=False)
-        self.boutons = [self.btn_retour, self.btn_dossier, self.btn_nom]
+        # 17/10 (travail p18) : importer une partie jouee ailleurs.
+        self.btn_importer = ui.Bouton((0, 0, 10, 10), "Importer (PGN)", "importer",
+                                      taille=16)
+        # 17/10 (travail p05) : les statistiques de progression.
+        self.btn_stats = ui.Bouton((0, 0, 10, 10), "Statistiques", "statistiques",
+                                   taille=16)
+        self.boutons = [self.btn_retour, self.btn_dossier, self.btn_nom,
+                        self.btn_importer, self.btn_stats]
         self._placer()
 
     # ------------------------------------------------------------- placement
@@ -67,6 +74,10 @@ class EcranMesParties:
         l_bouton = int(210 * ech)
         self.btn_retour.placer((marge, bas, l_bouton, h_bouton))
         self.btn_dossier.placer((largeur - marge - l_bouton, bas, l_bouton, h_bouton))
+        self.btn_importer.placer((largeur - marge - 2 * l_bouton - int(12 * ech), bas,
+                                  l_bouton, h_bouton))
+        self.btn_stats.placer((largeur - marge - 3 * l_bouton - int(24 * ech), bas,
+                               l_bouton, h_bouton))
 
         zone_h = bas - int(16 * ech) - haut
         l_fiche = max(int(270 * ech), min(int(360 * ech), int(largeur * 0.32)))
@@ -115,6 +126,23 @@ class EcranMesParties:
             self.message = str(souci)
         return False
 
+    def importer(self, texte=None, ouvrir=None):
+        """Importe le PGN du presse-papiers (ou 'texte', ou un fichier glisse).
+        Renvoie l'action « revoir » de la partie importee, ou None."""
+        if texte is None:
+            texte = ui.coller() or ""
+        chemin, erreur = historique_parties.importer(texte, self.profil.nom, ouvrir=ouvrir)
+        if erreur:
+            self.message = erreur + ("" if texte.strip() else
+                                     " Ou glisse un fichier .pgn sur la fenêtre.")
+            return None
+        self.parties = historique_parties.lister()
+        self.message = "Partie importée."
+        for index, partie in enumerate(self.parties):
+            if partie["chemin"] == chemin:
+                return self.revoir(index)
+        return None
+
     def revoir(self, index):
         try:
             partie = self.parties[int(index)]
@@ -159,9 +187,21 @@ class EcranMesParties:
             self.defiler(-int(getattr(event, "y", 0)))
             return None
 
+        if event.type == getattr(pygame, "DROPFILE", -1):
+            try:
+                with open(event.file, "r", encoding="utf-8", errors="replace") as f:
+                    return self.importer(f.read())
+            except OSError as souci:
+                self.message = "Fichier illisible : %s" % souci
+                return None
+
         cle = ui.gerer_boutons(self.boutons, event)
         if cle == "retour":
             return "retour"
+        if cle == "importer":
+            return self.importer()
+        if cle == "statistiques":
+            return {"action": "statistiques"}
         if cle == "dossier":
             self.ouvrir_le_dossier()
             return None
@@ -200,9 +240,12 @@ class EcranMesParties:
         self._dessiner_liste(ecran, t, ech)
 
         souris = pygame.mouse.get_pos()
-        for bouton in (self.btn_retour, self.btn_dossier):
+        # 17/10 : Importer et Statistiques etaient cliquables mais pas dessines !
+        for bouton in (self.btn_retour, self.btn_dossier, self.btn_importer, self.btn_stats):
             bouton.maj_survol(souris)
             bouton.dessiner(ecran, t, rayon=10)
+        import effets
+        effets.fondu(ecran, "mes_parties", t["fond"])
 
     # ---- fiche du joueur
 
@@ -302,6 +345,10 @@ class EcranMesParties:
             milieu = (haut_v + bas_v) / 2.0
             bas_v, haut_v = milieu - 20, milieu + 20
         interieur = rect.inflate(-int(24 * ech), -int(24 * ech))
+        # 17/10 (recette) : le dernier point cachait le chiffre du bas (« 1042 ») :
+        # on garde une marge a droite pour les chiffres.
+        marge = ui.police(ui.t(11, ech)).size(str(int(max(valeurs))) + "0")[0]
+        interieur.width -= marge
         points = []
         for i, v in enumerate(valeurs):
             px = interieur.x + interieur.width * i / float(len(valeurs) - 1)

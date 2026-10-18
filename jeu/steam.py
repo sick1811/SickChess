@@ -291,6 +291,9 @@ class Steam:
             "salons": self._accesseur("SteamAPI_SteamMatchmaking"),
             "messages": self._accesseur("SteamAPI_SteamNetworkingMessages_SteamAPI"),
             "reseau_utils": self._accesseur("SteamAPI_SteamNetworkingUtils_SteamAPI"),
+            # 17/10 (p19) : les succes Steam. Facultatif : sans elle, le jeu
+            # garde ses succes pour lui (succes.json).
+            "stats": self._accesseur("SteamAPI_SteamUserStats"),
         }
         manquantes = [cle for cle in ("user", "amis", "utils", "salons", "messages")
                       if not self._i.get(cle)]
@@ -324,6 +327,8 @@ class Steam:
           c_int, c_int, POINTER(c_bool))
 
         f("SteamAPI_ISteamUser_GetSteamID", U64, P)
+        f("SteamAPI_ISteamUserStats_SetAchievement", c_bool, P, c_char_p, facultative=True)
+        f("SteamAPI_ISteamUserStats_StoreStats", c_bool, P, facultative=True)
         f("SteamAPI_ISteamUtils_GetAppID", c_uint32, P)
         f("SteamAPI_ISteamFriends_GetPersonaName", c_char_p, P)
         f("SteamAPI_ISteamFriends_GetFriendPersonaName", c_char_p, P, U64)
@@ -622,6 +627,24 @@ class Steam:
         if self.actif and joueur:
             self.dll.SteamAPI_ISteamNetworkingMessages_CloseSessionWithUser(
                 self._i["messages"], byref(self._identite(joueur)))
+
+    # ------------------------------------------------------------ succes
+
+    def debloquer_succes(self, nom):
+        """Debloque un succes Steam (nom API, ex. 'PREMIERE_VICTOIRE'). Il doit
+        exister dans la page Steamworks du jeu ; sinon Steam l'ignore."""
+        if not self.actif or not self._i.get("stats"):
+            return False
+        fixer = getattr(self.dll, "SteamAPI_ISteamUserStats_SetAchievement", None)
+        ranger = getattr(self.dll, "SteamAPI_ISteamUserStats_StoreStats", None)
+        if fixer is None or ranger is None:
+            return False
+        try:
+            ok = bool(fixer(self._i["stats"], nom.encode("ascii")))
+            return bool(ranger(self._i["stats"])) and ok
+        except Exception as souci:
+            print("[STEAM] succes %s : %s" % (nom, souci))
+            return False
 
     # ------------------------------------------------------------ arret
 

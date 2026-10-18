@@ -178,6 +178,13 @@ def _en_francais():
         return _FRANCAIS
     _FRANCAIS = True
     try:
+        import langue
+        if langue.langue() == "en":          # 17/10 (p12) : noms anglais de lichess
+            _FRANCAIS = False
+            return _FRANCAIS
+    except Exception:
+        pass
+    try:
         for dossier in (os.getcwd(),
                         os.path.dirname(os.path.abspath(__file__))):
             chemin = os.path.join(dossier, "config.json")

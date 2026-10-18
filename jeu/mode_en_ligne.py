@@ -64,6 +64,11 @@ class ModeEnLigne:
         self.message = ""
         self._message_jusqu_a = 0.0
         self.coupure_depuis = None
+        # Nulle (17/10, travail p18) : proposee par l'un, acceptee par l'autre.
+        self.nulle_proposee = False      # par nous, en attente
+        self.nulle_recue = False         # par l'adversaire, en attente
+        self._coups_a_la_proposition = -10
+        self.partie_enregistree = False
 
     # ------------------------------------------------------------ boucle
 
@@ -77,6 +82,9 @@ class ModeEnLigne:
                 print("[EN LIGNE] message ignore (%s) : %r" % (souci, str(message)[:120]))
         self._etat_periodique()
         self._surveiller_connexion()
+        self._oublier_les_propositions()
+        if self.board.game_over:
+            self.enregistrer()
 
     def _envoyer(self, message):
         message = dict(message)
@@ -165,6 +173,21 @@ class ModeEnLigne:
                 self.board.terminer_partie("TEMPS ÉCOULÉ - les %s perdent au temps"
                                            % camp, gagnant)
 
+        elif genre == "nulle":
+            action = message.get("action")
+            if action == "proposer" and not self.board.game_over:
+                self.nulle_recue = True
+                self._nb_a_la_reception = len(self.board.board.move_stack)
+                self.afficher("%s propose la nulle : clique NULLE pour accepter."
+                              % self.nom_adverse, 15000)
+                self.board.chat.systeme("%s propose la nulle." % self.nom_adverse)
+            elif action == "accepter" and self.nulle_proposee and not self.board.game_over:
+                self.nulle_proposee = False
+                self.board.terminer_partie("Nulle d'un commun accord", "1/2-1/2")
+            elif action == "refuser":
+                self.nulle_proposee = False
+                self.afficher("%s refuse la nulle." % self.nom_adverse)
+
         elif genre == "chat":
             self.board.chat.recevoir(self.nom_adverse, message.get("texte", ""))
 
@@ -201,6 +224,62 @@ class ModeEnLigne:
     def abandonner(self):
         """Appele quand le joueur local a clique ABANDONNER."""
         self._envoyer({"type": "abandon"})
+
+    def nulle(self):
+        """Bouton NULLE : accepte la proposition recue, sinon en propose une
+        (au plus une fois tous les deux coups)."""
+        if self.board.game_over:
+            return None
+        if self.nulle_recue:
+            self.nulle_recue = False
+            self._envoyer({"type": "nulle", "action": "accepter"})
+            self.board.terminer_partie("Nulle d'un commun accord", "1/2-1/2")
+            return "acceptee"
+        nb = len(self.board.board.move_stack)
+        if self.nulle_proposee or nb - self._coups_a_la_proposition < 2:
+            self.afficher("Nulle déjà proposée : attends deux coups.")
+            return None
+        self.nulle_proposee = True
+        self._coups_a_la_proposition = nb
+        self._envoyer({"type": "nulle", "action": "proposer"})
+        self.afficher("Nulle proposée à %s." % self.nom_adverse)
+        return "proposee"
+
+    def _oublier_les_propositions(self):
+        """Un coup joue annule une proposition de nulle en attente."""
+        nb = len(self.board.board.move_stack)
+        if self.nulle_recue and nb > getattr(self, "_nb_a_la_reception", nb):
+            self.nulle_recue = False
+        if self.nulle_proposee and nb > self._coups_a_la_proposition + 1:
+            self.nulle_proposee = False
+
+    def enregistrer(self):
+        """La partie finie entre dans « Mes parties » (avec revue), sans
+        toucher au profil ni a l'Elo. Une seule fois."""
+        if self.partie_enregistree or not self.board.game_over:
+            return ""
+        self.partie_enregistree = True
+        try:
+            import historique_parties
+            blanc = self.couleur_locale == chess.WHITE
+            blancs, noirs = (self.nom_local, self.nom_adverse) if blanc \
+                else (self.nom_adverse, self.nom_local)
+            try:
+                cadence = self.board.timer.description_cadence()
+            except Exception:
+                cadence = ""
+            try:
+                import succes
+                succes.debloquer("en_ligne")
+            except Exception as e2:
+                print("[SUCCES] %s" % e2)
+            return historique_parties.enregistrer(
+                self.board.move_history, blancs, noirs, self.board.result or "*",
+                cadence=cadence, camp_du_joueur="blanc" if blanc else "noir",
+                raison=self.board.game_over_reason or "", mode="en_ligne")
+        except Exception as e:
+            print("[EN LIGNE] partie non enregistree : %s" % e)
+            return ""
 
     def envoyer_chat(self, texte):
         texte = str(texte).strip()[:160]

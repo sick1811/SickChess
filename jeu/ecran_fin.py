@@ -70,6 +70,13 @@ class EcranFin:
             ia_blancs = getattr(self.plateau, "ia_joue_blancs", False)
             moi = noirs if ia_blancs else blancs
             ia = blancs if ia_blancs else noirs
+            if moi >= 90 and not getattr(self, "_succes_precision", False):
+                self._succes_precision = True
+                try:
+                    import succes
+                    succes.debloquer("precision_90")
+                except Exception as e:
+                    print("[SUCCES] %s" % e)
             return "Précision : toi %.1f %%   -   ordinateur %.1f %%" % (moi, ia)
         return "Précision : Blancs %.1f %%   -   Noirs %.1f %%" % (blancs, noirs)
 

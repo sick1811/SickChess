@@ -19,8 +19,10 @@ ENTREES = [
     ("hotseat", "Jouer à deux sur ce PC", True),
     ("en_ligne", "Jouer en ligne (Steam)", True),
     ("puzzles", "Problèmes", True),
+    ("ouvertures", "Entraînement aux ouvertures", True),   # 17/10, travail p06
     ("historique", "Mes parties et profil", True),
     ("options", "Options", True),
+    ("signaler", "Signaler un problème / une idée", True),   # 17/10, travail p16
     ("quitter", "Quitter", True),
 ]
 
@@ -65,11 +67,11 @@ class MainMenu:
         """Menu « Vitrine » : colonne a gauche, rendu 3D du plateau a droite."""
         n = len(self.boutons)
         x = max(28, int(largeur * 0.065))
-        largeur_bouton = max(240, min(400, int(largeur * 0.32)))
+        largeur_bouton = max(240, min(max(400, int(largeur * 0.26)), int(largeur * 0.32)))
         ecart = max(4, int(hauteur * 0.008))
         y_mini = int(hauteur * 0.34)
         bas = hauteur - max(40, int(hauteur * 0.08))
-        hauteur_bouton = max(30, min(50, (bas - y_mini - (n - 1) * ecart) // max(1, n)))
+        hauteur_bouton = max(30, min(max(50, int(hauteur * 0.058)), (bas - y_mini - (n - 1) * ecart) // max(1, n)))
         y = y_mini
         for bouton in self.boutons:
             bouton.placer((x, y, largeur_bouton, hauteur_bouton))
@@ -132,7 +134,7 @@ class MainMenu:
             pygame.draw.rect(ecran, t["accent"],
                              pygame.Rect(rect.x, rect.y + 6, 3, rect.height - 12))
         decalage = 18 if (bouton.survol or bouton.selectionne) and bouton.actif else 10
-        taille = max(15, min(22, int(rect.height * 0.46)))
+        taille = max(15, min(max(22, int(rect.height * 0.46)), int(rect.height * 0.46)))
         y = rect.centery - ui.police(taille, True).get_height() // 2
         ui.texte(ecran, bouton.libelle.upper(), rect.x + decalage, y,
                  taille, couleur, gras=True, largeur_max=rect.width - decalage - 6)
@@ -171,6 +173,10 @@ class MainMenu:
         if self.version:
             ui.texte(ecran, "version %s" % self.version, largeur - 14,
                      hauteur - 26, 13, t["texte_discret"], ancre="droite")
+        import effets
+        effets.fondu(ecran, "menu", t["fond"])
+        import succes
+        succes.dessiner_annonce(ecran)
 
 
 _IMAGE_FOND = []

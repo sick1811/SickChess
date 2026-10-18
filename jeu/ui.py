@@ -307,6 +307,15 @@ def taille_qui_tient(chaine, taille_max, taille_min, largeur_max,
 
 # ---------------------------------------------------------------- dessin
 
+def _tr(chaine):
+    """17/10 (p12) : la traduction au moment d'afficher (langue.py)."""
+    try:
+        import langue
+        return langue.traduire(chaine)
+    except Exception:
+        return chaine
+
+
 def texte(surface, chaine, x, y, taille=17, couleur=(235, 232, 226), gras=False,
           mono=False, largeur_max=None, ancre="gauche", ajuster=False):
     """Ecrit une ligne de texte. Renvoie son rectangle.
@@ -314,7 +323,7 @@ def texte(surface, chaine, x, y, taille=17, couleur=(235, 232, 226), gras=False,
     largeur_max : ce qui depasse est rogne (ou la police retrecit si ajuster).
     ancre : "gauche", "centre" ou "droite" - x est le point d'ancrage.
     """
-    chaine = str(chaine)
+    chaine = _tr(str(chaine))
     if largeur_max:
         if ajuster:
             taille = taille_qui_tient(chaine, taille, max(9, taille * 0.6),
@@ -335,6 +344,7 @@ def texte_centre_dans(surface, chaine, rect, taille=17, couleur=(235, 232, 226),
                       gras=False, mono=False, marge=8, ajuster=True):
     """Texte centre dans un rectangle, garanti de ne pas en sortir."""
     rect = pygame.Rect(rect)
+    chaine = _tr(str(chaine))
     largeur = max(10, rect.width - 2 * marge)
     if ajuster:
         taille = taille_qui_tient(chaine, taille, max(9, taille * 0.55),
@@ -368,6 +378,7 @@ def paragraphe(surface, chaine, rect, taille=16, couleur=(180, 176, 170),
                gras=False, interligne=1.3, max_lignes=None):
     """Texte sur plusieurs lignes, coupe aux espaces, jamais hors du rectangle."""
     rect = pygame.Rect(rect)
+    chaine = _tr(str(chaine))
     lignes = couper_en_lignes(chaine, taille, rect.width, gras)
     hauteur_ligne = int(police(taille, gras).get_height() * interligne)
     place = max(1, rect.height // hauteur_ligne) if rect.height else len(lignes)

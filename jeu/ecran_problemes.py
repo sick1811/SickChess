@@ -126,9 +126,18 @@ class EcranProblemes:
                                       "theme_" + th, taille=13, gras=False)
                             for th in puzzles.THEMES_PROPOSES]
         self.btn_retour_choix = ui.Bouton((0, 0, 10, 10), "Retour", "retour", taille=16)
+        # 17/10 : les problemes tires de tes propres fautes (mes_erreurs.py).
+        self.btn_erreurs = ui.Bouton((0, 0, 10, 10), "Mes erreurs", "erreurs", taille=20)
+        self.nombre_erreurs = None
+        # 17/10 (travail p07) : les defis.
+        self.btns_defis = [ui.Bouton((0, 0, 10, 10), nom, "defi_" + cle, taille=15)
+                           for cle, nom in (("chrono", "Contre la montre"),
+                                            ("survie", "Survie"),
+                                            ("jour", "Problème du jour"))]
         self.boutons_choix = ([self.btn_classe, self.btn_libre, self.btn_moins,
                                self.btn_plus] + self.btns_niveaux + self.btns_themes
-                              + [self.btn_retour_choix])
+                              + self.btns_defis
+                              + [self.btn_erreurs, self.btn_retour_choix])
 
         # Boutons de l'ecran de jeu
         self.btn_suivant = ui.Bouton((0, 0, 10, 10), "Problème suivant", "suivant", taille=17)
@@ -190,8 +199,8 @@ class EcranProblemes:
         # --- choix : une colonne au centre
         lc = min(int(520 * ech), largeur - 60)
         cx = (largeur - lc) // 2
-        y = int(hauteur * 0.24)
-        h_mode = int(62 * ech)
+        y = int(hauteur * 0.20)
+        h_mode = int(56 * ech)
         self.btn_classe.placer((cx, y, lc, h_mode))
         y += h_mode + int(26 * ech)
         self.btn_libre.placer((cx, y, lc, h_mode))
@@ -214,6 +223,13 @@ class EcranProblemes:
             bouton.placer((cx + col * (lt + ecart), y + ligne * (petit + ecart), lt, petit))
         lignes = (len(self.btns_themes) + 3) // 4
         y += lignes * (petit + ecart) + int(16 * ech)
+        h_defi = int(46 * ech)
+        ld = (lc - 2 * ecart) // 3
+        for i, bouton in enumerate(self.btns_defis):
+            bouton.placer((cx + i * (ld + ecart), y, ld, h_defi))
+        y += h_defi + int(12 * ech)
+        self.btn_erreurs.placer((cx, y, lc, h_mode))
+        y += h_mode + int(18 * ech)
         self.btn_retour_choix.placer((cx + lc // 4, min(y, hauteur - int(50 * ech)),
                                       lc // 2, int(38 * ech)))
         self.colonne_choix = (cx, lc)
@@ -221,6 +237,18 @@ class EcranProblemes:
     # ================================================================ choix
 
     def commencer(self, mode, depart=None):
+        if mode in ("chrono", "survie", "jour"):
+            import modes_problemes
+            self.session = modes_problemes.SessionDefi(mode)
+            self.etape = "jeu"
+            self.nouveau_puzzle()
+            return
+        if mode == "erreurs":
+            import mes_erreurs
+            self.session = mes_erreurs.SessionErreurs()
+            self.etape = "jeu"
+            self.nouveau_puzzle()
+            return
         self.session = puzzles.Session(mode, depart)
         self.etape = "jeu"
         self.nouveau_puzzle()
@@ -272,7 +300,16 @@ class EcranProblemes:
             p.couleur_joueur = None
             p.game_over = True
             self.fini = True
-            self._dire("Aucun problème ne correspond (essaie sans filtre de theme).", AMBRE)
+            if hasattr(self.session, "message_si_vide") and self.session.terminee():
+                self._dire(self.session.resume(), AMBRE)
+            elif hasattr(self.session, "message_si_vide"):
+                self._dire(self.session.message_si_vide(), AMBRE)
+            elif getattr(self.session, "mode", "") == "erreurs":
+                self._dire("Pas encore d'erreur analysée : finis une partie et ouvre "
+                           "sa revue.", AMBRE)
+            else:
+                self._dire("Aucun problème ne correspond (essaie sans filtre de thème).",
+                           AMBRE)
             return
         try:
             p.board = chess.Board(self.puzzle["fen"])
@@ -337,7 +374,16 @@ class EcranProblemes:
         # Un mat immediat est toujours accepte, meme s'il n'est pas celui de la base.
         essai = self.plateau.board.copy()
         essai.push(coup)
-        return essai.is_checkmate()
+        if essai.is_checkmate():
+            return True
+        # Mes erreurs : un autre coup qui ne perd presque rien est accepte aussi
+        # (Stockfish verifie). La base lichess, elle, n'a qu'une solution.
+        if self.puzzle.get("source"):
+            import mes_erreurs
+            return mes_erreurs.coup_presque_aussi_bon(
+                self.plateau.board.fen(), coup, self.puzzle,
+                self.preferences.get("stockfish_path"))
+        return False
 
     def refuser(self, coup):
         p = self.plateau
@@ -355,6 +401,22 @@ class EcranProblemes:
         except Exception as souci:
             print("[PROBLEMES] explication impossible : %s" % souci)
             self.explication = ""
+        if getattr(self.session, "enchaine_sur_erreur", False) \
+                or getattr(self.session, "mode", "") == "jour":
+            # Defis : pas de deuxieme essai, on montre la solution et on passe.
+            self.explication = ""
+            self._arreter_le_chrono()
+            self.coup_en_attente = None
+            self.fini = True
+            p.game_over = True
+            self.index_solution = 2 * self.avance
+            self.aller_au_coup(len(self.solution), son=False)
+            if self.session.terminee():
+                self._dire(self.session.resume(), AMBRE)
+            else:
+                self._dire("Raté ! Problème suivant...", ROUGE)
+                self.enchainer_a = pygame.time.get_ticks() + PAUSE_REUSSITE
+            return
         self._dire("Ce n'est pas ça. Réessaie.", ROUGE)
 
     def apres_bon_coup(self, coup, position_avant):
@@ -382,7 +444,10 @@ class EcranProblemes:
             self.plateau.sounds.play("puzzle_reussi")
             self.flash = (VERT, pygame.time.get_ticks())
             self.enchainer_a = pygame.time.get_ticks() + PAUSE_REUSSITE
-            self._dire("Trouve en %s !" % self.chrono_lisible(), VERT)
+            self._dire("Trouvé en %s !" % self.chrono_lisible(), VERT)
+            if hasattr(self.session, "resume") and self.session.terminee():
+                self.enchainer_a = 0
+                self._dire(self.session.resume(), VERT)
         elif self.indice_utilise:
             self._dire("Trouve avec l'indice : aucun gain.", AMBRE)
         else:
@@ -415,6 +480,9 @@ class EcranProblemes:
     def demander_un_indice(self):
         """Montre le coup (fleche verte). 8 points, une seule fois par probleme."""
         if not self.puzzle or self.fini or self.coup_en_attente:
+            return False
+        if hasattr(self.session, "resume"):
+            self._dire("Pas d'indice pendant un défi.", AMBRE)
             return False
         attendu = puzzles.coup_attendu(self.puzzle, self.avance)
         if not attendu:
@@ -494,6 +562,10 @@ class EcranProblemes:
             self.commencer(puzzles.MODE_CLASSE)
         elif cle == "libre":
             self.commencer(puzzles.MODE_LIBRE, self.niveau_choisi)
+        elif cle == "erreurs":
+            self.commencer("erreurs")
+        elif cle.startswith("defi_"):
+            self.commencer(cle[5:])
         elif cle == "moins":
             self.regler_le_niveau(self.niveau_choisi - PAS_DE_NIVEAU)
         elif cle == "plus":
@@ -536,6 +608,12 @@ class EcranProblemes:
         if action == "retour":
             return "retour"
         if action == "suivant":
+            if hasattr(self.session, "resume") and self.session.terminee():
+                if self.session.mode == "jour":
+                    return "retour"
+                self._defi_clos = False
+                self.commencer(self.session.mode)       # rejouer le defi
+                return None
             if not self.fini and self.premiere_tentative and self.chrono_debut:
                 self._noter(False)        # passer un probleme commence = rate
             self.nouveau_puzzle()
@@ -564,6 +642,17 @@ class EcranProblemes:
         if self.etape != "jeu":
             return
         maintenant = pygame.time.get_ticks()
+        s = self.session
+        if hasattr(s, "temps_restant") and s.temps_restant() is not None \
+                and s.temps_restant() <= 0 and not getattr(self, "_defi_clos", False):
+            self._defi_clos = True
+            self.coup_en_attente = None
+            self.enchainer_a = 0
+            self.fini = True
+            self.plateau.game_over = True
+            self.plateau.premove = None
+            self.plateau.sounds.play("puzzle_reussi")
+            self._dire(s.resume(), AMBRE)
         if self.coup_en_attente and maintenant >= self.attente_jusqu_a:
             self._jouer_le_coup_adverse()
         if self.enchainer_a and maintenant >= self.enchainer_a:
@@ -596,6 +685,8 @@ class EcranProblemes:
             self._dessiner_choix(t)
         else:
             self._dessiner_jeu(t)
+        import succes
+        succes.dessiner_annonce(self.screen)
 
     # ---------------------------------------------------------------- choix
 
@@ -616,6 +707,25 @@ class EcranProblemes:
         self.btn_classe.libelle = "Mode classé  -  ton classement : %d" % int(
             score.get("classement", puzzles.CLASSEMENT_DEPART))
         self.btn_libre.libelle = "Mode libre  -  départ à %d" % self.niveau_choisi
+        if self.nombre_erreurs is None:
+            try:
+                import mes_erreurs
+                self.nombre_erreurs = len(mes_erreurs.tous_les_problemes())
+            except Exception as souci:
+                print("[MES ERREURS] %s" % souci)
+                self.nombre_erreurs = 0
+        self.btn_erreurs.libelle = ("Mes erreurs  -  %d position%s de tes parties"
+                                    % (self.nombre_erreurs,
+                                       "s" if self.nombre_erreurs > 1 else ""))
+        try:
+            import modes_problemes as mp
+            jour = mp.etat_du_jour()
+            self.btns_defis[0].libelle = "Contre la montre · %d" % mp.record("chrono")
+            self.btns_defis[1].libelle = "Survie · %d" % mp.record("survie")
+            self.btns_defis[2].libelle = ("Problème du jour · fait" if jour["fait"]
+                                          else "Problème du jour")
+        except Exception as souci:
+            print("[DEFIS] %s" % souci)
         for bouton in self.btns_niveaux:
             bouton.selectionne = bouton.cle == "niveau_%d" % self.niveau_choisi
         for bouton in self.btns_themes:
@@ -677,10 +787,17 @@ class EcranProblemes:
 
         # Classement (gros) et chrono, cote a cote
         ui.texte(ecran, str(s.classement()), x, y, ui.t(34, ech), t["texte"], gras=True)
-        ui.texte(ecran, self.chrono_lisible(), x + l, y, ui.t(28, ech),
-                 t["texte"], mono=True, ancre="droite")
+        restant = s.temps_restant() if hasattr(s, "temps_restant") else None
+        if restant is not None:
+            couleur_chrono = ROUGE if restant < 20 else t["texte"]
+            ui.texte(ecran, "%d:%02d" % (int(restant) // 60, int(restant) % 60), x + l, y,
+                     ui.t(28, ech), couleur_chrono, mono=True, ancre="droite")
+        else:
+            ui.texte(ecran, self.chrono_lisible(), x + l, y, ui.t(28, ech),
+                     t["texte"], mono=True, ancre="droite")
         y += ui.t(40, ech)
-        if self.puzzle and not self.fini and self.chrono_debut:
+        if self.puzzle and not self.fini and self.chrono_debut \
+                and not self.puzzle.get("source") and s.classe:
             bonus = "gain x%.1f" % puzzles.bonus_de_vitesse(self.temps_ecoule(), self.puzzle)
             ui.texte(ecran, bonus, x + l, y - int(4 * ech), ui.t(12, ech),
                      t["texte_discret"], ancre="droite")
@@ -697,16 +814,24 @@ class EcranProblemes:
         y += ui.t(16, ech)
 
         # Compteurs
-        compteurs = "Série %d  (record %d)    %d/%d réussis  %.0f %%" % (
-            s.serie(), s.meilleure_serie(), s.reussis(), s.reussis() + s.rates(),
-            s.pourcentage())
+        if hasattr(s, "compteurs"):
+            compteurs = s.compteurs()
+        else:
+            compteurs = "Série %d  (record %d)    %d/%d réussis  %.0f %%" % (
+                s.serie(), s.meilleure_serie(), s.reussis(), s.reussis() + s.rates(),
+                s.pourcentage())
         ui.texte(ecran, compteurs, x, y, ui.t(13, ech), t["texte_discret"], largeur_max=l)
         y += ui.t(22, ech)
         ui.separateur(ecran, x, y, l, t["bord"])
         y += int(10 * ech)
 
         # Le probleme
-        if self.puzzle:
+        if self.puzzle and self.puzzle.get("source"):
+            import mes_erreurs
+            y += ui.paragraphe(ecran, mes_erreurs.description(self.puzzle),
+                               (x, y, l, ui.t(40, ech)), ui.t(14, ech), t["texte"],
+                               max_lignes=2) + int(4 * ech)
+        elif self.puzzle:
             ui.texte(ecran, "Niveau %d  -  %s" % (self.puzzle["classement"],
                                                  puzzles.description(self.puzzle)),
                      x, y, ui.t(14, ech), t["texte"], largeur_max=l)
@@ -730,11 +855,14 @@ class EcranProblemes:
 
         # Boutons
         en_jeu = bool(self.puzzle) and not self.fini
-        self.btn_indice.actif = en_jeu and not self.coup_en_attente
+        defi = hasattr(s, "resume")
+        self.btn_indice.actif = en_jeu and not self.coup_en_attente and not defi
         self.btn_solution.actif = en_jeu
         self.btn_suivant.actif = True
         self.btn_suivant.selectionne = self.fini
         self.btn_suivant.libelle = "Problème suivant" if self.fini else "Passer ce problème"
+        if defi and s.terminee():
+            self.btn_suivant.libelle = "Retour" if s.mode == "jour" else "Rejouer le défi"
         for bouton in self.boutons_nav:
             bouton.actif = self.fini and bool(self.solution)
         souris = pygame.mouse.get_pos()

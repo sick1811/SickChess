@@ -33,14 +33,18 @@ def verifier(condition, message):
         echecs.append(message)
 
 
-print("1. Le materiel compte (une dame donnee n'est pas une imprecision)")
+print("1. Bareme de chess.com (17/10) et le materiel")
 base = dict(chances_avant=15.0, chances_apres=3.0, meilleur_connu=True)
-verifier(annotations.classer(12.0, **base) == "imprecision",
-         "sans le materiel : 12 points de chances = imprecision")
-verifier(annotations.classer(12.0, perte_pions=9.0, apres_pions=-14.0, **base) == "gaffe",
-         "dame donnee dans une position perdue : gaffe")
-verifier(annotations.classer(3.0, perte_pions=2.5, apres_pions=-1.0, **base) == "erreur",
-         "2,5 pions perdus : au moins erreur")
+verifier(annotations.classer(3.0, **base) == "bon", "3 points de chances : bon")
+verifier(annotations.classer(7.0, **base) == "imprecision", "7 points : imprecision")
+verifier(annotations.classer(12.0, **base) == "erreur", "12 points : erreur")
+verifier(annotations.classer(25.0, **base) == "gaffe", "25 points : gaffe")
+verifier(annotations.classer(1.0, perte_pions=9.0, apres_pions=-14.0, **base) == "erreur",
+         "dame donnee dans une position deja perdue : erreur, pas gaffe (comme chess.com)")
+verifier(annotations.classer(3.0, perte_pions=3.5, apres_pions=-1.0, **base) == "erreur",
+         "3,5 pions perdus : au moins erreur")
+verifier(annotations.classer(3.0, perte_pions=1.5, apres_pions=-1.0, **base) == "imprecision",
+         "1,5 pion perdu : au moins imprecision")
 verifier(annotations.classer(1.0, perte_pions=6.0, apres_pions=8.0, chances_avant=99.5,
                              chances_apres=98.5, meilleur_connu=True) == "imprecision",
          "position toujours ecrasante (+8) : pas plus qu'une imprecision")
@@ -101,6 +105,9 @@ else:
     gm = GameManager("test")
     gm.stockfish_path = sf
     gm.config["analyse_puissance"] = "rapide"
+    # 18/10 : le reglage passe par analyse_mode / analyse_niveau.
+    gm.config["analyse_mode"] = "profondeur"
+    gm.config["analyse_niveau"] = "rapide"
     gm.config["analyse_pendant_partie"] = True
     gm.game_mode = "hotseat"
     gm.reglages = {"pendule_active": False}

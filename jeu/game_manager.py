@@ -11,14 +11,19 @@ import json
 import os
 import sys
 
+import chess
+
 import pygame
 
+import analyse_partie
 import apparence
 import sauvegarde
+import mise_a_jour
 import partie_en_ligne
 import ui
 from board import ChessBoard
 from ecran_options import EcranOptions
+import menu_pause
 from ecran_fin import EcranFin
 from enregistrement import enregistrer_la_partie, texte_classement
 from layout import Disposition
@@ -39,6 +44,8 @@ class GameManager:
         pygame.mixer.pre_init(44100, -16, 2, 1024)
         pygame.init()
         self._verifier_le_son()
+        # Version amis : "0.2.0 (n°7)", lue dans paquets_installes.json.
+        version = mise_a_jour.version_affichee(version)
         self.version = version
 
         self.plein_ecran = False
@@ -51,6 +58,8 @@ class GameManager:
         self.disposition = Disposition(LARGEUR, HAUTEUR)
         self.aide = AideRaccourcis(self.screen)
         self.menu = MainMenu(self.screen, version)
+        self.maj = None
+        self._ajouter_bouton_maj()
 
         self.config = self._charger_config()
         self.stockfish_path = self.config.get("stockfish_path",
@@ -139,17 +148,66 @@ class GameManager:
 
     # ------------------------------------------------------------------ menu
 
+    # ------------------------------------------------------------------ mises a jour
+
+    def _ajouter_bouton_maj(self):
+        """Version amis seulement : entree "Mise a jour" juste avant Quitter, et
+        verification discrete en tache de fond. Voir mise_a_jour.py."""
+        mise_a_jour.nettoyer_restes()
+        self.maj = mise_a_jour.verifier_en_arriere_plan()
+        if self.maj is None:
+            return
+        bouton = ui.Bouton((0, 0, 10, 10), "Mise à jour", "mise_a_jour", taille=19)
+        place = next((i for i, b in enumerate(self.menu.boutons) if b.cle == "quitter"),
+                     len(self.menu.boutons))
+        self.menu.boutons.insert(place, bouton)
+        self.menu.redimensionner(*self.screen.get_size())
+
+    def _badge_maj(self):
+        """Le bouton s'allume quand une nouvelle version est en ligne."""
+        if self.maj is None:
+            return
+        for bouton in self.menu.boutons:
+            if bouton.cle == "mise_a_jour":
+                dispo = self.maj.etat in ("disponible", "pret")
+                bouton.libelle = "Mise à jour disponible !" if dispo else "Mise à jour"
+                bouton.selectionne = dispo
+
+    def ouvrir_mise_a_jour(self):
+        from ecran_mise_a_jour import EcranMiseAJour
+        resultat = EcranMiseAJour(self.screen, self.maj, self.config).run(
+            self.clock, self.evenement_fenetre)
+        if resultat in ("quitter", "redemarrer"):
+            # "redemarrer" : _maj.bat attend que le jeu soit ferme pour
+            # installer la nouvelle version, puis le relance.
+            self.quitter()
+        self._appliquer_taille(*self.screen.get_size())
+
     def show_menu(self):
         """Boucle du menu. Renvoie 'stockfish' ou 'hotseat'."""
+        import musique
+        musique.jouer(self.config)          # 17/10, travail p14
         while True:
             # Invitation Steam acceptee (ou jeu lance par une invitation) :
             # on file directement au salon de l'ami.
             if partie_en_ligne.invitation_en_attente():
                 self.ouvrir_en_ligne()
+            self._badge_maj()
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.quitter()
                 if self.evenement_fenetre(event):
+                    continue
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+                    # M : couper / remettre la musique (aide F1)
+                    self.config["musique"] = not self.config.get("musique", True)
+                    try:
+                        import ecran_options
+                        ecran_options.enregistrer({"musique": self.config["musique"],
+                                                   "volume_sons": self.config.get("volume_sons", 0.6)})
+                    except Exception:
+                        pass
+                    musique.jouer(self.config)
                     continue
                 choix = self.menu.handle_event(event)
                 if choix == "quitter":
@@ -157,14 +215,24 @@ class GameManager:
                 if choix == "en_ligne":
                     self.ouvrir_en_ligne()
                     continue
+                if choix == "mise_a_jour":
+                    self.ouvrir_mise_a_jour()
+                    continue
                 if choix == "options":
                     self.ouvrir_options()
+                    musique.jouer(self.config)
+                    continue
+                if choix == "signaler":
+                    self.ouvrir_signaler()
                     continue
                 if choix == "historique":
                     self.ouvrir_mes_parties()
                     continue
                 if choix == "puzzles":
                     self.ouvrir_problemes()
+                    continue
+                if choix == "ouvertures":
+                    self.ouvrir_entrainement()
                     continue
                 if choix == "reprendre":
                     donnees = sauvegarde.lire()
@@ -181,6 +249,15 @@ class GameManager:
             self.aide.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(60)
+
+    def ouvrir_signaler(self):
+        """« Signaler un problème / une idée » (17/10, travail p16)."""
+        from ecran_signaler import EcranSignaler
+        if EcranSignaler(self.screen, self.version).run(
+                self.clock, self.evenement_fenetre) == "quitter":
+            self.quitter()
+        self.screen = pygame.display.get_surface()
+        self._appliquer_taille(*self.screen.get_size())
 
     def ouvrir_options(self):
         """Ecran Options. Au retour : config relue, fenetre remise a jour."""
@@ -208,6 +285,15 @@ class GameManager:
         self.screen = pygame.display.get_surface()
         self._appliquer_taille(*self.screen.get_size())
 
+    def ouvrir_entrainement(self):
+        """Entraineur d'ouvertures (17/10, travail p06)."""
+        from ecran_entrainement import EcranEntrainement
+        if EcranEntrainement(self.screen, self.config).run(
+                self.clock, self.evenement_fenetre) == "quitter":
+            self.quitter()
+        self.screen = pygame.display.get_surface()
+        self._appliquer_taille(*self.screen.get_size())
+
     # ------------------------------------------------------------------ mes parties
 
     def ouvrir_mes_parties(self):
@@ -222,6 +308,12 @@ class GameManager:
                 self.quitter()
             if not isinstance(reponse, dict):
                 break
+            if reponse.get("action") == "statistiques":
+                from ecran_statistiques import EcranStatistiques
+                if EcranStatistiques(self.screen, theme).run(
+                        self.clock, self.evenement_fenetre) == "quitter":
+                    self.quitter()
+                continue
             relecture = self._revue_d_une_partie_enregistree(reponse["partie"]) \
                 or EcranRevoir(self.screen, reponse["partie"],
                                self.disposition, self.config)
@@ -248,7 +340,7 @@ class GameManager:
         chemin_pgn = partie.get("chemin", "")
         analyseur = AnalyseurPartie(donnees["fen"], donnees["coups"],
                                     self.stockfish_path,
-                                    self.config.get("analyse_puissance"),
+                                    analyse_partie.puissance_de(self.config),
                                     fichier_cache=os.path.splitext(chemin_pgn)[0]
                                     + ".analyse.json" if chemin_pgn else None)
         resultat = " ".join(m for m in (partie.get("resultat", ""),
@@ -271,6 +363,7 @@ class GameManager:
         vitesse = float(self.config.get("vitesse_animation", 0.18))
         board.animation.duree = max(0.01, vitesse)
         board.animation.active = vitesse > 0
+        board.sounds.changer_de_pack(self.config.get("pack_sons", "bois"))
         board.sounds.set_volume(float(self.config.get("volume_sons", 0.6)))
         board.sounds.actif = bool(self.config.get("sons_actifs", True))
         board.premouvement_actif = bool(self.config.get("premouvement", True))
@@ -289,6 +382,8 @@ class GameManager:
         return True
 
     def preparer_partie(self):
+        import musique
+        musique.arreter()                   # jamais de musique en partie
         """Cree le plateau et le mode avec self.reglages. False = echec."""
         self.board = ChessBoard(self.screen, self.reglages, self.disposition)
         self._appliquer_preferences(self.board)
@@ -324,7 +419,7 @@ class GameManager:
             raise RuntimeError("le processus ne répond pas")
         except Exception as e:
             print("[ERREUR] Stockfish n'a pas pu demarrer : %s" % e)
-            self.afficher_erreur("Stockfish n'a pas pu demarrer.",
+            self.afficher_erreur("Stockfish n'a pas pu démarrer.",
                                  "Le moteur doit être dans le dossier moteur/",
                                  "(voir moteur/LISEZ-MOI.txt).")
             return None
@@ -355,11 +450,31 @@ class GameManager:
     def ouvrir_en_ligne(self):
         """Jouer en ligne par Steam : salon, partie, revanche.
         Tout le parcours vit dans partie_en_ligne.py."""
+        import musique
+        musique.arreter()
         partie_en_ligne.lancer(self)
         self.board = None
         self._appliquer_taille(*self.screen.get_size())
 
+    def _premier_lancement(self):
+        """Accueil guide, une seule fois (17/10, travail p11)."""
+        try:
+            import premier_lancement
+            from profil import get_profil
+            profil = get_profil()
+            if not premier_lancement.a_afficher(self.config, profil):
+                return
+            if premier_lancement.EcranPremierLancement(self.screen, profil).run(
+                    self.clock, self.evenement_fenetre) == "quitter":
+                self.quitter()
+            self.config = self._charger_config()
+            self.screen = pygame.display.get_surface()
+            self._appliquer_taille(*self.screen.get_size())
+        except Exception as e:
+            print("[ACCUEIL] %s" % e)
+
     def run(self):
+        self._premier_lancement()
         while True:
             if self.show_menu() == "reprendre":
                 self.reglages = dict(self.reprise.get("reglages") or {})
@@ -374,13 +489,96 @@ class GameManager:
             self.menu.annoncer_reprise(sauvegarde.lire() is not None,
                                        sauvegarde.resume(sauvegarde.lire()))
 
+    # ------------------------------------------------------------------ pause
+
+    def _peut_ouvrir_la_pause(self, event):
+        """Echap sans rien de selectionne, partie en cours (17/10, travail p10)."""
+        if event.type != pygame.KEYDOWN or event.key != pygame.K_ESCAPE:
+            return False
+        b = self.board
+        if b.game_over or b.selected_square is not None or b.dragging:
+            return False
+        if getattr(b, "premove", None):
+            return False
+        promotion = getattr(b, "promotion", None)
+        if promotion is not None and getattr(promotion, "actif", False):
+            return False
+        return True
+
+    def _ouvrir_la_pause(self):
+        self._pendule_tournait = bool(self.board.timer.active and self.board.timer.demarree)
+        self.board.timer.pause()
+        self.pause.theme_plateau = self.board.theme_plateau
+        self.pause.screen = self.screen
+        self.pause.ouvrir()
+
+    def _fermer_la_pause(self):
+        self.pause.fermer()
+        if getattr(self, "_pendule_tournait", False) and not self.board.game_over:
+            self.board.timer.reprendre()
+
+    def _evaluation_en_direct(self):
+        a = getattr(self, "analyse_en_direct", None)
+        if a is None or getattr(a, "plateau_id", None) != id(self.board):
+            return None
+        try:
+            return a.evaluation_connue(a.nombre_de_coups())
+        except Exception:
+            return None
+
+    def _action_de_pause(self, action):
+        """Renvoie 'menu' pour quitter la partie, sinon None."""
+        if action == "reprendre":
+            self._fermer_la_pause()
+        elif action == "options":
+            self.ouvrir_options()
+            import musique
+            musique.arreter(0)              # Options a pu la relancer : pas en partie
+            self._appliquer_preferences(self.board)
+            self.pause.screen = self.screen
+            self.pause.theme_plateau = self.board.theme_plateau
+        elif action == "nulle":
+            if self.game_mode == "hotseat":
+                self.pause.fermer()
+                self.board.terminer_partie("Nulle d'un commun accord", "1/2-1/2")
+            else:
+                couleur_ia = chess.WHITE if getattr(self.board, "ia_joue_blancs", False) \
+                    else chess.BLACK
+                accepte, raison = menu_pause.ordinateur_accepte_la_nulle(
+                    self.board.board, couleur_ia, self._evaluation_en_direct())
+                print("[PAUSE] nulle proposee : %s" % raison)
+                if accepte:
+                    self.pause.fermer()
+                    self.board.terminer_partie("Nulle acceptée par l'ordinateur",
+                                               "1/2-1/2")
+                else:
+                    self.pause.message = raison
+        elif action == "abandon":
+            self.pause.fermer()
+            self.board.game_buttons._abandonner()
+        elif action == "menu":
+            self.pause.fermer()
+            sauvegarde.enregistrer(self.board, self.game_mode, self.reglages)
+            return "menu"
+        return None
+
     def boucle_de_partie(self):
         """Joue la partie. Renvoie 'menu' ou 'rejouer'."""
+        self.pause = menu_pause.MenuPause(
+            self.screen, self.board.theme_plateau,
+            nulle_possible=self.game_mode in ("stockfish", "hotseat"))
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.quitter()
                 if self.evenement_fenetre(event):
+                    continue
+                if self.pause.ouvert:
+                    if self._action_de_pause(self.pause.handle_event(event)) == "menu":
+                        return "menu"
+                    continue
+                if self._peut_ouvrir_la_pause(event):
+                    self._ouvrir_la_pause()
                     continue
                 if self.board.game_over:
                     action = self.board.end_screen.handle_event(event)
@@ -397,17 +595,19 @@ class GameManager:
                     return "menu"
                 self.board.handle_event(event, self.engine)
 
-            if self.current_mode is not None:
-                self.current_mode.update()
-            self.board.update()
+            if not self.pause.ouvert:          # en pause, tout est fige
+                if self.current_mode is not None:
+                    self.current_mode.update()
+                self.board.update()
 
             if self.board.game_over:
                 self._partie_terminee()
-            else:
+            elif not self.pause.ouvert:
                 self.sauvegardeur.peut_etre(self.board, self.game_mode, self.reglages)
                 self._suivre_analyse()
 
             self.board.draw()
+            self.pause.draw()
             self.aide.draw(self.screen, self.board.theme_plateau)
             pygame.display.flip()
             self.clock.tick(60)
@@ -437,7 +637,7 @@ class GameManager:
             self.analyse_en_direct = None
         try:
             analyseur = self.board.end_screen.lancer_analyse(
-                self.stockfish_path, self.config.get("analyse_puissance"))
+                self.stockfish_path, analyse_partie.puissance_de(self.config))
             if analyseur is not None and self._fichier_analyse:
                 analyseur.definir_fichier_cache(self._fichier_analyse)
         except Exception as e:
@@ -476,7 +676,7 @@ class GameManager:
             except Exception:
                 coeurs = 2
             a = AnalyseurPartie(historique.fen_initiale, coups, self.stockfish_path,
-                                self.config.get("analyse_puissance"), suivi=True,
+                                analyse_partie.puissance_de(self.config), suivi=True,
                                 threads=max(1, coeurs // 2))
             a.plateau_id = id(self.board)
             a.demarrer()
@@ -491,7 +691,7 @@ class GameManager:
         from ecran_revue import EcranRevue
         fin = self.board.end_screen
         analyseur = fin.lancer_analyse(self.stockfish_path,
-                                       self.config.get("analyse_puissance"))
+                                       analyse_partie.puissance_de(self.config))
         if analyseur is None:
             return
         cote_noir = False

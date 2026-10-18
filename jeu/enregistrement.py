@@ -57,6 +57,18 @@ def enregistrer_la_partie(plateau, mode):
             mode="ordinateur")
         print("[PROFIL] partie enregistree : %d -> %d Elo%s"
               % (elo_avant, profil.elo, "" if classee else " (non classee)"))
+        # 17/10 (p19) : les succes
+        try:
+            import succes
+            gagne = resultat == ("1-0" if couleur == "blanc" else "0-1")
+            succes.verifier({
+                "premiere_victoire": gagne,
+                "victoire_1500": gagne and elo_ia >= 1500,
+                "victoire_2000": gagne and elo_ia >= 2000,
+                "victoire_mat": gagne and "MAT" in raison.upper(),
+            })
+        except Exception as e:
+            print("[SUCCES] %s" % e)
     else:
         infos["pgn"] = historique_parties.enregistrer(
             historique, "Blancs", "Noirs", resultat, cadence=cadence,

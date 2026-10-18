@@ -28,6 +28,13 @@ pygame.mixer.pre_init(44100, -16, 2, 512)
 pygame.init()
 ecran = pygame.display.set_mode((1024, 640))
 
+# Les parties en ligne finies sont enregistrees (17/10) : dans un dossier
+# temporaire, jamais dans tes vraies parties.
+import tempfile
+import asset_manager
+_TEMP = tempfile.mkdtemp(prefix="sickchess_multi_")
+asset_manager.dossier_ecriture = lambda: _TEMP
+
 import reseau_transport
 import salon_en_ligne
 import steam as module_steam

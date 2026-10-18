@@ -11,6 +11,11 @@ import traceback
 
 VERSION = "0.1.0"
 
+# 17/10 (recette R-002) : en plein ecran, SDL reduisait la fenetre des qu'une
+# autre fenetre prenait la main (notification, Alt+Tab rate...), et le jeu
+# revenait tout noir. On garde la fenetre affichee.
+os.environ.setdefault("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0")
+
 if sys.stdout is None:          # lance sans console (pythonw ou .exe fenetre)
     class _Poubelle:
         def write(self, _t): return 0

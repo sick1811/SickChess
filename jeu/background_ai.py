@@ -175,6 +175,19 @@ class BackgroundAI:
         if board.is_check():
             base *= random.uniform(0.45, 0.8)
 
+        # 5 bis. SickChess 17/10 (travail p08) : on regarde la position comme un
+        # joueur. Reprendre une piece qu'on vient de perdre : presque reflexe.
+        # Pieces menacees, prises et echecs partout : on s'arrete.
+        try:
+            if rythme.est_une_reprise_evidente(board) and random.random() < 0.7:
+                base *= random.uniform(0.30, 0.55)
+            else:
+                base *= rythme.facteur_de_complexite(board)
+                if 16 <= demi_coups <= 70:
+                    base *= 1.12          # le milieu de partie se pense
+        except Exception as e:
+            print("[BACKGROUND AI] rythme : %s" % e)
+
         # 6. De temps en temps, une vraie longue reflexion (8 %).
         if random.random() < 0.08:
             base *= random.uniform(1.6, 2.4)
@@ -185,6 +198,9 @@ class BackgroundAI:
         # Le plafond suit lui aussi la cadence : en bullet, "une longue
         # reflexion" ne peut pas depasser une seconde.
         plancher = 200 if restant is None else max(100, int(bas * 0.5))
+        # Personne ne joue en 0,1 s quand il lui reste plus d'une minute.
+        if restant is None or restant > 60:
+            plancher = max(plancher, 350)
         if restant is None:
             plafond = self.temps_max_ms * 2.2
         else:

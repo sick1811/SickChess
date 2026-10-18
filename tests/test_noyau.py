@@ -103,6 +103,23 @@ verifier(plateau.end_screen.titre() == "Les Blancs gagnent", "carte de fin : %s"
 plateau.draw()
 pygame.image.save(ecran, os.path.join(RACINE, "tests", "capture_mat.png"))
 
+print("4 bis. Retour au menu en pleine partie (recette R-051, 17/10)")
+plateau = nouvelle_partie(3)
+plateau.draw()
+boutons = plateau.game_buttons
+verifier(not plateau.game_over and boutons.menu_button.rect.width > 0,
+         "bouton MENU present pendant la partie")
+verifier(not boutons.menu_button.rect.colliderect(boutons.abandon_button.rect),
+         "MENU et ABANDONNER ne se chevauchent pas")
+centre = boutons.menu_button.rect.center
+pygame.mouse.set_pos(centre)
+action = None
+for ev in (pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=centre),
+           pygame.event.Event(pygame.MOUSEBUTTONUP, button=1, pos=centre)):
+    action = boutons.handle_event(ev) or action
+verifier(action == "return_to_menu", "clic sur MENU -> retour au menu (%r)" % action)
+verifier(not plateau.game_over, "la partie n'est pas abandonnee")
+
 print("5. Menu")
 from menu_principal import MainMenu
 menu = MainMenu(ecran, "test")

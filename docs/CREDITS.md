@@ -28,3 +28,9 @@ Rien de copié d'un autre jeu ou d'un site sans licence claire.
 - Anciens bruitages `.mp3/.ogg` – origine inconnue, remplacés.
 - Logo, fond animé du menu, musique `game_start.mp3`, `icone.ico`, `wood_button.png` – origine inconnue.
 - Nom « Pokemon Chess » – remplacé par SickChess.
+
+## Sons « Feutre » et musique d'ambiance (17/10/2026)
+- `sounds/feutre/` : les sons du pack « Bois » adoucis par `outils/generer_sons.py --feutre`
+  (mêmes licences que les originaux : Kenney CC0 et sons synthétisés).
+- `music/calme.wav` : musique entièrement synthétisée par `outils/generer_sons.py --musique`
+  (aucune source extérieure, propriété du projet).

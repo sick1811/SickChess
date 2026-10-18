@@ -1,0 +1,29 @@
+SICKCHESS - VERSION AMIS
+========================
+
+Installer
+---------
+1. Dézippe SickChess_amis.zip ou tu veux (Bureau, Documents...),
+   PAS dans "Program Files".
+2. Ouvre le dossier SickChess et lance SickChess.exe.
+   Si Windows affiche "Windows a protégé votre ordinateur" :
+   clique "Informations complémentaires" puis "Exécuter quand même"
+   (le jeu n'est pas encore signé, c'est normal pour un jeu en test).
+3. Au premier lancement, clique "Mise à jour" dans le menu : le jeu
+   télécharge le moteur, les problèmes et les tables de finales
+   (environ 700 Mo, une seule fois).
+
+Mettre à jour
+-------------
+Quand Julien publie une nouvelle version, le bouton "Mise à jour" du menu
+s'allume. Un clic, le jeu télécharge seulement ce qui a changé, se ferme,
+s'installe et se relance tout seul. Tes parties, ton profil et tes
+réglages sont gardés.
+
+Jouer en ligne
+--------------
+Il faut que Steam soit ouvert. Steam dira que tu joues à "Spacewar" :
+c'est normal, c'est le numéro de test de Valve en attendant la vraie
+sortie sur Steam.
+
+Un bug ? Une idée ? Dis-le à Julien !

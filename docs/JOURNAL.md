@@ -208,6 +208,13 @@ Choix de Julien dans les deux pages « Atelier SickChess » (voir `assets_src/at
   (16 à 256 px, pour la fenêtre et le futur .exe), `assets/logo.png`, `assets/logo_fond.png`.
   Source : `outils/blender/gen_logo.py` ; `outils/generer_logo.py` (ancienne icône) ne doit
   plus être lancé. L'icône est aussi dessinée devant le titre du menu.
+- 17/10 : **images de la page Steam** dans `assets_src/steam/` (voir son LISEZ-MOI) : les 4
+  capsules obligatoires, les 4 images de bibliothèque, le fond de page, l'icône communauté
+  et 6 captures 1920×1080 (menu, partie, revue, problème, options, réglages) faites avec
+  les réglages par défaut. Illustrations : `outils/blender/rendu_steam.py`.
+  Menu : entrées plus grandes en plein écran 1920×1080.
+  Les pièces Relief vues de face (choix du 17/10) ont été remises dans `assets/pieces/` et
+  `assets_src/pieces_relief_origine/` (une retouche les avait remplacées par les anciennes).
 - **Plateaux** : défaut **Tournoi** (uni crème et vert, le plus lisible) ; 8 unis + 3 matières
   (marbre veiné, onyx et or, noyer et érable : images dans `assets/plateaux/`). Les 6 damiers
   de la v7 ne sont plus listés (toujours lus si un vieux config.json les nomme).
@@ -257,6 +264,44 @@ Git ni vérifié ensemble. Fait dans cette séance :
 Question ouverte : les coups sont écrits en notation anglaise (Nf3, Bc4, Qh5) alors que tout le jeu
 est en français. Trois choix : notation française (Cf3, Fc4, Dh5), notation par figurines
 (petite icône de pièce + case, lisible dans toutes les langues, comme chess.com), ou garder l'anglais.
+
+## 17/10/2026 (4) – « Mes erreurs » et variantes dans la revue (Cowork)
+Julien n'ayant rien choisi dans « Travaux proposés », Claude a pris sa recommandation (p04, p01).
+Fait :
+- **Problèmes tirés de tes gaffes** (`jeu/mes_erreurs.py`, nouveau) : chaque gaffe, erreur ou coup
+  manqué de Julien dans une partie dont l'analyse est enregistrée devient un problème au format
+  lichess (`fen` = avant le coup adverse précédent, `coups` = [coup adverse, meilleur coup]).
+  Bouton « Mes erreurs – N positions de tes parties » dans l'écran des problèmes ; description
+  « Ta partie du … – coup 3… : tu as joué Cf6 (gaffe) » ; un autre coup accepté s'il ne perd pas
+  plus de 0,3 pion (Stockfish profondeur 14) ; suivi dans `mes_erreurs.json` (hors GitHub) ; le
+  classement des problèmes n'est pas touché ; le gros chiffre du panneau = « 3/12 ».
+  Test : `tests/test_mes_erreurs.py`.
+- **Variantes dans la revue** (`jeu/ecran_revue.py`) : on joue sur l'échiquier de la revue ; le coup
+  de la partie fait avancer, un autre ouvre une variante, Stockfish répond (2e moteur d'analyse,
+  profondeur 18, verrou : un calcul à la fois) ; l'évaluation et la barre d'avantage suivent la
+  variante ; Échap / flèche gauche / clic sur la feuille = retour à la partie ; pas de pastille
+  dans une variante. Test : `tests/test_variantes.py`.
+- Le PC s'est déconnecté en cours de séance ; reprise à 20 h : tous les tests au vert
+  (307 contrôles, 11 séries).
+- Pas de commit depuis Cowork : à faire par Claude Code.
+
+À vérifier par Julien : tests « 17/10 (4) » de la page (Mes erreurs, variantes).
+
+## 17/10/2026 (3) – Sons des problèmes, travaux proposés (Cowork)
+Retours de la page : sons des pièces validés, pastilles stables et analyse gardée validées.
+Fait :
+- Son de réussite des problèmes refait (« pas ouf ») : arpège de marimba sol-si-ré-sol avec une
+  petite réverbération ; « pas le bon coup » = deux notes graves descendantes, sans buzzer
+  (`outils/generer_sons.py` : `marimba()`, `reverb()`).
+- Réponse à « pourquoi j'ai 5 zip ? » (version amis) : c'est voulu. `SickChess_amis.zip`
+  (24 Mo) est le seul à donner à un ami ; les 5 autres sont les paquets que le bouton
+  « Mise à jour » télécharge séparément (programme, jeu, moteur, problèmes, finales), pour
+  qu'une correction ne fasse retélécharger que le petit paquet « jeu » (5 Mo).
+- Page « À faire » : nouveau groupe **« Travaux proposés »** avec boutons « ★ Je veux » /
+  « Pas maintenant » (statut `veux` / `non`, hors du compteur de tests). 22 propositions.
+- Pas de commit depuis Cowork (consigne du skill) : à faire par Claude Code.
+
+À vérifier par Julien : sons des problèmes ; choisir dans « Travaux proposés ».
 
 ## 17/10/2026 (2) – Pastilles stables, analyse enregistrée, vrais sons de bois
 Retours de Julien sur la séance précédente : le son marche (tampon audio 1024), la précision
@@ -312,6 +357,52 @@ Tests ajoutés pour Julien dans la page (étapes « 17/10 · … ») : test du s
 précision immédiate en fin de partie, gaffes justes, revue au début, notation, vitesse de
 l'adversaire, promotion.
 
+## 17/10/2026 – Outils pour travailler avec Cowork et Claude Code
+Fait :
+- `CLAUDE.md` à la racine : les règles du projet, lues automatiquement par Claude Code.
+- `docs/A_FAIRE.md` : la liste partagée (retours de Julien, prochaines étapes, tests,
+  démarches), reprise de la page « SickChess – À faire ».
+- `docs/TRAVAILLER_AVEC_CLAUDE.md` : qui fait quoi entre Cowork et Claude Code.
+- `tests/lancer_tous.py` : toutes les séries de tests d'un coup (`--rapide` sans Stockfish).
+  180 contrôles verts en rapide.
+- `.claude/` : 4 skills (`seance-sickchess`, `compiler-exe`, `verifier-echecs`,
+  `captures-steam`), 2 agents (`testeur`, `relecteur-interface`), un crochet qui vérifie la
+  syntaxe de chaque fichier Python modifié, et les autorisations courantes (tests, git).
+
+À vérifier par Julien :
+- [ ] Ouvrir Claude Code (onglet Code de l'application, dossier SickChess) et lui dire :
+  « Lis CLAUDE.md et dis-moi la prochaine tâche ».
+- [ ] Lui demander de faire le commit de cette séance.
+
+## 17/10/2026 – Version amis + bouton « Mise à jour »
+Fait :
+- **CONSTRUIRE_VERSION_AMIS.bat** (→ `outils/publier_maj.py`) : fabrique l'exe avec
+  PyInstaller (`outils/sickchess_amis.spec`, mode dossier, sans console), découpe le jeu en
+  5 paquets (programme, jeu, moteur, puzzles, syzygy), ne garde que ceux qui ont changé,
+  écrit `maj.json` et `SickChess_amis.zip` (pour un nouvel ami), et les envoie dans une
+  « release » GitHub du dépôt `sick1811/SickChess-amis` (avec GitHub CLI ; sinon il dit
+  quoi glisser où). Le numéro de version amis (n°1, n°2…) augmente tout seul.
+- Le code (`jeu/*.py`) reste en fichiers à côté de l'exe : une correction = ~0,3 Mo à
+  télécharger pour les amis, sans refaire l'exe (vérifié par une vraie compilation).
+- Dans le jeu (version amis seulement) : entrée **« Mise à jour »** avant Quitter, qui
+  s'allume « Mise à jour disponible ! » ; écran avec notes de version, taille, barre de
+  progression, annulation. Fichiers vérifiés (SHA-256). L'installation se fait après la
+  fermeture du jeu (`_maj.bat` + robocopy), puis le jeu se relance. Jamais touchés :
+  config.json, profil.json, parties/, scores des problèmes, sauvegardes.
+- Nouveaux fichiers : `jeu/mise_a_jour.py`, `jeu/ecran_mise_a_jour.py`,
+  `docs/VERSION_AMIS.md`, `LISEZ-MOI_AMIS.txt`. `game_manager.py` : quelques lignes.
+- Vérifié par `tests/test_mise_a_jour.py` (36 contrôles, faux serveur web) et une
+  compilation PyInstaller d'essai (sous Linux : l'exe lit bien le code depuis le disque).
+
+À vérifier par Julien :
+- [ ] Créer le dépôt GitHub `SickChess-amis` (public) ; installer GitHub CLI
+  (`winget install GitHub.cli`, puis `gh auth login`).
+- [ ] Double-clic sur CONSTRUIRE_VERSION_AMIS.bat → la release n°1 apparaît sur GitHub.
+- [ ] Télécharger SickChess_amis.zip, dézipper sur le Bureau, lancer SickChess.exe,
+  cliquer « Mise à jour » (moteur + problèmes + finales).
+- [ ] Changer une petite chose, relancer le .bat → dans le jeu dézippé, le bouton
+  s'allume, la mise à jour s'installe et le jeu redémarre.
+
 ## Bugs connus (repris de « a debug.txt »)
 - [x] Pendule ne clignote pas à 30 s → fonctionne (testé).
 - [x] Fin de partie à 00:00 → corrigé (affichage du temps final).
@@ -321,7 +412,8 @@ l'adversaire, promotion.
 - [x] Organisation de la fenêtre de jeu : disposition « Classique » retenue (plateau à gauche, panneau à droite).
 
 ## Fonctions de V8_TURBO_3000 à réintégrer (dans cet ordre)
-1. Compilation en .exe (PyInstaller) – adapter COMPILER.bat à la nouvelle structure.
+1. Compilation en .exe : version amis faite (CONSTRUIRE_VERSION_AMIS.bat). Reste : version
+   Steam / itch.io (données du joueur dans %APPDATA%, version_info pour Windows Defender).
 2. ~~Options / personnalisation~~ → fait (étape 2). Reste : options accessibles en pleine partie.
 3. ~~Direction artistique~~ → fait (étape 3 + assemblage du 17/10). Reste : captures et
    capsules pour la page Steam, notation des coups.
@@ -333,3 +425,220 @@ l'adversaire, promotion.
 8. Bouton « Signaler un problème / Proposer une idée ».
 9. ~~Multijoueur Steam~~ → fait (étape 9). Reste : test réel à deux PC, nulle, parties en ligne dans « Mes parties ».
 10. Tables de finales Syzygy (379 Mo) : utiles ? à décider.
+
+## 17/10/2026 (5) – Recette complète
+Fait :
+- `docs/RECETTE.md` : la liste de tous les tests à faire à la main pour vérifier le jeu
+  entier (71 tests, 14 parties : lancement, partie, règles, pendule, fin et revue, mes
+  parties, problèmes, options, en ligne, version amis, solidité, graphisme).
+- Une seule source : `outils/recette.py` fabrique RECETTE.md et `outils/recette.json`.
+- Page « À faire » : nouveau groupe « Recette complète » (Fonctionne / Ne fonctionne pas
+  + commentaire), compté à part, avec un bouton « Nouvelle passe » qui remet tout à tester.
+- Règle ajoutée dans CLAUDE.md et dans la skill `seance-sickchess` : chaque fonction
+  touchée met à jour sa recette ; passe complète avant chaque version.
+- `tests/lancer_tous.py` : les séries `test_mes_erreurs` et `test_variantes` y sont déclarées.
+
+À vérifier par Julien :
+- [ ] Ouvrir la page « À faire » : le groupe « Recette complète » s'affiche en bas avec ses 14 parties.
+- [ ] Faire une première passe complète de la recette.
+
+## 17/10/2026 (6) – Première passe de la recette par Claude
+- Tous les tests automatiques passent (216 contrôles rapides + revue, analyse, Mes erreurs,
+  variantes avec Stockfish). 28 lignes de la recette cochées « Vérifié par Claude » dans la page.
+- Défaut trouvé sur les captures (R-130) : le chiffre de la barre d'avantage de la revue
+  était coupé (« -0… »). Barre élargie (18 px minimum), chiffre sans signe et à une décimale
+  (« 0.3 », « M3 ») : le côté de la barre dit déjà qui est mieux. `jeu/ecran_revue.py`.
+- Reste pour Julien : 43 lignes (sons, sensations, F11, Steam réel, version amis, solidité).
+
+## 17/10/2026 (7) – Recette passée par Claude sur le PC de Julien (contrôle de l'ordinateur)
+Lignes vérifiées en jouant pour de vrai : lancement, F11, fenêtre, F1, réglages, partie contre
+l'ordinateur avec les Noirs, partie à deux, glisser / clic-clic, coup illégal, petit roque, prise
+en passant, promotion en cavalier, échec, répétition triple, clic droit, incrément, sans limite,
+Rejouer, reprise, revue d'une vraie partie, Options, Mes parties, Ouvrir le dossier, un problème
+classé, Stockfish absent. 51 lignes de la recette validées en tout.
+Bugs trouvés et corrigés :
+- **Plein écran** : le jeu se réduisait et revenait tout noir dès qu'une autre fenêtre passait
+  devant → `SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS=0` dans `SickChess.py` (revérifié sur le PC).
+- **Aucun moyen de revenir au menu en pleine partie** (seulement Abandonner) → bouton MENU à côté
+  d'Abandonner (`game_buttons.py`), la partie est gardée et se reprend. Contrôle ajouté dans
+  `tests/test_noyau.py` (4 bis).
+- « 1 minutes par joueur » → « 1 minute » (`settings_screen.py`) ; « SUR ? » → « SÛR ? » ;
+  « n'a pas pu demarrer » → « démarrer » ; « Stockfish 400 Elo » → « Ordinateur 400 Elo »
+  dans le panneau (`board_render.py`).
+- Courbe Elo de « Mes parties » : le chiffre du bas était caché par le dernier point.
+Remarques pour Julien (pas changées) : pièces prises minuscules en grand écran ; l'ordinateur
+répond très vite même en « Humain » ; fond de l'aide F1 trop transparent.
+Recette : R-051 renommé (« Bouton MENU »).
+
+## 17/10/2026 (8) – Travaux choisis par Julien : pause, fautes expliquées, défis, adversaire, signaler
+- **Menu pause** (p10, `jeu/menu_pause.py`) : Échap en partie → Reprendre, Options (sans quitter
+  la partie), Proposer la nulle (à deux : acceptée ; contre l'ordinateur : refusée avant le 15e
+  coup ou s'il est mieux, acceptée si c'est égal ou s'il est moins bien), Abandonner (deux clics),
+  Retour au menu (partie gardée). La pendule s'arrête. Test : `tests/test_pause.py`.
+- **Fautes expliquées dans la revue** (p03, `jeu/explication_revue.py`) : une phrase sous la
+  pastille (« Ce coup laisse ton cavalier sans défense », « Tu avais un mat en un coup »,
+  « Il y avait une fourchette sur le roi et la tour »…). **Règle de Julien : jamais le coup.**
+  Test : `tests/test_explication_revue.py` (vérifie aussi qu'aucun coup n'est écrit).
+- **Défis de problèmes** (p07, `jeu/modes_problemes.py`) : Contre la montre (3 min, difficulté
+  qui monte), Survie (3 vies), Problème du jour (même problème toute la journée, série de jours).
+  Records dans `modes_problemes.json` (hors GitHub). Test : `tests/test_modes_problemes.py`.
+- **Adversaire plus humain** (p08, `rythme.py`, `background_ai.py`) : reprise évidente rapide,
+  plus long quand des pièces sont menacées ou qu'il y a beaucoup de prises / échecs, jamais
+  sous 0,35 s avec plus d'une minute. Test : `tests/test_adversaire.py`. Styles : pas encore.
+- **Signaler un problème / une idée** (p16, `jeu/signalement.py`, `jeu/ecran_signaler.py`) :
+  entrée du menu ; rapport avec version, système et fin du journal ; envoi direct sur Discord si
+  une adresse webhook est réglée (`signalement.json`, hors GitHub), sinon rangé dans `rapports/`,
+  dossier ouvert et texte copié. Test : `tests/test_signaler.py`.
+- Recette : R-015, R-055 à R-057, R-06A, R-087 à R-089, R-095, R-096. 290 contrôles rapides verts.
+
+## 17/10/2026 (9) – Import PGN, nulle en ligne, statistiques, ouvertures, accueil, sons et musique
+- **Import de parties** (p18, `historique_parties.importer`) : Mes parties → « Importer (PGN) »
+  lit le presse-papiers (texte PGN ou lien lichess, téléchargé) ; un fichier .pgn glissé sur la
+  fenêtre marche aussi ; la revue s'ouvre ; pastille PGN ; l'Elo ne bouge pas. Test : `test_import_pgn.py`.
+- **En ligne** (p18) : le bouton MENU devient **NULLE** (proposer / accepter ; un coup joué
+  oublie la proposition) ; chaque partie en ligne finie entre dans Mes parties (avec revue).
+  Test : `test_en_ligne_nulle.py`. Spectateurs : pas encore.
+- **Statistiques** (p05, `statistiques.py`, `ecran_statistiques.py`) : Mes parties → Statistiques.
+  Test : `test_statistiques.py`.
+- **Entraînement aux ouvertures** (p06, `entrainement.py`, `ecran_entrainement.py`, entrée du menu) :
+  83 ouvertures, lignes tirées au hasard dans la famille (les déviations), progression dans
+  `entrainement.json`. Test : `test_entrainement.py`.
+- **Premier lancement guidé** (p11, `premier_lancement.py`) : nom, niveau, trois choses à savoir ;
+  jamais chez un profil qui a déjà des parties. Test : `test_premier_lancement.py`.
+- **Sons** (p15) : packs Bois / Feutre (`sounds/feutre/`, généré) / Muet sauf alertes. **Musique** (p14) :
+  `music/calme.wav` synthétisée (32 s en boucle), menu / problèmes / entraînement, jamais en partie,
+  touche M. `outils/generer_sons.py --feutre --musique`. Test : `test_sons_musique.py`.
+- **Bugs trouvés en route** :
+  - le bouton « Mes erreurs » réécrivait les analyses enregistrées en « profondeur 16 » : la revue
+    suivante refaisait toute l'analyse. Corrigé (`analyse_partie.py`), test `test_cache_analyse.py`.
+    Tes analyses existantes sont marquées 16 : elles seront refaites une fois, puis gardées.
+  - `test_multijoueur.py`, `test_problemes.py` et `test_modes_problemes.py` écrivaient dans tes
+    vraies parties : ils travaillent maintenant dans un dossier temporaire (4 parties « Julien-Paul »
+    de test retirées de parties/).
+- Recette : ordre par section (ajouter un test ne décale plus toute la liste). 418 contrôles rapides verts.
+
+## 17/10/2026 (10) – Effets, succès, le jeu en anglais
+- **Effets** (p13, `effets.py`) : onde sur la case d'une prise, halo et confettis au mat, fondu doux
+  entre les écrans (coupé sans écran, pour les captures des tests). Test : `test_effets.py`.
+- **Succès** (p19, `succes.py`) : 14 succès dans `succes.json`, message à l'écran quand on en débloque un,
+  vue Statistiques → Succès ; `steam.debloquer_succes` prêt (identifiants dans `docs/SUCCES_STEAM.md`).
+  Manquent les icônes Steam (64×64, couleur + gris). Test : `test_succes.py`.
+- **Anglais** (p12, `langue.py` + `langue_en.py`, ~670 textes) : traduction au moment de dessiner
+  (`ui.texte`, `texte_centre_dans`, `paragraphe`), gabarits avec nombres, majuscules du menu ;
+  noms d'ouvertures lichess en anglais. Options → Affichage → Langue. Sans réglage, le jeu suit la
+  langue de Windows (français si Windows est en français). Test : `test_anglais.py` ;
+  `test_entrainement.py` force le français (la machine de test est en anglais).
+- **Bug** : les boutons Importer et Statistiques de Mes parties n'étaient pas dessinés. Corrigé.
+- Recette : R-078, R-132, R-09C. 443 contrôles rapides verts.
+- Reste à faire : styles de jeu de l'ordinateur (p08), spectateurs en ligne (p18), classements et
+  icônes de succès Steam, adresse du webhook Discord pour Signaler.
+
+## 17-18/10/2026 (11) – Revue refaite : Stockfish ne joue plus, analyse à la profondeur 30
+Retour de Julien : « dans la revue Stockfish joue les coups au lieu de proposer les meilleurs avec des
+flèches ; les stats ne sont pas fiables (comparées à chess.com) ; il faut une analyse très précise et
+beaucoup plus rapide ; profondeur 30 ».
+- **Revue** (`ecran_revue.py`) : Stockfish ne joue JAMAIS. Flèches bleues = meilleur coup de la position
+  affichée et coups aussi bons (moins de 2 points de chances d'écart, ~0,1 pion) ; flèche verte = ce qu'il
+  fallait jouer après une faute (gardée). Variante : on joue les deux camps, flèche gauche annule un coup,
+  Échap revient. « Meilleur ici : … » + suite prévue. Feuille : évaluation après chaque coup, colorée.
+  Touche B : flèches ; bouton/touche E : Exporter. La précision ne s'affiche qu'une fois l'analyse finie.
+- **Export** (`export_revue.py`) : PGN avec [%eval], NAG (!!, !, ?!, ?, ??), meilleur coup en variante pour
+  les fautes, WhiteAccuracy/BlackAccuracy ; dans exports/ + presse-papiers.
+- **Analyse** (`analyse_partie.py`) :
+  - profondeur 30 par défaut (« maximale ») : survol (10), trois meilleurs coups à 22, puis passe profonde
+    à 30 (meilleur coup seul : 3 fois moins cher). Pastilles et précision attendent la passe à 30.
+    Option : Options → Partie → Profondeur de l'analyse (18 / 22 / 26 / 30) ;
+  - profondeur réellement atteinte enregistrée ; position refaite une fois avec 2× plus de temps si
+    elle manque de 2 ; la revue affiche la plus petite profondeur atteinte ;
+  - jusqu'à 3 moteurs en parallèle après la partie (1 pendant la partie) ;
+  - analyse enregistrée format 2 (3 meilleurs coups + profondeurs) ; les anciennes sont refaites à la
+    revue (les statistiques les acceptent encore).
+- **Précision** : exactement la méthode lichess (évaluations bornées à 10 pions, bonus +1, poids par
+  fenêtre glissante, moyenne pondérée + harmonique). chess.com a sa formule secrète (CAPS2) : on ne peut
+  pas l'égaler au chiffre près.
+- **Pastilles** (`annotations.py`) : seuils corrigés à ceux publiés par chess.com (5 / 10 / 20 points de
+  chances) — l'ancienne lecture de lichess était fausse d'un facteur 2 ; le matériel perdu ne fait plus
+  monter qu'à Erreur (h3 contre dragondu5 : chess.com « Erreur », nous « Gaffe » avant). Comparaison sur
+  cette partie : gaffes 1 (chess.com 1, avant 3), 7.Qe2 ??, 10.h3 ?, 15.Qb3 ?, 7...Bxa1 ! identiques.
+- **Stockfish** (`engine.py`) : une borne (lowerbound/upperbound) ne remplace plus un score exact ; toutes
+  les lignes MultiPV et leur suite sont rendues. Tables Syzygy : déjà branchées (dossier syzygy/).
+- Tests : `test_variantes.py` réécrit, `test_analyse_profonde.py` (nouveau), `test_cache_analyse.py`,
+  `test_analyse_directe.py` mis à jour. 458 contrôles rapides verts + revue, variantes, mes erreurs.
+- Recette : R-067 modifié, R-06B à R-06E, R-09D.
+- **À vérifier par Julien** : temps de la revue à profondeur 30 sur son PC (sur 2 cœurs : 7 à 23 s par
+  position) ; si c'est trop long, régler 26 dans Options.
+
+## 18/10/2026 (12) – Vitesse maximale, Stockfish 19 testé
+- PC de Julien : i7-8700K (6 cœurs, 12 processeurs logiques, AVX2 + BMI2). Le stockfish.exe installé
+  (17.1, version « bmi2 ») est déjà la compilation la plus rapide pour ce processeur.
+- Après la partie : 3 moteurs × 4 threads = les 12 processeurs logiques ; table de hachage 2 Go
+  partagée (`analyse_partie.py`).
+- **Stockfish 19** (05/09/2026, +44 Elo sur la 18) testé avec le jeu (version Linux, même options UCI) :
+  revue, variantes, analyse directe et adversaire de 400 à 3190 Elo fonctionnent. MAIS pour atteindre
+  la même profondeur il lui faut 4,5 fois plus de temps (9 positions de la partie contre dragondu5, profondeur
+  24 : 17 s pour la 17.1, 79 s pour la 19). Avec une analyse « à profondeur 30 », la 19 serait donc
+  beaucoup plus lente. **Décision : on garde la 17.1** ; la version Windows de la 19 n'a pas été téléchargée.
+  À reconsidérer si on passe un jour à une analyse au temps (et non à la profondeur).
+
+## 18/10/2026 (13) – Analyse : calcul fixe par défaut, profondeur et temps au choix (Cowork)
+Question de Julien : analyse à la profondeur (30) ou au temps ? Mesure faite d'abord sur sa partie contre
+dragondu5 (Stockfish 17.1, ordinateur de test Linux à 2 processeurs) :
+- la profondeur 30 coûte de **3 à 78 millions de nœuds** selon la position (25 fois d'écart, moyenne
+  ≈ 28 millions) : c'est pour ça que la durée d'une revue « à la profondeur » est imprévisible ;
+- entre la profondeur 22 et la 30, l'évaluation bouge de **0,05 pion** en position équilibrée, moins de
+  0,3 pion quand la partie est jouée : les pastilles ne changent presque jamais ;
+- lichess n'analyse ni à la profondeur ni au temps, mais avec un **nombre de nœuds fixe** par position
+  (exemple de son protocole fishnet : profondeur 18, 1,7 million de nœuds).
+
+**Décision de Julien : plusieurs modes, le calcul fixe par défaut.**
+- `analyse_partie.py` : `REGLAGES` = 3 modes × 3 puissances (config `analyse_mode` + `analyse_niveau`,
+  lus par `puissance_de(config)` ; l'ancien `analyse_puissance` donne le niveau) :
+  - **Calcul fixe** (défaut) : 10 / 25 / **50 millions** de nœuds par position (passe des trois meilleurs
+    coups : un cinquième). Même analyse sur tous les PC, durée prévisible, une version plus récente de
+    Stockfish compte pour ce qu'elle vaut. 50 millions = profondeur 28 à 33 ; c'est environ 2 fois le
+    calcul moyen de l'ancienne profondeur 30, réparti également (aucune position bâclée).
+  - **Profondeur** : 22 / 26 / 30 (comme avant ; Maximale = l'ancienne profondeur 30).
+  - **Temps** : 3 / 7 / 15 s par position, refaite une fois avec le double si la profondeur minimale
+    (22 / 26 / 26) n'est pas atteinte.
+  - Les anciens noms (« rapide », « maximale »…) restent acceptés (Mes erreurs, statistiques).
+- **Analyses enregistrées** : comparées par un « effort » de 1 à 5 (enregistré avec le réglage), plus par
+  la profondeur. Une analyse à la profondeur 30 vaut le calcul fixe maximal : **changer de mode ne refait
+  pas les parties déjà analysées**. Une ancienne analyse à 26 est refaite en Maximale.
+- **Temps restant** affiché dans la revue et sur la carte de fin : « Analyse fine… 40 % · environ 3 min »
+  (vitesse réelle de Stockfish mesurée pendant l'analyse) ; à la fin « Analyse terminée (profondeur X à Y) ».
+- `engine.py` : `go nodes`, et chaque recherche rend les nœuds et le temps vraiment utilisés.
+- Variante dans la revue : réglage de la passe des meilleurs coups (rapide) ; une fois l'analyse de la
+  partie finie, tous les processeurs sauf un (le « 1 × 12 » du tableur de Julien) au lieu de 2.
+- Options → Partie : « Façon d'analyser » (Calcul fixe / Profondeur / Temps) et « Puissance de l'analyse »
+  (Rapide / Forte / Maximale), en français et en anglais. Export : l'en-tête dit le réglage et les profondeurs.
+- **Outil de mesure** `outils/mesurer_stockfish.py` (à lancer par Claude Code sur Windows, 10-15 min) :
+  1 × 12, 3 × 4, 6 × 2, 12 × 1 sur la partie contre dragondu5 au même budget → temps total, temps de la
+  première position, profondeur atteinte, nœuds/s, durée d'une revue par réglage → `docs/MESURE_STOCKFISH.md`.
+- **Hachage : 6 Go** (demande de Julien : « JE VEUX 6 GO DE HACHAGE ») – total de l'analyse, partagé
+  entre les moteurs prévus après la partie (3 × 2 Go sur son PC), y compris pendant la partie (2 Go pour
+  le seul moteur, pour ne jamais dépasser 6 Go quand les deux autres arrivent). Garde-fou pour les PC des
+  acheteurs : au plus la moitié de (mémoire − 4 Go) → 16 Go de mémoire = 6 Go, 8 Go = 2 Go. Stockfish
+  reçoit la taille exacte (plus d'arrondi à la puissance de 2). Avant : 2 Go (512 Mo par moteur).
+- Remarques sur le tableur de Julien : (1) le code était à 2 Go, pas 6 Go (corrigé ci-dessus) ; (2) les chiffres « 6,3 » et « 9,4 » venaient de commentaires de V8, jamais mesurés
+  sur son PC, et 9,4 dépasse le plafond théorique de 7,5 calculé dans le tableur : à remplacer par la mesure.
+- Tests : `tests/test_modes_analyse.py` (nouveau, 47 contrôles dont le hachage dont `go nodes` avec un vrai Stockfish),
+  `test_analyse_profonde.py` et `test_analyse_directe.py` mis à jour. 505 contrôles rapides verts +
+  revue, variantes, analyse directe, mes erreurs (Stockfish 17.1 Linux).
+- Recette : R-06E modifié, R-06F, R-06G, R-09E nouveaux, R-09D retiré (101 tests).
+
+À vérifier par Julien :
+- [ ] t64 à t66 (revue, flèches, comparaison chess.com) – toujours à faire.
+- [ ] t67 : temps réel d'une revue complète en Calcul fixe Maximale (estimation : 6 à 10 min pour 40 coups
+  analysés de zéro sur l'i7-8700K ; moins si l'analyse a tourné pendant la partie). Trop long → Forte.
+- [ ] t68 : Options → Façon d'analyser / Puissance ; une partie déjà analysée n'est pas refaite.
+- [ ] t69 : Claude Code lance `python outils/mesurer_stockfish.py`. Selon le résultat, on règlera la
+  répartition (aujourd'hui 3 × 4) et, si besoin, la puissance par défaut.
+- Claude Code : commit de la séance (13) après `python tests/lancer_tous.py`.
+
+Mesure faite par Claude Code sur le PC de Julien (i7-8700K, `docs/MESURE_STOCKFISH.md`, 20 positions,
+50 millions de nœuds) : 1 × 12 = 191 s, 3 × 4 = 195 s, 6 × 2 = 207 s, 12 × 1 = 253 s ; 4,7 millions de
+nœuds/s au mieux. 1 × 12 et 3 × 4 sont à égalité (2 % d'écart), mais la première position sort bien plus
+vite en 1 × 12 (27 s contre 46 s). Revue estimée pour 80 positions : Rapide 3,4 min, Forte 8,6 min,
+Maximale 17,1 min (plus que les 6 à 10 min prévues). À décider : réglage par défaut Forte, ou 1 × 12.
+Tests : `python tests/lancer_tous.py` → 611 contrôles verts. Commit de la séance (13) fait.
+

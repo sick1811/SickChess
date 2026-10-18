@@ -49,6 +49,8 @@ class ChessBoard:
         self.jeu_pieces = self.reglages.get("jeu_pieces", apparence.JEU_PAR_DEFAUT)
 
         self.board = chess.Board()
+        from effets import Effets
+        self.effets = Effets()           # 17/10 (p13) : onde de prise, mat
         self.selected_square = None
         self.dragging = False
         self.drag_piece = None
@@ -300,6 +302,13 @@ class ChessBoard:
             self.result = "1/2-1/2"
 
         self.timer.pause()
+        if self.board.is_checkmate():
+            gagnant = not self.board.turn
+            moi = getattr(self, "couleur_joueur", None)
+            if getattr(self, "ai_manager", None) is not None and moi is None:
+                moi = chess.BLACK if getattr(self, "ia_joue_blancs", False) else chess.WHITE
+            self.effets.mat(self.board.king(self.board.turn),
+                            confettis=moi is None or moi == gagnant)
         self.highlights.clear_legal_moves()
         self.promotion.fermer()
         self.premove = None
@@ -352,6 +361,7 @@ class ChessBoard:
 
         if capturee:
             self.captured_pieces.add_captured(capturee)
+            self.effets.prise(move.to_square)
 
         self.last_move_highlight.set_last_move(move.from_square, move.to_square)
         self.highlights.set_last_move(move.from_square, move.to_square)

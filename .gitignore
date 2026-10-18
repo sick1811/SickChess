@@ -35,3 +35,16 @@ tests/ecrans/
 journal_du_jeu.txt
 diagnostic_son.txt
 partie_en_cours.json
+
+# Version amis (CONSTRUIRE_VERSION_AMIS.bat) et mises a jour
+publier/
+build_amis/
+maj_temp/
+_maj.bat
+paquets_installes.json
+mes_erreurs.json
+modes_problemes.json
+rapports/
+signalement.json
+entrainement.json
+succes.json

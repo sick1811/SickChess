@@ -23,7 +23,7 @@ Proposition de périmètre (à valider) – le reste arrive en mises à jour gra
 - [x] Noyau : plateau, règles, pendule, sons, Stockfish, partie à deux (v0.1.0).
 - [ ] 1. Compilation en .exe (PyInstaller) qui marche sur un PC qui n'a pas Python.
 - [ ] 2. Options / personnalisation.
-- [ ] 3. Direction artistique : thème original complet, logo, icône.
+- [x] 3. Direction artistique : thème original complet, logo, icône (17/10).
 - [ ] 4. Revue de partie.
 - [ ] 5. Mes parties + profil.
 - [ ] 6. Problèmes (base Lichess).
@@ -39,14 +39,17 @@ Proposition de périmètre (à valider) – le reste arrive en mises à jour gra
       citer dans les crédits. Ne jamais modifier Stockfish sans publier les modifications.
 - [ ] **Pièces « Classique » (contours Cburnett)** : vérifier la licence sur Wikimedia et
       mettre la mention d'auteur, ou dessiner nos propres pièces (plus simple pour un jeu vendu).
+      (Les 5 autres jeux de pièces sont des créations SickChess : on peut aussi retirer
+      Classique de la version vendue.)
 - [ ] Ouvertures Lichess et base de problèmes : confirmer la licence (CC0 annoncée).
 - [ ] Polices : OK (OFL, fichiers de licence déjà fournis).
 - [ ] Questionnaire Steam sur le contenu généré par IA : y répondre honnêtement
       (code écrit avec Claude ; sons synthétisés par un script).
 
 ## Phase D – Page Steam « Bientôt disponible »
-- [ ] Images « capsule » aux formats imposés par Steam (logo SickChess lisible en petit).
-- [ ] Au moins 5 captures d'écran du jeu **avec le nouveau thème** (donc après l'étape 3).
+- [x] Images « capsule » et bibliothèque aux formats Steam (17/10) → `assets_src/steam/`.
+- [x] 6 captures d'écran 1920×1080 avec le nouveau thème (17/10) → `assets_src/steam/captures/`.
+      À refaire juste avant d'envoyer la page si les écrans changent d'ici là.
 - [ ] Description courte + longue (FR et EN), étiquettes : Échecs, Stratégie, Plateau, Solo…
 - [ ] Configuration minimale (Windows, petite config).
 - [ ] Une bande-annonce de 30 à 60 s (conseillée, pas obligatoire).
