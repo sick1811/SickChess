@@ -970,3 +970,29 @@ Fait :
 
 À vérifier par Julien :
 - [ ] t88 à t91 (voir A_FAIRE), R-10A à R-10E — il faut un ami Steam (ou deux comptes Steam).
+
+## 24/10/2026 (25) – Travail p37 : classements Steam, succès préparés (Claude Code dans le cloud)
+Demande de Julien : « fais le travail p37 », puis pousser sur GitHub.
+Fait :
+- **Classements Steam** (`jeu/classements.py`, `jeu/ecran_classements.py`) : Problèmes → « Classements
+  Steam ». Trois classements (Problèmes = ton classement du jour ; Contre la montre et Survie = ton
+  record, Steam garde le meilleur), trois vues (Mondial = 10 premiers, Amis, Autour de moi), ta ligne en
+  or, Actualiser. Ils marchent **dès maintenant** avec le numéro de test 480 (Steam les crée à la
+  première demande).
+- Les scores partent tout seuls : après chaque problème classé, à la fin de chaque contre la montre /
+  survie. Sans Steam, ils restent dans le jeu et partent à la connexion suivante (rattrapage). Rien
+  n'attend jamais Steam (réponses lues à chaque image ; message si Steam ne répond pas en 15 s).
+- **Succès préparés pour le vrai numéro Steam** : à chaque connexion, le jeu renvoie à Steam tous les
+  succès déjà gagnés (personne ne perd ses succès d'avant) ; avec 480, rien n'est envoyé (Steam ne les
+  connaît pas). **28 icônes** (débloqué + grisé, 256 px, Onyx & Or) dans `docs/steam_succes/`, faites par
+  `outils/generer_icones_succes.py` avec les pièces « Tournoi plat » et Barlow (noté dans CREDITS).
+  `docs/SUCCES_STEAM.md` réécrit : les 4 étapes du jour J dans Steamworks, les 14 succès, les 3 classements.
+- `steam.py` : appels Steam des classements (FindOrCreateLeaderboard, UploadLeaderboardScore,
+  DownloadLeaderboardEntries…), tailles des structures vérifiées au chargement.
+- Anglais : textes traduits. Tests : nouvelle série `tests/test_classements.py` (32 contrôles, faux Steam qui
+  répond comme le vrai). Suite complète : 829 contrôles verts.
+- Recette : R-08A à R-08C ajoutés (section « Problèmes »).
+- Pas de version amis (impossible dans le cloud).
+
+À vérifier par Julien :
+- [ ] t92 à t94 (voir A_FAIRE), R-08A à R-08C — Steam ouvert, avec steam_api64.dll et steam_appid.txt (480).

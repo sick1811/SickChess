@@ -183,6 +183,12 @@ RECETTE = [
          "Un seul essai ; ensuite « Tu as déjà fait le problème du jour. Reviens demain ! » ; le bouton affiche « fait »."),
         ("R-086", "Problèmes → Mes erreurs",
          "Tes gaffes de parties analysées reviennent en problèmes ; « Ta partie du … » ; un autre très bon coup est accepté."),
+        ("R-08A", "Steam ouvert : Problèmes → « Classements Steam » ; Problèmes / Contre la montre / Survie ; Mondial / Amis / Autour de moi",
+         "Les listes se chargent (rang, joueur, score) ; ta ligne « Toi » est en or ; flèches gauche/droite changent de classement ; Échap revient aux Problèmes."),
+        ("R-08B", "Faire un contre la montre (ou une survie, ou un problème classé), puis rouvrir les classements",
+         "Ton nouveau score y est (Actualiser si besoin) ; un moins bon record ne remplace pas le meilleur ; le classement des problèmes suit ta valeur du jour."),
+        ("R-08C", "Steam fermé : Problèmes → « Classements Steam » ; jouer un contre la montre ; puis relancer le jeu avec Steam ouvert",
+         "Sans Steam : message clair et tes scores du jeu ; une fois Steam ouvert, ton record apparaît dans le classement sans rien refaire."),
     ]),
     ("Entraînement aux ouvertures", [
         ("R-097", "Menu → Entraînement aux ouvertures : choisir Blancs ou Noirs puis une ouverture",

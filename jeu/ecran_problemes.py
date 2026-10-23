@@ -126,6 +126,9 @@ class EcranProblemes:
                                       "theme_" + th, taille=13, gras=False)
                             for th in puzzles.THEMES_PROPOSES]
         self.btn_retour_choix = ui.Bouton((0, 0, 10, 10), "Retour", "retour", taille=16)
+        # 24/10 (travail p37) : les classements Steam (ecran_classements.py).
+        self.btn_classements = ui.Bouton((0, 0, 10, 10), "Classements Steam", "classements",
+                                         taille=16)
         # 17/10 : les problemes tires de tes propres fautes (mes_erreurs.py).
         self.btn_erreurs = ui.Bouton((0, 0, 10, 10), "Mes erreurs", "erreurs", taille=20)
         self.nombre_erreurs = None
@@ -137,7 +140,8 @@ class EcranProblemes:
         self.boutons_choix = ([self.btn_classe, self.btn_libre, self.btn_moins,
                                self.btn_plus] + self.btns_niveaux + self.btns_themes
                               + self.btns_defis
-                              + [self.btn_erreurs, self.btn_retour_choix])
+                              + [self.btn_erreurs, self.btn_classements,
+                                 self.btn_retour_choix])
 
         # Boutons de l'ecran de jeu
         self.btn_suivant = ui.Bouton((0, 0, 10, 10), "Problème suivant", "suivant", taille=17)
@@ -230,8 +234,11 @@ class EcranProblemes:
         y += h_defi + int(12 * ech)
         self.btn_erreurs.placer((cx, y, lc, h_mode))
         y += h_mode + int(18 * ech)
-        self.btn_retour_choix.placer((cx + lc // 4, min(y, hauteur - int(50 * ech)),
-                                      lc // 2, int(38 * ech)))
+        y_bas = min(y, hauteur - int(50 * ech))
+        moitie = (lc - ecart) // 2
+        self.btn_classements.placer((cx, y_bas, moitie, int(38 * ech)))
+        self.btn_retour_choix.placer((cx + moitie + ecart, y_bas, lc - moitie - ecart,
+                                      int(38 * ech)))
         self.colonne_choix = (cx, lc)
 
     # ================================================================ choix
@@ -558,6 +565,8 @@ class EcranProblemes:
             return None
         if cle == "retour":
             return "retour"
+        if cle == "classements":
+            return "classements"            # ouvert par run() (il a l'horloge)
         if cle == "classe":
             self.commencer(puzzles.MODE_CLASSE)
         elif cle == "libre":
@@ -669,6 +678,13 @@ class EcranProblemes:
                     self._placer(pygame.display.get_surface())
                     continue
                 reponse = self.handle_event(event)
+                if reponse == "classements":
+                    from ecran_classements import EcranClassements
+                    reponse = EcranClassements(self.screen, self.preferences).run(
+                        clock, evenement_fenetre, apres_dessin)
+                    self._placer(pygame.display.get_surface())
+                    if reponse != "quitter":
+                        continue
                 if reponse is not None:
                     return reponse
             self.update()

@@ -498,6 +498,8 @@ class Session:
                                       secondes=secondes, indice=indice)
         if self.classe:
             enregistrer_le_score(self.score)
+            import classements                 # 24/10 (p37) : classement Steam
+            classements.envoyer("problemes", self.classement())
             try:
                 import succes
                 succes.verifier({"serie_10": self.serie() >= 10,

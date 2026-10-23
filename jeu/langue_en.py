@@ -534,4 +534,16 @@ EN = {
         "Your current game is saved: “Resume current game” will bring it back from the menu.",
     "INVITATIONS REÇUES": "INVITATIONS RECEIVED", "à l'instant": "just now",
     "il y a %d min": "%d min ago",
+    # --- classements Steam (24/10, travail p37)
+    "Classements Steam": "Steam leaderboards", "Mondial": "Global", "Amis": "Friends",
+    "Autour de moi": "Around me", "Actualiser": "Refresh", "RANG": "RANK", "JOUEUR": "PLAYER",
+    "CLASSEMENT": "RATING", "TROUVÉS EN 3 MIN": "SOLVED IN 3 MIN", "TROUVÉS": "SOLVED",
+    "Chargement du classement...": "Loading the leaderboard...",
+    "Steam ne répond pas. Réessaie avec « Actualiser ».": "Steam is not responding. Try again with “Refresh”.",
+    "Aucun de tes amis Steam n'a encore de score ici.": "None of your Steam friends has a score here yet.",
+    "Personne n'est encore classé ici : sois le premier !": "Nobody is ranked here yet: be the first!",
+    "Steam ne répond plus : liste peut-être ancienne.": "Steam stopped responding: this list may be old.",
+    "Les classements Steam ont besoin de Steam ouvert. Tes scores sont gardés dans le jeu et partiront à la prochaine connexion :":
+        "Steam leaderboards need Steam to be running. Your scores are kept in the game and will be sent next time:",
+    "Le multijoueur Steam n'existe que sous Windows.": "Steam multiplayer only exists on Windows.",
 }

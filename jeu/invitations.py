@@ -172,6 +172,11 @@ class BandeauInvitation:
             s.pomper()
         for invitation in recevoir(s):
             print("[INVITATION] %s t'invite (salon %d)" % (invitation["nom"], invitation["salon"]))
+        try:                                   # 24/10 (p37) : scores en attente
+            import classements
+            classements.instance().suivre()
+        except Exception as e:
+            print("[CLASSEMENTS] %s" % e)
 
     def _prendre(self, event, invitation):
         """True si l'evenement est pour le bandeau (il ne va pas a l'ecran)."""

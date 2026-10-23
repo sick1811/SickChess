@@ -133,6 +133,8 @@ bandeau = invitations.BandeauInvitation(Gestionnaire(), steam=MoteurMuet())
 invitations.ajouter(1, "Paul")
 m.draw(); bandeau.dessiner(ecran); photo("invitation")
 invitations.vider()
+from ecran_classements import EcranClassements      # 24/10 (p37)
+EcranClassements(ecran, {}).draw(); photo("classements")
 from ecran_signaler import EcranSignaler
 EcranSignaler(ecran, "0.1").draw(); photo("signaler")
 import premier_lancement

@@ -13,6 +13,7 @@ Rien de copié d'un autre jeu ou d'un site sans licence claire.
 | Pièces plates (Arène, Tournoi) | `assets/pieces/plat_*` | Tirées des mêmes profils (`outils/blender/gen_2d.py`) | Propriété du projet |
 | Plateaux en matière (marbre, onyx, noyer) | `assets/plateaux/` | Textures calculées (`outils/blender/gen_plateaux.py`) | Propriété du projet |
 | Icône et logo | `assets/icone.*`, `assets/logo*.png` | Fabriqués par `outils/generer_logo.py` (cavalier « Tournoi plat » du projet + police Barlow) | Propriété du projet |
+| Icônes des succès Steam | `docs/steam_succes/` | Fabriquées par `outils/generer_icones_succes.py` (pièces « Tournoi plat » du projet + police Barlow) ; pour Steamworks, pas chargées par le jeu | Propriété du projet |
 | Fond du menu | `assets/menu/fond_menu.jpg` | Rendu Blender (`outils/blender/rendu_menu.py`) | Propriété du projet |
 | Police Barlow Semi Condensed | `polices/` | Google Fonts (The Barlow Project) | SIL Open Font License (`BarlowSemiCondensed-OFL.txt`) |
 | Police Outfit | `polices/` | Google Fonts | SIL Open Font License (`Outfit-OFL.txt`) |

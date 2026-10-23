@@ -28,6 +28,7 @@ SERIES = [
     ("test_en_ligne_nulle.py", False),
     ("test_en_ligne_revue.py", False),
     ("test_invitations.py", False),
+    ("test_classements.py", False),
     ("test_cache_analyse.py", False),
     ("test_statistiques.py", False),
     ("test_entrainement.py", False),

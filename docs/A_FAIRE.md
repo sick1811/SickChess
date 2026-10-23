@@ -87,9 +87,9 @@ Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/
        1366×768 et 4K ; relecteur-interface).
 → 24/10 : nouvelles demandes de Julien (page « À faire », statut « veux ») : p35 Analyse libre (**faite le
   24/10, séance (23)**), p36 invitation d'un ami affichée dans le jeu
-  (**faite le 24/10, séance (24)**), p37 classements et succès Steam.
+  (**faite le 24/10, séance (24)**), p37 classements et succès Steam (**faite le 24/10, séance (25)**).
 Toujours en attente de décision : p21 Steamworks (le délai de 30 jours ne démarre qu'au paiement),
-p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
+p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence des pièces Classique, p02, p09, p17, p23–p26.
 
 ## Prochaines étapes (dans l'ordre)
 1. **Compilation en .exe** (PyInstaller, skill `compiler-exe`) – à faire dans Claude Code
@@ -103,6 +103,13 @@ p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t92 (25, Steam ouvert) : Problèmes → « Classements Steam » : les trois classements et les trois vues se
+      chargent ; ta ligne « Toi » en or (après un premier score). Lisible ? Rapide ?
+- [ ] t93 (25) : fais un contre la montre puis rouvre les classements : ton score y est (Actualiser si besoin) ;
+      même chose avec une survie et un problème classé.
+- [ ] t94 (25) : Steam fermé : l'écran le dit et montre tes scores ; joue un contre la montre ; relance le jeu
+      Steam ouvert : ton record apparaît dans le classement sans rien refaire.
+- [ ] Regarder `docs/steam_succes/apercu.png` : les icônes des succès te plaisent ? (à refaire avec Cowork sinon)
 - [ ] t88 (24, sans ami) : Jouer en ligne → « Test : invitation », puis Retour : dans le menu, « Ami de test
       t'invite à jouer » avec un petit son ; « Plus tard » le range ; Jouer en ligne le montre dans
       « INVITATIONS REÇUES ».
@@ -177,6 +184,8 @@ p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
       `steam_appid.txt` (480 = numéro de test de Valve).
 
 ## Fait récemment
+- 24/10 (25) : classements Steam (problèmes, contre la montre, survie ; mondial, amis, autour de moi) et
+  succès préparés pour le vrai numéro Steam (rattrapage, icônes, notice) (p37).
 - 24/10 (24) : invitation d'un ami Steam affichée dans le jeu (p36) : bandeau sur tous les écrans,
   confirmation en partie (partie gardée), liste « Invitations reçues » dans Jouer en ligne.
 - 24/10 (23) : analyse libre (p35) : les deux camps, Stockfish en continu (3 lignes), éditeur de position,
