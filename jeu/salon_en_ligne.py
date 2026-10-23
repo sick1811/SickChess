@@ -252,7 +252,7 @@ class SalonEnLigne:
         """Renvoie (transport, reglages) quand la partie commence, None pour
         revenir au menu, ou 'quitter'."""
         while self.resultat is None:
-            for event in pygame.event.get():
+            for event in ui.evenements():
                 if event.type == pygame.QUIT:
                     self._retour_accueil()
                     return "quitter"
@@ -265,7 +265,7 @@ class SalonEnLigne:
                     return None
             self.update()
             self.draw()
-            pygame.display.flip()
+            ui.afficher()
             self.clock.tick(60)
         self.champ_code.activer(False)
         return self.resultat
@@ -325,6 +325,10 @@ class SalonEnLigne:
             self.test_local(True)
         elif cle == "test_invite":
             self.test_local(False)
+        elif cle == "test_invitation":
+            import invitations
+            invitations.ajouter(module_steam.salon_depuis_code("TEST"), "Ami de test")
+            self.info = "Invitation de test : reviens au menu pour voir le bandeau."
         elif cle == "lancer":
             self.lancer()
         elif cle == "copier":
@@ -341,6 +345,11 @@ class SalonEnLigne:
         elif cle.startswith("couleur:"):
             self.couleur = cle.split(":")[1]
             self._envoyer_reglages(force=True)
+        elif cle.startswith("invitation:"):
+            import invitations
+            salon = int(cle.split(":")[1])
+            invitations.oublier(salon)
+            self.rejoindre(salon)
         elif cle.startswith("inviter:"):
             ami = int(cle.split(":")[1])
             if self.steam.inviter(self.salon, ami):
@@ -411,6 +420,7 @@ class SalonEnLigne:
         self._b("rejoindre", "Rejoindre avec ce code", (x, y, colonne, 46),
                 actif and bool(self.champ_code.contenu.strip()))
         y += 66
+        y = self._dessiner_invitations(t, x, y, colonne)
 
         if not actif:
             message = self.steam.erreur or "Steam n'est pas disponible."
@@ -427,15 +437,45 @@ class SalonEnLigne:
             ui.texte(ecran, self.erreur, largeur // 2, y, 17, (240, 140, 120),
                      ancre="centre", largeur_max=largeur - 40, ajuster=True)
             y += 34
+        elif self.info:
+            ui.texte(ecran, self.info, largeur // 2, y, 16, t["accent"],
+                     ancre="centre", largeur_max=largeur - 40, ajuster=True)
+            y += 34
 
         if MODE_TEST:
             y = max(y, hauteur - 130)
-            ui.texte(ecran, "Test sans Steam : deux fenetres du jeu sur ce PC",
+            ui.texte(ecran, "Test sans Steam : deux fenêtres du jeu sur ce PC",
                      largeur // 2, y, 14, t["texte_discret"], ancre="centre")
-            demi = (colonne - 10) // 2
-            self._b("test_hote", "Test : heberger", (x, y + 22, demi, 38), taille=14)
-            self._b("test_invite", "Test : rejoindre", (x + demi + 10, y + 22, demi, 38),
+            tiers = (colonne - 20) // 3
+            self._b("test_hote", "Test : héberger", (x, y + 22, tiers, 38), taille=14)
+            self._b("test_invite", "Test : rejoindre", (x + tiers + 10, y + 22, tiers, 38),
                     taille=14)
+            # 24/10 (p36) : voir le bandeau d'invitation sans ami (retour au menu).
+            self._b("test_invitation", "Test : invitation",
+                    (x + 2 * (tiers + 10), y + 22, colonne - 2 * (tiers + 10), 38), taille=14)
+
+    def _dessiner_invitations(self, t, x, y, colonne):
+        """24/10 (p36) : les invitations recues ces 10 dernieres minutes
+        (« Plus tard » sur le bandeau, ou arrivees pendant une partie)."""
+        import invitations
+        recues = invitations.en_attente()[:3]
+        if not recues:
+            return y
+        ui.texte(self.screen, "INVITATIONS REÇUES", x, y, 13, t["texte_discret"], gras=True)
+        y += 22
+        for invitation in recues:
+            rect = pygame.Rect(x, y, colonne, 46)
+            ui.cadre(self.screen, rect, t["panneau"], t["bord"], 1, 10)
+            l_bouton = 120
+            ui.texte(self.screen, "%s t'invite" % invitation["nom"], x + 14, y + 6, 16,
+                     t["texte"], gras=True, largeur_max=colonne - l_bouton - 30)
+            ui.texte(self.screen, invitations.depuis_quand(invitation), x + 14, y + 26, 12,
+                     t["texte_discret"], largeur_max=colonne - l_bouton - 30)
+            self._b("invitation:%d" % invitation["salon"], "Rejoindre",
+                    (rect.right - l_bouton - 6, y + 6, l_bouton, 34), self.steam.actif,
+                    selectionne=True, taille=15)
+            y += 54
+        return y + 12
 
     def _dessiner_salon(self, t, largeur, hauteur):
         ecran = self.screen

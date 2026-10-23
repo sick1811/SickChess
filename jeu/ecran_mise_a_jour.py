@@ -32,7 +32,7 @@ class EcranMiseAJour:
     def run(self, clock, evenement_fenetre=None):
         """Renvoie 'menu', 'redemarrer' ou 'quitter'."""
         while True:
-            for event in pygame.event.get():
+            for event in ui.evenements():
                 if event.type == pygame.QUIT:
                     if self.maj.etat == "telechargement":
                         self.maj.annuler()
@@ -44,7 +44,7 @@ class EcranMiseAJour:
                 if action:
                     return action
             self.draw()
-            pygame.display.flip()
+            ui.afficher()
             clock.tick(30)
 
     def handle_event(self, event):

@@ -122,6 +122,17 @@ verifier(langue.traduire("Trait aux Noirs  ·  profondeur 18 (analyse terminée)
 al.ouvrir_l_editeur(); al.edition.vider(); al.fermer_l_editeur(True); al.draw()
 al.edition.choisir_outil("Q"); al.draw(); photo("editeur_position")
 al.analyse.arreter()
+import invitations                                   # 24/10 (p36)
+
+
+class Gestionnaire:
+    au_menu, en_ligne, config = True, False, {}
+
+
+bandeau = invitations.BandeauInvitation(Gestionnaire(), steam=MoteurMuet())
+invitations.ajouter(1, "Paul")
+m.draw(); bandeau.dessiner(ecran); photo("invitation")
+invitations.vider()
 from ecran_signaler import EcranSignaler
 EcranSignaler(ecran, "0.1").draw(); photo("signaler")
 import premier_lancement

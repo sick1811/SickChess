@@ -838,7 +838,7 @@ class EcranAnalyseLibre:
             cadence = ui.Cadence()
             profondeur_vue = None
             while True:
-                evenements = pygame.event.get()
+                evenements = ui.evenements()
                 for event in evenements:
                     if evenement_fenetre is not None and evenement_fenetre(event):
                         self._placer(pygame.display.get_surface())
@@ -849,7 +849,7 @@ class EcranAnalyseLibre:
                 self.draw()
                 if apres_dessin is not None:
                     apres_dessin(self.screen)
-                pygame.display.flip()
+                ui.afficher()
                 # Une nouvelle profondeur compte comme du mouvement : l'ecran
                 # suit le moteur sans dessiner 60 images/s pour rien.
                 r = self.analyse.resultat()

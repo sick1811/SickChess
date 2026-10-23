@@ -744,6 +744,41 @@
    "ordre": 11309
   },
   {
+   "id": "R-10A",
+   "section": "En ligne (Steam)",
+   "texte": "SickChess ouvert au menu : un ami Steam t'invite (depuis son salon SickChess ou Maj+Tab)",
+   "detail": "Un petit son, et en haut « <ami> t'invite à jouer » avec Rejoindre / Plus tard ; Rejoindre : tu arrives dans son salon.",
+   "ordre": 11310
+  },
+  {
+   "id": "R-10B",
+   "section": "En ligne (Steam)",
+   "texte": "Même chose pendant les Problèmes, une revue ou l'analyse libre ; cliquer Rejoindre",
+   "detail": "L'écran se ferme et tu arrives dans le salon de l'ami.",
+   "ordre": 11311
+  },
+  {
+   "id": "R-10C",
+   "section": "En ligne (Steam)",
+   "texte": "Même chose pendant une partie contre l'ordinateur ; Rejoindre, puis « Rester » ; recommencer et confirmer « Rejoindre »",
+   "detail": "Une fenêtre demande « Rejoindre <ami> ? », la pendule s'arrête ; Rester : la partie continue ; Rejoindre : salon de l'ami, et plus tard « Reprendre la partie » dans le menu la retrouve.",
+   "ordre": 11312
+  },
+  {
+   "id": "R-10D",
+   "section": "En ligne (Steam)",
+   "texte": "« Plus tard » sur le bandeau (ou ne rien faire 45 s), puis Menu → Jouer en ligne",
+   "detail": "Le bandeau disparaît ; « INVITATIONS REÇUES » liste l'invitation (« il y a N min ») avec Rejoindre, pendant 10 minutes.",
+   "ordre": 11313
+  },
+  {
+   "id": "R-10E",
+   "section": "En ligne (Steam)",
+   "texte": "Sans ami : Jouer en ligne → « Test : invitation », puis Retour au menu",
+   "detail": "« Ami de test t'invite à jouer » apparaît dans le menu (Rejoindre mène à un salon qui n'existe pas : message clair).",
+   "ordre": 11314
+  },
+  {
    "id": "R-110",
    "section": "Version amis et mises à jour",
    "texte": "CONSTRUIRE_VERSION_AMIS.bat",

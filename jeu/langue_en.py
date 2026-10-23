@@ -411,8 +411,11 @@ EN = {
         "Steam window opened. If nothing shows up, use the friends list here.",
     "Joue contre un ami Steam. Cree une partie et invite-le, ou entre le code qu'il t'a donne.":
         "Play a Steam friend. Create a game and invite them, or enter the code they gave you.",
-    "Test : heberger": "Test: host", "Test : rejoindre": "Test: join",
+    "Test : heberger": "Test: host", "Test : héberger": "Test: host", "Test : rejoindre": "Test: join",
     "Test sans Steam : deux fenetres du jeu sur ce PC": "Test without Steam: two game windows on this PC",
+    "Test sans Steam : deux fenêtres du jeu sur ce PC": "Test without Steam: two game windows on this PC",
+    "Test : invitation": "Test: invitation",
+    "Invitation de test : reviens au menu pour voir le bandeau.": "Test invitation: go back to the menu to see the banner.",
     "Tu joues les %s contre %s.": "You play %s against %s.", "En ligne - tu joues les %s": "Online - you play %s",
     "Revanche": "Rematch", "Revanche ! Tu joues les %s.": "Rematch! You play %s.",
     "ACCEPTER LA REVANCHE": "ACCEPT REMATCH", "REVANCHE DEMANDEE...": "REMATCH REQUESTED...",
@@ -524,4 +527,11 @@ EN = {
     "Les Noirs ont plus de 8 pions.": "Black has more than 8 pawns.",
     "Les Blancs ont plus de 16 pièces.": "White has more than 16 pieces.",
     "Les Noirs ont plus de 16 pièces.": "Black has more than 16 pieces.",
+    # --- invitation d'un ami affichee dans le jeu (24/10, travail p36)
+    "%s t'invite à jouer": "%s invites you to play", "%s t'invite": "%s invites you",
+    "Rejoindre": "Join", "Rester": "Stay", "Rejoindre %s ?": "Join %s?",
+    "Ta partie en cours est gardée : « Reprendre la partie » la retrouvera dans le menu.":
+        "Your current game is saved: “Resume current game” will bring it back from the menu.",
+    "INVITATIONS REÇUES": "INVITATIONS RECEIVED", "à l'instant": "just now",
+    "il y a %d min": "%d min ago",
 }

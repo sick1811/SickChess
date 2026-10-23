@@ -939,3 +939,34 @@ Fait :
 
 À vérifier par Julien :
 - [ ] t82 à t87 (voir A_FAIRE), R-140 à R-149.
+
+## 24/10/2026 (24) – Travail p36 : l'invitation d'un ami affichée dans le jeu (Claude Code dans le cloud)
+Demande de Julien : « fais le travail p36 ».
+Fait :
+- Le jeu écoute maintenant l'**invitation reçue** de Steam (`LobbyInvite_t`, `steam.py`) : avant, il ne
+  savait réagir qu'à une invitation **acceptée** dans Steam.
+- **Bandeau en haut, sur tous les écrans** (`jeu/invitations.py`) : « Paul t'invite à jouer – Rejoindre /
+  Plus tard », avec un petit son (celui du début de partie, déjà dans le jeu).
+  - au menu : Rejoindre → salon de l'ami ;
+  - dans un autre écran (problèmes, revue, options, analyse libre…) : l'écran se ferme, puis salon de l'ami ;
+  - **pendant une partie** contre l'ordinateur ou à deux : fenêtre « Rejoindre Paul ? » (Rester / Rejoindre),
+    pendule arrêtée pendant la question ; si Rejoindre : la partie est **gardée** (« Reprendre la partie »
+    dans le menu) ;
+  - Plus tard (ou 45 s sans réponse) : le bandeau s'en va.
+- **« Jouer en ligne » : liste « INVITATIONS REÇUES »** (10 minutes), avec « il y a N min » et Rejoindre.
+  Pas de bandeau pendant le jeu en ligne lui-même (le salon a sa liste).
+- Mode test : bouton **« Test : invitation »** dans Jouer en ligne (fausse invitation, pour voir le bandeau
+  sans ami). Disparaît avec `MODE_TEST = False`.
+- Comment : tous les écrans lisent maintenant la souris / le clavier par `ui.evenements()` et affichent par
+  `ui.afficher()` (au lieu de `pygame.event.get()` / `pygame.display.flip()`, 17 endroits). Sans invitation
+  c'est exactement pareil ; le bandeau coûte 1,7 microseconde par image (négligeable).
+- Anglais : textes traduits. Tests : nouvelle série `tests/test_invitations.py` (31 contrôles : Steam,
+  bandeau au menu / dans un écran / en partie, Plus tard, en ligne, liste du salon, retour au menu).
+  Suite complète : 797 contrôles verts.
+- Recette : R-10A à R-10E ajoutés (section « En ligne (Steam) »).
+- Vu en passant (pas corrigé) : l'accueil de « Jouer en ligne » a deux textes sans accents (« Cree une
+  partie et invite-le… ») ; corrigé seulement pour « Test : héberger » et « fenêtres ».
+- Pas de version amis (impossible dans le cloud).
+
+À vérifier par Julien :
+- [ ] t88 à t91 (voir A_FAIRE), R-10A à R-10E — il faut un ami Steam (ou deux comptes Steam).

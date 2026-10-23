@@ -940,7 +940,7 @@ class EcranRevue:
         self._apres_dessin = apres_dessin
         cadence = ui.Cadence()
         while True:
-            evenements = pygame.event.get()
+            evenements = ui.evenements()
             for event in evenements:
                 if evenement_fenetre is not None and evenement_fenetre(event):
                     self._placer(pygame.display.get_surface())
@@ -951,7 +951,7 @@ class EcranRevue:
             self.draw()
             if apres_dessin is not None:
                 apres_dessin(self.screen)
-            pygame.display.flip()
+            ui.afficher()
             animation = getattr(self.plateau, "animation", None)
             clock.tick(cadence.suivante(evenements, bool(getattr(animation, "animations", None))))
 

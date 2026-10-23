@@ -86,7 +86,8 @@ Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/
 7. [ ] **p33 – Lisibilité pour tous** (pastilles reconnaissables sans couleur, contrastes,
        1366×768 et 4K ; relecteur-interface).
 → 24/10 : nouvelles demandes de Julien (page « À faire », statut « veux ») : p35 Analyse libre (**faite le
-  24/10, séance (23)**), p36 invitation d'un ami affichée dans le jeu, p37 classements et succès Steam.
+  24/10, séance (23)**), p36 invitation d'un ami affichée dans le jeu
+  (**faite le 24/10, séance (24)**), p37 classements et succès Steam.
 Toujours en attente de décision : p21 Steamworks (le délai de 30 jours ne démarre qu'au paiement),
 p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
 
@@ -102,6 +103,14 @@ p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t88 (24, sans ami) : Jouer en ligne → « Test : invitation », puis Retour : dans le menu, « Ami de test
+      t'invite à jouer » avec un petit son ; « Plus tard » le range ; Jouer en ligne le montre dans
+      « INVITATIONS REÇUES ».
+- [ ] t89 (24, avec un ami) : SickChess ouvert au menu, ton ami t'invite depuis son salon : bandeau en haut ;
+      « Rejoindre » → tu arrives dans son salon et la partie se lance normalement.
+- [ ] t90 (24, avec un ami) : même chose pendant les Problèmes (ou une revue) : l'écran se ferme, salon de l'ami.
+- [ ] t91 (24, avec un ami) : même chose pendant une partie contre l'ordinateur : « Rejoindre <ami> ? »,
+      pendule arrêtée ; Rester continue ; Rejoindre → salon, et ensuite « Reprendre la partie » dans le menu.
 - [ ] t82 (23) : Menu → Analyse libre : en quelques secondes, 3 lignes de Stockfish, « profondeur » qui monte,
       flèche bleue ; joue des coups des deux camps : Stockfish suit chaque coup aussitôt ; le jeu reste fluide.
 - [ ] t83 (23) : clique sur une des 3 lignes (son premier coup est joué) ; Espace : « Relancer » en or et le
@@ -168,6 +177,8 @@ p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
       `steam_appid.txt` (480 = numéro de test de Valve).
 
 ## Fait récemment
+- 24/10 (24) : invitation d'un ami Steam affichée dans le jeu (p36) : bandeau sur tous les écrans,
+  confirmation en partie (partie gardée), liste « Invitations reçues » dans Jouer en ligne.
 - 24/10 (23) : analyse libre (p35) : les deux camps, Stockfish en continu (3 lignes), éditeur de position,
   FEN / PGN, tables de finale, « Analyser » depuis la revue.
 - 18/10 (13) : analyse en calcul fixe par défaut (comme lichess), profondeur et temps au choix,

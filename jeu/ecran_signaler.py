@@ -160,7 +160,7 @@ class EcranSignaler:
         try:
             cadence = ui.Cadence()       # 23/10 : 30 images/s au repos
             while True:
-                evenements = pygame.event.get()
+                evenements = ui.evenements()
                 for event in evenements:
                     if evenement_fenetre is not None and evenement_fenetre(event):
                         self.screen = pygame.display.get_surface()
@@ -171,7 +171,7 @@ class EcranSignaler:
                         return reponse
                 self.update()
                 self.draw()
-                pygame.display.flip()
+                ui.afficher()
                 clock.tick(cadence.suivante(evenements))
         finally:
             self.champ.activer(False)

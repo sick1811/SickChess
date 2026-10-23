@@ -170,7 +170,7 @@ class EcranPremierLancement:
 
     def run(self, clock, evenement_fenetre=None):
         while True:
-            for event in pygame.event.get():
+            for event in ui.evenements():
                 if evenement_fenetre is not None and evenement_fenetre(event):
                     self.screen = pygame.display.get_surface()
                     continue
@@ -178,5 +178,5 @@ class EcranPremierLancement:
                 if reponse:
                     return reponse
             self.draw()
-            pygame.display.flip()
+            ui.afficher()
             clock.tick(60)

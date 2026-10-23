@@ -797,10 +797,10 @@ class SettingsScreen:
         """Renvoie un dictionnaire de reglages, None (retour au menu)
         ou la chaine 'quitter'."""
         while self.running:
-            for event in pygame.event.get():
+            for event in ui.evenements():
                 self.handle_event(event)
             self.draw()
-            pygame.display.flip()
+            ui.afficher()
             if clock is not None:
                 clock.tick(60)
             else:

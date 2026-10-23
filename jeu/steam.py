@@ -52,6 +52,7 @@ CANAL = 0
 
 # Numeros des evenements Steam utilises (k_iCallback)
 CB_INVITATION_ACCEPTEE = 333       # GameLobbyJoinRequested_t
+CB_INVITATION_RECUE = 503          # LobbyInvite_t (24/10, p36 : jeu ouvert)
 CB_SALON_ENTRE = 504               # LobbyEnter_t
 CB_SALON_INFOS = 505               # LobbyDataUpdate_t
 CB_SALON_MEMBRE = 506              # LobbyChatUpdate_t
@@ -103,6 +104,10 @@ class InvitationAcceptee(Structure):       # GameLobbyJoinRequested_t
     _fields_ = [("salon", c_uint64), ("ami", c_uint64)]
 
 
+class InvitationRecue(Structure):          # LobbyInvite_t
+    _fields_ = [("ami", c_uint64), ("salon", c_uint64), ("jeu", c_uint64)]
+
+
 class MembreChange(Structure):             # LobbyChatUpdate_t
     _fields_ = [("salon", c_uint64), ("membre", c_uint64),
                 ("auteur", c_uint64), ("changement", c_uint32)]
@@ -119,6 +124,7 @@ assert sizeof(MessageReseau) == 216
 assert sizeof(MessageRappel) == 24
 assert sizeof(SalonEntre) == 24
 assert sizeof(MembreChange) == 32
+assert sizeof(InvitationRecue) == 24
 assert sizeof(InfoJeuAmi) == 24
 
 
@@ -433,6 +439,17 @@ class Steam:
             s = copie(InvitationAcceptee)
             if s is not None:
                 self._evenements.append({"type": "invitation_acceptee",
+                                         "salon": int(s.salon),
+                                         "ami": int(s.ami)})
+        elif numero == CB_INVITATION_RECUE:
+            # 24/10 (p36) : un ami nous invite PENDANT que SickChess est ouvert
+            # (Steam l'ecrit aussi dans sa discussion). Le jeu affiche un
+            # bandeau « X t'invite » (invitations.py). On ne garde que les
+            # invitations pour CE jeu (les 24 bits bas de l'identifiant de jeu).
+            s = copie(InvitationRecue)
+            if s is not None and (not s.jeu or not self.appid
+                                  or int(s.jeu) & 0xFFFFFF == int(self.appid)):
+                self._evenements.append({"type": "invitation_recue",
                                          "salon": int(s.salon),
                                          "ami": int(s.ami)})
         elif numero == CB_SALON_MEMBRE:

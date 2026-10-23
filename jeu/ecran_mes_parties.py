@@ -440,7 +440,7 @@ class EcranMesParties:
         """Boucle autonome. evenement_fenetre(event) -> True si F11/F1/taille."""
         cadence = ui.Cadence()       # 23/10 : 30 images/s au repos
         while True:
-            evenements = pygame.event.get()
+            evenements = ui.evenements()
             for event in evenements:
                 if evenement_fenetre is not None and evenement_fenetre(event):
                     self._placer(pygame.display.get_surface())
@@ -452,5 +452,5 @@ class EcranMesParties:
             self.draw()
             if apres_dessin is not None:
                 apres_dessin(self.screen)
-            pygame.display.flip()
+            ui.afficher()
             clock.tick(cadence.suivante(evenements))
