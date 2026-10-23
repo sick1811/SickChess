@@ -66,6 +66,9 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
   section « À tester par Julien ». (Dans Cowork, Claude les recopie aussi dans la page
   « SickChess – À faire » : https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5.)
 - Pour un bug : le reproduire dans un test avant de le corriger.
+- **Recette automatique** : `python outils/recette_auto.py` pilote le vrai jeu (souris, clavier, vrai
+  Stockfish, fenêtre invisible) et vérifie les lignes de recette qu'un programme peut juger →
+  `tests/recette_auto/resultats.json`. À lancer sur le PC avant de demander une passe à Julien.
 - **Recette complète (`docs/RECETTE.md`)** : la liste de TOUS les tests à la main du jeu
   (R-001…). Elle est fabriquée par `python outils/recette.py` : on modifie la liste
   `RECETTE` dans `outils/recette.py`, jamais RECETTE.md à la main. **Chaque fonction

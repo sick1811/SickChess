@@ -54,3 +54,6 @@ succes.json
 tests/banc_essai.json
 tests/banc_essai_historique.jsonl
 tests/surveillance.csv
+
+# 24/10 : captures et resultats de outils/recette_auto.py
+/tests/recette_auto/
