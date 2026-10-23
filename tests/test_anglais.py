@@ -86,10 +86,11 @@ from ecran_mes_parties import EcranMesParties
 mp2 = EcranMesParties(ecran); mp2.draw(); photo("mes_parties")
 from ecran_statistiques import EcranStatistiques
 st = EcranStatistiques(ecran); st.attendre(); st.draw(); st.vue = "succes"; st.draw(); photo("succes")
-from ecran_problemes import EcranProblemes
-pb = EcranProblemes(ecran, {}); pb.draw(); photo("problemes_choix")
-pb.commencer("chrono"); pb.draw(); photo("problemes_chrono")
-pb.commencer("classe"); pb.attente_jusqu_a = 0; pb.update(); pb.draw(); photo("problemes")
+if os.path.exists(os.path.join("puzzles", "tranches.tsv")):   # pas de base : ecrans sautes
+    from ecran_problemes import EcranProblemes
+    pb = EcranProblemes(ecran, {}); pb.draw(); photo("problemes_choix")
+    pb.commencer("chrono"); pb.draw(); photo("problemes_chrono")
+    pb.commencer("classe"); pb.attente_jusqu_a = 0; pb.update(); pb.draw(); photo("problemes")
 from ecran_entrainement import EcranEntrainement
 en = EcranEntrainement(ecran, {}); en.draw(); photo("ouvertures")
 en.commencer(en.familles[0][0]); en.draw()

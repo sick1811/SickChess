@@ -81,6 +81,8 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
   textes, page « À faire ». Il voit ce dossier, mais sous Linux : il ne lance pas le vrai jeu.
 - **Claude Code** (onglet Code, sur ce PC Windows) : lancer le jeu, Stockfish.exe, Steam,
   compiler le .exe, commits Git.
+- **Claude Code dans le cloud** (claude.ai/code, Linux, depuis GitHub) : code et tests, sans
+  écran ni Steam ni .exe. Réglage : `docs/CLAUDE_CLOUD.md` (`outils/cloud/configuration.sh`).
 - Le lien entre les deux = **ce fichier + `docs/A_FAIRE.md` + `docs/JOURNAL.md`** :
   toujours les tenir à jour en fin de séance.
 

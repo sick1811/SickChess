@@ -43,6 +43,14 @@ def verifier(condition, message):
         echecs.append(message)
 
 
+# 23/10 : sans la base puzzles/ (223 Mo, pas sur GitHub : Claude dans le cloud,
+# copie neuve du depot), on saute la serie au lieu de la mettre en rouge.
+if not os.path.exists(os.path.join("puzzles", "tranches.tsv")):
+    print("Base puzzles/ absente : serie sautee (elle tourne sur le PC de Julien).")
+    print("RESULTAT : tout est bon")
+    sys.exit(0)
+
+
 def coup(uci):
     return chess.Move.from_uci(uci)
 

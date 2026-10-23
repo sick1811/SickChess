@@ -6,3 +6,4 @@ vulture>=2.11      # repere les fonctions et classes jamais utilisees
 psutil>=5.9        # mesure memoire et processeur (banc d'essai)
 pyinstaller>=6.0   # fabrique le .exe
 py-spy>=0.3        # montre ou le jeu passe son temps (py-spy top -- python SickChess.py)
+numpy>=1.26        # tests des sons, outils/generer_sons.py, generer_logo.py

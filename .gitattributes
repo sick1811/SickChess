@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Scripts Linux (cloud, WSL) : toujours en fins de ligne Linux, sinon bash plante.
+*.sh text eol=lf

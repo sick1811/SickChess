@@ -871,3 +871,21 @@ Fait :
 
 À vérifier par Julien (à deux) :
 - [ ] t78 à t81 (voir A_FAIRE), R-108, R-109.
+
+## 23/10/2026 (21) – Claude Code dans le cloud (Claude Code)
+Fait :
+- `outils/cloud/configuration.sh` (script à coller dans l'environnement claude.ai/code) : bibliothèques
+  Python, Stockfish 17.1 Linux (repli : Stockfish d'Ubuntu), base des problèmes prise dans la version amis.
+- `outils/cloud/demarrage_session.sh` + crochet SessionStart dans `.claude/settings.json` : dans le cloud,
+  complète les installations et rappelle à Claude ce qui est impossible là-bas ; sur le PC, ne fait rien.
+- `.gitattributes` : scripts `.sh` toujours en fins de ligne Linux. `requirements-dev.txt` : numpy (tests des sons).
+- `test_problemes.py` et `test_anglais.py` : sautent la partie « problèmes » si `puzzles/` manque (au lieu
+  d'être rouges dans une copie neuve du dépôt).
+- Essai dans WSL (Ubuntu 24.04, comme le cloud), copie neuve du dépôt : 587 contrôles verts sans les
+  problèmes, 686 avec. Mode d'emploi : `docs/CLAUDE_CLOUD.md`.
+- Les « prebuilds » Codespaces activés sur GitHub le 23/10 ne servent pas : à supprimer par Julien.
+
+À faire par Julien :
+- [ ] Régler l'environnement sur claude.ai/code (`docs/CLAUDE_CLOUD.md`, 5 étapes) puis lancer une session
+  cloud : « lance python tests/lancer_tous.py » → tout vert.
+- [ ] Supprimer les prebuilds Codespaces (github.com/sick1811/SickChess/settings/codespaces).
