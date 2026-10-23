@@ -655,3 +655,47 @@ Fait :
 - [ ] t67 : durée réelle d'une revue en Forte (environ 9 min prévues pour 40 coups).
 - [ ] t68 : Options → Partie → Puissance de l'analyse affiche « Forte ».
 
+
+## 18/10/2026 (15) – Hachage 4 Go (Cowork)
+- Julien, après explication (au-delà de 4 Go, aucun gain visible pour ces analyses ; 8 Go demanderait
+  32 Go de mémoire vive) : **« OK 4 »**. `HASH_ANALYSE_MB` = 4096 (au lieu de 6144) : 3 × 1,3 Go sur
+  l'i7-8700K. Le garde-fou reste : jamais plus de la moitié de (mémoire − 4 Go) sur un petit PC.
+- `tests/test_modes_analyse.py` et `outils/mesurer_stockfish.py` alignés. 506 contrôles rapides verts.
+- Claude Code : commit de la séance (15).
+
+## 18/10/2026 (16) – Revue : bug des threads, vérification ciblée (Cowork)
+Retour de Julien : « 35 MIN POUR 70 COUPS ?? », puis « plus précise que maintenant et quasiment
+instantanée ». Question : « peut-on utiliser le moteur de lichess pour la rapidité ? »
+- **Bug corrigé (journal du jeu de Julien)** : les trois Stockfish d'analyse avaient 11, 6 et 4 threads
+  (21 pour 12 processeurs) : le nombre dépendait de l'ordre de démarrage. Maintenant on partage selon le
+  nombre de moteurs PRÉVUS (3 × 4 = 12), et un moteur qui finit la partie avec 6 threads repasse à 4.
+- **Vérification ciblée** (mode Calcul fixe) : toutes les positions reçoivent une analyse rapide (trois
+  meilleurs coups, 2 / 3 / 5 millions de nœuds), puis SEULS les coups dont la pastille hésite sont vérifiés
+  en profondeur (15 / 25 / 50 millions) : perte à moins de 3 points d'un seuil (5 / 10 / 20), à moins de
+  0,3 pion des seuils en pions, candidat Très bien / Brillant / Manque (`_coup_sur`). Ailleurs, la
+  pastille est déjà sûre. Plus de passe profonde non plus pour les mats et la théorie (pas pour une
+  partie qui ne commence pas à la position de départ).
+- Mesure sur la partie contre dragondu5 (Stockfish 17.1, Forte) : **11 positions vérifiées sur 39** ;
+  comparé à l'analyse complète Forte de la nuit (25 millions partout) : aucune pastille de faute ne
+  change (Imprécision / Erreur / Gaffe identiques) ; 5 nuances Meilleur / Excellent / Bon sur des coups
+  presque équivalents (Stockfish lui-même varie d'une analyse à l'autre là-dessus) ; précision
+  65,0 / 63,9 (Blancs) et 93,7 / 92,4 (Noirs). Le raccourci « partie jouée à 8 pions » essayé d'abord a
+  été retiré : il faisait passer 12...d4 d'Imprécision à Excellent (règle du matériel perdu).
+- Durée estimée sur l'i7-8700K (4,7 millions de nœuds/s mesurés) pour 70 coups : Forte ≈ **5 min**
+  (avant : ≈ 15 min, plus le bug) ; la courbe, les flèches et ~70 % des pastilles après ≈ 1,5 min.
+  Une partie jouée dans SickChess est analysée pendant qu'on joue : la revue est prête à la fin.
+- Temps restant : compte seulement les positions à vérifier ; vitesse mesurée sur les vraies recherches
+  (≥ 1 million de nœuds) ; recalculé une fois par seconde.
+- **Moteur de lichess** : c'est Stockfish, le même. Sa rapidité vient de milliers d'ordinateurs bénévoles
+  et d'un budget plus petit (~2 millions de nœuds par position). Son API « cloud-eval » ne rend que des
+  positions déjà analysées sur le site (surtout des ouvertures, déjà « Théorique » chez nous), demande
+  Internet et est faite pour « quelques positions ici et là » : pas de gain pour la revue.
+- Tests : `test_modes_analyse.py` (56 contrôles : vérification ciblée, threads, théorie), `test_analyse_profonde.py`
+  adapté. Séries rapides vertes + revue (32), variantes (19), mes erreurs (18), analyse directe (34).
+- Recette : R-06F, R-09E modifiés ; R-06H nouveau (102 tests).
+
+À vérifier par Julien :
+- [ ] t67 : revue d'une longue partie importée en Forte : temps réel (≈ 5 min prévues pour 70 coups) ?
+- [ ] t71 : pendant la revue, les ronds creux se remplissent ; une pastille posée ne change plus.
+- Claude Code : commit de la séance (16) après `python tests/lancer_tous.py`.
+

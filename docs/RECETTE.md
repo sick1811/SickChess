@@ -127,8 +127,10 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 18/10
   → PGN copié et enregistré dans exports/ ; lichess / chess.com relisent les évaluations et les pastilles. Précision : identique à la méthode lichess (chess.com a sa propre formule, secrète : écart de quelques points normal).
 - [ ] **R-06E** – Revue d'une partie importée de chess.com (ex. contre dragondu5)  
   → Mêmes moments forts que chess.com : 7.Qe2 gaffe, 10.h3 erreur, 15.Qb3 erreur, 7...Bxa1 Très bien.
-- [ ] **R-06F** – Revue juste après une partie, pendant que l'analyse calcule (Options : Calcul fixe, Maximale)  
+- [ ] **R-06F** – Revue juste après une partie, pendant que l'analyse calcule (Options : Calcul fixe, Forte)  
   → En haut : « Analyse fine… 40 % · environ 3 min » ; le temps restant baisse régulièrement ; à la fin « Analyse terminée (profondeur X à Y) ».
+- [ ] **R-06H** – Mes parties → Importer une longue partie (60 coups et plus), ouvrir la revue (Calcul fixe, Forte)  
+  → Courbe, flèches et la plupart des pastilles en 1 à 2 minutes ; quelques coups gardent un rond creux (« en vérification ») puis reçoivent leur pastille ; une pastille posée ne change plus ; revue complète en environ 5 minutes pour 70 coups.
 - [ ] **R-06G** – Changer Options → Partie → Façon d'analyser, puis rouvrir la revue d'une partie déjà analysée  
   → La revue s'affiche tout de suite, sans tout refaire (une analyse assez forte est gardée, quel que soit le mode).
 - [ ] **R-068** – Revue : touche F  
@@ -207,7 +209,7 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 18/10
 - [ ] **R-09B** – Menu : la musique d'ambiance ; Options → Son → Musique Non ; touche M dans le menu  
   → Musique douce dans le menu, les problèmes et l'entraînement, coupée en partie ; Non ou M la coupent ; le volume change.
 - [ ] **R-09E** – Options → Partie → Façon d'analyser (Calcul fixe / Profondeur / Temps) et Puissance (Rapide / Forte / Maximale)  
-  → Calcul fixe et Forte par défaut ; Rapide = revue plus courte ; Profondeur Maximale = l'ancienne profondeur 30 ; Temps : chaque position prend le temps choisi (3 / 7 / 15 s).
+  → Calcul fixe et Forte par défaut (analyse rapide de toutes les positions, puis vérification à 15 / 25 / 50 millions des seuls coups dont la pastille hésite) ; Profondeur Maximale = l'ancienne profondeur 30 ; Temps : chaque position prend le temps choisi (3 / 7 / 15 s).
 - [ ] **R-093** – Options → Affichage : taille des textes, police, plein écran  
   → Tous les écrans suivent, rien ne déborde.
 - [ ] **R-09C** – Options → Affichage → Langue → English, puis Enregistrer ; parcourir menu, partie, revue, problèmes, aide F1  

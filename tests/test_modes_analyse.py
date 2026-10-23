@@ -48,7 +48,8 @@ class Factice:
         lignes_moteur = [{"coup": u, "cp": 30 - 5 * n, "mat": None,
                           "profondeur": atteinte, "suite": []}
                          for n, u in enumerate(coups[:lignes])]
-        return {"coup": coups[0], "evaluation": 0.3, "mat": None,
+        blancs = chess.Board(fen).turn == chess.WHITE
+        return {"coup": coups[0], "evaluation": 0.3 if blancs else -0.3, "mat": None,
                 "profondeur": atteinte, "lignes": lignes_moteur,
                 "second_evaluation": 0.25 if lignes > 1 else None,
                 "second_mat": None, "noeuds": noeuds or 1000000, "temps_ms": 500}
@@ -72,25 +73,84 @@ verifier(A.puissance_de({"analyse_mode": "n'importe quoi"}) == "calcul_forte",
 for nom in ("rapide", "normale", "forte", "maximale"):
     verifier(nom in A.REGLAGES, "ancien nom « %s » toujours accepte" % nom)
 
-print("2. Calcul fixe : la meme quantite de calcul pour chaque position")
+print("2. Calcul fixe : analyse rapide partout, verification la ou le verdict hesite")
+HORS_LIVRE = ["h2h3", "a7a6", "h1h2", "a8a7", "h2h1", "a7a8"]   # 1.h3 seul est theorique
 m = Factice()
-a = A.AnalyseurPartie(None, COUPS, None, "calcul_maximale", moteur=m)
+a = A.AnalyseurPartie(None, HORS_LIVRE, None, "calcul_maximale", moteur=m)
 a._travailler()
 verifier(a.terminee(), "analyse terminee")
-finales = [c for c in m.appels if c[1] == 50000000]
-verifier(len(finales) == len(COUPS) + 1 and all(c[3] == 1 for c in finales),
-         "passe finale : 50 millions de noeuds, meilleur coup seul, pour chaque position")
-verifier(all(c[0] == 0 for c in finales), "aucune profondeur imposee")
-verifier(any(c[1] == 10000000 and c[3] == 3 for c in m.appels),
-         "trois meilleurs coups a 10 millions de noeuds")
-verifier(not any(c[2] > 240000 for c in m.appels), "jamais refaite (pas de profondeur minimale)")
-verifier("profondeur 28 à 28" in a.texte_avancement(),
-         "fin : %s" % a.texte_avancement())
-verifier("50 millions" in a.description(), "description : %s" % a.description())
+verifier(any(c[1] == 5000000 and c[3] == 3 for c in m.appels),
+         "analyse rapide : trois meilleurs coups a 5 millions de noeuds")
+verifier(not [c for c in m.appels if c[1] == 50000000],
+         "partie calme (+0.30 partout) : aucune verification necessaire")
+verifier(len(a.allegees) == len(HORS_LIVRE) + 1, "toutes les pastilles sures : %d positions"
+         % len(a.allegees))
+verifier(all(a.detail(i)["pret"] for i in range(len(HORS_LIVRE))), "toutes les pastilles posees")
+
+
+class Hesitant(Factice):
+    """Apres 2.Rh2 (position 3 et suivantes), les Blancs perdent ~4 points de
+    chances : tout pres du seuil Imprecision (5). Le verdict hesite."""
+    def analyser_position(self, fen, profondeur, temps, lignes=1, **reste):
+        d = Factice.analyser_position(self, fen, profondeur, temps, lignes, **reste)
+        plateau = chess.Board(fen)
+        if plateau.fullmove_number >= 3 or (plateau.fullmove_number == 2
+                                            and plateau.turn == chess.BLACK):
+            blanc = -0.11
+            d["evaluation"] = blanc if plateau.turn == chess.WHITE else -blanc
+            for l in d["lignes"]:
+                l["cp"] = int(d["evaluation"] * 100)
+        return d
+
+
+h = Hesitant()
+b = A.AnalyseurPartie(None, HORS_LIVRE, None, "calcul_maximale", moteur=h)
+b._travailler()
+perte = A.annotations.chances_de_gagner(0.3) - A.annotations.chances_de_gagner(-0.11)
+verifiees = [k for k in range(len(b.fens)) if k not in b.allegees]
+verifier(b.terminee() and verifiees == [2, 3],
+         "perte de %.1f points (seuil Imprecision : 5) : positions 2 et 3 verifiees, %s" % (perte, verifiees))
+verifier(len([c for c in h.appels if c[1] == 50000000]) == 2,
+         "deux verifications a 50 millions, pas plus")
+verifier(not [c for c in h.appels if c[2] > 240000], "jamais refaite (pas de profondeur minimale)")
+verifier("vérifiée (2 sur 7)" in b.description(), "description : %s" % b.description())
+verifier("profondeur 28 à 28" in b.texte_avancement(), "fin : %s" % b.texte_avancement())
 ancien = Factice(connait_les_noeuds=False)
 b = A.AnalyseurPartie(None, COUPS[:2], None, "calcul_rapide", moteur=ancien)
 b._travailler()
 verifier(b.terminee(), "un moteur qui ne connait pas les noeuds marche encore")
+
+print("2b. Pas de passe profonde quand elle ne changerait rien (18/10)")
+class Gagnant(Factice):
+    def analyser_position(self, fen, profondeur, temps, lignes=1, **reste):
+        d = Factice.analyser_position(self, fen, profondeur, temps, lignes, **reste)
+        d["evaluation"] = 9.0
+        for l in d["lignes"]:
+            l["cp"] = 900
+        return d
+g = Gagnant()
+x = A.AnalyseurPartie(None, HORS_LIVRE, None, "calcul_maximale", moteur=g)
+x._travailler()
+verifier(x.terminee() and not [c for c in g.appels if c[1] == 50000000],
+         "partie jouee (+9) : aucune passe profonde, %d positions allegees" % len(x.allegees))
+livre = Factice()
+y = A.AnalyseurPartie(None, COUPS, None, "calcul_maximale", moteur=livre)
+y._travailler()
+verifier({0, 1, 2, 3} <= y.allegees, "theorie (1.e4 e5 2.Nf3 Nc6) : positions 0 a 3 allegees (%s)"
+         % sorted(y.allegees))
+verifier(y.detail(0)["note"] == "theorique", "les coups de theorie gardent leur pastille")
+
+print("2c. Threads : jamais plus que de processeurs (bug des 35 min)")
+ancien_cpu = os.cpu_count
+os.cpu_count = lambda: 12
+try:
+    z = A.AnalyseurPartie(None, COUPS, "x")
+    verifier([z._threads_par_moteur(c) for c in (1, 2, 3)] == [4, 4, 4],
+             "apres la partie : 3 moteurs x 4 threads, quel que soit l'ordre de demarrage")
+    z.suivi = True
+    verifier(z._threads_par_moteur(1) == 6, "pendant la partie : 1 moteur, 6 threads")
+finally:
+    os.cpu_count = ancien_cpu
 
 print("3. Temps : refaite une fois si la profondeur minimale manque")
 lent = Factice(profondeur_au_temps=True)
@@ -124,23 +184,23 @@ try:
              "effort et reglage enregistres")
     for nom, attendu in (("profondeur_maximale", True), ("calcul_forte", True),
                          ("rapide", True)):
-        x = A.AnalyseurPartie(None, COUPS, None, nom, moteur=Factice(),
+        x = A.AnalyseurPartie(None, HORS_LIVRE, None, nom, moteur=Factice(),
                               fichier_cache=cache)
         verifier(x.terminee() == attendu, "analyse calcul maximale relue en « %s »" % nom)
     # Une ancienne analyse (17/10) : seule la profondeur etait notee.
     d.pop("effort"); d.pop("reglage"); d["profondeur"] = 30
     with open(cache, "w", encoding="utf-8") as f:
         json.dump(d, f)
-    x = A.AnalyseurPartie(None, COUPS, None, "calcul_maximale", moteur=Factice(),
+    x = A.AnalyseurPartie(None, HORS_LIVRE, None, "calcul_maximale", moteur=Factice(),
                           fichier_cache=cache)
     verifier(x.terminee(), "ancienne analyse a la profondeur 30 : pas refaite")
     d["profondeur"] = 26
     with open(cache, "w", encoding="utf-8") as f:
         json.dump(d, f)
-    x = A.AnalyseurPartie(None, COUPS, None, "calcul_maximale", moteur=Factice(),
+    x = A.AnalyseurPartie(None, HORS_LIVRE, None, "calcul_maximale", moteur=Factice(),
                           fichier_cache=cache)
     verifier(not x.terminee(), "ancienne analyse a 26 : refaite en calcul maximal")
-    x = A.AnalyseurPartie(None, COUPS, None, "calcul_rapide", moteur=Factice(),
+    x = A.AnalyseurPartie(None, HORS_LIVRE, None, "calcul_rapide", moteur=Factice(),
                           fichier_cache=cache)
     verifier(x.terminee(), "... mais suffit au calcul rapide")
 finally:
@@ -172,10 +232,10 @@ for texte in ("Façon d'analyser", "Puissance de l'analyse", "Calcul fixe",
     verifier(langue.traduire(texte) != texte, "anglais : %s" % langue.traduire(texte))
 langue.regler("fr")
 
-print("7b. Hachage : 6 Go au total (demande de Julien), sans etouffer un petit PC")
-verifier(A.HASH_ANALYSE_MB == 6144, "6 Go demandes")
-verifier(A.hachage_total_mo(16384) == 6144, "PC a 16 Go : 6 Go")
-verifier(A.hachage_total_mo(32768) == 6144, "PC a 32 Go : 6 Go (jamais plus)")
+print("7b. Hachage : 4 Go au total (choix de Julien, 18/10), sans etouffer un petit PC")
+verifier(A.HASH_ANALYSE_MB == 4096, "4 Go demandes")
+verifier(A.hachage_total_mo(16384) == 4096, "PC a 16 Go : 4 Go")
+verifier(A.hachage_total_mo(32768) == 4096, "PC a 32 Go : 4 Go (jamais plus)")
 verifier(A.hachage_total_mo(8192) == 2048, "PC a 8 Go : 2 Go seulement")
 verifier(A.hachage_total_mo(4096) == 512, "PC a 4 Go : 512 Mo")
 verifier(A.memoire_totale_mo() is None or A.memoire_totale_mo() > 500,

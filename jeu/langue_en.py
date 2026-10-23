@@ -463,7 +463,7 @@ EN = {
     "Calcul fixe : même analyse sur tous les PC, durée prévisible": "Fixed calculation: same analysis on every PC, predictable duration",
     "Calcul fixe": "Fixed calculation", "Profondeur": "Depth", "Temps": "Time",
     "Puissance de l'analyse": "Analysis strength",
-    "Calcul : 10 / 25 / 50 millions - profondeur : 22 / 26 / 30 - temps : 3 / 7 / 15 s": "Calculation: 10 / 25 / 50 million - depth: 22 / 26 / 30 - time: 3 / 7 / 15 s",
+    "Calcul : vérifie les coups qui comptent (15 / 25 / 50 millions) - profondeur : 22 / 26 / 30 - temps : 3 / 7 / 15 s": "Calculation: checks the moves that matter (15 / 25 / 50 million) - depth: 22 / 26 / 30 - time: 3 / 7 / 15 s",
     "Forte": "Strong", "Maximale": "Maximum",
     "Analyse terminée (profondeur %d à %d)": "Analysis complete (depth %d to %d)",
     "environ %d min": "about %d min", "moins d'une minute": "less than a minute",

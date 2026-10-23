@@ -117,7 +117,7 @@ def _onglets():
                     [("Calcul fixe", "calcul"), ("Profondeur", "profondeur"),
                      ("Temps", "temps")], 3),
             Reglage("analyse_niveau", "Puissance de l'analyse",
-                    "Calcul : 10 / 25 / 50 millions - profondeur : 22 / 26 / 30 - temps : 3 / 7 / 15 s",
+                    "Calcul : vérifie les coups qui comptent (15 / 25 / 50 millions) - profondeur : 22 / 26 / 30 - temps : 3 / 7 / 15 s",
                     [("Rapide", "rapide"), ("Forte", "forte"),
                      ("Maximale", "maximale")], 3),
             Reglage("hotseat_retourner_plateau", "Partie à deux",

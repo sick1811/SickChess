@@ -33,6 +33,9 @@ page Steam, démarches Steamworks, licence des pièces Classique.
 → Lire les choix (`statut` = `veux` / `non` + commentaire) avant de choisir la séance suivante.
 → p04 (Mes erreurs) et p01 (variantes) faits le 17/10.
 
+→ 18/10 (16) : 5 nouvelles propositions pour garder les joueurs sans attente (p23 à p27 : moments clés
+  d'abord, « Trouve mieux », analyse en tâche de fond, objectif pour la partie suivante, résumé du coach).
+
 ## Prochaines étapes (dans l'ordre)
 1. **Compilation en .exe** (PyInstaller, skill `compiler-exe`) – à faire dans Claude Code
    sur Windows.
@@ -51,6 +54,8 @@ page Steam, démarches Steamworks, licence des pièces Classique.
 - [ ] t68 : Options → Partie → Façon d'analyser / Puissance ; « Forte » est sélectionné ; partie déjà
       analysée pas refaite.
 - [x] t69 : mesure faite le 18/10 (`docs/MESURE_STOCKFISH.md`) ; décision de Julien : Forte et 3 × 4.
+- [ ] t71 (16) : revue d'une longue partie importée (Forte) : ≈ 5 min pour 70 coups ? Ronds creux qui se
+      remplissent, pastilles qui ne changent plus. Commit de la séance (16) par Claude Code.
 - [ ] t70 : hachage 6 Go – les stockfish.exe prennent ~6 Go pendant une revue, le PC reste fluide ;
       noter la mémoire du PC (Gestionnaire des tâches → Performance → Mémoire).
 - [x] Commit Git de la séance du 18/10 (13) par Claude Code (fusionné sur GitHub, PR n° 1).

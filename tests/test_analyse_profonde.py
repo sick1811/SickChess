@@ -57,7 +57,8 @@ verifier(A.poids_lichess([50, 52, 48, 60, 30, 35]) == [1.0, 2.0, 6.0, 12.0, 2.5]
 
 print("2. Profondeur 30 : trois coups a 22, puis le meilleur a 30")
 m = Factice()
-a = A.AnalyseurPartie(None, ["e2e4", "e7e5", "g1f3"], None, "maximale", moteur=m)
+# 18/10 (16) : hors theorie (les positions de theorie ne sont plus creusees).
+a = A.AnalyseurPartie(None, ["h2h3", "a7a6", "h1h2"], None, "maximale", moteur=m)
 verifier(a.profondeur == 30 and a.niveau_final == 3, "reglage par defaut : profondeur 30")
 verifier(A.PUISSANCE_PAR_DEFAUT == "calcul_forte",
          "18/10 (14) : le calcul fixe fort est le reglage par defaut")
@@ -65,10 +66,10 @@ a._travailler()
 verifier(a.terminee(), "analyse terminee")
 verifier((10, 1) in m.appels and (22, 3) in m.appels and (30, 1) in m.appels,
          "survol, trois coups a 22, meilleur coup a 30 : %s" % sorted(set(m.appels)))
-verifier(a.lignes[0][0][0] == a.meilleurs[0] and a.lignes[0][0][1] == 0.4,
+verifier(a.lignes[1][0][0] == a.meilleurs[1] and a.lignes[1][0][1] == -0.4,
          "le meilleur coup de la passe profonde passe en tete")
-verifier(len(a.meilleurs_coups(0)) >= 1, "meilleurs coups proposes : %s"
-         % [c["san"] for c in a.meilleurs_coups(0)])
+verifier(len(a.meilleurs_coups(1)) >= 1, "meilleurs coups proposes : %s"
+         % [c["san"] for c in a.meilleurs_coups(1)])
 verifier(a.profondeur_atteinte() == 30, "profondeur atteinte : %d" % a.profondeur_atteinte())
 
 print("3. Les pastilles attendent la passe profonde")

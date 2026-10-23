@@ -347,30 +347,37 @@
   {
    "id": "R-06F",
    "section": "Fin de partie et revue",
-   "texte": "Revue juste après une partie, pendant que l'analyse calcule (Options : Calcul fixe, Maximale)",
+   "texte": "Revue juste après une partie, pendant que l'analyse calcule (Options : Calcul fixe, Forte)",
    "detail": "En haut : « Analyse fine… 40 % · environ 3 min » ; le temps restant baisse régulièrement ; à la fin « Analyse terminée (profondeur X à Y) ».",
    "ordre": 10613
+  },
+  {
+   "id": "R-06H",
+   "section": "Fin de partie et revue",
+   "texte": "Mes parties → Importer une longue partie (60 coups et plus), ouvrir la revue (Calcul fixe, Forte)",
+   "detail": "Courbe, flèches et la plupart des pastilles en 1 à 2 minutes ; quelques coups gardent un rond creux (« en vérification ») puis reçoivent leur pastille ; une pastille posée ne change plus ; revue complète en environ 5 minutes pour 70 coups.",
+   "ordre": 10614
   },
   {
    "id": "R-06G",
    "section": "Fin de partie et revue",
    "texte": "Changer Options → Partie → Façon d'analyser, puis rouvrir la revue d'une partie déjà analysée",
    "detail": "La revue s'affiche tout de suite, sans tout refaire (une analyse assez forte est gardée, quel que soit le mode).",
-   "ordre": 10614
+   "ordre": 10615
   },
   {
    "id": "R-068",
    "section": "Fin de partie et revue",
    "texte": "Revue : touche F",
    "detail": "L'échiquier se retourne.",
-   "ordre": 10615
+   "ordre": 10616
   },
   {
    "id": "R-069",
    "section": "Fin de partie et revue",
    "texte": "Ressortir de la revue, la rouvrir",
    "detail": "Tout s'affiche tout de suite, sans nouvelle analyse.",
-   "ordre": 10616
+   "ordre": 10617
   },
   {
    "id": "R-070",
@@ -572,7 +579,7 @@
    "id": "R-09E",
    "section": "Options",
    "texte": "Options → Partie → Façon d'analyser (Calcul fixe / Profondeur / Temps) et Puissance (Rapide / Forte / Maximale)",
-   "detail": "Calcul fixe et Forte par défaut ; Rapide = revue plus courte ; Profondeur Maximale = l'ancienne profondeur 30 ; Temps : chaque position prend le temps choisi (3 / 7 / 15 s).",
+   "detail": "Calcul fixe et Forte par défaut (analyse rapide de toutes les positions, puis vérification à 15 / 25 / 50 millions des seuls coups dont la pastille hésite) ; Profondeur Maximale = l'ancienne profondeur 30 ; Temps : chaque position prend le temps choisi (3 / 7 / 15 s).",
    "ordre": 11105
   },
   {

@@ -36,7 +36,7 @@ sys.path.insert(0, os.path.join(RACINE, "jeu"))
 import chess
 import chess.pgn
 
-HASH_TOTAL_MO = 6144      # comme analyse_partie.HASH_ANALYSE_MB (6 Go, choix de Julien)
+HASH_TOTAL_MO = 4096      # comme analyse_partie.HASH_ANALYSE_MB (4 Go, choix de Julien du 18/10)
 
 
 def chemin_stockfish():

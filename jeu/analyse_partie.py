@@ -62,9 +62,18 @@ def _r(mode, profondeur, noeuds, temps_ms, profondeur_min, effort, lignes):
 
 _LIGNES_22 = (22, 0, 6000)
 REGLAGES = {
-    "calcul_rapide": _r("calcul", 0, 10000000, 120000, 0, 3, (0, 2000000, 60000)),
-    "calcul_forte": _r("calcul", 0, 25000000, 180000, 0, 4, (0, 5000000, 60000)),
-    "calcul_maximale": _r("calcul", 0, 50000000, 240000, 0, 5, (0, 10000000, 60000)),
+    # 18/10 (16) - VERIFICATION CIBLEE (Julien : « plus precise que maintenant
+    # et quasiment instantanee »). En calcul fixe, chaque position recoit une
+    # analyse rapide (trois meilleurs coups : 2 / 3 / 5 millions), puis SEULS
+    # les coups dont la pastille pourrait changer sont verifies en profondeur
+    # (15 / 25 / 50 millions). Mesure sur les parties de Julien : 20 a 35 %
+    # des positions a verifier (13 sur 39 contre dragondu5). Forte : la meme
+    # verification qu'en (14) (25 millions) la ou le verdict se joue, pour
+    # environ 1,7 fois moins de calcul au total ; Maximale : deux fois plus
+    # profond que Forte la ou ca compte.
+    "calcul_rapide": _r("calcul", 0, 15000000, 120000, 0, 3, (0, 2000000, 60000)),
+    "calcul_forte": _r("calcul", 0, 25000000, 180000, 0, 4, (0, 3000000, 60000)),
+    "calcul_maximale": _r("calcul", 0, 50000000, 240000, 0, 5, (0, 5000000, 60000)),
     "profondeur_rapide": _r("profondeur", 22, 0, 6000, 22, 2, None),
     "profondeur_forte": _r("profondeur", 26, 0, 12000, 26, 3, _LIGNES_22),
     "profondeur_maximale": _r("profondeur", 30, 0, 30000, 30, 5, _LIGNES_22),
@@ -123,7 +132,9 @@ TEMPS_SURVOL_MS = 300
 # partie comme apres. Garde-fou pour les PC des acheteurs : jamais plus de la
 # moitie de la memoire qui reste une fois 4 Go laisses a Windows et au jeu
 # (16 Go de memoire -> 6 Go ; 8 Go -> 2 Go).
-HASH_ANALYSE_MB = 6144
+# 18/10 (15) - Julien, apres explication (au-dela de 4 Go, aucun gain visible
+# pour des analyses de cette duree) : « OK 4 ». Total 4 Go (3 x 1,3 Go).
+HASH_ANALYSE_MB = 4096
 
 
 def memoire_totale_mo():
@@ -154,7 +165,7 @@ def memoire_totale_mo():
 
 
 def hachage_total_mo(memoire=None):
-    """Le hachage total de l'analyse : 6 Go, sauf si le PC n'a pas assez de
+    """Le hachage total de l'analyse : 4 Go, sauf si le PC n'a pas assez de
     memoire (voir HASH_ANALYSE_MB)."""
     memoire = memoire_totale_mo() if memoire is None else memoire
     if not memoire:
@@ -177,6 +188,15 @@ ECART_CANDIDAT = 15.0
 EVAL_MAT = 20.0
 
 NOMBRE_MOMENTS_CLES = 3
+
+# 18/10 (16) : marge autour des seuils de pastille (points de chances, pions)
+# en dessous de laquelle un coup est verifie en profondeur.
+MARGE_VERDICT = 3.0
+MARGE_PIONS = 0.3
+
+# 18/10 (13) : au-dela de 8 pions d'avance (95 % de chances de gagner) ou d'un
+# mat, la passe profonde ne change aucune pastille : on s'en passe.
+PIONS_PARTIE_JOUEE = 8.0
 
 # 17/10 (Julien : « il calculera toujours le meilleur coup, et s'il y a
 # plusieurs coups aussi bons, il les propose ») : la passe fine classe TOUJOURS
@@ -297,7 +317,8 @@ class AnalyseurPartie:
         # 18/10 : durees mesurees par passe et vitesse du moteur (noeuds par
         # seconde) : le temps restant affiche dans la revue.
         self._durees = {1: [], 2: [], 3: []}
-        self._vitesses = []
+        self._vitesses = []             # (noeuds, ms) des vraies recherches
+        self.allegees = set()           # positions sans passe profonde (inutile)
         self._moteur_fourni = moteur          # les tests passent le leur
 
         self.fen_initiale = fen_initiale or chess.STARTING_FEN
@@ -414,6 +435,7 @@ class AnalyseurPartie:
             setattr(self, champ, list(valeur))
         self.profondeur_lue = int(d.get("profondeur") or 0)
         self.effort_lu = int(effort or 0)
+        self.allegees = set(int(k) for k in (d.get("allegees") or []) if 0 <= int(k) < n)
         self.reglage_lu = d.get("reglage")
         self.niveau = [self.niveau_final] * n
         self._cache = {}
@@ -429,6 +451,7 @@ class AnalyseurPartie:
                                getattr(self, "profondeur_lue", 0)),
              "effort": max(self.effort, getattr(self, "effort_lu", 0)),
              "reglage": getattr(self, "reglage_lu", None) or self.puissance,
+             "allegees": sorted(self.allegees),
              "version": VERSION_CACHE}
         for champ in self.CHAMPS_CACHE:
             d[champ] = list(getattr(self, champ))
@@ -493,16 +516,25 @@ class AnalyseurPartie:
         coeurs = os.cpu_count() or 2
         return 1 if coeurs < 4 else (2 if coeurs < 8 else 3)
 
-    def _threads_par_moteur(self, combien):
-        if self.threads is not None and combien == 1:
-            return self.threads
-        # 18/10 (Julien : « le plus performant et rapide possible ») : apres
-        # la partie, TOUS les processeurs logiques (Stockfish gagne encore un
-        # peu avec l'hyperthreading). i7-8700K : 3 moteurs x 4 = 12.
+    def _threads_par_moteur(self, combien=None):
+        """Threads de CHAQUE moteur d'analyse.
+
+        18/10 (13) - BUG trouve dans le journal de Julien (revue de 35 min) :
+        le nombre de threads dependait du nombre de moteurs DEJA lances au
+        moment ou chacun demarrait. Le premier se croyait seul (11 threads),
+        le deuxieme en voyait deux (6), le troisieme trois (4) : 21 threads
+        pour 12 processeurs logiques, qui se marchaient dessus. Maintenant on
+        partage selon le nombre de moteurs PREVUS : 3 x 4 = 12, jamais plus.
+        'combien' est garde pour les anciens appels, il ne sert plus."""
         coeurs = os.cpu_count() or 2
-        if combien == 1:
-            return max(1, coeurs - 1)
-        return max(1, coeurs // combien)
+        if self.suivi:
+            # Pendant la partie : un seul moteur, la moitie des coeurs
+            # (l'adversaire a besoin du reste).
+            return self.threads or max(1, coeurs // 2)
+        prevus = self._moteurs_prevus()
+        if prevus == 1:
+            return self.threads or max(1, coeurs - 1)
+        return max(1, coeurs // prevus)
 
     def _lancer_ouvriers(self, combien, premier_indice=0):
         for n in range(combien):
@@ -542,10 +574,13 @@ class AnalyseurPartie:
         occupe = self._en_travail
         if p is not None:
             # Le coup regarde a besoin des positions p et p+1 ; p+2 donne le
-            # meilleur coup de la position suivante.
-            for k in (p + 1, p, p + 2):
-                if 0 <= k < n and self.niveau[k] < self.niveau_final and k not in occupe:
-                    return k, self.niveau[k] + 1
+            # meilleur coup de la position suivante. 18/10 (16) : les quatre
+            # voisines passent d'abord l'analyse rapide (pour savoir s'il faut
+            # verifier), puis la verification.
+            for niveau in range(1, self.niveau_final + 1):
+                for k in (p + 1, p, p + 2, p - 1):
+                    if 0 <= k < n and self.niveau[k] < niveau and k not in occupe:
+                        return k, niveau
         for niveau in range(1, self.niveau_final + 1):
             for k in range(min(n, len(self.niveau))):
                 if self.niveau[k] < niveau and k not in occupe:
@@ -617,6 +652,20 @@ class AnalyseurPartie:
             self.niveau[k] = self.niveau_final
             return
         final = niveau >= self.niveau_final
+        if final and self.lignes_spec and self.niveau[k] >= 2 \
+                and self._inutile_de_creuser(k):
+            # 18/10 : rien a gagner a creuser (partie jouee, mat, theorie) :
+            # le resultat de la passe des trois coups devient definitif.
+            self.allegees.add(k)
+            self.niveau[k] = self.niveau_final
+            return
+        # Avant de chercher : le bon nombre de threads (le moteur gardait
+        # celui de la partie quand la partie se termine).
+        if self._moteur_fourni is None and hasattr(moteur, "regler_threads"):
+            try:
+                moteur.regler_threads(self._threads_par_moteur())
+            except Exception:
+                pass
         if niveau <= 1:
             spec, lignes = (PROFONDEUR_SURVOL, 0, TEMPS_SURVOL_MS), 1
         elif not final:                      # les trois meilleurs coups
@@ -676,6 +725,101 @@ class AnalyseurPartie:
 
     # ------------------------------------------------------------------ avancement
 
+    def _profondeurs_vues(self):
+        """Les profondeurs vraiment atteintes par la passe finale (sans les
+        positions finies ni celles qu'on n'a pas eu besoin de creuser)."""
+        return [p for k, (p, fini) in enumerate(zip(self.profondeurs, self.finie))
+                if p and not fini and k not in self.allegees]
+
+    def _coup_sur(self, i):
+        """La pastille du coup i est-elle SURE avec l'analyse rapide ?
+        True / False, ou None tant que les deux positions ne sont pas passees.
+        Pas sure quand la perte est a moins de MARGE_VERDICT points d'un seuil
+        de pastille (5 / 10 / 20), ou d'un seuil en pions, ou quand le coup
+        peut etre « Tres bien », « Brillant » ou « Manque » : la, une analyse
+        plus profonde peut changer le verdict ; ailleurs, non (de 22 a 30,
+        l'evaluation bouge de 0,05 pion : 1 a 2 points de chances)."""
+        if not 0 <= i < len(self.coups):
+            return True
+        for k in (i, i + 1):
+            if self.niveau[k] < 2 and not self.finie[k]:
+                return None
+        avant, apres = self.evaluations[i], self.evaluations[i + 1]
+        if avant is None or apres is None:
+            return False
+        blancs = self.trait[i]
+
+        def du_joueur(v):
+            c = annotations.chances_de_gagner(v)
+            return c if blancs else 100.0 - c
+
+        perte = max(0.0, du_joueur(avant) - du_joueur(apres))
+        m = MARGE_VERDICT
+        for seuil in (annotations.SEUIL_IMPRECISION, annotations.SEUIL_ERREUR,
+                      annotations.SEUIL_GAFFE):
+            if abs(perte - seuil) < m:
+                return False
+        signe = 1.0 if blancs else -1.0
+        borne = lambda v: max(-BORNE_PIONS, min(BORNE_PIONS, signe * v))
+        perte_pions = max(0.0, borne(avant) - borne(apres))
+        for seuil in (annotations.PIONS_IMPRECISION, annotations.PIONS_ERREUR):
+            if abs(perte_pions - seuil) < MARGE_PIONS:
+                return False
+        if abs(borne(apres) - annotations.TOUJOURS_ECRASANT) < MARGE_PIONS:
+            return False
+        if self.premiers[i] is not None and self.seconds[i] is not None \
+                and perte <= annotations.PERTE_QUASI_MEILLEUR + m:
+            ecart = du_joueur(self.premiers[i]) - du_joueur(self.seconds[i])
+            if abs(ecart - annotations.ECART_SEUL_COUP) < m:
+                return False                    # « Tres bien » ou pas ?
+        if perte <= annotations.PERTE_QUASI_MEILLEUR + m:
+            try:
+                if annotations.est_un_sacrifice(chess.Board(self.fens[i]),
+                                                chess.Move.from_uci(self.coups[i])):
+                    return False                # « Brillant » ou pas ?
+            except Exception:
+                return False
+        if abs(du_joueur(avant) - annotations.CHANCES_GAGNANTES) < m \
+                and perte >= annotations.SEUIL_ERREUR - m:
+            return False                        # « Manque » ou pas ?
+        return True
+
+    def _verdicts_surs(self, k):
+        """Les deux coups qui touchent la position k ont une pastille sure."""
+        return self._coup_sur(k - 1) is True and self._coup_sur(k) is True
+
+    def _inutile_de_creuser(self, k):
+        """La passe profonde ne changerait rien pour la position k :
+          - la partie y est jouee (au moins 8 pions d'avance, ou un mat) :
+            les chances de gagner sont deja a 95 % et plus, aucune pastille ne
+            peut changer (mesure du 18/10 : de 22 a 30, l'evaluation bouge de
+            moins de 0,3 pion dans ces positions) ;
+          - on est encore dans la theorie (le coup qui y mene et celui qu'on y
+            joue sont des coups de livre : pastille « Theorique » de toute
+            facon).
+        C'est la que partaient la moitie des calculs sur une partie comme
+        celle contre dragondu5 (-8 des le coup 11)."""
+        if self.mats[k] is not None:
+            return True
+        # 18/10 (16) : plus de raccourci « partie jouee » (8 pions) : la regle
+        # du materiel perdu (1 pion = Imprecision) joue justement la. Mesure
+        # sur la partie contre dragondu5 : 12...d4 passait d'Imprecision a
+        # Excellent. Ces positions passent maintenant par _coup_sur, qui
+        # surveille aussi les seuils en pions.
+        # 18/10 (16) : en calcul fixe, on ne verifie que ce qui peut changer.
+        if self.mode == "calcul" and self._verdicts_surs(k):
+            return True
+        try:
+            import ouvertures
+            # Le livre ne connait que les parties parties du debut.
+            if self.fen_initiale == chess.STARTING_FEN and k < len(self.coups) \
+                    and ouvertures.est_un_coup_de_livre(self.sans, k) \
+                    and (k == 0 or ouvertures.est_un_coup_de_livre(self.sans, k - 1)):
+                return True
+        except Exception:
+            pass
+        return False
+
     def _chercher(self, moteur, fen, spec, lignes, niveau):
         """Une recherche de Stockfish ; note sa duree et sa vitesse."""
         profondeur, noeuds, temps = spec
@@ -692,8 +836,12 @@ class AnalyseurPartie:
             details = moteur.analyser_position(fen, profondeur, temps, lignes=lignes)
         duree = time.time() - debut
         self._durees.setdefault(niveau, []).append(duree)
-        if details and details.get("noeuds") and details.get("temps_ms"):
-            self._vitesses.append(details["noeuds"] * 1000.0 / max(1, details["temps_ms"]))
+        # 18/10 : la vitesse ne se mesure que sur les vraies recherches (au
+        # moins un million de noeuds) : les toutes petites (survol) demarrent
+        # lentement et faisaient annoncer un temps restant trop long.
+        if details and (details.get("noeuds") or 0) >= 1000000 \
+                and details.get("temps_ms"):
+            self._vitesses.append((details["noeuds"], details["temps_ms"]))
         for liste in [self._durees[niveau], self._vitesses]:
             if len(liste) > 60:
                 del liste[:-30]
@@ -705,15 +853,43 @@ class AnalyseurPartie:
         vitesse du moteur en mode calcul)."""
         if not self.en_cours or self.suivi:
             return None
+        # Calcul couteux (l'affichage le demande a chaque image) : une fois
+        # par seconde suffit.
+        maintenant = time.time()
+        memo = getattr(self, "_memo_reste", None)
+        if memo is not None and maintenant - memo[0] < 1.0:
+            return memo[1]
+        reste = self._calculer_temps_restant()
+        self._memo_reste = (maintenant, reste)
+        return reste
+
+    def _calculer_temps_restant(self):
         ouvriers = max(1, self._ouvriers)
         vitesse = None
         if len(self._vitesses) >= 2:
-            recentes = self._vitesses[-10:]
-            vitesse = sum(recentes) / len(recentes)
+            recentes = self._vitesses[-20:]
+            vitesse = sum(n for n, _t in recentes) * 1000.0 / max(
+                1, sum(t for _n, t in recentes))
         total = 0.0
+        n = len(self.niveau)
         for niveau in range(1, self.niveau_final + 1):
-            reste = sum(1 for k, v in enumerate(self.niveau)
-                        if v < niveau and not self.finie[k])
+            if niveau == self.niveau_final and niveau > 2:
+                # Passe profonde : seules les positions a verifier comptent.
+                # Pour celles dont l'analyse rapide n'est pas encore faite, on
+                # suppose la meme part qu'ailleurs (30 % au debut).
+                connues = [k for k in range(n) if self.niveau[k] >= 2 and not self.finie[k]]
+                a_faire = [k for k in connues if self.niveau[k] < niveau
+                           and not self._inutile_de_creuser(k)]
+                faites = [k for k in connues if self.niveau[k] >= niveau
+                          and k not in self.allegees]
+                inconnues = sum(1 for k in range(n)
+                                if self.niveau[k] < 2 and not self.finie[k])
+                part = (len(a_faire) + len(faites)) / float(len(connues)) \
+                    if connues else 0.3
+                reste = len(a_faire) + inconnues * part
+            else:
+                reste = sum(1 for k, v in enumerate(self.niveau)
+                            if v < niveau and not self.finie[k])
             if not reste:
                 continue
             mesures = self._durees.get(niveau) or []
@@ -752,11 +928,15 @@ class AnalyseurPartie:
 
     def description(self):
         """Le reglage, en clair (en-tete de l'export, fin d'analyse)."""
-        vues = [p for p, fini in zip(self.profondeurs, self.finie) if p and not fini]
+        vues = self._profondeurs_vues()
         bas, haut = (min(vues), max(vues)) if vues else (self.profondeur_min,) * 2
         if self.mode == "calcul":
-            return "%d millions de calculs par position, profondeur %d à %d" % (
-                self.noeuds // 1000000, bas, haut)
+            verifiees = sum(1 for k in range(len(self.fens))
+                            if not self.finie[k] and k not in self.allegees)
+            return ("%d millions de calculs par position vérifiée (%d sur %d), "
+                    "%d millions pour les autres, profondeur %d à %d") % (
+                self.noeuds // 1000000, verifiees, len(self.fens),
+                (self.lignes_spec or (0, 0, 0))[1] // 1000000, bas, haut)
         if self.mode == "temps":
             return "%d s par position, profondeur %d à %d" % (
                 self.temps_max_ms // 1000, bas, haut)
@@ -785,7 +965,7 @@ class AnalyseurPartie:
         if fine >= 1.0:
             if self.mode == "profondeur":
                 return "Analyse terminée (profondeur %d)" % self.profondeur_atteinte()
-            vues = [p for p, fini in zip(self.profondeurs, self.finie) if p and not fini]
+            vues = self._profondeurs_vues()
             bas, haut = (min(vues), max(vues)) if vues else (self.profondeur_min,) * 2
             return "Analyse terminée (profondeur %d à %d)" % (bas, haut)
         if survol < 1.0:
@@ -807,7 +987,7 @@ class AnalyseurPartie:
     def profondeur_atteinte(self):
         """La plus petite profondeur vraiment atteinte (honnete : c'est la
         position la moins bien analysee qui compte)."""
-        vues = [p for p, fini in zip(self.profondeurs, self.finie) if p and not fini]
+        vues = self._profondeurs_vues()
         return min(vues) if vues else (self.profondeur or self.profondeur_min)
 
     # ------------------------------------------------------------------ lecture
