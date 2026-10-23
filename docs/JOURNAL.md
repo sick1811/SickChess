@@ -910,3 +910,19 @@ Fait :
   présents ; `python tests/lancer_tous.py` → **686 contrôles verts** en 1 min 50.
 - `tests/ecrans_en/` n'est plus suivi par Git (`.gitignore`) : `test_anglais.py` refait ces 20 captures à
   chaque passage, elles apparaissaient toujours « modifiées » (PC et cloud). Les images restent sur le disque.
+
+## 24/10/2026 (24) – Version amis n° 2 publiée (Claude Code)
+Fait :
+- Avant : `python tests/lancer_tous.py` → 687 contrôles verts ; banc d'essai rapide : rien en rouge.
+- Version **n° 2** (`v0.1.0-n2` sur `sick1811/SickChess-amis`) : seul le paquet « jeu » change (fin de partie et
+  revue en ligne comme contre l'ordinateur, jeu plus fluide, analyse en priorité basse qui libère la mémoire) ;
+  programme, moteur, problèmes et finales reprennent ceux de la n° 1. Aucun fichier personnel dans les paquets.
+- Installeur vérifié avant l'envoi : installation silencieuse dans un dossier d'essai, jeu lancé 25 s sans erreur
+  (Steam connecté), `outils/verifier_en_ligne.py` sur la version installée → tout ✅, désinstallation propre.
+- En ligne : `maj.json` « latest » = n° 2, les 5 paquets et l'installeur répondent. Les amis la reçoivent par la
+  mise à jour automatique du menu.
+- `docs/A_FAIRE.md` : section performance et ménage cochée (faite le 23/10).
+
+À vérifier par Julien :
+- [ ] R-102 à R-107 : vraie partie en ligne avec un ami (il ouvre SickChess AVANT d'accepter l'invitation),
+  puis la fin de partie : précision, bouton Revue, revue complète.

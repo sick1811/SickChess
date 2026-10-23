@@ -39,18 +39,18 @@ page Steam, démarches Steamworks, licence des pièces Classique.
 ## Performance et ménage (banc d'essai du 23/10, page « SickChess – Banc d'essai »)
 Mesures faites dans Cowork (machine Linux plus lente) : à refaire sur le PC de Julien
 (`python outils/banc_essai.py`, puis `python outils/surveiller.py` en jouant).
-- [ ] **Fichiers relus à chaque image** (le plus rentable) : `entrainement.charger_progression`
+- [x] (23/10, journal 17) **Fichiers relus à chaque image** (le plus rentable) : `entrainement.charger_progression`
       (24 lectures par image dans Ouvertures, 44–51 ms par image), `modes_problemes.charger`
       (Problèmes), `succes.obtenus` (Statistiques). Lire une fois, garder en mémoire.
-- [ ] **Cache des textes** dans `ui.py` (`texte` / `rogner`) : `font.size` + `font.render` =
+- [x] (23/10, journal 17-18) **Cache des textes** dans `ui.py` (`texte` / `rogner`) : `font.size` + `font.render` =
       40 à 60 % du temps d'une image sur Partie, Revue, Options, Mes parties.
-- [ ] **Ne pas redessiner au repos** : une partie arrêtée prend ~50 % d'un cœur (machine
+- [x] (23/10, journal 17-19 : 30 images/s au repos, partie 9 % d'un cœur) **Ne pas redessiner au repos** : une partie arrêtée prend ~50 % d'un cœur (machine
       Cowork) ; redessiner seulement si quelque chose change, 30 images/s au repos.
-- [ ] Stockfish d'analyse en priorité basse (le jeu reste fluide pendant une revue).
-- [ ] Ménage : 8 imports/variables inutiles (correction automatique), `jeu/fond_anime.py` jamais
+- [x] (23/10, journal 19) Stockfish d'analyse en priorité basse (le jeu reste fluide pendant une revue).
+- [ ] Ménage : ~~8 imports/variables inutiles~~ faits le 23/10 ; `jeu/fond_anime.py` jamais
       importé, ~100 fonctions peut-être mortes à vérifier une par une (skill `menage-code`).
-- [ ] Réglage `ia_suivre_la_pendule` de config.json lu nulle part : le reprendre ou l'enlever.
-- [ ] Commit : 34 fichiers modifiés non enregistrés + 1 commit pas encore envoyé sur GitHub.
+- [x] (23/10, retiré) Réglage `ia_suivre_la_pendule` de config.json lu nulle part : le reprendre ou l'enlever.
+- [x] (23/10) Commit : 34 fichiers modifiés non enregistrés + 1 commit pas encore envoyé sur GitHub.
 → Avant de commencer, lire les décisions de Julien dans la page (Corriger / OK / Ignorer).
 
 → 23/10 (soir) : banc d'essai tout vert sur le PC de Julien (sauf ménage). 7 nouvelles propositions
