@@ -834,3 +834,20 @@ Fait :
 À vérifier par Julien :
 - [ ] t77 : relancer la surveillance (« lance la surveillance en direct »), jouer une partie puis sa revue :
   jeu fluide pendant l'analyse ; après la revue, la mémoire de Stockfish redescend (≈ 2 Go au lieu de 5,8).
+
+## 23/10/2026 (20) – Version amis n° 1 publiée (Claude Code)
+Fait :
+- Inno Setup 6.7.3 et GitHub CLI 2.103.0 installés (winget) ; Julien connecté à GitHub (`gh auth login`).
+- Vérification en ligne (Steam ouvert, compte Sick) : fichiers, connexion, salon, réseau → tout ✅,
+  depuis les sources puis sur la version installée.
+- Le dépôt `sick1811/SickChess-amis` n'existait pas : l'ancienne « n° 1 » du 17/10 n'avait jamais été
+  publiée (son `publier/maj.json` mis de côté). Dépôt créé (public, avec un README), version **n° 1**
+  publiée : programme, jeu, moteur, problèmes, finales, zip et installeur (90,5 Mo).
+- Installeur vérifié avant l'envoi : installation silencieuse dans un dossier d'essai, jeu lancé 25 s sans
+  erreur (Steam connecté, Stockfish prêt), vérification en ligne ✅, désinstallation propre.
+- Aucun fichier personnel dans les paquets (config.json, profil.json, parties…).
+- Lien pour un ami : https://github.com/sick1811/SickChess-amis/releases/latest/download/SickChess_Installation.exe
+
+À vérifier par Julien :
+- [ ] R-102 à R-107 : vraie partie en ligne avec un ami (il installe, ouvre SickChess AVANT d'accepter
+  l'invitation).

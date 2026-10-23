@@ -59,9 +59,9 @@ Mesures faites dans Cowork (machine Linux plus lente) : à refaire sur le PC de 
   (daltoniens, petits écrans), niveaux de l'ordinateur calibrés en vrai Elo. Julien choisit.
 
 ## Version amis et jeu en ligne (23/10 soir) – AVANT les travaux p30…
-1. [ ] Claude Code : `winget install JRSoftware.InnoSetup` et `winget install GitHub.cli` + `gh auth login`.
-2. [ ] Claude Code : `python outils/verifier_en_ligne.py` (Steam ouvert) → tout ✅.
-3. [ ] Claude Code : version amis avec installeur (skill `version-amis`) : essai silencieux, lancement,
+1. [x] Claude Code : `winget install JRSoftware.InnoSetup` et `winget install GitHub.cli` + `gh auth login`.
+2. [x] Claude Code : `python outils/verifier_en_ligne.py` (Steam ouvert) → tout ✅.
+3. [x] (23/10, n° 1 publiée) Claude Code : version amis avec installeur (skill `version-amis`) : essai silencieux, lancement,
        vérification en ligne sur le dossier d'essai, puis publication ; donner le lien à Julien.
 4. [ ] Julien + un ami : vraie partie en ligne sur deux PC (R-102 à R-107).
 5. [ ] Plus tard (avant la vente) : certificat de signature de code → `"signature"` dans maj_config.json.
