@@ -69,6 +69,7 @@ class ModeEnLigne:
         self.nulle_recue = False         # par l'adversaire, en attente
         self._coups_a_la_proposition = -10
         self.partie_enregistree = False
+        self.chemin_pgn = ""            # la partie dans parties/ (revue, Mes erreurs)
 
     # ------------------------------------------------------------ boucle
 
@@ -268,15 +269,19 @@ class ModeEnLigne:
                 cadence = self.board.timer.description_cadence()
             except Exception:
                 cadence = ""
+            raison = self.board.game_over_reason or ""
             try:
                 import succes
                 succes.debloquer("en_ligne")
+                gagne = self.board.result == ("1-0" if blanc else "0-1")
+                succes.verifier({"victoire_mat": gagne and "MAT" in raison.upper()})
             except Exception as e2:
                 print("[SUCCES] %s" % e2)
-            return historique_parties.enregistrer(
+            self.chemin_pgn = historique_parties.enregistrer(
                 self.board.move_history, blancs, noirs, self.board.result or "*",
                 cadence=cadence, camp_du_joueur="blanc" if blanc else "noir",
-                raison=self.board.game_over_reason or "", mode="en_ligne")
+                raison=raison, mode="en_ligne")
+            return self.chemin_pgn
         except Exception as e:
             print("[EN LIGNE] partie non enregistree : %s" % e)
             return ""

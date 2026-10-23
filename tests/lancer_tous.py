@@ -26,6 +26,7 @@ SERIES = [
     ("test_signaler.py", False),
     ("test_import_pgn.py", False),
     ("test_en_ligne_nulle.py", False),
+    ("test_en_ligne_revue.py", False),
     ("test_cache_analyse.py", False),
     ("test_statistiques.py", False),
     ("test_entrainement.py", False),

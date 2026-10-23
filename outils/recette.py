@@ -233,6 +233,10 @@ RECETTE = [
          "Il arrive dans ton salon en quelques secondes ; avec le numéro de test 480, accepter quand SickChess est fermé ouvrirait « Spacewar » : c'est normal."),
         ("R-107", "Claude Code : python outils/verifier_en_ligne.py (Steam ouvert)",
          "Fichiers, connexion Steam, salon créé avec son code, tests réseau : tout en ✅ dans docs/VERIFICATION_EN_LIGNE.md."),
+        ("R-108", "Fin d'une partie en ligne : regarder la carte de fin, puis cliquer « Revue de la partie »",
+         "Carte : résultat, raison, « Précision : toi … – <ami> … » (après « Analyse en cours… »), boutons Revue, Revanche, Menu ; la revue s'ouvre de ton côté (plateau dans ton sens, noms « Toi » et ton ami), pastilles, flèches et variantes comme contre l'ordinateur ; l'ami ne voit pas ta revue."),
+        ("R-109", "Pendant ta revue, l'ami demande une revanche ou écrit dans le chat ; puis Retour",
+         "Un bandeau en haut de la revue annonce la revanche ; au retour, la carte propose « Accepter la revanche » et le chat contient son message ; la partie compte dans Statistiques et ses fautes dans « Mes erreurs » une fois l'analyse finie."),
     ]),
     ("Version amis et mises à jour", [
         ("R-110", "CONSTRUIRE_VERSION_AMIS.bat",

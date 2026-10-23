@@ -100,6 +100,14 @@ p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t78 (21, à deux) : finir une partie en ligne : la carte montre « Analyse en cours… » puis
+      « Précision : toi … – <ami> … », et les boutons Revue de la partie / Revanche / Menu (R-108).
+- [ ] t79 (21, à deux) : cliquer « Revue de la partie » : revue dans ton sens, noms « Toi » et ton ami,
+      pastilles, flèches, variantes ; l'ami, lui, reste sur sa carte de fin.
+- [ ] t80 (21, à deux) : pendant ta revue, l'ami demande la revanche et écrit dans le chat : bandeau en haut ;
+      au retour « Accepter la revanche » marche, couleurs inversées (R-109).
+- [ ] t81 (21) : après une partie en ligne analysée : elle compte dans Statistiques ; ses fautes arrivent dans
+      Problèmes → « Mes erreurs ».
 - [ ] t77 (19) : surveillance en direct, une partie puis sa revue : jeu fluide pendant l'analyse ; après la
       revue, mémoire de Stockfish ≈ 2 Go (5,8 avant) ; menus moins gourmands.
 - [ ] t75 (18) : revue : flèches des meilleurs coups, surlignages et pastilles comme avant ; défilement fluide.

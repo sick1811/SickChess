@@ -851,3 +851,23 @@ Fait :
 À vérifier par Julien :
 - [ ] R-102 à R-107 : vraie partie en ligne avec un ami (il installe, ouvre SickChess AVANT d'accepter
   l'invitation).
+
+## 23/10/2026 (21) – En ligne : fin de partie et revue comme contre l'ordinateur (Claude Code)
+Demande de Julien : « rajoute toutes les fonctionnalités pour les fins de partie et de revue pour le mode
+Steam online, comme contre le bot ».
+Fait :
+- **Carte de fin en ligne** (`partie_en_ligne.EcranFinEnLigne`, reprend `ecran_fin.EcranFin`) : résultat,
+  raison, **précision « toi / ton ami »**, boutons **Revue de la partie**, Revanche, Menu.
+- **Analyse pendant la partie** en ligne aussi (en silence, moitié des cœurs, réglage « analyse pendant la
+  partie » respecté) ; à la fin, elle est reprise et rangée à côté du PGN (`<partie>.analyse.json`) :
+  la partie compte dans les **Statistiques** et ses fautes dans **« Mes erreurs »**.
+  (`game_manager.brancher_analyse`, partagé avec les parties contre l'ordinateur.)
+- **Revue** : locale à chaque joueur, plateau dans son sens, noms « Toi » et l'ami. Pendant la revue, le
+  réseau continue (chat, demande de revanche, départ de l'ami) avec un bandeau en haut.
+- **Succès** en ligne : « Chirurgien » (90 % de précision) et « Échec et mat » comptent aussi.
+- Pas d'Elo en ligne (l'ami n'a pas de classement) : inchangé.
+- Tests : nouvelle série `tests/test_en_ligne_revue.py` (deux joueurs simulés, fausse analyse) ;
+  recette : R-108 et R-109 ajoutés.
+
+À vérifier par Julien (à deux) :
+- [ ] t78 à t81 (voir A_FAIRE), R-108, R-109.

@@ -662,14 +662,20 @@ class GameManager:
             print("[PROFIL] partie non enregistree : %s" % e)
             infos = None
         self.board.end_screen.ligne_classement = texte_classement(infos)
+        self.brancher_analyse(infos.get("pgn") if infos else "")
+
+    def brancher_analyse(self, chemin_pgn=""):
+        """L'analyse de la partie qui vient de finir, rangee a cote de son PGN
+        (<partie>.analyse.json : revue, statistiques, « Mes erreurs »).
+        Sert aussi a la fin d'une partie en ligne (partie_en_ligne.py)."""
         self._fichier_analyse = None
-        if infos and infos.get("pgn"):
-            self._fichier_analyse = os.path.splitext(infos["pgn"])[0] + ".analyse.json"
+        if chemin_pgn:
+            self._fichier_analyse = os.path.splitext(chemin_pgn)[0] + ".analyse.json"
         # La revue de partie : l'analyse faite PENDANT la partie est reprise
         # telle quelle (rien a recalculer) ; sinon elle demarre maintenant.
         direct = getattr(self, "analyse_en_direct", None)
         if direct is not None and getattr(direct, "plateau_id", None) == id(self.board):
-            self._suivre_analyse(force=True)
+            self._suivre_analyse(force=True, en_ligne=True)
             direct.finir_le_suivi()
             self.board.end_screen.analyseur = direct
             self.analyse_en_direct = None
@@ -683,12 +689,12 @@ class GameManager:
 
     # ---------------------------------------------------- analyse en direct
 
-    def _suivre_analyse(self, force=False):
+    def _suivre_analyse(self, force=False, en_ligne=False):
         """SickChess 17/10 (demande de Julien) : Stockfish analyse la partie
         PENDANT qu'on joue, sans rien afficher. A la fin, la precision et la
         revue sont pretes tout de suite. Moitie des coeurs seulement, pour ne
         pas ralentir l'adversaire. "analyse_pendant_partie": false la coupe."""
-        if self.game_mode not in ("stockfish", "hotseat"):
+        if self.game_mode not in ("stockfish", "hotseat") and not en_ligne:
             return
         if not self.config.get("analyse_pendant_partie", True):
             return
@@ -724,26 +730,27 @@ class GameManager:
 
     # ------------------------------------------------------------------ revue
 
-    def ouvrir_revue(self):
-        """Revue de la partie qui vient de finir (ecran_revue.py)."""
+    def ouvrir_revue(self, noms=None, cote_noir=False, apres_dessin=None):
+        """Revue de la partie qui vient de finir (ecran_revue.py). En ligne,
+        partie_en_ligne.py donne les noms, le camp du joueur, et apres_dessin
+        garde la connexion en vie pendant la revue."""
         from ecran_revue import EcranRevue
         fin = self.board.end_screen
         analyseur = fin.lancer_analyse(self.stockfish_path,
                                        analyse_partie.puissance_de(self.config))
         if analyseur is None:
             return
-        cote_noir = False
-        noms = ("Blancs", "Noirs")
-        if self.game_mode == "stockfish":
+        if noms is None and self.game_mode == "stockfish":
             cote_noir = bool(getattr(self.board, "ia_joue_blancs", False))
             ia = "Ordinateur (%s)" % self.reglages.get("elo", "?")
             noms = (ia, "Toi") if cote_noir else ("Toi", ia)
-        revue = EcranRevue(self.screen, analyseur, self.config, noms,
+        revue = EcranRevue(self.screen, analyseur, self.config,
+                           noms or ("Blancs", "Noirs"),
                            getattr(self.board, "result", "") or "",
                            getattr(self.board, "game_over_reason", "") or "",
                            cote_noir)
         if revue.run(self.clock, self.evenement_fenetre,
-                     self._dessiner_aide) == "quitter":
+                     apres_dessin or self._dessiner_aide) == "quitter":
             self.quitter()
         # On rend a la partie sa geometrie (la revue a la sienne).
         self.screen = pygame.display.get_surface()

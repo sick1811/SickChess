@@ -660,6 +660,20 @@
    "ordre": 11207
   },
   {
+   "id": "R-108",
+   "section": "En ligne (Steam)",
+   "texte": "Fin d'une partie en ligne : regarder la carte de fin, puis cliquer « Revue de la partie »",
+   "detail": "Carte : résultat, raison, « Précision : toi … – <ami> … » (après « Analyse en cours… »), boutons Revue, Revanche, Menu ; la revue s'ouvre de ton côté (plateau dans ton sens, noms « Toi » et ton ami), pastilles, flèches et variantes comme contre l'ordinateur ; l'ami ne voit pas ta revue.",
+   "ordre": 11208
+  },
+  {
+   "id": "R-109",
+   "section": "En ligne (Steam)",
+   "texte": "Pendant ta revue, l'ami demande une revanche ou écrit dans le chat ; puis Retour",
+   "detail": "Un bandeau en haut de la revue annonce la revanche ; au retour, la carte propose « Accepter la revanche » et le chat contient son message ; la partie compte dans Statistiques et ses fautes dans « Mes erreurs » une fois l'analyse finie.",
+   "ordre": 11209
+  },
+  {
    "id": "R-110",
    "section": "Version amis et mises à jour",
    "texte": "CONSTRUIRE_VERSION_AMIS.bat",
