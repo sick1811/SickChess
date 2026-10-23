@@ -345,14 +345,14 @@ def section_processeur(rapide):
     clock = pygame.time.Clock()
     duree = 2.0 if rapide else 5.0
 
-    def mesurer(image):
+    def mesurer(image, cadence=lambda: 60):
         c0, t0 = time.process_time(), time.perf_counter()
         n = 0
         while time.perf_counter() - t0 < duree:
             pygame.event.pump()
             image()
             pygame.display.flip()
-            clock.tick(60)
+            clock.tick(cadence())
             n += 1
         mur = time.perf_counter() - t0
         return round(100 * (time.process_time() - c0) / mur, 1), round(n / mur)
@@ -365,7 +365,9 @@ def section_processeur(rapide):
     gm.preparer_partie()
     for uci in PARTIE[:8]:
         gm.board.make_move(chess.Move.from_uci(uci))
-    resultats["Partie"] = mesurer(lambda: (gm.board.update(), gm.board.draw()))
+    # La cadence du jeu (game_manager.cadence_de_partie : 30 images/s au repos).
+    cadence = getattr(gm, "cadence_de_partie", lambda: 60)
+    resultats["Partie"] = mesurer(lambda: (gm.board.update(), gm.board.draw()), cadence)
     try:
         gm.cleanup_game()
     except Exception:

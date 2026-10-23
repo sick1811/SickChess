@@ -140,6 +140,31 @@ verifier(not gm.board.game_over, "la partie n'est pas terminee")
 d = sauvegarde.lire()
 verifier(d is not None and "d2d4" in str(d), "la partie est gardee pour la reprendre")
 
+print("6. Cadence : 30 images/s au repos, 60 quand il se passe quelque chose (banc 23/10)")
+b = nouvelle_partie()
+gm.pause.ouvert = False
+horloge = [10000]
+vraie_horloge = pygame.time.get_ticks
+pygame.time.get_ticks = lambda: horloge[0]
+try:
+    verifier(gm.cadence_de_partie([object()]) == 60, "un geste : 60 images/s")
+    horloge[0] += 1000
+    verifier(gm.cadence_de_partie() == 60, "1 s apres : encore 60")
+    horloge[0] += 1000
+    verifier(gm.cadence_de_partie() == 30, "2 s sans rien : 30 images/s")
+    b.make_move(chess.Move.from_uci("e2e4"))
+    verifier(gm.cadence_de_partie() == 60, "un coup joue (par l'ordinateur aussi) : 60")
+    horloge[0] += 5000
+    b.animation.animations.append({"to_square": chess.E4})
+    verifier(gm.cadence_de_partie() == 60, "pendant une animation : 60")
+    b.animation.animations.clear()
+    horloge[0] += 5000
+    gm.pause.ouvert = True
+    verifier(gm.cadence_de_partie() == 60, "pause ouverte : 60")
+    gm.pause.ouvert = False
+finally:
+    pygame.time.get_ticks = vraie_horloge
+
 gm.cleanup_game()
 gm.cleanup()
 print()

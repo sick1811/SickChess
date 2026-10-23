@@ -56,10 +56,6 @@ class AideRaccourcis:
         self.screen = screen
         self.visible = False
         # Polices conservees pour compatibilite ; l'affichage passe par ui.py.
-        self.f_titre = ui.police(26, True)
-        self.f_section = ui.police(15, True)
-        self.f_touche = ui.police(15, True, True)
-        self.f_texte = ui.police(15)
 
     def basculer(self):
         self.visible = not self.visible

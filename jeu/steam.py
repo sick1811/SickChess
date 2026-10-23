@@ -29,7 +29,6 @@
 import ctypes
 import os
 import sys
-import time
 from ctypes import (POINTER, Structure, byref, c_bool, c_char_p, c_int,
                     c_int64, c_uint16, c_uint32, c_uint64, c_ubyte, c_void_p,
                     sizeof)

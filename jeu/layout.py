@@ -71,9 +71,6 @@ class Disposition:
         marge = int(14 * ech)
         x = self.panneau_x + marge
         interieur = self.panneau_l - 2 * marge
-        self.zone_x = x
-        self.zone_l = interieur
-        self.marge_panneau = marge
 
         h_horloge = _borne(56 * ech, 44, 74)
         h_captures = _borne(40 * ech, 30, 56)

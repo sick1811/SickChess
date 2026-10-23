@@ -238,6 +238,45 @@ def police_emoji(taille):
 def vider_cache():
     _POLICES.clear()
     _POLICE_EMOJI.clear()
+    _LARGEURS.clear()
+    _RENDUS.clear()
+    _ROGNES.clear()
+
+
+# 23/10 (banc d'essai) : mesurer et dessiner les textes prenait 40 a 60 % de
+# chaque image, alors que ce sont presque toujours les memes. On garde les
+# mesures, les textes rognes et les textes dessines (cle = la police elle-meme,
+# qui ne change qu'apres vider_cache). Quand c'est plein, on vide tout.
+_LARGEURS = {}
+_RENDUS = {}
+_ROGNES = {}
+_MAX_LARGEURS = 20000
+_MAX_RENDUS = 3000
+
+
+def _taille_de(pol, chaine):
+    cle = (pol, chaine)
+    taille = _LARGEURS.get(cle)
+    if taille is None:
+        if len(_LARGEURS) >= _MAX_LARGEURS:
+            _LARGEURS.clear()
+        taille = _LARGEURS[cle] = pol.size(chaine)
+    return taille
+
+
+def _rendu_de(pol, chaine, couleur):
+    """Texte dessine (a ne pas modifier : la meme image resert)."""
+    try:
+        cle_couleur = tuple(couleur)
+    except TypeError:
+        cle_couleur = couleur
+    cle = (pol, chaine, cle_couleur)
+    rendu = _RENDUS.get(cle)
+    if rendu is None:
+        if len(_RENDUS) >= _MAX_RENDUS:
+            _RENDUS.clear()
+        rendu = _RENDUS[cle] = pol.render(chaine, True, couleur)
+    return rendu
 
 
 # ---------------------------------------------------------------- echelle
@@ -270,7 +309,7 @@ def t(base, ech=1.0):
 # ---------------------------------------------------------------- mesure
 
 def mesurer(chaine, taille, gras=False, mono=False):
-    return police(taille, gras, mono).size(str(chaine))
+    return _taille_de(police(taille, gras, mono), str(chaine))
 
 
 def rogner(chaine, taille, largeur_max, gras=False, mono=False, suffixe="..."):
@@ -279,10 +318,18 @@ def rogner(chaine, taille, largeur_max, gras=False, mono=False, suffixe="..."):
     if largeur_max is None or largeur_max <= 0:
         return chaine
     pol = police(taille, gras, mono)
-    if pol.size(chaine)[0] <= largeur_max:
+    cle = (pol, chaine, largeur_max, suffixe)
+    deja = _ROGNES.get(cle)
+    if deja is not None:
+        return deja
+    if len(_ROGNES) >= _MAX_RENDUS:
+        _ROGNES.clear()
+    if _taille_de(pol, chaine)[0] <= largeur_max:
+        _ROGNES[cle] = chaine
         return chaine
-    largeur_suffixe = pol.size(suffixe)[0]
+    largeur_suffixe = _taille_de(pol, suffixe)[0]
     if largeur_suffixe >= largeur_max:
+        _ROGNES[cle] = ""
         return ""
     bas, haut = 0, len(chaine)
     while bas < haut:
@@ -291,7 +338,8 @@ def rogner(chaine, taille, largeur_max, gras=False, mono=False, suffixe="..."):
             bas = milieu
         else:
             haut = milieu - 1
-    return chaine[:bas].rstrip() + suffixe
+    _ROGNES[cle] = chaine[:bas].rstrip() + suffixe
+    return _ROGNES[cle]
 
 
 def taille_qui_tient(chaine, taille_max, taille_min, largeur_max,
@@ -299,7 +347,7 @@ def taille_qui_tient(chaine, taille_max, taille_min, largeur_max,
     """Plus grande taille de police pour laquelle la chaine tient."""
     taille = int(taille_max)
     while taille > taille_min:
-        if police(taille, gras, mono).size(str(chaine))[0] <= largeur_max:
+        if _taille_de(police(taille, gras, mono), str(chaine))[0] <= largeur_max:
             return taille
         taille -= 1
     return max(int(taille_min), 9)
@@ -331,7 +379,7 @@ def texte(surface, chaine, x, y, taille=17, couleur=(235, 232, 226), gras=False,
         # Meme apres avoir retreci la police, on rogne : c'est la garantie
         # qu'un texte ne depasse JAMAIS de sa zone.
         chaine = rogner(chaine, taille, largeur_max, gras, mono)
-    rendu = police(taille, gras, mono).render(chaine, True, couleur)
+    rendu = _rendu_de(police(taille, gras, mono), chaine, couleur)
     if ancre == "centre":
         x -= rendu.get_width() // 2
     elif ancre == "droite":
@@ -350,7 +398,7 @@ def texte_centre_dans(surface, chaine, rect, taille=17, couleur=(235, 232, 226),
         taille = taille_qui_tient(chaine, taille, max(9, taille * 0.55),
                                   largeur, gras, mono)
     chaine = rogner(chaine, taille, largeur, gras, mono)
-    rendu = police(taille, gras, mono).render(str(chaine), True, couleur)
+    rendu = _rendu_de(police(taille, gras, mono), str(chaine), couleur)
     surface.blit(rendu, (rect.centerx - rendu.get_width() // 2,
                          rect.centery - rendu.get_height() // 2))
     return rendu.get_rect(center=rect.center)
@@ -365,7 +413,7 @@ def couper_en_lignes(chaine, taille, largeur_max, gras=False, mono=False):
         courante = ""
         for mot in mots:
             essai = mot if not courante else courante + " " + mot
-            if pol.size(essai)[0] <= largeur_max or not courante:
+            if _taille_de(pol, essai)[0] <= largeur_max or not courante:
                 courante = essai
             else:
                 lignes.append(courante)
@@ -692,7 +740,6 @@ class ChampTexte:
         self.contenu = ""
         self.longueur_max = int(longueur_max)
         self.actif = False
-        self._clignote = 0
 
     def activer(self, actif=True):
         self.actif = bool(actif)

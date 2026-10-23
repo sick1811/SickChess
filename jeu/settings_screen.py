@@ -289,12 +289,6 @@ class SettingsScreen:
         self.afficher_niveau = (mode == "stockfish")
 
         # Polices conservees pour compatibilite ; l'affichage passe par ui.py.
-        self.f_titre = ui.police(40, True)
-        self.f_section = ui.police(20, True)
-        self.f_texte = ui.police(17)
-        self.f_chip = ui.police(15, True)
-        self.f_valeur = ui.police(40, True, True)
-        self.f_petit = ui.police(14)
 
         config = charger_config()
         # V7.1 (ta demande) : par defaut, Stockfish joue AU NIVEAU DE TON
@@ -356,10 +350,8 @@ class SettingsScreen:
         self.btn_commencer = _Bouton("Commencer la partie", primaire=True)
         self.btn_retour = _Bouton("Retour au menu")
         self.case_retenir = pygame.Rect(0, 0, 22, 22)
-        self.case_position = pygame.Rect(0, 0, 22, 22)
         self.case_profil = pygame.Rect(0, 0, 22, 22)
         self.zone_retenir = pygame.Rect(0, 0, 0, 0)
-        self.zone_position = pygame.Rect(0, 0, 0, 0)
         self.zone_profil = pygame.Rect(0, 0, 0, 0)
         self._placer()
         self._synchroniser_chips()
@@ -381,7 +373,6 @@ class SettingsScreen:
         # ligne. Avant, le rappel etait dessous : trois lignes pour deux mots.
         self.h_titre = ui.police(ui.t(30, ech), True).get_height()
         self.y_titre = marge
-        self.y_sous_titre = self.y_titre        # meme ligne, a droite
         haut = self.y_titre + self.h_titre + mep.m(ech)
 
         # --- bandeau du bas : cases A GAUCHE, boutons A DROITE, meme ligne de
@@ -428,9 +419,6 @@ class SettingsScreen:
         x_position = min(droite_cases - h_case - 12 - largeur_position,
                          self.zone_retenir.right + mep.xl(ech))
         x_position = max(x_position, self.zone_retenir.right + mep.m(ech))
-        self.case_position = pygame.Rect(x_position, y_cases, h_case, h_case)
-        self.zone_position = pygame.Rect(x_position, y_cases - 4,
-                                         h_case + 12 + largeur_position, h_case + 8)
         self.taille_case_texte = taille_case_texte
 
         # --- deux colonnes entre les deux bandeaux.
@@ -443,7 +431,6 @@ class SettingsScreen:
         parts = (2, 3) if self.mode == "online" else (1, 1)
         col_g, col_d = mep.colonnes(zone_colonnes, parts, ech)
         colonne = col_g.width
-        self.colonne_l = colonne
         self.colonne_droite_l = col_d.width
         gauche = ui.Pile(col_g.x, haut, col_g.width, bas - haut,
                          espace=mep.m(ech))

@@ -15,7 +15,6 @@
 # handle_event, make_move et terminer_partie sont conservees.
 
 import chess
-import pygame
 
 import apparence
 from layout import Disposition
@@ -56,7 +55,6 @@ class ChessBoard:
         self.drag_piece = None
         self.drag_pos = None
         self.legal_moves = []
-        self.legal_moves_objets = []
         self.flipped = False
         self.ia_joue_blancs = False
         self.hotseat_mode = False
@@ -69,7 +67,6 @@ class ChessBoard:
         # et l'annulation sont coupes, et la partie compte dans les statistiques.
         # Faux = partie amicale : rien de tout ca.
         self.competitive = False
-        self.message_competitif = ""
 
         # Nouveautes V7
         self.indice = None            # (case_depart, case_arrivee) ou None
@@ -248,8 +245,6 @@ class ChessBoard:
         # joue pas avec le moteur qui souffle les coups.
         if getattr(self, "competitive", False):
             self.indice = None
-            self.message_competitif = ("Partie compétitive : l'indice est "
-                                       "désactivé pour les deux joueurs.")
             print("[INDICE] refuse : partie competitive")
             return None
         moteur = engine or self.engine

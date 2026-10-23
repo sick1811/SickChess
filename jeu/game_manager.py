@@ -567,8 +567,10 @@ class GameManager:
         self.pause = menu_pause.MenuPause(
             self.screen, self.board.theme_plateau,
             nulle_possible=self.game_mode in ("stockfish", "hotseat"))
+        self._activite_ms, self._coups_vus = pygame.time.get_ticks(), -1
         while True:
-            for event in pygame.event.get():
+            evenements = pygame.event.get()
+            for event in evenements:
                 if event.type == pygame.QUIT:
                     self.quitter()
                 if self.evenement_fenetre(event):
@@ -610,7 +612,25 @@ class GameManager:
             self.pause.draw()
             self.aide.draw(self.screen, self.board.theme_plateau)
             pygame.display.flip()
-            self.clock.tick(60)
+            self.clock.tick(self.cadence_de_partie(evenements))
+
+    # 23/10 (banc d'essai) : au repos, la partie prenait ~40 % d'un coeur en
+    # dessinant 60 images/s d'une position immobile. 60 images/s pendant
+    # 1,5 s apres un geste, un coup ou pendant une animation ; 30 sinon.
+    REPOS_APRES_MS = 1500
+
+    def cadence_de_partie(self, evenements=()):
+        maintenant = pygame.time.get_ticks()
+        coups = len(self.board.board.move_stack)
+        anime = (getattr(self.board.animation, "animations", None)
+                 or getattr(self.board.retournement, "vols", None))
+        if evenements or anime or coups != getattr(self, "_coups_vus", coups) \
+                or self.board.game_over or getattr(getattr(self, "pause", None), "ouvert", False):
+            self._activite_ms = maintenant
+        self._coups_vus = coups
+        if maintenant - getattr(self, "_activite_ms", maintenant) < self.REPOS_APRES_MS:
+            return 60
+        return 30
 
     def _partie_terminee(self):
         """Une seule fois par partie : profil, PGN, et plus rien a reprendre."""

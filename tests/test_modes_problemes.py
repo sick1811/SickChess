@@ -161,6 +161,29 @@ verifier(ecr.session.terminee() and "Trois fautes" in ecr.message, "survie : %s"
 ecr.draw()
 pygame.image.save(ecran, "tests/capture_survie.png")
 
+print("Records gardes en memoire (banc d'essai 23/10)")
+import builtins
+import json
+lectures = []
+def _open_compte(*a, **k):
+    if "r" in (a[1] if len(a) > 1 else k.get("mode", "r")):
+        lectures.append(a[0])
+    return builtins.open(*a, **k)
+mp.open = _open_compte
+mp.charger()
+for _ in range(3):
+    ecr.draw()
+verifier(not lectures, "dessin de l'ecran : aucune lecture du fichier (%d)" % len(lectures))
+d = mp.charger()
+d["record_survie"] = 4242
+mp.enregistrer(d)
+verifier(mp.record("survie") == 4242, "un record enregistre se voit tout de suite")
+with builtins.open(mp._chemin(), encoding="utf-8") as f:
+    verifier(json.load(f)["record_survie"] == 4242, "et il est bien ecrit sur le disque")
+d["record_survie"] = 1
+verifier(mp.record("survie") == 4242, "modifier ce qu'on a recu ne change pas la memoire")
+del mp.open
+
 print()
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))
 pygame.quit()

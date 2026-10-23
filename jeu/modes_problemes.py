@@ -11,6 +11,7 @@
 # difference), plus quelques methodes propres aux defis. Le classement des
 # problemes n'est jamais touche. Records dans modes_problemes.json.
 
+import copy
 import datetime
 import json
 import os
@@ -39,18 +40,29 @@ def _chemin():
         return os.path.join(os.getcwd(), FICHIER)
 
 
+# 23/10 (banc d'essai) : l'ecran Problemes relisait le fichier 3 fois par
+# image. Lu une fois, puis garde en memoire (par chemin : les tests en
+# changent) et mis a jour a chaque enregistrement.
+_EN_MEMOIRE = {}
+
+
 def charger():
-    try:
-        with open(_chemin(), "r", encoding="utf-8") as f:
-            donnees = json.load(f)
-        if isinstance(donnees, dict):
-            return donnees
-    except (OSError, ValueError):
-        pass
-    return {}
+    chemin = _chemin()
+    if chemin not in _EN_MEMOIRE:
+        donnees = {}
+        try:
+            with open(chemin, "r", encoding="utf-8") as f:
+                lu = json.load(f)
+            if isinstance(lu, dict):
+                donnees = lu
+        except (OSError, ValueError):
+            pass
+        _EN_MEMOIRE[chemin] = donnees
+    return copy.deepcopy(_EN_MEMOIRE[chemin])
 
 
 def enregistrer(donnees):
+    _EN_MEMOIRE[_chemin()] = copy.deepcopy(donnees)
     try:
         with open(_chemin(), "w", encoding="utf-8") as f:
             json.dump(donnees, f, ensure_ascii=False, indent=1)

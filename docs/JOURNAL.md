@@ -733,3 +733,31 @@ instantanée ». Question : « peut-on utiliser le moteur de lichess pour la rap
 - [ ] t71 : pendant la revue, les ronds creux se remplissent ; une pastille posée ne change plus.
 - Claude Code : commit de la séance (16) après `python tests/lancer_tous.py`.
 
+
+## 23/10/2026 (17) – Banc d'essai : constats « Corriger » (Claude Code)
+Fait (mesuré sur le PC de Julien, i7-8700K, avant → après) :
+- **Fichiers relus à chaque image** : la progression des ouvertures (`entrainement.py`, 24 lectures par
+  image) et les records des défis (`modes_problemes.py`, 3 par image) sont lus une fois puis gardés en
+  mémoire, mis à jour à chaque enregistrement. Ouvertures 14,9 → 11,0 ms/image, Problèmes 7,6 → 6,6.
+- **Textes gardés en mémoire** (`ui.py`) : mesures, textes rognés et textes dessinés ne sont plus refaits à
+  chaque image (vidés quand la police change). Toutes les images sous 5 ms sauf la Revue :
+  Partie 6,6 → 3,5 · Revue 9,1 → 5,3 · Options 9,8 → 3,4 · Mes parties 14,3 → 4,2 · Ouvertures → 1,8 ·
+  Problèmes → 1,1 ms.
+- **Partie au repos** (`game_manager.cadence_de_partie`) : 60 images/s pendant 1,5 s après un geste, un coup,
+  une animation ou la pause ; 30 sinon. Processeur au repos : 42 → 17 % d'un cœur (menu 8 → 4 %).
+  Le banc mesure maintenant avec la vraie cadence du jeu.
+- **Ménage** : 4 imports et 4 variables inutiles retirés ; 43 valeurs rangées mais jamais relues retirées
+  (13 fichiers) ; 4 fausses alertes (champs Windows, commentaires PGN, position d'un rectangle) ajoutées à
+  `outils/vulture_liste_blanche.py`. `ia_suivre_la_pendule` retiré de config.json (le jeu suit toujours
+  la pendule).
+- `outils/banc_essai.py` : Stockfish trouvé sous Windows (chemin complet).
+- Pas corrigés, volontairement : **fichiers en double** (le même son de nulle sous trois noms, voulu par
+  `generer_sons.py` ; deux images Steam de même taille, exigées séparément par Steam) → à passer en « OK ».
+  **Restes sur le disque** (`publier/` 720 Mo, `build_amis/` 52 Mo) et **push** : attendent l'accord de Julien.
+- Tests : `test_entrainement.py`, `test_modes_problemes.py` (fichier lu une seule fois), `test_pause.py`
+  (cadence). `python tests/lancer_tous.py` → 634 contrôles verts. Banc complet : rien en rouge.
+
+À vérifier par Julien :
+- [ ] t72 : partie contre l'ordinateur : tout reste fluide (pièces, flèches, pendule, coups de l'ordinateur).
+- [ ] t73 : Gestionnaire des tâches → SickChess pendant une partie où personne ne joue : bien moins qu'avant.
+- [ ] t74 : Ouvertures et Problèmes : la progression et les records s'affichent et se mettent à jour.

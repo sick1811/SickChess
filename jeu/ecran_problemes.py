@@ -749,7 +749,7 @@ class EcranProblemes:
     # ---------------------------------------------------------------- jeu
 
     def _dessiner_jeu(self, t):
-        ecran, ech, p = self.screen, self.ech, self.plateau
+        ecran, p = self.screen, self.plateau
         p.renderer.dessiner_plateau(avec_interaction=True)
         cote = p.SQ_SIZE * 8
         rect_plateau = pygame.Rect(self.disposition.plateau_x, self.disposition.plateau_y,

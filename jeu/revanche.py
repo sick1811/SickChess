@@ -34,8 +34,6 @@ class Revanche:
         self.etat = RIEN
         self.nom_adverse = nom_adverse or "Ton adversaire"
         self.parties_jouees = 1        # celle qui vient de finir
-        self.j_ai_demande = False
-        self.il_a_demande = False
 
     # ------------------------------------------------------------- questions
 
@@ -90,7 +88,6 @@ class Revanche:
             return None
         if self.etat == RECUE:
             return self.accepter()
-        self.j_ai_demande = True
         self.etat = DEMANDEE
         return {"type": "revanche", "action": "demande"}
 
@@ -104,7 +101,6 @@ class Revanche:
         if self.etat == IMPOSSIBLE:
             return None
         self.etat = RIEN
-        self.il_a_demande = False
         return {"type": "revanche", "action": "non"}
 
     def adversaire_parti(self):
@@ -125,7 +121,6 @@ class Revanche:
             self.nom_adverse = nom[:24]
 
         if action == "demande":
-            self.il_a_demande = True
             if self.etat == DEMANDEE:
                 # On a demande tous les deux : personne n'attend, on relance.
                 self.etat = ACCEPTEE
@@ -141,7 +136,6 @@ class Revanche:
         if action == "non":
             if self.etat == DEMANDEE:
                 self.etat = REFUSEE
-            self.j_ai_demande = False
             return None
 
         return None
@@ -156,6 +150,4 @@ class Revanche:
         """Remet le compteur a zero pour la partie qui commence."""
         self.parties_jouees += 1
         self.etat = RIEN
-        self.j_ai_demande = False
-        self.il_a_demande = False
         return self.parties_jouees

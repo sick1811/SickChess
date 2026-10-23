@@ -53,7 +53,6 @@ class BackgroundAI:
         self._stop = False
         self.fen_au_moment_du_calcul = None
         self.derniere_evaluation = None
-        self.dernier_temps_ms = 0
 
         # V7.2 - LA CADENCE COMMANDE LE RYTHME (ta remarque : "rapidite
         # stockfish pas adapte en bullet"). On regarde la pendule du moteur
@@ -61,7 +60,6 @@ class BackgroundAI:
         # prend ses huit secondes. Sans pendule, on garde exactement l'ancien
         # comportement, avec les bornes de config.json.
         self.suivre_la_pendule = True
-        self.derniere_cadence = None
 
     # ------------------------------------------------------------------ pilotage
 
@@ -372,7 +370,6 @@ class BackgroundAI:
                     return
                 self.pending_ai_move = move
                 self.fen_au_moment_du_calcul = fen
-                self.dernier_temps_ms = int((time.time() - depart) * 1000)
                 if details and details.get("evaluation") is not None:
                     # Stockfish donne le score du point de vue du joueur au trait.
                     # On le ramene au point de vue des BLANCS, convention de la

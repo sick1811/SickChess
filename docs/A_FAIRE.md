@@ -65,6 +65,11 @@ Mesures faites dans Cowork (machine Linux plus lente) : à refaire sur le PC de 
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t72 (17) : partie contre l'ordinateur : tout reste fluide (pièces, flèches, pendule, coups de l'ordinateur).
+- [ ] t73 (17) : Gestionnaire des tâches → SickChess, partie où personne ne joue : processeur bien plus bas qu'avant.
+- [ ] t74 (17) : Ouvertures et Problèmes : progression et records s'affichent et se mettent à jour.
+- [ ] Page « Banc d'essai » : passer « Fichiers en double » en OK (voulu) ; dire si on supprime publier/ et
+      build_amis/ (772 Mo, refaits à chaque version amis) ; dire si on pousse sur GitHub.
 - [ ] t64-t66 : revue – Stockfish ne joue plus, flèches bleues/vertes, export et comparaison chess.com.
 - [ ] t67 : temps réel d'une revue complète (Calcul fixe, **Forte**, par défaut depuis le 18/10 (14)) ;
       la mesure prévoit environ 9 min pour 40 coups. « environ X min » juste ?

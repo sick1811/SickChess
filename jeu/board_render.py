@@ -32,7 +32,6 @@ class BoardRender:
     def __init__(self, chessboard):
         self.chessboard = chessboard
         self.afficher_coordonnees = True
-        self._polices = {}
         self.onglet = "coups"          # "coups" ou "chat"
         self.rect_onglets = []         # [(rect, "coups"), (rect, "chat")]
         self._zones_coups = []         # [(rect, index)] - liste cliquable
@@ -286,7 +285,6 @@ class BoardRender:
 
     def _dessiner_selection_simple(self, case):
         """Case choisie + points sur les arrivees possibles, pour le replay."""
-        import chess
         plateau = self.chessboard
         t = self.theme()
         try:

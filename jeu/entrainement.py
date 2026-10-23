@@ -12,6 +12,7 @@
 # la memoire des coups. La progression par ouverture est gardee dans
 # entrainement.json (hors GitHub).
 
+import copy
 import json
 import os
 import random
@@ -173,13 +174,22 @@ def _chemin():
         return os.path.join(os.getcwd(), FICHIER)
 
 
+# 23/10 (banc d'essai) : l'ecran Ouvertures demandait la progression 24 fois
+# par image. On lit le fichier une fois, puis on garde une copie en memoire,
+# mise a jour a chaque enregistrement (par chemin : les tests en changent).
+_EN_MEMOIRE = {}
+
+
 def charger_progression():
-    try:
-        with open(_chemin(), "r", encoding="utf-8") as f:
-            d = json.load(f)
-        return d if isinstance(d, dict) else {}
-    except (OSError, ValueError):
-        return {}
+    chemin = _chemin()
+    if chemin not in _EN_MEMOIRE:
+        try:
+            with open(chemin, "r", encoding="utf-8") as f:
+                d = json.load(f)
+            _EN_MEMOIRE[chemin] = d if isinstance(d, dict) else {}
+        except (OSError, ValueError):
+            _EN_MEMOIRE[chemin] = {}
+    return copy.deepcopy(_EN_MEMOIRE[chemin])
 
 
 def noter_une_ligne(famille, couleur, note):
@@ -196,6 +206,7 @@ def noter_une_ligne(famille, couleur, note):
             succes.debloquer("ouverture_parfaite")
         except Exception as e3:
             print("[SUCCES] %s" % e3)
+    _EN_MEMOIRE[_chemin()] = copy.deepcopy(d)
     try:
         with open(_chemin(), "w", encoding="utf-8") as f:
             json.dump(d, f, ensure_ascii=False, indent=1)
@@ -206,4 +217,6 @@ def noter_une_ligne(famille, couleur, note):
 
 def progression(famille, couleur):
     cle = "%s|%s" % (famille, "blancs" if couleur == chess.WHITE else "noirs")
-    return charger_progression().get(cle)
+    charger_progression()                   # remplit la memoire si besoin
+    e = _EN_MEMOIRE[_chemin()].get(cle)
+    return dict(e) if e is not None else None

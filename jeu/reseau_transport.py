@@ -47,7 +47,6 @@ class Transport:
         self._dernier_recu = None
         self._dernier_bonjour = -999.0
         self._dernier_ping = -999.0
-        self._bonjour_repondu = False
 
     # ------------------------------------------------------ a fournir
 

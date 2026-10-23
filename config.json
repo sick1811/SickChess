@@ -21,7 +21,6 @@
     "sons_actifs": true,
     "hotseat_retourner_plateau": true,
     "bouton_abandon_haut_droite": false,
-    "ia_suivre_la_pendule": true,
     "taux_de_gaffe": 1.0,
     "ouvertures_en_francais": true,
     "bot_livre_ouvertures": true,

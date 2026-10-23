@@ -310,7 +310,6 @@ class AnalyseurPartie:
         self.profondeur_min = r["profondeur_min"]
         self.effort = r["effort"]
         self.lignes_spec = r["lignes"]
-        self.profondeur_lignes = bool(self.lignes_spec)      # compatibilite
         # 1 = survol, 2 = trois meilleurs coups, 3 = passe profonde (si elle
         # existe). Une position est finie a self.niveau_final.
         self.niveau_final = 3 if self.lignes_spec else 2
@@ -676,7 +675,6 @@ class AnalyseurPartie:
             spec = (self.profondeur, self.noeuds,
                     self.temps_max_ms * (1 + self._essais[k]))
             lignes = 1 if self.lignes_spec else LIGNES_FINES
-        profondeur = spec[0]
         details = self._chercher(moteur, self.fens[k], spec, lignes,
                                  min(niveau, self.niveau_final))
         if details:

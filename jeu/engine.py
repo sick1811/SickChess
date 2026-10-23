@@ -162,7 +162,6 @@ class StockfishEngine:
         self._verrou = threading.RLock()
         self.options_disponibles = {}   # nom -> dict(min, max, type)
         self.elo_courant = None
-        self.skill_courant = None
         # V7.2 : quand le classement vise est SOUS le minimum de Stockfish, ce
         # n'est plus lui qui choisit le coup, c'est nous (voir faiblesse.py).
         # None = Stockfish choisit tout seul, comme avant.
@@ -360,7 +359,6 @@ class StockfishEngine:
 
         skill = self._elo_vers_skill(elo)
         self.elo_courant = elo
-        self.skill_courant = skill
 
         if self._option_existe("UCI_LimitStrength") and elo >= elo_min:
             # Le moteur sait limiter sa force lui-meme : c'est le plus fidele.
@@ -585,7 +583,6 @@ class StockfishEngine:
                                % min(hash_mb, int(maxi or 33554432)))
         self.profondeur_max = int(profondeur) if profondeur else None
         self.elo_courant = None
-        self.skill_courant = 20
         self._send_command("isready")
         self._wait_response("readyok", timeout=6.0)
         self.mode_analyse = True

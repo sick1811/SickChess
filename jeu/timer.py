@@ -107,7 +107,6 @@ class ChessTimer:
         self.sons = None               # SoundManager, branche par ChessBoard
 
         self.font = None
-        self.font_petit = None
         # Zones fixees par la disposition (layout.py). En V6 les horloges
         # etaient dessinees a des coordonnees fixes, donc par-dessus
         # l'echiquier des que la fenetre changeait de taille.

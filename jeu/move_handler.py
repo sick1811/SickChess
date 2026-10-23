@@ -192,7 +192,6 @@ class MoveHandler:
         coups = self._coups_depuis(square, premouvement)
         self.selection_premouvement = premouvement
         plateau.selected_square = square
-        plateau.legal_moves_objets = coups
         plateau.legal_moves = []
         for m in coups:
             if m.to_square not in plateau.legal_moves:
@@ -208,7 +207,6 @@ class MoveHandler:
         plateau = self.chessboard
         plateau.selected_square = None
         plateau.legal_moves = []
-        plateau.legal_moves_objets = []
         plateau.dragging = False
         plateau.drag_piece = None
         plateau.drag_pos = None

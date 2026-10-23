@@ -147,9 +147,6 @@ def expliquer(position, coup_joue, coup_attendu, puzzle=None,
         except Exception:
             mat = False
 
-    joue_san = _san(plateau, coup_joue)
-    piece_jouee = plateau.piece_at(coup_joue.from_square)
-
     apres = plateau.copy()
     try:
         apres.push(coup_joue)

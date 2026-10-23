@@ -14,7 +14,6 @@
 # Aucune bibliotheque en plus : tout est fait avec pygame.draw, en dessinant
 # quatre fois trop grand puis en reduisant, ce qui lisse les bords.
 
-import math
 
 import pygame
 

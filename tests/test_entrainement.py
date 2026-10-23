@@ -118,6 +118,32 @@ m.annoncer_reprise(True, "x")
 verifier(any(b.cle == "ouvertures" for b in m.boutons), "entree « Entraînement aux ouvertures »")
 verifier(max(b.rect.bottom for b in m.boutons) <= 640, "les 10 entrees tiennent en 640 px")
 
+print("6. La progression n'est plus relue sur le disque a chaque image (banc d'essai 23/10)")
+import builtins
+import json
+lectures = []
+def _open_compte(*a, **k):
+    if "r" in (a[1] if len(a) > 1 else k.get("mode", "r")):
+        lectures.append(a[0])
+    return builtins.open(*a, **k)
+entrainement.open = _open_compte
+entrainement.charger_progression()
+for _ in range(24):
+    entrainement.progression("Partie italienne", chess.BLACK)
+verifier(not lectures, "24 demandes : aucune lecture du fichier (%d)" % len(lectures))
+avant = entrainement.progression("Partie italienne", chess.BLACK)["lignes"]
+entrainement.noter_une_ligne("Partie italienne", chess.BLACK, 50.0)
+verifier(entrainement.progression("Partie italienne", chess.BLACK)["lignes"] == avant + 1,
+         "une ligne notee se voit tout de suite")
+with builtins.open(entrainement._chemin(), encoding="utf-8") as f:
+    verifier(json.load(f)["Partie italienne|noirs"]["lignes"] == avant + 1,
+             "et elle est bien ecrite sur le disque")
+p = entrainement.progression("Partie italienne", chess.BLACK)
+p["lignes"] = 999
+verifier(entrainement.progression("Partie italienne", chess.BLACK)["lignes"] == avant + 1,
+         "modifier ce qu'on a recu ne change pas la memoire")
+del entrainement.open
+
 print()
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))
 pygame.quit()
