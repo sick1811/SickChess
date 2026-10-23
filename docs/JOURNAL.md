@@ -903,3 +903,10 @@ Fait :
 À faire par Julien :
 - [ ] Recoller `outils/cloud/configuration.sh` (100 lignes) dans l'environnement claude.ai/code.
 - [ ] Plus tard : rendre fiable le contrôle « autre coup qui défend f7 » de `test_mes_erreurs.py`.
+
+## 23/10/2026 (23) – Cloud prêt (Claude Code)
+- Environnement claude.ai/code « SickChess » mis à jour avec le script corrigé (100 lignes).
+- 2e session cloud de test : pygame 2.6.1, python-chess 1.11.2 (Python 3.13), Stockfish 17.1, puzzles/
+  présents ; `python tests/lancer_tous.py` → **686 contrôles verts** en 1 min 50.
+- `tests/ecrans_en/` n'est plus suivi par Git (`.gitignore`) : `test_anglais.py` refait ces 20 captures à
+  chaque passage, elles apparaissaient toujours « modifiées » (PC et cloud). Les images restent sur le disque.
