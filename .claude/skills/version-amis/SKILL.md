@@ -31,6 +31,12 @@ une grosse nouveauté.
 4. Signature si `"signature"` est réglé dans `outils/maj_config.json` (certificat de Julien).
 5. Release GitHub avec tous les fichiers.
 
+## Installeur complet (24/10, choix de Julien)
+L'installeur contient tout : programme, jeu, Stockfish, problèmes et finales (~700 Mo).
+`SICKCHESS_INSTALLEUR_LEGER=1` pour un installeur sans problèmes ni finales.
+Si seul l'installeur a changé (pas le jeu) : `py outils/publier_maj.py --installeur-seul`
+refait l'installeur de la dernière version et le remplace dans sa release.
+
 ## Vérifier avant d'annoncer (à faire à chaque nouvel installeur)
 1. Installer en silence dans un dossier d'essai :
    `publier\<etiquette>\SickChess_Installation.exe /VERYSILENT /CURRENTUSER /DIR="%TEMP%\SickChessEssai" /TASKS=""`
@@ -38,6 +44,8 @@ une grosse nouveauté.
    dossier d'essai sans erreur, menu atteint.
 3. `python outils/verifier_en_ligne.py --dossier "%TEMP%\SickChessEssai"` (Steam ouvert) :
    tout en ✅ dans `docs/VERIFICATION_EN_LIGNE.md`.
+   Vérifier aussi que `puzzles/` et `syzygy/` sont dans le dossier d'essai et que le menu
+   propose « Problèmes » (pas « base absente »).
 4. Désinstaller l'essai : `"%TEMP%\SickChessEssai\unins000.exe" /VERYSILENT`.
 
 ## Ne jamais

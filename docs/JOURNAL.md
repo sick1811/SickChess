@@ -471,6 +471,26 @@ Fait :
   « Fais la version amis avec l'installeur, vérifie-la, puis publie ».
 - [ ] Une vraie partie en ligne avec un ami sur deux PC.
 
+## 24/10/2026 (25) – Installeur complet ; analyse libre, invitations, classements à faire (Cowork)
+Retour de Julien sur la version installée : « il reste beaucoup d'éléments manquants : les problèmes,
+l'analyse en partie, Steam ». Précisé : installeur → tout dedans ; analyse = **analyse libre** ;
+Steam = **succès et classements** + **notification en jeu de l'invitation d'un ami**.
+Cause pour les problèmes : l'installeur n° 2 n'avait que programme + jeu + Stockfish, problèmes et
+finales (~600 Mo) arrivaient ensuite par la mise à jour automatique.
+Fait :
+- `outils/publier_maj.py` : installeur **complet** (programme, jeu, Stockfish, problèmes, finales,
+  ~700 Mo ; `SICKCHESS_INSTALLEUR_LEGER=1` pour l'ancien) ; option **`--installeur-seul`** (refait
+  l'installeur de la dernière version publiée et le remplace dans sa release, refuse si le jeu a
+  changé). Essayé avec un faux Inno Setup : contenu et `paquets_installes.json` justes.
+- `outils/installeur_amis.iss` : compression normale non solide (données déjà compressées).
+- Docs (VERSION_AMIS, LISEZ-MOI_AMIS, skill version-amis) mises à jour.
+- Nouveaux travaux dans A_FAIRE (en premier) et la page : p35 analyse libre, p36 invitation
+  affichée dans le jeu (rappel Steam LobbyInvite_t), p37 classements Steam (testables avec 480) +
+  succès Steam préparés (affichage dans Steam seulement avec le vrai numéro, p21).
+À faire par Julien (page « À faire ») :
+- [ ] v05 : Claude Code refait l'installeur complet ; réinstaller et vérifier Problèmes / finales.
+- [ ] Puis « fais le travail p35 », p36, p37.
+
 ## Bugs connus (repris de « a debug.txt »)
 - [x] Pendule ne clignote pas à 30 s → fonctionne (testé).
 - [x] Fin de partie à 00:00 → corrigé (affichage du temps final).
@@ -941,3 +961,15 @@ mis en ligne dans le cloud à chaque modification acceptée localement ».
 - Branche `seance-13-analyse-calcul-fixe` supprimée (fusionnée dans main le 18/10).
 À faire par Julien (une fois, la sécurité de Claude Code refuse qu'un crochet s'installe sans lui) :
 - [ ] `python outils/git/installer_envoi_auto.py` dans le dossier SickChess.
+
+## 24/10/2026 (25) – Installeur complet, version amis n° 3 (Claude Code)
+Fait :
+- Installeur complet préparé par Cowork (`publier_maj.py`, `installeur_amis.iss`, `LISEZ-MOI_AMIS.txt`) :
+  programme, jeu, Stockfish, problèmes ET tables de finales dans `SickChess_Installation.exe` (664 Mo).
+- `--installeur-seul` a refusé de remplacer l'installeur de la n° 2 : `LISEZ-MOI_AMIS.txt` (dans le paquet
+  « jeu ») avait changé. Publié donc en **version n° 3** (seul le paquet « jeu » change ; le lien
+  `releases/latest/download/SickChess_Installation.exe` donne le nouvel installeur).
+- Vérifié avant l'envoi : installation silencieuse en ~1 min, problèmes (65 fichiers) et finales (145) présents,
+  jeu lancé sans erreur (Steam connecté, 4 180 151 problèmes chargés au démarrage), vérification en ligne de la
+  version installée toute verte, désinstallation propre. Aucun fichier personnel dans les paquets.
+- En ligne : `maj.json` « latest » = n° 3 ; paquets et installeur répondent.

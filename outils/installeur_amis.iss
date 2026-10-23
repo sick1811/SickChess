@@ -52,8 +52,10 @@ OutputBaseFilename=SickChess_Installation
 SetupIconFile=..\assets\icone.ico
 UninstallDisplayIcon={app}\SickChess.exe
 UninstallDisplayName=SickChess
-Compression=lzma2/max
-SolidCompression=yes
+; Problemes et tables de finales (~600 Mo) sont deja compresses : une compression
+; normale non solide va bien plus vite pour le meme resultat.
+Compression=lzma2/normal
+SolidCompression=no
 WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
