@@ -1,6 +1,6 @@
 # Recette complète – SickChess
 
-Tous les tests à faire à la main pour vérifier le jeu entier. Version : 23/10/2026.
+Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10/2026.
 
 **Règles**
 - Fichier fabriqué par `python outils/recette.py` : modifier `outils/recette.py`, pas ce fichier.
@@ -188,6 +188,29 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 23/10
   → Le jeu joue les coups adverses de la théorie ; à toi de trouver les tiens ; un coup faux = rouge, on réessaie.
 - [ ] **R-098** – « Montrer le coup (H) », finir la ligne, « Ligne suivante »  
   → Flèche du bon coup ; à la fin : score et nom exact de la variante ; la suivante est une autre variante ; le % s'affiche sur l'ouverture dans la liste.
+
+## Analyse libre
+
+- [ ] **R-140** – Menu → Analyse libre  
+  → Position de départ ; en quelques secondes, 3 lignes de Stockfish à droite (évaluation + coups), « profondeur » qui monte, flèche bleue du meilleur coup, barre d'avantage à gauche.
+- [ ] **R-141** – Jouer des coups des deux camps (glisser ou clic-clic), puis flèches gauche/droite, Début/Fin, clic sur un coup de la feuille  
+  → Les deux camps se jouent ; Stockfish repart aussitôt sur chaque nouvelle position ; on navigue dans les coups ; un autre coup joué au milieu remplace la suite.
+- [ ] **R-142** – Cliquer sur une des 3 lignes de Stockfish  
+  → Son premier coup est joué sur l'échiquier.
+- [ ] **R-143** – Espace (ou bouton Pause), attendre, puis Espace encore  
+  → « Stockfish à l'arrêt », bouton « Relancer » en or, le processeur redescend (Gestionnaire des tâches) ; Espace : l'analyse reprend.
+- [ ] **R-144** – Copier un FEN (ex. lichess → Partager → FEN) puis Ctrl+V ; puis copier une partie PGN et Ctrl+V  
+  → « Position collée » : la position s'affiche et s'analyse ; « Partie collée : N coups » : la partie s'affiche depuis le début, flèches pour avancer. Un texte quelconque : message clair, rien ne casse.
+- [ ] **R-145** – Éditer (E) : Vider, poser rois, tours, pions ; Déplacer ; Gomme ; clic droit ; trait ; roques ; Analyser  
+  → Les pièces se posent / s'enlèvent ; les roques ne se cochent que si roi et tour sont à leur place ; une position impossible (pas de roi, pion sur la 1re rangée…) est refusée avec la raison ; « Analyser » lance Stockfish dessus ; Échap annule.
+- [ ] **R-146** – Copier le FEN (C), le coller dans lichess.org/analysis  
+  → « FEN copié » ; lichess affiche la même position.
+- [ ] **R-147** – Revue d'une partie → aller à un coup → « Analyser (A) » ; puis Retour  
+  → L'analyse libre s'ouvre sur la même position (variante comprise), avec la partie dans la feuille ; Retour revient à la revue au même coup.
+- [ ] **R-148** – Finale à 5 pièces ou moins (ex. coller 8/8/8/4k3/8/8/4P3/4K3 w - - 0 1), dossier syzygy/ présent  
+  → Sous les lignes : « Tables de finale : les Blancs gagnent / nulle » ; sans le dossier syzygy/, rien ne s'affiche et tout marche.
+- [ ] **R-149** – Laisser l'analyse libre ouverte 2 minutes sur la même position, puis Retour  
+  → Au bout d'une minute « analyse terminée » et le processeur redescend ; après Retour, plus de stockfish.exe d'analyse libre dans le Gestionnaire des tâches.
 
 ## Signaler un problème
 

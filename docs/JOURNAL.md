@@ -903,3 +903,39 @@ Fait :
 À faire par Julien :
 - [ ] Recoller `outils/cloud/configuration.sh` (100 lignes) dans l'environnement claude.ai/code.
 - [ ] Plus tard : rendre fiable le contrôle « autre coup qui défend f7 » de `test_mes_erreurs.py`.
+
+## 24/10/2026 (23) – Travail p35 : l'analyse libre (Claude Code dans le cloud)
+Demande de Julien (page « À faire », « Demandes du 24/10 ») : « fais le travail p35 ».
+Fait :
+- **Nouvelle entrée du menu « Analyse libre »** (`jeu/ecran_analyse_libre.py`) : un échiquier où tu joues
+  **les deux camps** ; flèches, Début/Fin et clic sur la feuille pour naviguer ; un autre coup joué au
+  milieu remplace la suite.
+- **Stockfish en continu** (`jeu/analyse_continue.py`), comme sur lichess : les **3 meilleures lignes**
+  s'affinent en direct (profondeur qui monte), **flèche bleue** du meilleur coup (plus fines : les coups
+  presque aussi bons), **barre d'avantage** (la même que la revue). Un clic sur une ligne joue son premier
+  coup. Changement de position : Stockfish repart aussitôt (0,1 s). Espace = pause / relance.
+  Pour ne pas chauffer : arrêt tout seul après 1 minute (ou profondeur 40) sur une même position ; un seul
+  Stockfish à lui, en priorité basse, fermé en quittant l'écran.
+- **Éditeur de position** (E) : palette de pièces, Déplacer, Gomme, clic droit pour enlever, trait, roques
+  (cochables seulement si roi et tour sont en place), Vider / Départ. Une position impossible est refusée
+  avec la raison (« Il manque le roi noir », « pion sur la première rangée »…).
+- **Coller un FEN ou une partie PGN** (Ctrl+V) ; **copier le FEN** (C).
+- **Tables de finale Syzygy** : si le dossier `syzygy/` est là, « Tables de finale : les Blancs gagnent /
+  nulle » sous les lignes (5 pièces ou moins). Sans le dossier : rien ne s'affiche.
+- **Revue → « Analyser (A) »** : la position regardée (variante comprise) s'ouvre dans l'analyse libre ;
+  Retour revient à la revue au même coup. Les boutons du bas de la revue passent sur deux rangées.
+- Anglais : tous les nouveaux textes traduits (« Analysis board »).
+- Tests : `tests/test_analyse_libre.py` (64 contrôles, faux Stockfish) et `tests/test_analyse_libre_moteur.py`
+  (14, vrai Stockfish : mat en 1 trouvé en 0,1 s, dame en prise prise, arrêt tout seul, moteur fermé en
+  sortant). Suite complète : 766 contrôles verts (686 avant).
+- Banc (mesure à part, dans le cloud, même machine avant / après ; `tests/banc_essai.json` du PC de Julien
+  pas touché) : revue 3,29 → 3,31 ms/image et menu 0,90 → 0,86 ms (inchangés) ; analyse libre 4,24 →
+  **2,44 ms/image** après mise en cache (−42 %), 16 % → 11 % d'un cœur au repos, Stockfish à l'arrêt.
+  « Analyse libre » ajoutée aux écrans mesurés par `outils/banc_essai.py`.
+- Recette : R-140 à R-149 ajoutés (section « Analyse libre »).
+- Vu en passant (pas corrigé) : dans le cloud, un Stockfish met ~4,5 s à démarrer (réservation de sa
+  mémoire, 512 Mo) ; à mesurer sur le PC de Julien.
+- Pas de version amis : impossible dans le cloud (Windows seulement) ; à publier par Claude Code sur le PC.
+
+À vérifier par Julien :
+- [ ] t82 à t87 (voir A_FAIRE), R-140 à R-149.

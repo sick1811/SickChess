@@ -131,7 +131,12 @@ def moteur_d_analyse_n(indice, chemin=None, threads=None, hash_mb=1024,
     positions qui se suivent restent chez le meme moteur, qui retrouve donc le
     travail de la precedente.
     """
-    role = role_d_analyse(indice)
+    return moteur_d_analyse_role(role_d_analyse(indice), chemin, threads, hash_mb, creer)
+
+
+def moteur_d_analyse_role(role, chemin=None, threads=None, hash_mb=1024, creer=True):
+    """Un moteur d'analyse sous un nom libre (24/10, p35 : celui de l'analyse
+    libre, « libre », ferme en quittant l'ecran)."""
     with _verrou:
         moteur = _moteurs.get(role)
         if moteur is not None and not _vivant(moteur):

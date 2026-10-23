@@ -12,7 +12,8 @@
 # passe toujours en premier : tout se remplit pendant qu'on navigue.
 #
 # Commandes : fleches gauche/droite (ou molette) = coup precedent/suivant,
-# Debut/Fin = premier/dernier coup, F = retourner l'echiquier, Echap = retour.
+# Debut/Fin = premier/dernier coup, F = retourner l'echiquier, Echap = retour,
+# A = analyser la position regardee dans l'analyse libre (24/10, p35).
 # Un clic sur un coup de la feuille ou sur la courbe y saute directement.
 #
 # 17/10 (Julien : « Stockfish joue a ma place dans la revue ; il ne doit
@@ -75,6 +76,40 @@ class DispositionRevue(Disposition):
         return self
 
 
+def dessiner_barre_avantage(ecran, barre, evaluation, texte, retourne, t, ech):
+    """La barre d'avantage le long de l'echiquier (revue, analyse libre) : la
+    part blanche = les chances des Blancs, l'evaluation ecrite du cote du mieux."""
+    chances = annotations.chances_de_gagner(evaluation)
+    chances = 0.5 if chances is None else chances / 100.0
+    pygame.draw.rect(ecran, (58, 56, 52), barre, border_radius=4)
+    h_blanc = int(barre.height * chances)
+    if retourne:
+        blanc = pygame.Rect(barre.x, barre.y, barre.width, h_blanc)
+    else:
+        blanc = pygame.Rect(barre.x, barre.bottom - h_blanc, barre.width, h_blanc)
+    pygame.draw.rect(ecran, (232, 229, 220), blanc, border_radius=4)
+    pygame.draw.rect(ecran, t["bord"], barre, 1, border_radius=4)
+    texte = (texte or "").replace("+", "")
+    if texte in ("", "..."):
+        return
+    # 17/10 (recette R-130) : « -0.25 » ne tenait pas dans la barre et etait coupe.
+    # Le cote de la barre dit deja qui est mieux : on enleve le signe et on
+    # garde une decimale (0.3, 2.5, M3).
+    texte = texte.lstrip("+-")
+    try:
+        texte = "%.1f" % float(texte)
+    except ValueError:
+        pass
+    taille = ui.t(10, ech)
+    cote_blanc = (evaluation or 0) >= 0
+    en_bas = cote_blanc != retourne
+    y = barre.bottom - ui.police(taille, True).get_height() - 3 if en_bas \
+        else barre.y + 3
+    couleur = (40, 38, 34) if cote_blanc else (232, 229, 220)
+    ui.texte(ecran, texte, barre.centerx, y, taille, couleur, gras=True,
+             ancre="centre", largeur_max=barre.width + 4, ajuster=True)
+
+
 class EcranRevue:
     def __init__(self, screen, analyseur, preferences=None,
                  noms=("Blancs", "Noirs"), resultat="", raison="",
@@ -86,6 +121,7 @@ class EcranRevue:
         self.resultat = resultat
         self.raison = raison
         prefs = dict(preferences or {})
+        self.preferences = prefs
 
         self.fen = analyseur.fen_initiale
         self.coups = [chess.Move.from_uci(u) for u in analyseur.coups]
@@ -121,8 +157,11 @@ class EcranRevue:
         self.btn_retour = ui.Bouton((0, 0, 10, 10), "Retour", "retour", taille=16)
         self.btn_exporter = ui.Bouton((0, 0, 10, 10), "Exporter", "exporter",
                                       taille=15, gras=False)
+        # 24/10 (p35) : la position regardee (variante comprise) dans l'analyse libre.
+        self.btn_analyser = ui.Bouton((0, 0, 10, 10), "Analyser (A)", "analyser",
+                                      taille=15, gras=False)
         self.boutons = self.boutons_nav + [self.btn_retourner, self.btn_exporter,
-                                           self.btn_retour]
+                                           self.btn_analyser, self.btn_retour]
         self.message = ""
         self.message_fin = 0
         self.fleches_visibles = bool(prefs.get("revue_fleches", True))
@@ -389,13 +428,15 @@ class EcranRevue:
         h_bouton = int(42 * ech)
         bas = panneau.bottom - int(12 * ech)
 
-        tiers = (l - 2 * espace) // 3
+        moitie = (l - espace) // 2
         h36 = int(36 * ech)
-        self.btn_retourner.placer((x, bas - h36, tiers, h36))
-        self.btn_exporter.placer((x + tiers + espace, bas - h36, tiers, h36))
-        self.btn_retour.placer((x + 2 * (tiers + espace), bas - h36,
-                                l - 2 * (tiers + espace), h36))
-        bas -= int(36 * ech) + espace
+        # 24/10 (p35) : deux rangees de deux, pour faire de la place a « Analyser ».
+        self.btn_analyser.placer((x, bas - h36, moitie, h36))
+        self.btn_retour.placer((x + moitie + espace, bas - h36, l - moitie - espace, h36))
+        bas -= h36 + espace
+        self.btn_retourner.placer((x, bas - h36, moitie, h36))
+        self.btn_exporter.placer((x + moitie + espace, bas - h36, l - moitie - espace, h36))
+        bas -= h36 + espace
         lb = (l - 3 * int(6 * ech)) // 4
         for i, bouton in enumerate(self.boutons_nav):
             bouton.placer((x + i * (lb + int(6 * ech)), bas - h_bouton, lb, h_bouton))
@@ -475,7 +516,7 @@ class EcranRevue:
                       pygame.K_HOME: "debut", pygame.K_END: "fin",
                       pygame.K_UP: "debut", pygame.K_DOWN: "fin",
                       pygame.K_f: "retourner", pygame.K_b: "fleches",
-                      pygame.K_e: "exporter",
+                      pygame.K_e: "exporter", pygame.K_a: "analyser",
                       pygame.K_ESCAPE: "retour"}.get(event.key)
         elif event.type == pygame.MOUSEWHEEL:
             action = "precedent" if getattr(event, "y", 0) > 0 else "suivant"
@@ -511,7 +552,32 @@ class EcranRevue:
                                    % ("affichées" if self.fleches_visibles else "cachées"))
         elif action == "exporter":
             self.exporter()
+        elif action == "analyser":
+            return self.ouvrir_l_analyse_libre()
         return None
+
+    def ouvrir_l_analyse_libre(self, clock=None, evenement_fenetre=None):
+        """La position regardee (et sa variante) dans l'analyse libre (p35) ;
+        on revient ensuite a la revue la ou on l'avait laissee."""
+        from ecran_analyse_libre import EcranAnalyseLibre, threads_conseilles
+        if self.variante is not None:
+            coups, index = self.coups[:self.index] + list(self.variante), None
+        else:
+            coups, index = self.coups, self.index
+        libre = EcranAnalyseLibre(
+            self.screen, self.preferences, self.fen, coups, index,
+            stockfish_path=getattr(self.analyseur, "chemin", None),
+            threads=threads_conseilles(getattr(self.analyseur, "en_cours", False)),
+            retourne=self.plateau.flipped)
+        self.analyse_libre = libre
+        clock = clock or getattr(self, "_horloge", None)
+        if clock is None:                 # tests : l'ecran est cree, pas lance
+            return None
+        reponse = libre.run(clock, evenement_fenetre or getattr(self, "_evenement_fenetre", None),
+                            getattr(self, "_apres_dessin", None))
+        self.analyse_libre = None
+        self._placer(pygame.display.get_surface())
+        return "quitter" if reponse == "quitter" else None
 
     def _afficher_message(self, texte, secondes=5):
         self.message = texte
@@ -571,40 +637,14 @@ class EcranRevue:
 
     def _dessiner_barre(self, ecran, t, ech):
         """Barre d'avantage : la part blanche = les chances des Blancs."""
-        barre = self.disposition.barre
         evaluation = self.analyseur.evaluation_connue(self.index)
-        if self.variante is not None and self.eval_variante is not None:
-            evaluation = self.eval_variante       # la barre suit la variante
-        chances = annotations.chances_de_gagner(evaluation) / 100.0
-        pygame.draw.rect(ecran, (58, 56, 52), barre, border_radius=4)
-        h_blanc = int(barre.height * chances)
-        if self.plateau.flipped:
-            blanc = pygame.Rect(barre.x, barre.y, barre.width, h_blanc)
-        else:
-            blanc = pygame.Rect(barre.x, barre.bottom - h_blanc, barre.width, h_blanc)
-        pygame.draw.rect(ecran, (232, 229, 220), blanc, border_radius=4)
-        pygame.draw.rect(ecran, t["bord"], barre, 1, border_radius=4)
-        texte = self.analyseur.texte_evaluation(self.index).replace("+", "")
+        texte = self.analyseur.texte_evaluation(self.index)
         if self.variante is not None:
-            texte = (self.texte_eval_variante or "...").replace("+", "")
-        if texte in ("", "..."):
-            return
-        # 17/10 (recette R-130) : « -0.25 » ne tenait pas dans la barre et etait coupe.
-        # Le cote de la barre dit deja qui est mieux : on enleve le signe et on
-        # garde une decimale (0.3, 2.5, M3).
-        texte = texte.lstrip("+-")
-        try:
-            texte = "%.1f" % float(texte)
-        except ValueError:
-            pass
-        taille = ui.t(10, ech)
-        cote_blanc = evaluation >= 0
-        en_bas = cote_blanc != self.plateau.flipped
-        y = barre.bottom - ui.police(taille, True).get_height() - 3 if en_bas \
-            else barre.y + 3
-        couleur = (40, 38, 34) if cote_blanc else (232, 229, 220)
-        ui.texte(ecran, texte, barre.centerx, y, taille, couleur, gras=True,
-                 ancre="centre", largeur_max=barre.width + 4, ajuster=True)
+            if self.eval_variante is not None:
+                evaluation = self.eval_variante       # la barre suit la variante
+            texte = self.texte_eval_variante or "..."
+        dessiner_barre_avantage(ecran, self.disposition.barre, evaluation, texte,
+                                self.plateau.flipped, t, ech)
 
     def _dessiner_titre(self, ecran, t, ech):
         zone = self.zone_titre
@@ -896,6 +936,8 @@ class EcranRevue:
             self._liberer_la_variante()
 
     def _boucle(self, clock, evenement_fenetre, apres_dessin):
+        self._horloge, self._evenement_fenetre = clock, evenement_fenetre
+        self._apres_dessin = apres_dessin
         cadence = ui.Cadence()
         while True:
             evenements = pygame.event.get()

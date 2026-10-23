@@ -37,10 +37,12 @@ SERIES = [
     ("test_anglais.py", False),
     ("test_analyse_profonde.py", False),
     ("test_modes_analyse.py", False),
+    ("test_analyse_libre.py", False),
     ("test_revue.py", True),            # True = utilise Stockfish
     ("test_analyse_directe.py", True),
     ("test_mes_erreurs.py", True),
     ("test_variantes.py", True),
+    ("test_analyse_libre_moteur.py", True),
 ]
 
 

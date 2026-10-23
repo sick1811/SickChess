@@ -1,7 +1,8 @@
 # menu_principal.py - SickChess : le menu d'accueil.
 #
-# Cinq entrees claires, comme prevu dans le plan Steam :
-#   Jouer contre l'ordinateur / Jouer a deux / Problemes / Mes parties / Options
+# Les entrees du jeu, comme prevu dans le plan Steam :
+#   Jouer contre l'ordinateur / Jouer a deux / En ligne / Problemes /
+#   Ouvertures / Analyse libre / Mes parties / Options / Signaler / Quitter
 # Les fonctions pas encore integrees dans SickChess sont affichees grisees avec
 # la mention "bientot" : elles reviendront une par une depuis V8_TURBO_3000.
 
@@ -20,6 +21,7 @@ ENTREES = [
     ("en_ligne", "Jouer en ligne (Steam)", True),
     ("puzzles", "Problèmes", True),
     ("ouvertures", "Entraînement aux ouvertures", True),   # 17/10, travail p06
+    ("analyse", "Analyse libre", True),                    # 24/10, travail p35
     ("historique", "Mes parties et profil", True),
     ("options", "Options", True),
     ("signaler", "Signaler un problème / une idée", True),   # 17/10, travail p16

@@ -94,6 +94,34 @@ if os.path.exists(os.path.join("puzzles", "tranches.tsv")):   # pas de base : ec
 from ecran_entrainement import EcranEntrainement
 en = EcranEntrainement(ecran, {}); en.draw(); photo("ouvertures")
 en.commencer(en.familles[0][0]); en.draw()
+from ecran_analyse_libre import EcranAnalyseLibre      # 24/10 (p35)
+
+
+class MoteurMuet:
+    multipv_courant = 3
+
+    def est_vivant(self):
+        return True
+
+    def send_command(self, cmd):
+        pass
+
+    def _lire_ligne(self):
+        import time
+        time.sleep(0.2)
+        return ""
+
+
+al = EcranAnalyseLibre(ecran, {}, moteur=MoteurMuet())
+al.draw(); al.analyse.mettre_en_pause(True); al.draw(); photo("analyse_libre")
+al.coller_texte("rien"); al.draw()
+verifier(langue.traduire(al.etat_du_moteur()) == "White to move  ·  Stockfish paused (Space)",
+         "analyse libre : %s" % langue.traduire(al.etat_du_moteur()))
+verifier(langue.traduire("Trait aux Noirs  ·  profondeur 18 (analyse terminée)")
+         == "Black to move  ·  depth 18 (analysis complete)", "analyse libre : profondeur finie")
+al.ouvrir_l_editeur(); al.edition.vider(); al.fermer_l_editeur(True); al.draw()
+al.edition.choisir_outil("Q"); al.draw(); photo("editeur_position")
+al.analyse.arreter()
 from ecran_signaler import EcranSignaler
 EcranSignaler(ecran, "0.1").draw(); photo("signaler")
 import premier_lancement

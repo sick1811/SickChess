@@ -191,6 +191,14 @@ def _ecrans(gm):
         return image
     ecrans.append(("Revue", revue))
 
+    def analyse_libre():
+        # 24/10 (p35) : Stockfish a l'arret, on ne mesure que le dessin.
+        from ecran_analyse_libre import EcranAnalyseLibre
+        e = EcranAnalyseLibre(gm.screen, gm.config, coups=PARTIE[:12])
+        e.analyse.mettre_en_pause(True)
+        return e.draw
+    ecrans.append(("Analyse libre", analyse_libre))
+
     def simple(module, classe, *args):
         def fabrique():
             mod = __import__(module)

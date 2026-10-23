@@ -3,7 +3,7 @@
 Fichier partagé entre Cowork et Claude Code. **À relire au début de chaque séance,
 à mettre à jour à la fin.** La page « SickChess – À faire »
 (https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5) en est la version à cocher pour Julien.
-Mis à jour le 18/10/2026.
+Mis à jour le 24/10/2026.
 
 ## Retours de Julien à traiter (priorité)
 - [x] Analyses gardées (fichier `.analyse.json` à côté du PGN), pastilles stables, analyse
@@ -85,6 +85,8 @@ Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/
        provisoire, comparaison avec les 10 dernières parties).
 7. [ ] **p33 – Lisibilité pour tous** (pastilles reconnaissables sans couleur, contrastes,
        1366×768 et 4K ; relecteur-interface).
+→ 24/10 : nouvelles demandes de Julien (page « À faire », statut « veux ») : p35 Analyse libre (**faite le
+  24/10, séance (23)**), p36 invitation d'un ami affichée dans le jeu, p37 classements et succès Steam.
 Toujours en attente de décision : p21 Steamworks (le délai de 30 jours ne démarre qu'au paiement),
 p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
 
@@ -100,6 +102,20 @@ p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t82 (23) : Menu → Analyse libre : en quelques secondes, 3 lignes de Stockfish, « profondeur » qui monte,
+      flèche bleue ; joue des coups des deux camps : Stockfish suit chaque coup aussitôt ; le jeu reste fluide.
+- [ ] t83 (23) : clique sur une des 3 lignes (son premier coup est joué) ; Espace : « Relancer » en or et le
+      processeur redescend (Gestionnaire des tâches) ; Espace : ça repart.
+- [ ] t84 (23) : copie un FEN sur lichess (Partager) puis Ctrl+V ; copie une partie PGN puis Ctrl+V ; C copie
+      le FEN et lichess.org/analysis affiche la même position.
+- [ ] t85 (23) : Éditer (E) : vide le plateau, pose rois / tours / pions, essaie une position impossible
+      (message), coche un roque, « Analyser ». L'éditeur est-il facile à utiliser ?
+- [ ] t86 (23) : revue d'une partie → un coup → « Analyser (A) » : même position ; Retour : la revue revient
+      au même coup. Les 4 boutons du bas de la revue tiennent bien sur ton écran ?
+- [ ] t87 (23) : avec le dossier syzygy/ : colle `8/8/8/4k3/8/8/4P3/4K3 w - - 0 1` → « Tables de finale :
+      les Blancs gagnent » ; laisse 2 min sur une position : « analyse terminée », plus de stockfish.exe
+      d'analyse libre après Retour.
+- [ ] Claude Code (PC) : commit / envoi de la séance (23) si pas fait dans le cloud, puis version amis.
 - [ ] t78 (21, à deux) : finir une partie en ligne : la carte montre « Analyse en cours… » puis
       « Précision : toi … – <ami> … », et les boutons Revue de la partie / Revanche / Menu (R-108).
 - [ ] t79 (21, à deux) : cliquer « Revue de la partie » : revue dans ton sens, noms « Toi » et ton ami,
@@ -152,6 +168,8 @@ p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
       `steam_appid.txt` (480 = numéro de test de Valve).
 
 ## Fait récemment
+- 24/10 (23) : analyse libre (p35) : les deux camps, Stockfish en continu (3 lignes), éditeur de position,
+  FEN / PGN, tables de finale, « Analyser » depuis la revue.
 - 18/10 (13) : analyse en calcul fixe par défaut (comme lichess), profondeur et temps au choix,
   temps restant affiché, outil de mesure de Stockfish.
 - 17/10 : son réparé chez Julien, analyse en tâche de fond (précision immédiate),

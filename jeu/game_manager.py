@@ -252,6 +252,9 @@ class GameManager:
                 if choix == "ouvertures":
                     self.ouvrir_entrainement()
                     continue
+                if choix == "analyse":
+                    self.ouvrir_analyse_libre()
+                    continue
                 if choix == "reprendre":
                     donnees = sauvegarde.lire()
                     if donnees is None:
@@ -308,6 +311,16 @@ class GameManager:
         from ecran_entrainement import EcranEntrainement
         if EcranEntrainement(self.screen, self.config).run(
                 self.clock, self.evenement_fenetre) == "quitter":
+            self.quitter()
+        self.screen = pygame.display.get_surface()
+        self._appliquer_taille(*self.screen.get_size())
+
+    def ouvrir_analyse_libre(self):
+        """Analyse libre : les deux camps, editeur, FEN / PGN (24/10, travail p35)."""
+        from ecran_analyse_libre import EcranAnalyseLibre
+        if EcranAnalyseLibre(self.screen, self.config,
+                             stockfish_path=self.stockfish_path).run(
+                self.clock, self.evenement_fenetre, self._dessiner_aide) == "quitter":
             self.quitter()
         self.screen = pygame.display.get_surface()
         self._appliquer_taille(*self.screen.get_size())
