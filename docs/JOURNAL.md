@@ -889,3 +889,17 @@ Fait :
 - [ ] Régler l'environnement sur claude.ai/code (`docs/CLAUDE_CLOUD.md`, 5 étapes) puis lancer une session
   cloud : « lance python tests/lancer_tous.py » → tout vert.
 - [ ] Supprimer les prebuilds Codespaces (github.com/sick1811/SickChess/settings/codespaces).
+
+## 23/10/2026 (22) – Première vraie session cloud : deux corrections (Claude Code)
+Session cloud de test (environnement « SickChess » déjà réglé par Julien : script, variable, accès Complet) :
+pygame et python-chess ne s'étaient PAS installés (pip 24.0 + Python 3.13 du cloud : python-chess demande
+`--use-pep517`) ; une fois installés à la main : 685 contrôles verts, 1 rouge passager dans
+`test_mes_erreurs.py` (« un autre coup qui défend f7 », vert relancé seul : sans doute Stockfish trop lent
+quand toute la suite tourne). Stockfish 17.1 et puzzles/ bien présents.
+Fait :
+- `outils/cloud/configuration.sh` : `--use-pep517` ; `demarrage_session.sh` : réinstalle pygame / python-chess
+  s'ils manquent et le dit à Claude au début de la session.
+- `.gitignore` : `/puzzles` (le raccourci créé dans le cloud n'était pas ignoré).
+À faire par Julien :
+- [ ] Recoller `outils/cloud/configuration.sh` (100 lignes) dans l'environnement claude.ai/code.
+- [ ] Plus tard : rendre fiable le contrôle « autre coup qui défend f7 » de `test_mes_erreurs.py`.

@@ -12,11 +12,20 @@ fi
 
 cd "${CLAUDE_PROJECT_DIR:-.}" || exit 0
 marque=/tmp/.sickchess_requirements.sha256
-if ! sha256sum --check --status "$marque" 2>/dev/null; then
-    if python3 -m pip install -q --break-system-packages -r requirements.txt ruff vulture psutil numpy \
-            >/dev/null 2>&1; then
+# On reinstalle si requirements.txt a change OU si pygame / python-chess manquent
+# (le 23/10, la configuration les avait rates sans que personne ne le voie).
+# --use-pep517 : sans lui, python-chess ne s'installe pas avec le pip du cloud.
+if ! sha256sum --check --status "$marque" 2>/dev/null \
+        || ! python3 -c "import pygame, chess" >/dev/null 2>&1; then
+    if python3 -m pip install -q --break-system-packages --use-pep517 \
+            -r requirements.txt ruff vulture psutil numpy >/dev/null 2>&1; then
         sha256sum requirements.txt > "$marque"
     fi
+fi
+if python3 -c "import pygame, chess" >/dev/null 2>&1; then
+    biblios="pygame et python-chess : installes"
+else
+    biblios="ATTENTION : pygame ou python-chess MANQUE, lancer : python3 -m pip install --break-system-packages --use-pep517 -r requirements.txt"
 fi
 
 # La base des problemes, telechargee par configuration.sh
@@ -38,7 +47,7 @@ fi
 
 # Ce qui est ecrit ici est lu par Claude au debut de la session.
 cat <<EOF
-SickChess dans le cloud (Linux, sans ecran). $moteur. $problemes.
+SickChess dans le cloud (Linux, sans ecran). $biblios. $moteur. $problemes.
 - Tests : python tests/lancer_tous.py (tout) ou --rapide (sans Stockfish).
 - Impossible ici (Windows seulement, a laisser a Claude Code sur le PC de Julien) :
   lancer le vrai jeu, Steam et le jeu en ligne, stockfish.exe, le .exe, l'installeur,

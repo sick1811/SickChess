@@ -11,6 +11,7 @@ dist/
 moteur/*.exe
 syzygy/
 puzzles/
+/puzzles
 
 # Donnees du joueur, creees par le jeu
 parties/

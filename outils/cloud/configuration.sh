@@ -33,18 +33,20 @@ if ! command -v python >/dev/null 2>&1; then
         || ln -sf "$(command -v python3)" /usr/local/bin/python
 fi
 
-# 2. Bibliotheques Python (en parallele avec Stockfish : le cloud donne 5 min)
+# 2. Bibliotheques Python (en parallele avec Stockfish : le cloud donne 5 min).
+#    --use-pep517 : sans lui, python-chess ne s installe pas avec le pip du cloud
+#    (pip 24.0, Python 3.13) - vu le 23/10 dans une vraie session.
 installer_python() {
     local dossier=""
     for essai in "${CLAUDE_PROJECT_DIR:-}" "$PWD" /home/user/SickChess /workspace/SickChess; do
         if [ -n "$essai" ] && [ -f "$essai/requirements.txt" ]; then dossier="$essai"; break; fi
     done
     if [ -n "$dossier" ]; then
-        python3 -m pip install -q --break-system-packages -r "$dossier/requirements.txt" \
+        python3 -m pip install -q --break-system-packages --use-pep517 -r "$dossier/requirements.txt" \
             ruff vulture psutil numpy || journal "pip : echec (refait au demarrage de la session)"
     else
         # Le depot n'est pas encore la : on installe la liste connue.
-        python3 -m pip install -q --break-system-packages "pygame>=2.5" "chess>=1.10" \
+        python3 -m pip install -q --break-system-packages --use-pep517 "pygame>=2.5" "chess>=1.10" \
             ruff vulture psutil numpy || journal "pip : echec (refait au demarrage de la session)"
     fi
     journal "Python : $(python3 -c 'import pygame, chess; print("pygame", pygame.version.ver, "- python-chess", chess.__version__)' 2>/dev/null || echo 'incomplet')"
