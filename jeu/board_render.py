@@ -27,6 +27,10 @@ import apparence
 import board_geometry as geo
 import ui
 
+# Fleches deja dessinees (voir BoardRenderer._fleche).
+_FLECHES = {}
+_DAMIERS = {}
+
 
 class BoardRender:
     def __init__(self, chessboard):
@@ -67,10 +71,19 @@ class BoardRender:
         if matiere is not None:          # plateau en marbre, en bois...
             plateau.screen.blit(matiere, (geo.ORIGINE_X, geo.ORIGINE_Y))
         else:
-            for square in chess.SQUARES:
-                couleur = t["clair"] if geo.case_claire(square) else t["sombre"]
-                x, y = geo.case_vers_pixel(square, sq, plateau.flipped)
-                pygame.draw.rect(plateau.screen, couleur, pygame.Rect(x, y, sq, sq))
+            # 23/10 (banc d'essai) : le damier uni est dessine une fois puis garde.
+            cle = (sq, tuple(t["clair"]), tuple(t["sombre"]))
+            damier = _DAMIERS.get(cle)
+            if damier is None:
+                if len(_DAMIERS) >= 8:
+                    _DAMIERS.clear()
+                damier = _DAMIERS[cle] = pygame.Surface((8 * sq, 8 * sq))
+                for square in chess.SQUARES:
+                    couleur = t["clair"] if geo.case_claire(square) else t["sombre"]
+                    colonne, ligne = geo.colonne_ligne_ecran(square, False)
+                    pygame.draw.rect(damier, couleur, pygame.Rect(colonne * sq, ligne * sq, sq, sq))
+            # retourne ou non, le damier est le meme (a1 reste une case sombre)
+            plateau.screen.blit(damier, (geo.ORIGINE_X, geo.ORIGINE_Y))
         pygame.draw.rect(plateau.screen, t["bord"],
                          pygame.Rect(geo.ORIGINE_X - 2, geo.ORIGINE_Y - 2,
                                      8 * sq + 4, 8 * sq + 4), 2)
@@ -86,7 +99,7 @@ class BoardRender:
             case = chess.square(colonne, rang_bas)
             x, y = geo.case_vers_pixel(case, sq, plateau.flipped)
             couleur = t["sombre"] if geo.case_claire(case) else t["clair"]
-            rendu = ui.police(taille, True).render("abcdefgh"[colonne], True, couleur)
+            rendu = ui.rendu_texte("abcdefgh"[colonne], taille, couleur, gras=True)
             plateau.screen.blit(rendu, (x + sq - rendu.get_width() - 3,
                                         y + sq - rendu.get_height() - 2))
 
@@ -95,7 +108,7 @@ class BoardRender:
             case = chess.square(colonne_gauche, rang)
             x, y = geo.case_vers_pixel(case, sq, plateau.flipped)
             couleur = t["sombre"] if geo.case_claire(case) else t["clair"]
-            rendu = ui.police(taille, True).render(str(rang + 1), True, couleur)
+            rendu = ui.rendu_texte(str(rang + 1), taille, couleur, gras=True)
             plateau.screen.blit(rendu, (x + 3, y + 2))
 
     def _dessiner_pieces(self):
@@ -137,9 +150,28 @@ class BoardRender:
         plateau.screen.blit(image, (x, y))
 
     def _fleche(self, depart, arrivee, couleur, epaisseur_relative=0.11):
-        """Fleche d'une case a une autre (indice Stockfish, coup fantome)."""
+        """Fleche d'une case a une autre (indice Stockfish, coup fantome).
+
+        23/10 (banc d'essai) : la fleche etait refaite a chaque image sur un
+        calque transparent grand comme le plateau. Elle est gardee en memoire,
+        rognee a sa taille utile."""
         plateau = self.chessboard
         sq = plateau.SQ_SIZE
+        cle = (depart, arrivee, tuple(couleur), epaisseur_relative, sq, plateau.flipped)
+        deja = _FLECHES.get(cle)
+        if deja is None:
+            if len(_FLECHES) >= 64:
+                _FLECHES.clear()
+            calque = self._calque_fleche(depart, arrivee, couleur, epaisseur_relative, sq)
+            zone = calque.get_bounding_rect()
+            if not zone.width or not zone.height:
+                zone = pygame.Rect(0, 0, 1, 1)
+            deja = _FLECHES[cle] = (calque.subsurface(zone).copy(), zone.topleft)
+        image, (dx, dy) = deja
+        plateau.screen.blit(image, (geo.ORIGINE_X + dx, geo.ORIGINE_Y + dy))
+
+    def _calque_fleche(self, depart, arrivee, couleur, epaisseur_relative, sq):
+        plateau = self.chessboard
         calque = pygame.Surface((8 * sq, 8 * sq), pygame.SRCALPHA)
         x1, y1 = geo.case_vers_pixel_local(depart, sq, plateau.flipped)
         x2, y2 = geo.case_vers_pixel_local(arrivee, sq, plateau.flipped)
@@ -156,7 +188,7 @@ class BoardRender:
             (x2 - pointe * math.cos(angle - 0.5), y2 - pointe * math.sin(angle - 0.5)),
             (x2 - pointe * math.cos(angle + 0.5), y2 - pointe * math.sin(angle + 0.5)),
         ])
-        plateau.screen.blit(calque, (geo.ORIGINE_X, geo.ORIGINE_Y))
+        return calque
 
     def _dessiner_indice(self):
         indice = getattr(self.chessboard, "indice", None)

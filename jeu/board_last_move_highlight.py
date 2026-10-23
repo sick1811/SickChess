@@ -19,6 +19,7 @@ class LastMoveHighlight:
         self.from_square = None
         self.to_square = None
         self._calque = None
+        self._cle = None
 
     def set_last_move(self, from_square, to_square):
         self.from_square = from_square
@@ -38,17 +39,16 @@ class LastMoveHighlight:
             return
         sq = geo.taille_case(sq_size or self.chessboard.SQ_SIZE)
         t = apparence.theme(getattr(self.chessboard, "theme_plateau", None))
-        cote = 8 * sq
-        if self._calque is None or self._calque.get_width() != cote:
-            self._calque = pygame.Surface((cote, cote), pygame.SRCALPHA)
-        self._calque.fill((0, 0, 0, 0))
-
-        epaisseur = max(3, sq // 20)
-        cadre = t["dernier"][:3] + (min(255, t["dernier"][3] + 70),)
+        # 23/10 (banc d'essai) : une seule case transparente, gardee en memoire,
+        # posee sur les deux cases (au lieu d'un calque grand comme le plateau
+        # repeint et recopie a chaque image).
+        cle = (sq, tuple(t["dernier"]))
+        if self._calque is None or self._cle != cle:
+            self._cle = cle
+            self._calque = pygame.Surface((sq, sq), pygame.SRCALPHA)
+            cadre = t["dernier"][:3] + (min(255, t["dernier"][3] + 70),)
+            pygame.draw.rect(self._calque, t["dernier"], self._calque.get_rect())
+            pygame.draw.rect(self._calque, cadre, self._calque.get_rect(), max(3, sq // 20))
         for case in (self.from_square, self.to_square):
             colonne, ligne = geo.colonne_ligne_ecran(case, self.chessboard.flipped)
-            rect = pygame.Rect(colonne * sq, ligne * sq, sq, sq)
-            pygame.draw.rect(self._calque, t["dernier"], rect)
-            pygame.draw.rect(self._calque, cadre, rect, epaisseur)
-
-        screen.blit(self._calque, (geo.ORIGINE_X, geo.ORIGINE_Y))
+            screen.blit(self._calque, (geo.ORIGINE_X + colonne * sq, geo.ORIGINE_Y + ligne * sq))

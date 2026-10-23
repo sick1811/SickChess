@@ -28,6 +28,8 @@ class Highlights:
         self.last_move_to = None
         self.case_echec = None
         self._calque = None
+        self._cle = None
+        self._zones = []
 
     # ------------------------------------------------------------------ etat
 
@@ -82,35 +84,53 @@ class Highlights:
         return pygame.Rect(colonne * sq_size, ligne * sq_size, sq_size, sq_size)
 
     def draw(self, screen, sq_size=None):
+        """23/10 (banc d'essai) : le calque grand comme le plateau etait repeint
+        et recopie en entier a chaque image. Il n'est repeint que si quelque
+        chose change, et seules les cases concernees sont recopiees."""
         sq = geo.taille_case(sq_size or self.chessboard.SQ_SIZE)
+        montrer_dernier = apparence.reglage("surbrillance_dernier_coup", True)
+        montrer_coups = apparence.reglage("points_coups_possibles", True)
+        t = self._theme()
+        cle = (sq, self.chessboard.flipped,
+               tuple(tuple(t[k]) for k in ("dernier", "selection", "echec", "prise", "coup")),
+               montrer_dernier, montrer_coups, self.last_move_from, self.last_move_to,
+               self.selected_square, self.case_echec, tuple(self.legal_moves),
+               tuple(self.cases_atteignables),
+               self.chessboard.board.board_fen() if self.legal_moves else None)
+        if cle != self._cle:
+            self._cle = cle
+            self._zones = self._peindre(sq, montrer_dernier, montrer_coups)
+        for zone in self._zones:
+            screen.blit(self._calque, (geo.ORIGINE_X + zone.x, geo.ORIGINE_Y + zone.y), zone)
+
+    def _peindre(self, sq, montrer_dernier, montrer_coups):
+        """Repeint le calque ; renvoie les cases touchees (a recopier)."""
         t = self._theme()
         calque = self._calque_pour(8 * sq)
-        dessine = False
+        zones = []
 
-        montrer_dernier = apparence.reglage("surbrillance_dernier_coup", True)
         # 1. Dernier coup joue (sous tout le reste).
         for case in (self.last_move_from, self.last_move_to):
             if case is not None and montrer_dernier:
                 pygame.draw.rect(calque, t["dernier"], self._rect_local(case, sq))
-                dessine = True
+                zones.append(self._rect_local(case, sq))
 
         # 2. Case selectionnee.
         if self.selected_square is not None:
             pygame.draw.rect(calque, t["selection"],
                              self._rect_local(self.selected_square, sq))
-            dessine = True
+            zones.append(self._rect_local(self.selected_square, sq))
 
         # 3. Roi en echec.
         if self.case_echec is not None:
             rect = self._rect_local(self.case_echec, sq)
             pygame.draw.rect(calque, t["echec"], rect, max(3, sq // 16))
-            dessine = True
+            zones.append(rect)
 
         # 4. Coups possibles : pastille sur une case vide, anneau sur une prise.
         #    V8 : reglable aussi. Ceux qui jouent en club s'en passent, et
         #    c'est le seul moyen de voir l'echiquier exactement comme sur une
         #    vraie table.
-        montrer_coups = apparence.reglage("points_coups_possibles", True)
         plateau = self.chessboard.board
         for coup in (self.legal_moves if montrer_coups else ()):
             rect = self._rect_local(coup.to_square, sq)
@@ -124,14 +144,13 @@ class Highlights:
                                    sq // 2 - 3, max(4, sq // 13))
             else:
                 pygame.draw.circle(calque, t["coup"], rect.center, max(5, sq // 6))
-            dessine = True
+            zones.append(rect)
 
         # 5. Cases fournies en simple numero (ancien format).
         if montrer_coups and not self.legal_moves and self.cases_atteignables:
             for case in self.cases_atteignables:
                 rect = self._rect_local(case, sq)
                 pygame.draw.circle(calque, t["coup"], rect.center, max(5, sq // 6))
-                dessine = True
+                zones.append(rect)
 
-        if dessine:
-            screen.blit(calque, (geo.ORIGINE_X, geo.ORIGINE_Y))
+        return zones

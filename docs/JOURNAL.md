@@ -761,3 +761,22 @@ Fait (mesuré sur le PC de Julien, i7-8700K, avant → après) :
 - [ ] t72 : partie contre l'ordinateur : tout reste fluide (pièces, flèches, pendule, coups de l'ordinateur).
 - [ ] t73 : Gestionnaire des tâches → SickChess pendant une partie où personne ne joue : bien moins qu'avant.
 - [ ] t74 : Ouvertures et Problèmes : la progression et les records s'affichent et se mettent à jour.
+
+## 23/10/2026 (18) – Banc d'essai : derniers constats « Corriger » (Claude Code)
+Fait (PC de Julien, banc complet avant → après) :
+- **Revue** 5,3 → 2,5 ms/image : meilleurs coups gardés en mémoire (`analyse_partie.meilleurs_depuis_lignes`,
+  calculés deux fois par image avant) ; flèches gardées en mémoire, rognées à leur taille (`board_render._fleche`).
+- **Partie** 3,5 → 1,9 ms/image, **processeur au repos 17 → 9 % d'un cœur** : damier uni dessiné une fois ;
+  coordonnées par la mémoire des textes (`ui.rendu_texte`) ; surlignages (dernier coup, sélection, coups
+  possibles) repeints seulement quand ils changent, et seules les cases concernées recopiées.
+- Captures vérifiées : plateau, surlignages et coordonnées identiques à avant (a1 sombre, h1 clair).
+- `publier/` et `build_amis/` supprimés (770 Mo, accord de Julien) ; `publier/maj.json` gardé (numéro de la
+  version amis suivante).
+- Banc complet : **tout vert** sauf Ménage (orange, rien de marqué « Corriger » hormis les fichiers en double,
+  voulus). 634 contrôles verts.
+- Reste à Julien : passer « Fichiers en double » en OK ; dire quand pousser (4 commits d'avance).
+
+À vérifier par Julien :
+- [ ] t75 : revue : flèches des meilleurs coups, surlignages et pastilles comme avant ; défilement fluide.
+- [ ] t76 : partie : cliquer une pièce montre ses coups possibles ; le dernier coup reste surligné ;
+  plateau retourné (F) correct.

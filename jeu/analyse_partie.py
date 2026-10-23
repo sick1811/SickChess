@@ -1184,10 +1184,31 @@ def lignes_du_moteur(fen, details):
     return classees
 
 
+# 23/10 (banc d'essai) : la revue demandait les meilleurs coups deux fois par
+# image (notation des coups + suites). Meme position et memes lignes = meme
+# reponse : on la garde (cle = la position et les lignes elles-memes).
+_MEILLEURS = {}
+
+
 def meilleurs_depuis_lignes(fen, lignes, maximum=3):
     """Voir AnalyseurPartie.meilleurs_coups."""
     if not lignes:
         return []
+    try:
+        cle = (fen, maximum, tuple((l[0], l[1], l[2], tuple(l[3] or ())) for l in lignes))
+    except Exception:
+        cle = None
+    if cle is not None and cle in _MEILLEURS:
+        return [dict(c, suite_san=list(c["suite_san"])) for c in _MEILLEURS[cle]]
+    choisis = _calculer_meilleurs(fen, lignes, maximum)
+    if cle is not None:
+        if len(_MEILLEURS) >= 2000:
+            _MEILLEURS.clear()
+        _MEILLEURS[cle] = [dict(c, suite_san=list(c["suite_san"])) for c in choisis]
+    return choisis
+
+
+def _calculer_meilleurs(fen, lignes, maximum):
     texte_eval = AnalyseurPartie.texte_d_une_evaluation
     blancs = chess.Board(fen).turn == chess.WHITE
 

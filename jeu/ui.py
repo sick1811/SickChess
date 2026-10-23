@@ -264,6 +264,11 @@ def _taille_de(pol, chaine):
     return taille
 
 
+def rendu_texte(chaine, taille, couleur, gras=False, mono=False):
+    """Un texte dessine, garde en memoire (ne pas modifier l'image rendue)."""
+    return _rendu_de(police(taille, gras, mono), str(chaine), couleur)
+
+
 def _rendu_de(pol, chaine, couleur):
     """Texte dessine (a ne pas modifier : la meme image resert)."""
     try:
