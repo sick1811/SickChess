@@ -372,6 +372,43 @@ def verifier_en_arriere_plan():
     return _FOND["maj"]
 
 
+# 23/10 - MISE A JOUR AUTOMATIQUE (demande de Julien : « il se met a jour a chaque
+# nouvelle modification »). Dans le menu, une nouvelle version publiee est
+# telechargee toute seule, puis installee (le jeu redemarre) - jamais pendant une
+# partie, puisque seul le menu appelle ceci. Reglage "maj_auto" de config.json
+# (vrai par defaut). Le jeu reverifie toutes les 20 minutes s'il reste ouvert.
+REVERIFIER_TOUTES_LES = 20 * 60
+ATTENTE_AVANT_REDEMARRAGE = 3.0
+
+
+def pas_automatique(maj, config, maintenant, etat_auto):
+    """Un pas de la mise a jour automatique, appele a chaque image du menu.
+    etat_auto : petit dict garde par l'appelant ({} au depart).
+    Renvoie (action, libelle) : action = None | "telecharger" | "installer" |
+    "verifier" ; libelle = texte du bouton du menu, ou None (libelle normal)."""
+    if maj is None or not (config or {}).get("maj_auto", True):
+        return None, None
+    etat = maj.etat
+    if etat == "disponible":
+        return "telecharger", "Mise à jour : téléchargement…"
+    if etat == "telechargement":
+        return None, "Mise à jour : %d %%" % int(100 * maj.progression())
+    if etat == "pret":
+        depuis = etat_auto.setdefault("pret_depuis", maintenant)
+        if maintenant - depuis >= ATTENTE_AVANT_REDEMARRAGE:
+            if etat_auto.get("installation_lancee"):
+                return None, "Nouvelle version : redémarrage…"
+            etat_auto["installation_lancee"] = True      # une seule tentative
+            return "installer", "Nouvelle version : redémarrage…"
+        return None, "Nouvelle version prête : redémarrage…"
+    if etat in ("a_jour", "erreur"):
+        derniere = etat_auto.setdefault("verifie_le", maintenant)
+        if maintenant - derniere >= REVERIFIER_TOUTES_LES:
+            etat_auto["verifie_le"] = maintenant
+            return "verifier", None
+    return None, None
+
+
 def disponible():
     """Vrai si la verification de fond a trouve une mise a jour."""
     maj = _FOND["maj"]

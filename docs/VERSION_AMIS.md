@@ -31,8 +31,28 @@ pour une correction. Tes amis gardent leurs parties, profil et réglages.
    La première fois, PyInstaller fabrique l'exe (2 à 5 min). Ensuite, l'exe n'est refait
    que si `SickChess.py`, la recette ou les bibliothèques changent.
 
-## Pour un nouvel ami
+## Pour un nouvel ami : l'installeur (23/10)
 Envoie-lui une fois ce lien (il donne toujours la dernière version) :
+`https://github.com/sick1811/SickChess-amis/releases/latest/download/SickChess_Installation.exe`
+- Double-clic : **aucune demande d'administrateur**, le jeu s'installe dans ses programmes
+  (`%LOCALAPPDATA%\Programs\SickChess`, un dossier où la mise à jour peut écrire) avec une
+  **icône sur le Bureau** et dans le menu Démarrer. Désinstallation par Windows (Paramètres →
+  Applications) ; ses parties et son profil ne sont pas effacés.
+- Contient le programme, le jeu et Stockfish : on joue contre l'ordinateur et en ligne tout de
+  suite. Problèmes et tables de finales arrivent seuls par la mise à jour automatique.
+- Fabriqué par `CONSTRUIRE_VERSION_AMIS.bat` si **Inno Setup** est installé
+  (une fois : `winget install JRSoftware.InnoSetup`). Recette : `outils/installeur_amis.iss`.
+
+## Mise à jour automatique (23/10)
+Dès qu'une nouvelle version est publiée, le jeu de l'ami, **quand il est dans le menu**,
+la télécharge tout seul (« Mise à jour : 42 % »), puis redémarre dessus. Jamais en pleine
+partie. S'il reste ouvert, il revérifie toutes les 20 minutes. Pour couper :
+`"maj_auto": false` dans son config.json.
+→ Chaque fois que tu publies (`CONSTRUIRE_VERSION_AMIS.bat`), tous tes amis l'ont dans
+l'heure, sans rien faire.
+
+## Pour un nouvel ami : le zip (ancienne façon, toujours valable)
+Lien :
 `https://github.com/sick1811/SickChess-amis/releases/latest/download/SickChess_amis.zip`
 Il dézippe, lance SickChess.exe, clique **Mise à jour** : le moteur, les problèmes et les
 tables de finales se téléchargent (~700 Mo, une fois). Mode d'emploi : `LISEZ-MOI_AMIS.txt`.
@@ -41,8 +61,20 @@ tables de finales se téléchargent (~700 Mo, une fois). Mode d'emploi : `LISEZ-
 - **Dépôt public** = quelqu'un qui a le lien peut télécharger le jeu. Pour des versions de
   test entre amis, c'est le plus simple. Avant la vente, on pourra passer sur un
   hébergement privé : il suffit de changer l'adresse dans `outils/maj_config.json`.
-- **Windows SmartScreen** affichera « Windows a protégé votre ordinateur » (jeu non signé) :
-  « Informations complémentaires » → « Exécuter quand même ».
+- **Windows SmartScreen et les antivirus** : on ne « contourne » pas la sécurité de Windows,
+  on fait en sorte que le jeu soit reconnu comme un vrai programme :
+  - déjà fait : exe en dossier (pas d'exe « tout-en-un » qui se décompresse, souvent pris pour
+    un virus), pas de compression UPX, nom / éditeur / version renseignés dans SickChess.exe
+    et dans l'installeur, installation sans droits d'administrateur ;
+  - ce qui reste sans signature : « Windows a protégé votre ordinateur » → « Informations
+    complémentaires » → « Exécuter quand même ». L'avertissement disparaît peu à peu quand
+    assez de gens ont installé le même fichier ;
+  - pour le supprimer vraiment : **signer** l'exe et l'installeur avec un certificat de
+    signature de code (payant, quelques dizaines à quelques centaines d'euros par an), puis
+    régler `"signature"` dans `outils/maj_config.json` ; `publier_maj.py` signe alors tout seul ;
+  - un antivirus bloque à tort ? Envoyer le fichier à Microsoft comme « faux positif » :
+    https://www.microsoft.com/wdsi/filesubmission ;
+  - sur **Steam**, rien de tout ça : Steam installe le jeu lui-même.
 - Le bouton « Mise à jour » n'apparaît **que** dans la version amis (là où il y a
   `paquets_installes.json`), jamais quand tu lances le jeu depuis les sources.
 - La version Steam n'en aura pas besoin : Steam fait les mises à jour lui-même.

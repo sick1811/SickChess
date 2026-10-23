@@ -39,8 +39,12 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
   Une série seule : `python tests/test_revue.py`. Tout doit être vert avant un commit.
 - Captures des écrans (pour juger le graphisme) : `python tests/captures_ecrans.py`
   → `tests/ecrans/`.
-- Version amis (exe + bouton « Mise à jour ») : `CONSTRUIRE_VERSION_AMIS.bat`
-  → `outils/publier_maj.py` ; voir `docs/VERSION_AMIS.md`.
+- Version amis : `CONSTRUIRE_VERSION_AMIS.bat` → `outils/publier_maj.py` : exe, paquets,
+  zip et **installeur `SickChess_Installation.exe`** (Inno Setup), publiés sur GitHub ; le jeu
+  des amis se met à jour **tout seul** dans le menu. Voir `docs/VERSION_AMIS.md` et la skill
+  `version-amis`. **Demande de Julien : publier une version amis à la fin de chaque séance
+  où le jeu a changé et où tout est vert.**
+- Jeu en ligne : `python outils/verifier_en_ligne.py` (Steam ouvert) → `docs/VERIFICATION_EN_LIGNE.md`.
 - **Banc d'essai : `python outils/banc_essai.py`** (bugs, vitesse, processeur, mémoire,
   Stockfish, ménage, conflits ; `--rapide`, `--sections vitesse,menage`) → `docs/BANC_ESSAI.md`
   et `tests/banc_essai.json`. Page à cocher : « SickChess – Banc d'essai »
@@ -89,6 +93,7 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
 `seance-sickchess` (déroulé d'une séance) · `compiler-exe` (PyInstaller) ·
 `verifier-echecs` (règles et analyse justes) · `captures-steam` (images de la page Steam) ·
 `banc-essai` (mesures et décisions de Julien) · `performance-pygame` (processeur, carte
-graphique, Stockfish) · `menage-code` (code et fichiers inutiles, sans rien casser).
+graphique, Stockfish) · `menage-code` (code et fichiers inutiles, sans rien casser) · `version-amis` (installeur,
+publication, mise à jour automatique, vérification en ligne).
 Agents (`.claude/agents/`) : `testeur` (cherche les bugs), `relecteur-interface` (graphisme),
 `optimiseur` (cherche les lenteurs et chiffre les gains).

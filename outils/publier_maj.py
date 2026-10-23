@@ -199,7 +199,90 @@ def construire_exe(racine):
     resultat = subprocess.run(commande, cwd=racine)
     if resultat.returncode != 0:
         raise SystemExit("PyInstaller a echoue : regarde les messages au-dessus.")
-    return os.path.join(DOSSIER_BUILD, "dist", "SickChess")
+    dist = os.path.join(DOSSIER_BUILD, "dist", "SickChess")
+    signer([os.path.join(dist, "SickChess.exe")])
+    return dist
+
+
+# ---------------------------------------------------------------- signature
+
+def signer(chemins):
+    """Signe les fichiers si une signature est reglee dans outils/maj_config.json :
+        "signature": {"commande": ["signtool", "sign", "/fd", "SHA256",
+                                   "/tr", "http://timestamp.digicert.com", "/td", "SHA256", "/a"]}
+    (certificat de signature de code installe sur le PC). Sans reglage : rien, le jeu
+    marche quand meme, Windows affichera seulement « editeur inconnu »."""
+    commande = (lire_config().get("signature") or {}).get("commande")
+    if not commande:
+        return False
+    for chemin in chemins:
+        if os.path.exists(chemin):
+            r = subprocess.run(list(commande) + [chemin])
+            dire("  signature %s : %s" % (os.path.basename(chemin),
+                                          "OK" if r.returncode == 0 else "ECHEC"))
+    return True
+
+
+# ---------------------------------------------------------------- installeur
+
+ISS = os.path.join(RACINE, "outils", "installeur_amis.iss")
+
+
+def trouver_iscc():
+    """Le compilateur d'Inno Setup (winget install JRSoftware.InnoSetup)."""
+    for nom in ("ISCC", "iscc"):
+        if shutil.which(nom):
+            return shutil.which(nom)
+    for variable, sous in (("ProgramFiles(x86)", ""), ("ProgramFiles", ""),
+                           ("LOCALAPPDATA", "Programs")):
+        base = os.environ.get(variable)
+        if base:
+            chemin = os.path.join(base, sous, "Inno Setup 6", "ISCC.exe")
+            if os.path.exists(chemin):
+                return chemin
+    return None
+
+
+def _installeur(manifeste, contenus, racine, dist, sortie, depot):
+    """SickChess_Installation.exe : installeur Windows pour un NOUVEL ami
+    (programme + jeu + moteur : on peut jouer contre l'ordinateur et en ligne
+    tout de suite ; problemes et finales arrivent par la mise a jour)."""
+    iscc = trouver_iscc()
+    if iscc is None:
+        dire("  (Installeur non fabrique : Inno Setup absent. Pour l'avoir :"
+             " winget install JRSoftware.InnoSetup)")
+        return None
+    programme = contenus.get("programme")
+    if programme is None:
+        dossier = dist or os.path.join(DOSSIER_BUILD, "dist", "SickChess")
+        if not os.path.isdir(dossier):
+            dire("  (Installeur non fabrique : l'exe n'est pas dans build_amis/.)")
+            return None
+        programme = fichiers_du_paquet(dossier, sorted(os.listdir(dossier)))
+    scene = os.path.join(DOSSIER_BUILD, "installeur", "SickChess")
+    shutil.rmtree(os.path.dirname(scene), ignore_errors=True)
+    inclus = ["programme", "jeu"] + (["moteur"] if contenus.get("moteur") else [])
+    for absolu, nom in programme + (contenus.get("jeu") or []) + (contenus.get("moteur") or []):
+        cible = os.path.join(scene, nom)
+        os.makedirs(os.path.dirname(cible), exist_ok=True)
+        shutil.copy2(absolu, cible)
+    installe = {"source": url_manifeste(depot), "numero": manifeste["numero"],
+                "version": manifeste["version"],
+                "paquets": {n: manifeste["paquets"][n]["empreinte"]
+                            for n in inclus if n in manifeste["paquets"]}}
+    with open(os.path.join(scene, "paquets_installes.json"), "w", encoding="utf-8") as f:
+        json.dump(installe, f, indent=2, ensure_ascii=False)
+    dire("  installeur : Inno Setup compresse le jeu (1 a 3 minutes)...")
+    r = subprocess.run([iscc, "/Q", "/DVersion=%s" % manifeste["version"],
+                        "/DNumero=%d" % manifeste["numero"], "/DSource=%s" % scene,
+                        "/DSortie=%s" % sortie, ISS])
+    chemin = os.path.join(sortie, "SickChess_Installation.exe")
+    if r.returncode != 0 or not os.path.exists(chemin):
+        dire("  (Installeur : Inno Setup a echoue, voir les messages au-dessus.)")
+        return None
+    signer([chemin])
+    dire("  SickChess_Installation.exe (nouvel ami) : %s" % _mo(os.path.getsize(chemin)))
+    return chemin
 
 
 # ---------------------------------------------------------------- publication
@@ -287,6 +370,9 @@ def publier(notes, racine=RACINE, dossier_publier=DOSSIER_PUBLIER, dist=None,
     installation = _zip_installation(manifeste, contenus, racine, dist, sortie, depot)
     if installation:
         a_envoyer.append(installation)
+    installeur = _installeur(manifeste, contenus, racine, dist, sortie, depot)
+    if installeur:
+        a_envoyer.append(installeur)
 
     dire()
     dire("Fichiers prets dans %s" % sortie)
@@ -362,8 +448,10 @@ def _envoyer_sur_github(depot, etiquette, manifeste, fichiers, sortie):
                     "--notes", notes, "--latest"], check=True)
     dire()
     dire("C'est en ligne. Tes amis n'ont plus qu'a cliquer sur \"Mise a jour\".")
-    dire("Lien pour un nouvel ami : https://github.com/%s/releases/latest/download/"
-         "SickChess_amis.zip" % depot)
+    dire("Lien pour un nouvel ami (installeur) : https://github.com/%s/releases/latest/"
+         "download/SickChess_Installation.exe" % depot)
+    dire("  (ou le zip : https://github.com/%s/releases/latest/download/SickChess_amis.zip)"
+         % depot)
 
 
 def main():

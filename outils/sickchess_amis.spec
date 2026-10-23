@@ -53,6 +53,38 @@ a.pure = [entree for entree in a.pure
 
 pyz = PYZ(a.pure)
 
+# Identite du programme (editeur, produit, version) : un exe qui s'annonce clairement
+# est moins souvent pris pour un programme suspect par Windows et les antivirus.
+_fichier_version = None
+try:
+    import re as _re
+    from PyInstaller.utils.win32.versioninfo import (FixedFileInfo, StringFileInfo, StringStruct,
+                                                     StringTable, VarFileInfo, VarStruct,
+                                                     VSVersionInfo)
+    with open(os.path.join(RACINE, "SickChess.py"), encoding="utf-8") as _f:
+        _trouve = _re.search(r'^VERSION\s*=\s*"([^"]+)"', _f.read(), _re.M)
+    _version = _trouve.group(1) if _trouve else "0.0.0"
+    _nombres = tuple((list(int(x) for x in _re.findall(r"\d+", _version)) + [0, 0, 0, 0])[:4])
+    _infos = VSVersionInfo(
+        ffi=FixedFileInfo(filevers=_nombres, prodvers=_nombres),
+        kids=[StringFileInfo([StringTable("040C04B0", [
+            StringStruct("CompanyName", "sick1811"),
+            StringStruct("FileDescription", "SickChess - jeu d'échecs"),
+            StringStruct("FileVersion", _version),
+            StringStruct("InternalName", "SickChess"),
+            StringStruct("LegalCopyright", "sick1811"),
+            StringStruct("OriginalFilename", "SickChess.exe"),
+            StringStruct("ProductName", "SickChess"),
+            StringStruct("ProductVersion", _version)])]),
+            VarFileInfo([VarStruct("Translation", [0x040C, 1200])])])
+    _fichier_version = os.path.join(RACINE, "build_amis", "version_info.txt")
+    os.makedirs(os.path.dirname(_fichier_version), exist_ok=True)
+    with open(_fichier_version, "w", encoding="utf-8") as _f:
+        _f.write(str(_infos))
+except Exception as _souci:   # jamais bloquant : l'exe se fait sans fiche
+    print("[SPEC] fiche de version non faite : %s" % _souci)
+    _fichier_version = None
+
 _icone = os.path.join(RACINE, "assets", "icone.ico")
 exe = EXE(
     pyz,
@@ -63,6 +95,7 @@ exe = EXE(
     icon=_icone if os.path.exists(_icone) else None,
     console=False,
     upx=False,
+    version=_fichier_version,
 )
 
 coll = COLLECT(exe, a.binaries, a.datas, name="SickChess", upx=False)

@@ -16,7 +16,7 @@
 import json
 import os
 
-VERSION_RECETTE = "18/10/2026"
+VERSION_RECETTE = "23/10/2026"
 
 # (section, [(id, a faire, ce qu'on doit voir)])
 RECETTE = [
@@ -229,14 +229,22 @@ RECETTE = [
          "La partie y est (avec ton camp et le résultat) et se revoit avec l'analyse ; l'Elo ne bouge pas."),
         ("R-103", "Revanche, abandon, un joueur qui ferme le jeu",
          "Revanche couleurs inversées ; abandon et départ donnent le bon résultat."),
+        ("R-106", "Ton ami (SickChess déjà OUVERT) accepte ton invitation Steam, ou tape le code",
+         "Il arrive dans ton salon en quelques secondes ; avec le numéro de test 480, accepter quand SickChess est fermé ouvrirait « Spacewar » : c'est normal."),
+        ("R-107", "Claude Code : python outils/verifier_en_ligne.py (Steam ouvert)",
+         "Fichiers, connexion Steam, salon créé avec son code, tests réseau : tout en ✅ dans docs/VERIFICATION_EN_LIGNE.md."),
     ]),
     ("Version amis et mises à jour", [
         ("R-110", "CONSTRUIRE_VERSION_AMIS.bat",
-         "Une version est fabriquée ; SickChess_amis.zip est le seul fichier à donner."),
+         "Une version est fabriquée ; SickChess_Installation.exe (ou SickChess_amis.zip) est le fichier à donner à un nouvel ami."),
         ("R-111", "Sur un PC sans Python : dézipper, lancer SickChess.exe",
          "Le jeu démarre ; Windows ne le bloque pas (ou propose « Exécuter quand même »)."),
         ("R-112", "Bouton Mise à jour après une nouvelle version",
          "Il s'allume, ne télécharge que ce qui a changé, garde profil et réglages."),
+        ("R-113", "Chez un ami : double-clic sur SickChess_Installation.exe",
+         "Aucune demande d'administrateur ; installation dans ses programmes, icône sur le Bureau ; le jeu démarre et on peut jouer contre l'ordinateur tout de suite. (Si Windows prévient « éditeur inconnu » : Informations complémentaires → Exécuter quand même.)"),
+        ("R-114", "Publier une nouvelle version, l'ami ouvre le jeu et reste dans le menu",
+         "Le bouton affiche « Mise à jour : X % », puis « Nouvelle version prête », le jeu redémarre tout seul sur la nouvelle version ; profil et parties gardés ; jamais de redémarrage en pleine partie."),
     ]),
     ("Solidité", [
         ("R-120", "Renommer moteur/stockfish.exe puis lancer une partie contre l'ordinateur",

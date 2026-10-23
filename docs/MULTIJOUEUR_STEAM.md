@@ -6,8 +6,11 @@
   - depuis la **liste de tes amis Steam** affichée dans le jeu (bouton *Inviter*) ;
   - avec la **fenêtre d'invitation Steam** (overlay, Maj+Tab) ;
   - ou en lui donnant le **code** de la partie (bouton *Copier*).
-- **Ton ami accepte l'invitation** dans Steam : le jeu s'ouvre (ou, s'il est déjà
-  ouvert, passe tout seul au salon). Il peut aussi taper le code.
+- **Ton ami accepte l'invitation** dans Steam **avec SickChess déjà ouvert** : le jeu passe
+  tout seul au salon. Il peut aussi taper le code.
+  ⚠️ Tant que le jeu utilise le numéro de test 480, accepter une invitation quand SickChess
+  est **fermé** fait lancer « Spacewar » par Steam (le jeu de test de Valve), pas SickChess.
+  Avec le vrai numéro Steam du jeu, l'invitation ouvrira SickChess directement.
 - Quand il est là, tu cliques **Lancer la partie**.
 - Pendant la partie : chat (onglet CHAT), pendules synchronisées, abandon.
 - À la fin : **Revanche** (couleurs inversées) ou **Menu**.
@@ -33,6 +36,10 @@ Et le **client Steam ouvert et connecté**.
    peut pas faire tourner deux comptes Steam). Avec le numéro 480, Steam affiche
    que vous jouez à « Spacewar » : c'est normal.
 3. Tests automatiques : `python tests/test_multijoueur.py`.
+4. **Vérification complète sur ce PC** (Claude Code, Steam ouvert) :
+   `python outils/verifier_en_ligne.py` (ou `--dossier "<dossier installé>"` pour la version
+   amis) → fichiers, connexion Steam, salon et code, tests réseau ; résultat dans
+   `docs/VERIFICATION_EN_LIGNE.md`.
 
 ## Avant la sortie
 - `MODE_TEST = False` dans `jeu/salon_en_ligne.py` (cache les boutons de test).

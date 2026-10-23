@@ -164,13 +164,29 @@ class GameManager:
         self.menu.redimensionner(*self.screen.get_size())
 
     def _badge_maj(self):
-        """Le bouton s'allume quand une nouvelle version est en ligne."""
+        """Le bouton s'allume quand une nouvelle version est en ligne. En mise a
+        jour automatique (par defaut), le menu telecharge et installe tout seul."""
         if self.maj is None:
             return
+        import time as _time
+        if not hasattr(self, "_maj_auto"):
+            self._maj_auto = {}
+        action, libelle_auto = mise_a_jour.pas_automatique(
+            self.maj, self.config, _time.time(), self._maj_auto)
+        if action == "telecharger":
+            self.maj.telecharger()
+        elif action == "verifier":
+            self.maj.verifier()
+        elif action == "installer":
+            if self.maj.lancer_installation():
+                self.quitter()          # _maj.bat installe puis relance le jeu
         for bouton in self.menu.boutons:
             if bouton.cle == "mise_a_jour":
-                dispo = self.maj.etat in ("disponible", "pret")
-                bouton.libelle = "Mise à jour disponible !" if dispo else "Mise à jour"
+                dispo = self.maj.etat in ("disponible", "telechargement", "pret")
+                if libelle_auto:
+                    bouton.libelle = libelle_auto
+                else:
+                    bouton.libelle = "Mise à jour disponible !" if dispo else "Mise à jour"
                 bouton.selectionne = dispo
 
     def ouvrir_mise_a_jour(self):

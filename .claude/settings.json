@@ -13,7 +13,10 @@
       "Bash(python outils/banc_essai.py*)",
       "Bash(python -m ruff *)",
       "Bash(python -m vulture *)",
-      "Bash(py-spy *)"
+      "Bash(py-spy *)",
+      "Bash(py outils/publier_maj.py*)",
+      "Bash(python outils/publier_maj.py*)",
+      "Bash(python outils/verifier_en_ligne.py*)"
     ],
     "deny": [
       "Bash(git push --force*)",

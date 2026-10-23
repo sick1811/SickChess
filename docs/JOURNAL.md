@@ -437,6 +437,40 @@ Fait :
   Ouvertures 15 ms/image. Décisions de Julien : 18 constats « corriger », 2 « ignorer »
   (fonctions peut-être mortes, `fond_anime.py`).
 
+## 23/10/2026 (soir) – Installeur amis, mise à jour automatique, vérification en ligne (Cowork)
+Demande de Julien : « un installeur .exe pour les amis qui évite les détections Windows, sur le
+Bureau, et qu'on puisse jouer ensemble ; le mode en ligne est important, vérifie qu'il
+fonctionne » ; puis « il se met à jour à chaque nouvelle modification ».
+Fait :
+- **Installeur** `SickChess_Installation.exe` (Inno Setup, `outils/installeur_amis.iss`) fabriqué et
+  publié par `outils/publier_maj.py` : programme + jeu + Stockfish, installation pour l'utilisateur
+  sans administrateur dans `%LOCALAPPDATA%\Programs\SickChess` (dossier où la mise à jour peut
+  écrire), icône Bureau + menu Démarrer, désinstallation Windows (parties gardées).
+- **Windows / antivirus, sans rien cacher** : fiche d'identité de SickChess.exe (éditeur, produit,
+  version) dans `outils/sickchess_amis.spec` (sans risque : si elle échoue, l'exe se fait sans),
+  installeur renseigné, exe en dossier sans UPX, signature automatique si un certificat est
+  réglé (`"signature"` dans `outils/maj_config.json`). Sans certificat, « éditeur inconnu »
+  reste affiché une fois (Informations complémentaires → Exécuter quand même).
+- **Mise à jour automatique** : dans le menu, une version publiée se télécharge seule
+  (« Mise à jour : 42 % ») puis le jeu redémarre dessus ; jamais en pleine partie ; revérifie
+  toutes les 20 min ; `"maj_auto": false` pour couper. `mise_a_jour.pas_automatique` +
+  `game_manager._badge_maj` ; `tests/test_maj_auto.py` (13 contrôles).
+  Règle ajoutée (CLAUDE.md, skills) : Claude Code publie une version amis à la fin de chaque séance
+  où le jeu a changé et où tout est vert.
+- **En ligne vérifié autant que possible ici** : relecture de `jeu/steam.py` (relais de Valve,
+  sessions acceptées, salons réservés aux amis) ; tests réseau verts (multijoueur 41, nulle 15).
+  **Piège trouvé** : avec le numéro de test 480, accepter une invitation quand SickChess est fermé
+  fait lancer « Spacewar » par Steam → l'ami ouvre SickChess d'abord (ou tape le code). Doc et
+  LISEZ-MOI_AMIS corrigés. Nouveau `outils/verifier_en_ligne.py` (fichiers, Steam, salon + code,
+  tests réseau) à lancer sur Windows → `docs/VERIFICATION_EN_LIGNE.md`.
+- Skill `version-amis` (fabriquer, installer l'essai en silence, vérifier, publier). Recette :
+  R-106, R-107, R-113, R-114 (106 tests). 550 contrôles rapides verts (Cowork).
+
+À vérifier par Julien (page « À faire », v01 à v04) :
+- [ ] Claude Code : installer Inno Setup + GitHub CLI ; « Vérifie le jeu en ligne » ;
+  « Fais la version amis avec l'installeur, vérifie-la, puis publie ».
+- [ ] Une vraie partie en ligne avec un ami sur deux PC.
+
 ## Bugs connus (repris de « a debug.txt »)
 - [x] Pendule ne clignote pas à 30 s → fonctionne (testé).
 - [x] Fin de partie à 00:00 → corrigé (affichage du temps final).

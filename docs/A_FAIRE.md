@@ -58,6 +58,36 @@ Mesures faites dans Cowork (machine Linux plus lente) : à refaire sur le PC de 
   précision des pastilles, mode « petit PC », vérification avant chaque version, lisibilité
   (daltoniens, petits écrans), niveaux de l'ordinateur calibrés en vrai Elo. Julien choisit.
 
+## Version amis et jeu en ligne (23/10 soir) – AVANT les travaux p30…
+1. [ ] Claude Code : `winget install JRSoftware.InnoSetup` et `winget install GitHub.cli` + `gh auth login`.
+2. [ ] Claude Code : `python outils/verifier_en_ligne.py` (Steam ouvert) → tout ✅.
+3. [ ] Claude Code : version amis avec installeur (skill `version-amis`) : essai silencieux, lancement,
+       vérification en ligne sur le dossier d'essai, puis publication ; donner le lien à Julien.
+4. [ ] Julien + un ami : vraie partie en ligne sur deux PC (R-102 à R-107).
+5. [ ] Plus tard (avant la vente) : certificat de signature de code → `"signature"` dans maj_config.json.
+
+## Travaux choisis par Julien le 23/10 (statut « veux ») – ORDRE DES SÉANCES
+Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/après, recette mise
+à jour, tests pour Julien dans la page « À faire ». Phrase à Claude Code : « fais le travail pXX ».
+1. [ ] **p30 – Banque de positions** (`tests/positions_revue.json`, 50–100 positions : vrais
+       sacrifices, vraies gaffes, mats, finales Syzygy, + m04 « bon sacrifice ») ; 8e contrôle
+       « precision » du banc d'essai. À faire en premier : protège tout le reste.
+2. [ ] **p29 – Rapport de plantage** (erreur + fin du journal gardées, proposées au lancement
+       suivant via « Signaler »), puis **p28 – Test d'endurance** (`outils/endurance.py` : robot
+       2 h, mémoire, plantages, ralentissements ; section « endurance » du banc, hors --rapide).
+3. [ ] **p32 – Vérification avant chaque version** (`outils/verifier_version.py`, appelé par
+       CONSTRUIRE_VERSION_AMIS.bat : tests, banc, MODE_TEST, appid, licences, version, .exe neuf).
+4. [ ] **p31 – Mode « petit PC »** (détection cœurs / mémoire au 1er lancement → puissance
+       d'analyse, hachage, animations ; modifiable dans Options).
+5. [ ] **p34 – Niveaux en vrai Elo** (matchs automatiques contre des références, à lancer la nuit
+       sur le PC de Julien ; table de calibrage dans le code, test qui la vérifie).
+6. [ ] **p27 – Résumé du coach immédiat** (carte de fin : ouverture, plus gros moment, précision
+       provisoire, comparaison avec les 10 dernières parties).
+7. [ ] **p33 – Lisibilité pour tous** (pastilles reconnaissables sans couleur, contrastes,
+       1366×768 et 4K ; relecteur-interface).
+Toujours en attente de décision : p21 Steamworks (le délai de 30 jours ne démarre qu'au paiement),
+p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
+
 ## Prochaines étapes (dans l'ordre)
 1. **Compilation en .exe** (PyInstaller, skill `compiler-exe`) – à faire dans Claude Code
    sur Windows.

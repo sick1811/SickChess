@@ -1,5 +1,5 @@
 {
- "version": "18/10/2026",
+ "version": "23/10/2026",
  "tests": [
   {
    "id": "R-001",
@@ -646,10 +646,24 @@
    "ordre": 11205
   },
   {
+   "id": "R-106",
+   "section": "En ligne (Steam)",
+   "texte": "Ton ami (SickChess déjà OUVERT) accepte ton invitation Steam, ou tape le code",
+   "detail": "Il arrive dans ton salon en quelques secondes ; avec le numéro de test 480, accepter quand SickChess est fermé ouvrirait « Spacewar » : c'est normal.",
+   "ordre": 11206
+  },
+  {
+   "id": "R-107",
+   "section": "En ligne (Steam)",
+   "texte": "Claude Code : python outils/verifier_en_ligne.py (Steam ouvert)",
+   "detail": "Fichiers, connexion Steam, salon créé avec son code, tests réseau : tout en ✅ dans docs/VERIFICATION_EN_LIGNE.md.",
+   "ordre": 11207
+  },
+  {
    "id": "R-110",
    "section": "Version amis et mises à jour",
    "texte": "CONSTRUIRE_VERSION_AMIS.bat",
-   "detail": "Une version est fabriquée ; SickChess_amis.zip est le seul fichier à donner.",
+   "detail": "Une version est fabriquée ; SickChess_Installation.exe (ou SickChess_amis.zip) est le fichier à donner à un nouvel ami.",
    "ordre": 11300
   },
   {
@@ -665,6 +679,20 @@
    "texte": "Bouton Mise à jour après une nouvelle version",
    "detail": "Il s'allume, ne télécharge que ce qui a changé, garde profil et réglages.",
    "ordre": 11302
+  },
+  {
+   "id": "R-113",
+   "section": "Version amis et mises à jour",
+   "texte": "Chez un ami : double-clic sur SickChess_Installation.exe",
+   "detail": "Aucune demande d'administrateur ; installation dans ses programmes, icône sur le Bureau ; le jeu démarre et on peut jouer contre l'ordinateur tout de suite. (Si Windows prévient « éditeur inconnu » : Informations complémentaires → Exécuter quand même.)",
+   "ordre": 11303
+  },
+  {
+   "id": "R-114",
+   "section": "Version amis et mises à jour",
+   "texte": "Publier une nouvelle version, l'ami ouvre le jeu et reste dans le menu",
+   "detail": "Le bouton affiche « Mise à jour : X % », puis « Nouvelle version prête », le jeu redémarre tout seul sur la nouvelle version ; profil et parties gardés ; jamais de redémarrage en pleine partie.",
+   "ordre": 11304
   },
   {
    "id": "R-120",
