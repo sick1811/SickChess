@@ -926,3 +926,18 @@ Fait :
 À vérifier par Julien :
 - [ ] R-102 à R-107 : vraie partie en ligne avec un ami (il ouvre SickChess AVANT d'accepter l'invitation),
   puis la fin de partie : précision, bouton Revue, revue complète.
+
+## 24/10/2026 (24) – GitHub toujours à jour (Claude Code)
+Demande de Julien : « redépose toutes les fonctionnalités travaillées en Cowork et avec Claude Code ; ça doit être
+mis en ligne dans le cloud à chaque modification acceptée localement ».
+- Vérifié : tout le travail (Cowork + Claude Code) était déjà sur GitHub (PC et GitHub au même commit) ;
+  hors GitHub, seulement ce qui doit y rester (parties, profil, sauvegardes, stockfish.exe, puzzles/,
+  syzygy/, fabrications, captures de tests).
+- **Envoi automatique** : `outils/git/post-commit` (crochet Git : après chaque commit, envoie la branche sur
+  GitHub, sans forcer, sans jamais bloquer ; journal `.git/envoi_github.log` ; `SICKCHESS_SANS_ENVOI=1`
+  pour un commit qui reste local) et `outils/git/installer_envoi_auto.py`. Essayé dans un dépôt jetable :
+  envoi réussi, envoi raté (commit gardé + message), envoi coupé.
+- Règle changée dans CLAUDE.md, le skill seance-sickchess, TRAVAILLER_AVEC_CLAUDE.md et CLAUDE_CLOUD.md.
+- Branche `seance-13-analyse-calcul-fixe` supprimée (fusionnée dans main le 18/10).
+À faire par Julien (une fois, la sécurité de Claude Code refuse qu'un crochet s'installe sans lui) :
+- [ ] `python outils/git/installer_envoi_auto.py` dans le dossier SickChess.

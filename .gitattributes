@@ -3,3 +3,4 @@
 
 # Scripts Linux (cloud, WSL) : toujours en fins de ligne Linux, sinon bash plante.
 *.sh text eol=lf
+outils/git/post-commit text eol=lf

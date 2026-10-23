@@ -1,0 +1,35 @@
+#!/bin/sh
+# outils/git/post-commit - SickChess : chaque commit accepte est envoye sur GitHub.
+#
+# Demande de Julien (24/10/2026) : « ca doit etre mis en ligne dans le cloud a
+# chaque modification acceptee localement ». Git lance ce fichier juste apres
+# chaque commit (installe dans .git/hooks par outils/git/installer_envoi_auto.py).
+#
+# - Envoie la branche en cours sur GitHub (origin), sans jamais forcer.
+# - Ne bloque jamais : si l'envoi echoue (pas d'Internet, Cowork sous Linux sans
+#   les identifiants de Julien, conflit), le commit reste sur le PC et un message
+#   l'explique ; l'envoi repartira au commit suivant (git push envoie tout ce qui
+#   manque).
+# - Journal : .git/envoi_github.log (date, branche, resultat).
+# - Pour couper une fois : SICKCHESS_SANS_ENVOI=1 git commit ...
+
+[ "${SICKCHESS_SANS_ENVOI:-}" = "1" ] && exit 0
+
+branche="$(git rev-parse --abbrev-ref HEAD 2>/dev/null)"
+[ -z "$branche" ] || [ "$branche" = "HEAD" ] && exit 0      # pas de branche (rebase...)
+git remote get-url origin >/dev/null 2>&1 || exit 0          # pas de GitHub configure
+
+journal="$(git rev-parse --git-dir)/envoi_github.log"
+date="$(date '+%d/%m/%Y %H:%M:%S')"
+commit="$(git log -1 --format='%h %s' | cut -c1-90)"
+
+# GIT_TERMINAL_PROMPT=0 : ne jamais rester bloque a demander un mot de passe.
+if sortie="$(GIT_TERMINAL_PROMPT=0 git push --quiet --set-upstream origin "$branche" 2>&1)"; then
+    echo "$date  OK      $branche  $commit" >> "$journal"
+    echo "[SickChess] Commit envoye sur GitHub ($branche)."
+else
+    echo "$date  ECHEC   $branche  $commit  :: $(echo "$sortie" | tr '\n' ' ' | cut -c1-200)" >> "$journal"
+    echo "[SickChess] Commit garde sur ce PC, PAS envoye sur GitHub : $(echo "$sortie" | head -1)"
+    echo "[SickChess] Il partira au prochain commit (ou : git push)."
+fi
+exit 0

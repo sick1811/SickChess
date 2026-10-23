@@ -44,7 +44,9 @@ Claude ce qu'il peut faire ; **sur le PC de Julien il ne fait rien**.
 
 ## Bon à savoir
 
-- Le cloud part de ce qui est **sur GitHub** : pousser d'abord les commits du PC.
+- Le cloud part de ce qui est **sur GitHub**. Sur le PC, chaque commit y part tout seul
+  (crochet `outils/git/post-commit`, voir `CLAUDE.md`) : le cloud voit donc toujours le
+  dernier travail accepté, de Cowork comme de Claude Code.
 - Le travail du cloud arrive sur une **branche** ; on la récupère sur le PC par une PR fusionnée
   (puis `git pull`) ou avec `claude --teleport`.
 - Les sessions cloud comptent dans la même limite d'usage que le reste de Claude.

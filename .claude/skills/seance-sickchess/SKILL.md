@@ -38,7 +38,8 @@ description: Déroulé d'une séance de travail sur SickChess (lire A_FAIRE et J
    (une ligne = une action concrète + ce qu'il doit observer).
 8. **Commit** : `git add` des fichiers touchés (jamais `profil.json`, `parties/`,
    gros fichiers), message en français : `SickChess : <ce qui change>`.
-   Pas de `git push` sans demande de Julien.
+   Le commit part seul sur GitHub (crochet post-commit) : vérifier le message
+   « [SickChess] Commit envoyé sur GitHub », sinon faire `git push`.
    Si le jeu a changé et que tout est vert : publier la version amis (skill `version-amis`),
    les amis la reçoivent automatiquement.
 9. **Finir** par un court message à Julien : ce qui change pour lui, et la liste des
