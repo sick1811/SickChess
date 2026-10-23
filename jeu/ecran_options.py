@@ -614,11 +614,13 @@ class EcranOptions:
 
     def run(self, clock=None):
         clock = clock or pygame.time.Clock()
+        cadence = ui.Cadence()       # 23/10 : 30 images/s au repos
         while True:
-            for event in pygame.event.get():
+            evenements = pygame.event.get()
+            for event in evenements:
                 reponse = self.handle_event(event)
                 if reponse:
                     return reponse
             self.draw()
             pygame.display.flip()
-            clock.tick(60)
+            clock.tick(cadence.suivante(evenements))

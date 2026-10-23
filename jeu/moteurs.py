@@ -37,6 +37,7 @@
 # tout ce qu'il avait, on ne fait que le partager au lieu de le recreer.
 
 import atexit
+import os
 import threading
 
 _verrou = threading.RLock()
@@ -47,6 +48,27 @@ _reglages_analyse = {}  # ce avec quoi le moteur d'analyse a ete configure
 def _fabriquer(chemin):
     from engine import StockfishEngine
     return StockfishEngine(chemin)
+
+
+def _priorite_basse(moteur):
+    """23/10 (surveillance en direct) : pendant la revue, les Stockfish
+    d'analyse prenaient les 12 processeurs et le jeu devait se battre avec eux
+    (PC a 100 %). En priorite basse, ils prennent tout ce qui est libre, mais
+    le jeu passe avant : il reste fluide. L'analyse ne perd presque rien."""
+    processus = getattr(moteur, "process", None)
+    if processus is None:
+        return False
+    try:
+        if os.name == "nt":
+            import ctypes
+            SOUS_LA_NORMALE = 0x00004000          # BELOW_NORMAL_PRIORITY_CLASS
+            return bool(ctypes.windll.kernel32.SetPriorityClass(
+                int(processus._handle), SOUS_LA_NORMALE))
+        os.setpriority(os.PRIO_PROCESS, processus.pid, 5)
+        return True
+    except Exception as e:
+        print("[MOTEURS] priorite basse impossible : %s" % e)
+        return False
 
 
 def moteur_de_jeu(chemin=None, elo=None, creer=True):
@@ -122,7 +144,8 @@ def moteur_d_analyse_n(indice, chemin=None, threads=None, hash_mb=1024,
             if not _vivant(moteur):
                 return None
             _moteurs[role] = moteur
-            print("[MOTEURS] moteur d'ANALYSE %s pret" % role)
+            _priorite_basse(moteur)
+            print("[MOTEURS] moteur d'ANALYSE %s pret (priorite basse)" % role)
         voulu = (threads, int(hash_mb or 0))
         # On ne renvoie les options que si elles ont change : "setoption Hash"
         # VIDE la table de hachage, ce serait perdre exactement ce qu'on essaie
@@ -164,6 +187,21 @@ def nombre_d_analyse():
     with _verrou:
         return sum(1 for role, m in _moteurs.items()
                    if role.startswith("analyse") and _vivant(m))
+
+
+def liberer_les_renforts(combien):
+    """Ferme les moteurs d'analyse de renfort (analyse-2, analyse-3...) une
+    fois l'analyse de la partie finie : ils gardaient ~1,3 Go chacun jusqu'a
+    la fermeture du jeu. Le premier reste (sa table de hachage sert encore)."""
+    return sum(1 for indice in range(1, int(combien)) if liberer(role_d_analyse(indice)))
+
+
+ROLE_VARIANTE = role_d_analyse(5)
+
+
+def liberer_la_variante():
+    """Ferme le moteur des variantes de la revue (en quittant la revue)."""
+    return liberer(ROLE_VARIANTE)
 
 
 def liberer_les_analyses(garder=1):

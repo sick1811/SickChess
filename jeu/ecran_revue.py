@@ -252,11 +252,12 @@ class EcranRevue:
             profondeur, noeuds, temps = self.analyseur.limites_variante()
             # 18/10 (tableur de Julien : « 1 x 12 pour la variante ») : une
             # fois l'analyse de la partie finie, la variante prend tous les
-            # processeurs sauf un ; pendant l'analyse, 2 seulement.
-            threads = 2
+            # processeurs sauf un ; pendant l'analyse, 1 seul (23/10,
+            # surveillance : les 12 processeurs sont deja pris par l'analyse).
+            threads = 1
             if not getattr(self.analyseur, "en_cours", False):
                 import os
-                threads = max(2, (os.cpu_count() or 2) - 1)
+                threads = max(1, (os.cpu_count() or 2) - 1)
 
             def travail():
                 details = None
@@ -889,8 +890,16 @@ class EcranRevue:
 
     def run(self, clock, evenement_fenetre=None, apres_dessin=None):
         """Renvoie 'retour' ou 'quitter'."""
+        try:
+            return self._boucle(clock, evenement_fenetre, apres_dessin)
+        finally:
+            self._liberer_la_variante()
+
+    def _boucle(self, clock, evenement_fenetre, apres_dessin):
+        cadence = ui.Cadence()
         while True:
-            for event in pygame.event.get():
+            evenements = pygame.event.get()
+            for event in evenements:
                 if evenement_fenetre is not None and evenement_fenetre(event):
                     self._placer(pygame.display.get_surface())
                     continue
@@ -901,4 +910,21 @@ class EcranRevue:
             if apres_dessin is not None:
                 apres_dessin(self.screen)
             pygame.display.flip()
-            clock.tick(60)
+            animation = getattr(self.plateau, "animation", None)
+            clock.tick(cadence.suivante(evenements, bool(getattr(animation, "animations", None))))
+
+    def _liberer_la_variante(self):
+        """23/10 (surveillance) : le moteur des variantes restait ouvert jusqu'a
+        la fermeture du jeu. On le ferme en quittant la revue, apres la
+        recherche en cours (en tache de fond : on n'attend pas)."""
+        if getattr(self.analyseur, "_moteur_fourni", None) is not None:
+            return
+
+        def fermer():
+            with _VERROU_VARIANTE:
+                try:
+                    import moteurs
+                    moteurs.liberer_la_variante()
+                except Exception as e:
+                    print("[REVUE] moteur des variantes non ferme : %s" % e)
+        threading.Thread(target=fermer, daemon=True).start()

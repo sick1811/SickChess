@@ -284,6 +284,26 @@ def _rendu_de(pol, chaine, couleur):
     return rendu
 
 
+class Cadence:
+    """23/10 (surveillance en direct) : les menus et les ecrans dessinaient 60
+    images/s meme quand rien ne bougeait (jeu a ~30 % d'un coeur). 60 images/s
+    pendant 1,5 s apres un geste ou pendant une animation ; 30 sinon.
+
+        cadence = ui.Cadence()
+        ... clock.tick(cadence.suivante(evenements, anime=...))
+    """
+    REPOS_APRES_MS = 1500
+
+    def __init__(self):
+        self._activite_ms = None
+
+    def suivante(self, evenements=(), anime=False):
+        maintenant = pygame.time.get_ticks()
+        if evenements or anime or self._activite_ms is None:
+            self._activite_ms = maintenant
+        return 60 if maintenant - self._activite_ms < self.REPOS_APRES_MS else 30
+
+
 # ---------------------------------------------------------------- echelle
 
 def echelle(cible):

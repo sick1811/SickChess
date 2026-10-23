@@ -293,6 +293,51 @@ else:
              "temps (%s ms) et profondeur (%s) rendus" % (d.get("temps_ms"), d.get("profondeur")))
     moteur.quit()
 
+print("9. Surveillance du 23/10 : moteurs fermes apres l'analyse, priorite basse")
+
+
+class MoteurFaux:
+    def __init__(self):
+        self.ferme = False
+
+    def est_vivant(self):
+        return not self.ferme
+
+    def quit(self):
+        self.ferme = True
+
+
+faux = {role: MoteurFaux() for role in ("jeu", "analyse", "analyse-2", "analyse-3",
+                                        moteurs.ROLE_VARIANTE)}
+sauves = dict(moteurs._moteurs)
+moteurs._moteurs.clear()
+moteurs._moteurs.update(faux)
+try:
+    verifier(moteurs.liberer_les_renforts(3) == 2, "les 2 moteurs de renfort sont fermes")
+    verifier(faux["analyse-2"].ferme and faux["analyse-3"].ferme, "analyse-2 et analyse-3 fermes")
+    verifier(not faux["analyse"].ferme and not faux["jeu"].ferme,
+             "le premier moteur d'analyse et le moteur de jeu restent")
+    verifier(not faux[moteurs.ROLE_VARIANTE].ferme, "le moteur des variantes reste (revue ouverte)")
+    verifier(moteurs.liberer_la_variante() and faux[moteurs.ROLE_VARIANTE].ferme,
+             "en quittant la revue, le moteur des variantes est ferme")
+finally:
+    moteurs._moteurs.clear()
+    moteurs._moteurs.update(sauves)
+
+if chemin and os.path.exists(chemin) and os.name == "nt":
+    try:
+        import psutil
+    except ImportError:
+        psutil = None
+    if psutil is not None:
+        m = moteurs.moteur_d_analyse_n(7, chemin, threads=1, hash_mb=16)
+        try:
+            p = psutil.Process(m.process.pid)
+            verifier(p.nice() == psutil.BELOW_NORMAL_PRIORITY_CLASS,
+                     "moteur d'analyse en priorite basse (%s)" % p.nice())
+        finally:
+            moteurs.liberer(moteurs.role_d_analyse(7))
+
 print()
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))
 sys.exit(1 if echecs else 0)

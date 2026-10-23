@@ -53,6 +53,11 @@ Mesures faites dans Cowork (machine Linux plus lente) : à refaire sur le PC de 
 - [ ] Commit : 34 fichiers modifiés non enregistrés + 1 commit pas encore envoyé sur GitHub.
 → Avant de commencer, lire les décisions de Julien dans la page (Corriger / OK / Ignorer).
 
+→ 23/10 (soir) : banc d'essai tout vert sur le PC de Julien (sauf ménage). 7 nouvelles propositions
+  qualité (p28 à p34) : test d'endurance de 2 h, rapport de plantage, banque de positions pour la
+  précision des pastilles, mode « petit PC », vérification avant chaque version, lisibilité
+  (daltoniens, petits écrans), niveaux de l'ordinateur calibrés en vrai Elo. Julien choisit.
+
 ## Prochaines étapes (dans l'ordre)
 1. **Compilation en .exe** (PyInstaller, skill `compiler-exe`) – à faire dans Claude Code
    sur Windows.
@@ -65,6 +70,8 @@ Mesures faites dans Cowork (machine Linux plus lente) : à refaire sur le PC de 
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t77 (19) : surveillance en direct, une partie puis sa revue : jeu fluide pendant l'analyse ; après la
+      revue, mémoire de Stockfish ≈ 2 Go (5,8 avant) ; menus moins gourmands.
 - [ ] t75 (18) : revue : flèches des meilleurs coups, surlignages et pastilles comme avant ; défilement fluide.
 - [ ] t76 (18) : partie : coups possibles d'une pièce, dernier coup surligné, plateau retourné (F) correct.
 - [ ] t72 (17) : partie contre l'ordinateur : tout reste fluide (pièces, flèches, pendule, coups de l'ordinateur).

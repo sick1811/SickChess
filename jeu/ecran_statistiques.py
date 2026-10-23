@@ -237,8 +237,10 @@ class EcranStatistiques:
                      rect.y + int(8 * ech), ui.t(12, ech), t["texte_discret"])
 
     def run(self, clock, evenement_fenetre=None):
+        cadence = ui.Cadence()       # 23/10 : 30 images/s au repos
         while True:
-            for event in pygame.event.get():
+            evenements = pygame.event.get()
+            for event in evenements:
                 if evenement_fenetre is not None and evenement_fenetre(event):
                     self.screen = pygame.display.get_surface()
                     continue
@@ -247,4 +249,4 @@ class EcranStatistiques:
                     return reponse
             self.draw()
             pygame.display.flip()
-            clock.tick(60)
+            clock.tick(cadence.suivante(evenements))

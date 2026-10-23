@@ -187,13 +187,15 @@ class GameManager:
         """Boucle du menu. Renvoie 'stockfish' ou 'hotseat'."""
         import musique
         musique.jouer(self.config)          # 17/10, travail p14
+        cadence = ui.Cadence()       # 23/10 : 30 images/s au repos
         while True:
             # Invitation Steam acceptee (ou jeu lance par une invitation) :
             # on file directement au salon de l'ami.
             if partie_en_ligne.invitation_en_attente():
                 self.ouvrir_en_ligne()
             self._badge_maj()
-            for event in pygame.event.get():
+            evenements = pygame.event.get()
+            for event in evenements:
                 if event.type == pygame.QUIT:
                     self.quitter()
                 if self.evenement_fenetre(event):
@@ -248,7 +250,7 @@ class GameManager:
             self.menu.draw()
             self.aide.draw(self.screen)
             pygame.display.flip()
-            self.clock.tick(60)
+            self.clock.tick(cadence.suivante(evenements))
 
     def ouvrir_signaler(self):
         """« Signaler un problème / une idée » (17/10, travail p16)."""

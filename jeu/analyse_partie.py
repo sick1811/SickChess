@@ -637,6 +637,18 @@ class AnalyseurPartie:
                 self.en_cours = False
                 if not self._stop and not self.suivi:
                     self._ecrire_cache()
+                    self._liberer_les_renforts()
+
+    def _liberer_les_renforts(self):
+        """23/10 (surveillance) : l'analyse finie, les moteurs de renfort
+        gardaient leur memoire jusqu'a la fermeture du jeu."""
+        if self._moteur_fourni is not None or not self.terminee():
+            return
+        try:
+            import moteurs
+            moteurs.liberer_les_renforts(self._moteurs_prevus())
+        except Exception as e:
+            print("[ANALYSE] moteurs de renfort non fermes : %s" % e)
 
     def _analyser(self, moteur, k, niveau):
         if self.finie[k]:

@@ -162,6 +162,15 @@ try:
     gm.pause.ouvert = True
     verifier(gm.cadence_de_partie() == 60, "pause ouverte : 60")
     gm.pause.ouvert = False
+    # 23/10 (surveillance) : menus et ecrans, meme regle (ui.Cadence)
+    import ui
+    c = ui.Cadence()
+    verifier(c.suivante() == 60, "ecran qui s'ouvre : 60 images/s")
+    horloge[0] += 2000
+    verifier(c.suivante() == 30, "menu immobile 2 s : 30 images/s")
+    verifier(c.suivante([object()]) == 60, "un geste dans le menu : 60")
+    horloge[0] += 2000
+    verifier(c.suivante(anime=True) == 60, "une animation dans l'ecran : 60")
 finally:
     pygame.time.get_ticks = vraie_horloge
 

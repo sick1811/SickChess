@@ -289,8 +289,10 @@ class EcranRevoir:
     # ------------------------------------------------------------- boucle
 
     def run(self, clock, evenement_fenetre=None, apres_dessin=None):
+        cadence = ui.Cadence()       # 23/10 : 30 images/s au repos
         while True:
-            for event in pygame.event.get():
+            evenements = pygame.event.get()
+            for event in evenements:
                 if evenement_fenetre is not None and evenement_fenetre(event):
                     self._placer(pygame.display.get_surface())
                     continue
@@ -301,4 +303,4 @@ class EcranRevoir:
             if apres_dessin is not None:
                 apres_dessin(self.screen)
             pygame.display.flip()
-            clock.tick(60)
+            clock.tick(cadence.suivante(evenements, bool(getattr(getattr(getattr(self, 'plateau', None), 'animation', None), 'animations', None))))

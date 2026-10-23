@@ -780,3 +780,23 @@ Fait (PC de Julien, banc complet avant → après) :
 - [ ] t75 : revue : flèches des meilleurs coups, surlignages et pastilles comme avant ; défilement fluide.
 - [ ] t76 : partie : cliquer une pièce montre ses coups possibles ; le dernier coup reste surligné ;
   plateau retourné (F) correct.
+
+## 23/10/2026 (19) – Surveillance en direct : trois corrections (Claude Code)
+Première surveillance sur le PC de Julien (`docs/SURVEILLANCE.md`, 14 min : une partie puis sa revue) :
+pendant la revue, 4 Stockfish d'analyse + le moteur de jeu, PC à 100 %, 6,8 Go de mémoire pour Stockfish ;
+après la revue, 5,8 Go gardés jusqu'à la fermeture du jeu ; le jeu seul à ~30 % d'un cœur dans les menus.
+Fait :
+- **Stockfish d'analyse en priorité basse** (`moteurs._priorite_basse`, Windows : BELOW_NORMAL) : l'analyse prend
+  tout ce qui est libre, mais le jeu passe avant et reste fluide. Moteur des variantes de la revue : 1 thread
+  tant que l'analyse tourne (2 avant), les 12 processeurs étant déjà pris par 3 × 4.
+- **Moteurs fermés** : à la fin de l'analyse, les moteurs de renfort (analyse-2, analyse-3, ~1,3 Go chacun) sont
+  fermés (`moteurs.liberer_les_renforts`) ; en quittant la revue, le moteur des variantes aussi. Le premier
+  moteur d'analyse et le moteur de jeu restent (revanche, deuxième analyse rapide).
+- **Menus et écrans à 30 images/s au repos** (`ui.Cadence`) : menu, revue, options, mes parties, problèmes,
+  revoir, statistiques, ouvertures, signaler ; 60 pendant 1,5 s après un geste ou pendant une animation.
+- Tests : `test_modes_analyse.py` (moteurs fermés, priorité basse vérifiée sur un vrai Stockfish),
+  `test_pause.py` (cadence). 644 contrôles verts.
+
+À vérifier par Julien :
+- [ ] t77 : relancer la surveillance (« lance la surveillance en direct »), jouer une partie puis sa revue :
+  jeu fluide pendant l'analyse ; après la revue, la mémoire de Stockfish redescend (≈ 2 Go au lieu de 5,8).
