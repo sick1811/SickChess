@@ -1,0 +1,8 @@
+# Outils de developpement (pas livres avec le jeu).
+#     pip install -r requirements-dev.txt
+-r requirements.txt
+ruff>=0.6          # repere les erreurs, imports et variables inutiles (tres rapide)
+vulture>=2.11      # repere les fonctions et classes jamais utilisees
+psutil>=5.9        # mesure memoire et processeur (banc d'essai)
+pyinstaller>=6.0   # fabrique le .exe
+py-spy>=0.3        # montre ou le jeu passe son temps (py-spy top -- python SickChess.py)

@@ -8,6 +8,7 @@ description: Déroulé d'une séance de travail sur SickChess (lire A_FAIRE et J
 1. **Lire** `CLAUDE.md`, `docs/A_FAIRE.md`, puis la fin de `docs/JOURNAL.md`.
    Choisir la tâche : celle demandée par Julien, sinon le premier « Retour de Julien »
    non coché, sinon la première « Prochaine étape ».
+   Lire aussi les constats « corriger » de la page « Banc d'essai » (ou `tests/banc_essai.json`).
 2. **Dire en une phrase** ce qui va être fait.
 3. **Avant de coder** : `git status` (ne rien perdre) et `python tests/lancer_tous.py --rapide`
    pour partir d'un état vert. Si une fonction vient de V8, lire son code dans
@@ -16,7 +17,9 @@ description: Déroulé d'une séance de travail sur SickChess (lire A_FAIRE et J
    qui correspond, avec la fonction `verifier(condition, message)`), puis corriger.
    **Une nouvelle fonction** : ajouter ses contrôles, ou une nouvelle série
    `tests/test_<nom>.py` à déclarer dans `tests/lancer_tous.py`.
-5. **Vérifier** : `python tests/lancer_tous.py` (tout vert). Si un écran a changé :
+5. **Vérifier** : `python tests/lancer_tous.py` (tout vert). Si la séance touche au dessin,
+   à l'analyse ou au chargement : `python outils/banc_essai.py --sections vitesse,processeur`
+   avant et après, et noter le gain. Si un écran a changé :
    `python tests/captures_ecrans.py` et regarder les images dans `tests/ecrans/`
    (accents, textes qui débordent, contraste Onyx & Or). Sous Windows, lancer aussi
    `python SickChess.py` pour un essai réel quand c'est utile.

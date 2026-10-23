@@ -9,7 +9,11 @@
       "Bash(git log*)",
       "Bash(git add *)",
       "Bash(git commit *)",
-      "Bash(pip install *)"
+      "Bash(pip install *)",
+      "Bash(python outils/banc_essai.py*)",
+      "Bash(python -m ruff *)",
+      "Bash(python -m vulture *)",
+      "Bash(py-spy *)"
     ],
     "deny": [
       "Bash(git push --force*)",

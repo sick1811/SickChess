@@ -41,6 +41,17 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
   → `tests/ecrans/`.
 - Version amis (exe + bouton « Mise à jour ») : `CONSTRUIRE_VERSION_AMIS.bat`
   → `outils/publier_maj.py` ; voir `docs/VERSION_AMIS.md`.
+- **Banc d'essai : `python outils/banc_essai.py`** (bugs, vitesse, processeur, mémoire,
+  Stockfish, ménage, conflits ; `--rapide`, `--sections vitesse,menage`) → `docs/BANC_ESSAI.md`
+  et `tests/banc_essai.json`. Page à cocher : « SickChess – Banc d'essai »
+  https://claude.ai/artifact/ARYw19umG9WeUbQDVJrXe9 (collections `passages`, `constats`,
+  `ressenti`). **Avant de travailler, lire les constats marqués « corriger » et leurs
+  commentaires.** Outils : `pip install -r requirements-dev.txt` (ruff, vulture, psutil,
+  pyinstaller, py-spy) ; réglages dans `pyproject.toml`.
+- **Performances en direct (Windows seulement)** : `python outils/surveiller.py` lance le jeu
+  et mesure chaque seconde processeur (jeu + Stockfish), mémoire, carte graphique pendant que
+  Julien joue → `docs/SURVEILLANCE.md`. Cowork ne voit pas le vrai Windows : c'est Claude Code
+  qui le lance.
 - Sons : `python outils/generer_sons.py`. Logo/icône : `python outils/generer_logo.py`.
 
 ## Façon de travailler
@@ -69,7 +80,15 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
 - Le lien entre les deux = **ce fichier + `docs/A_FAIRE.md` + `docs/JOURNAL.md`** :
   toujours les tenir à jour en fin de séance.
 
+## Performance (le jeu doit rester léger)
+- Rien ne se lit sur le disque dans un `draw()` ; textes et fonds fixes gardés en cache ;
+  ne pas tout redessiner 60 fois par seconde quand rien ne bouge (skill `performance-pygame`).
+- Toute optimisation : banc avant / après sur la même machine, gain noté dans le journal.
+
 ## Skills du projet (`.claude/skills/`)
 `seance-sickchess` (déroulé d'une séance) · `compiler-exe` (PyInstaller) ·
-`verifier-echecs` (règles et analyse justes) · `captures-steam` (images de la page Steam).
-Agents (`.claude/agents/`) : `testeur` (cherche les bugs), `relecteur-interface` (graphisme).
+`verifier-echecs` (règles et analyse justes) · `captures-steam` (images de la page Steam) ·
+`banc-essai` (mesures et décisions de Julien) · `performance-pygame` (processeur, carte
+graphique, Stockfish) · `menage-code` (code et fichiers inutiles, sans rien casser).
+Agents (`.claude/agents/`) : `testeur` (cherche les bugs), `relecteur-interface` (graphisme),
+`optimiseur` (cherche les lenteurs et chiffre les gains).

@@ -403,6 +403,40 @@ Fait :
 - [ ] Changer une petite chose, relancer le .bat → dans le jeu dézippé, le bouton
   s'allume, la mise à jour s'installe et le jeu redémarre.
 
+## 23/10/2026 – Boîte à outils : banc d'essai, surveillance en direct, ménage (Cowork)
+Fait :
+- `outils/banc_essai.py` : 7 contrôles d'un coup – bugs (tous les tests), vitesse (ms par
+  image de 8 écrans + où passe le temps), processeur au repos, mémoire, Stockfish (bench),
+  ménage (ruff, vulture, fichiers orphelins, ressources non citées, doublons, restes), conflits
+  (marques Git, syntaxe, dépendances, travail non enregistré, verrous, réglages inconnus).
+  Rapport `docs/BANC_ESSAI.md` + `tests/banc_essai.json` + historique.
+- `outils/surveiller.py` : lance le jeu et mesure en direct (Windows) processeur du jeu et de
+  Stockfish, mémoire, carte graphique, chaque seconde → `docs/SURVEILLANCE.md`.
+- Page « SickChess – Banc d'essai » (https://claude.ai/artifact/ARYw19umG9WeUbQDVJrXe9) :
+  résultats, constats à décider (Corriger / OK / Ignorer + commentaire), 8 tests de ressenti,
+  historique. `outils/banc_vers_page.py` prépare la recopie.
+- Outils : `requirements-dev.txt` (ruff, vulture, psutil, pyinstaller, py-spy),
+  `pyproject.toml`, `outils/vulture_liste_blanche.py`.
+- Skills `banc-essai`, `performance-pygame`, `menage-code` ; agent `optimiseur` ;
+  `CLAUDE.md`, `seance-sickchess` et `docs/TRAVAILLER_AVEC_CLAUDE.md` mis à jour (outils,
+  connecteurs, crédits).
+- Premier passage (Cowork, indicatif) : 514 contrôles verts ; trouvé que Ouvertures,
+  Problèmes et Statistiques relisent des fichiers à chaque image, et que les textes
+  coûtent 40–60 % de chaque image (voir A_FAIRE, « Performance et ménage »).
+
+À vérifier par Julien :
+- [ ] Claude Code : « installe les outils de développement », puis « lance le banc d'essai
+  complet » et « lance la surveillance en direct pendant que je joue ».
+- [ ] Page Banc d'essai : décider chaque constat, remplir les 8 tests de ressenti.
+- [ ] Activer les crédits d'utilisation (claude.ai → Réglages → Utilisation).
+- 18h57 : `.git/index.lock` bloquait les commits. Cause : le `git status` du banc lancé depuis
+  Cowork (qui ne peut pas supprimer de fichiers). Verrou supprimé par Claude Code ; le banc
+  utilise maintenant `git --no-optional-locks` et la skill `banc-essai` l'impose dans Cowork.
+- Vrais chiffres du PC (banc complet Windows, 18h52) recopiés dans la page : 620 contrôles
+  verts ; Stockfish 6,35 M nœuds/s sur 10 fils ; partie au repos 38 % d'un cœur ;
+  Ouvertures 15 ms/image. Décisions de Julien : 18 constats « corriger », 2 « ignorer »
+  (fonctions peut-être mortes, `fond_anime.py`).
+
 ## Bugs connus (repris de « a debug.txt »)
 - [x] Pendule ne clignote pas à 30 s → fonctionne (testé).
 - [x] Fin de partie à 00:00 → corrigé (affichage du temps final).

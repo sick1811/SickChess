@@ -10,7 +10,7 @@
     "stockfish_threads": null,
     "preset_pendule": 2,
     "minutes": 3,
-    "increment_secondes": 2,
+    "increment_secondes": 0,
     "pendule_active": true,
     "theme_plateau": "marbre_uni",
     "jeu_pieces": "plat_tournoi",
@@ -42,5 +42,5 @@
     "langue": "fr",
     "analyse_puissance": "maximale",
     "analyse_mode": "calcul",
-    "analyse_niveau": "forte"
+    "analyse_niveau": "maximale"
 }

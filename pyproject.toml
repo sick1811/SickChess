@@ -1,0 +1,17 @@
+# Reglages des outils de developpement de SickChess (pas du jeu lui-meme).
+
+[tool.ruff]
+line-length = 110
+target-version = "py310"
+extend-exclude = ["publier", "build_amis", "puzzles", "syzygy", "assets_src", "outils/blender"]
+
+[tool.ruff.lint]
+# E9/F : vraies erreurs (nom inconnu, import inutile, variable jamais lue, code en double).
+# B : pieges classiques (argument par defaut modifiable, except trop large...).
+# PERF : petites lenteurs evitables dans les boucles.
+select = ["E9", "F", "B", "PERF"]
+ignore = ["B008", "PERF203", "F403", "F405", "B905"]
+
+[tool.vulture]
+paths = ["jeu", "SickChess.py", "outils/vulture_liste_blanche.py"]
+min_confidence = 60
