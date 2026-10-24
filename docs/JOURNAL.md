@@ -1264,3 +1264,27 @@ Fait :
   d'essai pointée vers un fichier absent sur GitHub → le vrai jeu affiche « introuvable (erreur 404) … réessaie
   dans quelques minutes » ; vérification en ligne toute verte ; désinstallation propre.
 - En ligne : `maj.json` « latest » = n° 5, paquets et installeur répondent. `publier/maj.json` local = n° 5.
+
+## 24/10/2026 (28) – Quitter et lancer une partie plus vite (Claude Code, cloud)
+Retours de Julien : « des fois le jeu ne répond pas quand on appuie sur Quitter » ; « quitter une partie ou en
+lancer une est des fois long ». Travail commencé sur le PC (mesures), fini dans le cloud.
+Causes et corrections :
+- Fermer un Stockfish attendait la fin de sa recherche (verrou tenu jusqu'à « bestmove ») : 1 à 1,3 s de fenêtre
+  figée. `engine.quit()` envoie maintenant « stop » + « quit » sans attendre (petit verrou d'écriture à part) ;
+  nouveau `engine.interrompre()`.
+- Arrêter l'analyse laissait les recherches finir (Stockfish à 100 % après avoir quitté) et attendait 0,3 s PAR
+  fil : `AnalyseurPartie.arreter()` interrompt ses moteurs, 0,3 s au total, résultat incomplet jeté.
+- L'adversaire attendait jusqu'à 2 s la fin de sa réflexion : `BackgroundAI.stop()` l'interrompt.
+- Démarrer un Stockfish (~1 s) se faisait sous le verrou général de `moteurs.py` : Quitter attendait ce démarrage.
+  Le verrou ne protège plus que la liste ; deux demandes du même moteur n'en lancent qu'un.
+- L'adversaire était fermé à chaque fin de partie (~0,6 s sur 0,7 s de lancement) : il reste prêt, et il démarre
+  en tâche de fond au menu. **Sauf en mode petit PC** (un seul Stockfish à la fois) : là, fermé comme avant.
+- `recette_auto.py` : R-148 vérifie vraiment le verdict des tables quand `syzygy/` est là.
+- Suite complète : 1049 contrôles OK ; `test_mes_erreurs.py` rouge une fois (machine chargée), vert relancé seul (2 fois).
+- Tests : `tests/test_sortie_rapide.py` (16 contrôles, dont le vrai Stockfish : fermeture en pleine recherche
+  de 20 s en 0,02 s). Recette : R-005 précisé, R-125 nouveau.
+
+À vérifier par Julien :
+- [ ] t101 / R-125 : quitter pendant que l'ordinateur réfléchit ou pendant une revue → menu aussitôt, Stockfish à
+  0 % ; nouvelle partie immédiate ; Quitter le jeu en moins d'une seconde.
+

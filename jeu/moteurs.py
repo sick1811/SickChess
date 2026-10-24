@@ -50,6 +50,50 @@ def _fabriquer(chemin):
     return StockfishEngine(chemin)
 
 
+_creations = {}        # role -> threading.Event (un Stockfish en train de demarrer)
+
+
+def _obtenir(role, chemin, creer, apres_creation=None):
+    """Le moteur du role, cree s'il le faut. 24/10 (« quitter est long ») :
+    demarrer Stockfish prend ~1 s ; avant, tout se faisait SOUS le verrou
+    general, et liberer() / tout_fermer() (bouton Quitter) attendaient la fin
+    de ce demarrage. Maintenant le verrou ne protege que la liste ; un second
+    fil qui demande le meme role attend le premier au lieu d'en lancer un autre.
+    Renvoie (moteur ou None, True s'il vient d'etre cree)."""
+    with _verrou:
+        moteur = _moteurs.get(role)
+        if moteur is not None and not _vivant(moteur):
+            _oublier(role)
+            moteur = None
+        if moteur is not None or not creer:
+            return moteur, False
+        attente = _creations.get(role)
+        createur = attente is None
+        if createur:
+            attente = _creations[role] = threading.Event()
+    if not createur:
+        attente.wait(30)
+        with _verrou:
+            return _moteurs.get(role), False
+    moteur = None
+    try:
+        moteur = _fabriquer(chemin)
+        if not _vivant(moteur):
+            moteur = None
+        elif apres_creation is not None:
+            apres_creation(moteur)
+    except Exception as e:
+        print("[MOTEURS] demarrage de %s impossible : %s" % (role, e))
+        moteur = None
+    finally:
+        with _verrou:
+            if moteur is not None:
+                _moteurs[role] = moteur
+            _creations.pop(role, None)
+        attente.set()
+    return moteur, moteur is not None
+
+
 def _priorite_basse(moteur):
     """23/10 (surveillance en direct) : pendant la revue, les Stockfish
     d'analyse prenaient les 12 processeurs et le jeu devait se battre avec eux
@@ -77,27 +121,19 @@ def moteur_de_jeu(chemin=None, elo=None, creer=True):
     On ne le confond jamais avec celui d'analyse : regler l'analyse a fond ne
     rend donc pas ton adversaire plus fort.
     """
-    with _verrou:
-        moteur = _moteurs.get("jeu")
-        if moteur is not None and not _vivant(moteur):
-            _oublier("jeu")
-            moteur = None
-        if moteur is None:
-            if not creer:
-                return None
-            moteur = _fabriquer(chemin)
-            if not _vivant(moteur):
-                return None
-            _moteurs["jeu"] = moteur
-            print("[MOTEURS] moteur de JEU pret (processus 1/2)")
-        if elo is not None:
-            try:
-                if getattr(moteur, "elo_courant", None) != int(elo) \
-                        or getattr(moteur, "mode_analyse", False):
-                    moteur.set_custom_elo(int(elo))
-            except Exception as e:
-                print("[MOTEURS] reglage du niveau impossible : %s" % e)
-        return moteur
+    moteur, neuf = _obtenir("jeu", chemin, creer)
+    if moteur is None:
+        return None
+    if neuf:
+        print("[MOTEURS] moteur de JEU pret (processus 1/2)")
+    if elo is not None:
+        try:
+            if getattr(moteur, "elo_courant", None) != int(elo) \
+                    or getattr(moteur, "mode_analyse", False):
+                moteur.set_custom_elo(int(elo))
+        except Exception as e:
+            print("[MOTEURS] reglage du niveau impossible : %s" % e)
+    return moteur
 
 
 def role_d_analyse(indice):
@@ -137,33 +173,24 @@ def moteur_d_analyse_n(indice, chemin=None, threads=None, hash_mb=1024,
 def moteur_d_analyse_role(role, chemin=None, threads=None, hash_mb=1024, creer=True):
     """Un moteur d'analyse sous un nom libre (24/10, p35 : celui de l'analyse
     libre, « libre », ferme en quittant l'ecran)."""
-    with _verrou:
-        moteur = _moteurs.get(role)
-        if moteur is not None and not _vivant(moteur):
-            _oublier(role)
-            moteur = None
-        if moteur is None:
-            if not creer:
-                return None
-            moteur = _fabriquer(chemin)
-            if not _vivant(moteur):
-                return None
-            _moteurs[role] = moteur
-            _priorite_basse(moteur)
-            print("[MOTEURS] moteur d'ANALYSE %s pret (priorite basse)" % role)
-        voulu = (threads, int(hash_mb or 0))
-        # On ne renvoie les options que si elles ont change : "setoption Hash"
-        # VIDE la table de hachage, ce serait perdre exactement ce qu'on essaie
-        # de garder.
-        if _reglages_analyse.get(role) != voulu \
-                or not getattr(moteur, "mode_analyse", False):
-            try:
-                moteur.configurer_pour_analyse(threads, hash_mb)
-                _reglages_analyse[role] = voulu
-            except Exception as e:
-                print("[MOTEURS] configuration de %s impossible : %s"
-                      % (role, e))
-        return moteur
+    moteur, neuf = _obtenir(role, chemin, creer, apres_creation=_priorite_basse)
+    if moteur is None:
+        return None
+    if neuf:
+        print("[MOTEURS] moteur d'ANALYSE %s pret (priorite basse)" % role)
+    voulu = (threads, int(hash_mb or 0))
+    # On ne renvoie les options que si elles ont change : "setoption Hash"
+    # VIDE la table de hachage, ce serait perdre exactement ce qu'on essaie
+    # de garder.
+    if _reglages_analyse.get(role) != voulu \
+            or not getattr(moteur, "mode_analyse", False):
+        try:
+            moteur.configurer_pour_analyse(threads, hash_mb)
+            _reglages_analyse[role] = voulu
+        except Exception as e:
+            print("[MOTEURS] configuration de %s impossible : %s"
+                  % (role, e))
+    return moteur
 
 
 def moteurs_d_analyse(combien, chemin=None, threads=None, hash_mb=1024,

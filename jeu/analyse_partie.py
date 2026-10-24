@@ -363,6 +363,9 @@ class AnalyseurPartie:
         # analysent des positions differentes en meme temps.
         self._fils = []
         self._en_travail = set()
+        # 24/10 : les moteurs qui cherchent EN CE MOMENT pour cette analyse
+        # (arreter() n'interrompt qu'eux, jamais une autre analyse).
+        self._moteurs_en_cours = set()
         self._verrou_choix = threading.Lock()
         self._ouvriers = 0
         self._priorite = None
@@ -575,10 +578,23 @@ class AnalyseurPartie:
         return True
 
     def arreter(self, attendre=0.3):
+        """24/10 (« quitter une partie est long ») : avant, les recherches en
+        cours continuaient jusqu'au bout (plusieurs secondes a 100 % des
+        processeurs, apres avoir quitte la partie) et on attendait 0,3 s PAR
+        fil. Maintenant on interrompt Stockfish (« stop » : leur resultat,
+        incomplet, n'est pas garde) et on attend 0,3 s AU TOTAL."""
         self._stop = True
+        for moteur in list(self._moteurs_en_cours):
+            interrompre = getattr(moteur, "interrompre", None)
+            if interrompre is not None:
+                try:
+                    interrompre()
+                except Exception:
+                    pass
+        limite = time.time() + attendre
         for fil in list(self._fils):
             if fil.is_alive():
-                fil.join(attendre)
+                fil.join(max(0.0, limite - time.time()))
 
     def prioriser(self, index_coup):
         """Le joueur regarde le coup index_coup (-1 = position de depart)."""
@@ -706,6 +722,10 @@ class AnalyseurPartie:
             lignes = 1 if self.lignes_spec else LIGNES_FINES
         details = self._chercher(moteur, self.fens[k], spec, lignes,
                                  min(niveau, self.niveau_final))
+        if self._stop:
+            # 24/10 : recherche interrompue par arreter() : resultat incomplet,
+            # on ne le garde pas (la position sera refaite si l'analyse reprend).
+            return
         if details:
             signe = 1.0 if self.trait[k] else -1.0
             classees = lignes_du_moteur(self.fens[k], details)
@@ -851,16 +871,20 @@ class AnalyseurPartie:
         """Une recherche de Stockfish ; note sa duree et sa vitesse."""
         profondeur, noeuds, temps = spec
         debut = time.time()
-        if noeuds:
-            try:
-                details = moteur.analyser_position(fen, profondeur, temps,
-                                                   lignes=lignes, noeuds=noeuds)
-            except TypeError:
-                # Un moteur de test qui ne connait pas les noeuds.
-                details = moteur.analyser_position(fen, profondeur or 22, temps,
-                                                   lignes=lignes)
-        else:
-            details = moteur.analyser_position(fen, profondeur, temps, lignes=lignes)
+        self._moteurs_en_cours.add(moteur)
+        try:
+            if noeuds:
+                try:
+                    details = moteur.analyser_position(fen, profondeur, temps,
+                                                       lignes=lignes, noeuds=noeuds)
+                except TypeError:
+                    # Un moteur de test qui ne connait pas les noeuds.
+                    details = moteur.analyser_position(fen, profondeur or 22, temps,
+                                                       lignes=lignes)
+            else:
+                details = moteur.analyser_position(fen, profondeur, temps, lignes=lignes)
+        finally:
+            self._moteurs_en_cours.discard(moteur)
         duree = time.time() - debut
         self._durees.setdefault(niveau, []).append(duree)
         # 18/10 : la vitesse ne se mesure que sur les vraies recherches (au

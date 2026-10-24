@@ -142,6 +142,10 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t101 (28) : **quitter et lancer vite** : pendant que l'ordinateur réfléchit (niveau Maximum, longue cadence),
+      clique Quitter la partie → le menu revient aussitôt ; dans le Gestionnaire des tâches, stockfish.exe redescend
+      à 0 % ; relance une partie contre l'ordinateur → elle démarre tout de suite. Même chose pendant une revue, puis
+      bouton Quitter du jeu (et la croix) : le jeu se ferme en moins d'une seconde, sans « ne répond pas ».
 - [ ] t78 (26) : couper Internet, cliquer Mise à jour → le message dit « pas d'Internet, ou adresse du site … introuvable » (et plus « pas de connexion » quand Internet marche) ; rétablir Internet → la mise à jour marche.
 - [ ] t100 (32) : la revue sur ton écran : les symboles des pastilles (surtout Imprécision jaune, Excellent vert
       clair) ont un fin contour sombre : plus lisibles ? toujours jolis ? Si tu as un écran 2560×1440 ou une télé

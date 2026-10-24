@@ -557,9 +557,24 @@ class GameManager:
         except Exception as e:
             print("[PLANTAGE] %s" % e)
 
+    def _preparer_l_adversaire(self):
+        """24/10 (« lancer une partie est long ») : le Stockfish adversaire
+        demarre en tache de fond pendant qu'on est au menu (~0,6 s) ; la
+        premiere partie contre l'ordinateur se lance alors tout de suite."""
+        import threading
+
+        def demarrer():
+            try:
+                import moteurs
+                moteurs.moteur_de_jeu(self.stockfish_path)
+            except Exception as e:
+                print("[MOTEURS] adversaire pas prepare a l'avance : %s" % e)
+        threading.Thread(target=demarrer, daemon=True, name="adversaire").start()
+
     def run(self):
         self._premier_lancement()
         self._proposer_le_rapport_de_plantage()
+        self._preparer_l_adversaire()
         while True:
             try:
                 self._une_partie()
@@ -858,15 +873,30 @@ class GameManager:
                 self.current_mode.arreter()
             except Exception:
                 pass
-        try:
-            import moteurs
-            moteurs.liberer("jeu")
-        except Exception:
-            if self.engine:
-                self.engine.quit()
+        # 24/10 (« lancer une partie est long ») : le Stockfish adversaire
+        # n'est plus ferme en quittant une partie (le relancer prenait ~0,6 s
+        # sur les 0,7 s d'un lancement). Il reste pret pour la partie suivante
+        # et la revanche ; il est ferme en quittant le jeu (cleanup).
+        # Sauf sur un petit PC (p31 : un seul Stockfish a la fois, la revue
+        # qui suit lance le sien) : la on le ferme comme avant.
+        if self._petit_pc():
+            try:
+                import moteurs
+                moteurs.liberer("jeu")
+            except Exception:
+                if self.engine:
+                    self.engine.quit()
         self.engine = None
         self.board = None
         self.current_mode = None
+
+    @staticmethod
+    def _petit_pc():
+        try:
+            import petit_pc
+            return petit_pc.est_petit()
+        except Exception:
+            return False
 
     def quitter(self):
         if self.board is not None and not self.board.game_over:

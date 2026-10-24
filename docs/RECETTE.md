@@ -22,7 +22,7 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
 - [ ] **R-006** – Premier lancement (dézipper la version amis dans un dossier neuf, ou renommer profil.json)  
   → Accueil : ton nom, ton niveau (4 choix), puis « Trois choses à savoir » ; ensuite le menu ; il ne revient plus. (Remettre profil.json.)
 - [ ] **R-005** – Quitter par le bouton Quitter puis par la croix de la fenêtre  
-  → Le jeu se ferme sans message d'erreur ; journal_du_jeu.txt finit par « Fin normale ».
+  → Le jeu se ferme tout de suite (moins d'une seconde, même pendant une revue ou quand l'ordinateur réfléchit), sans message d'erreur ; journal_du_jeu.txt finit par « Fin normale ».
 
 ## Partie contre l'ordinateur
 
@@ -318,6 +318,8 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
   → Aucune ligne « Traceback » ni « ERREUR ».
 - [ ] **R-124** – Dans un terminal, dans le dossier du jeu : python SickChess.py --plantage-test (le jeu se ferme tout de suite), puis relancer le jeu normalement  
   → Au lancement : « La dernière fois, SickChess s'est fermé à cause d'une erreur » ; « Envoyer le rapport » ouvre Signaler déjà rempli (message + journal du plantage) ; « Non merci » efface ; Échap : reproposé (3 fois au plus).
+- [ ] **R-125** – Quitter une partie pendant que l'ordinateur réfléchit ou que l'analyse tourne, puis relancer une partie contre l'ordinateur  
+  → Retour au menu aussitôt (pas de fenêtre figée) ; Stockfish redescend à 0 % dans le Gestionnaire des tâches ; la nouvelle partie se lance tout de suite et l'ordinateur joue normalement.
 
 ## Graphisme et textes
 
