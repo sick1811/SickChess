@@ -1323,3 +1323,20 @@ Question de Julien : « pourquoi tu ne changes pas le numéro de version 0.1.0 c
   et `CLAUDE.md` : nouveautés → MINEUR +1, corrections seules → CORRECTIF +1, 1.0.0 = sortie Steam.
 - Le n° amis (compteur des mises à jour) ne change pas de rôle. La n° 5 en ligne est en 0.1.0 et n'a **pas**
   le travail des séances 28 à 30 : **à publier en n° 6 (0.2.0)** par Claude Code sur le PC.
+
+## 24/10/2026 (32) – Au menu, les Stockfish d'analyse rendent leur mémoire (Claude Code, cloud)
+Constat du test d'endurance : au menu, 4 Stockfish gardaient ~5,5 Go jusqu'à la fermeture du jeu. Julien : **oui**.
+- `moteurs.liberer_au_repos()` : ferme tous les Stockfish sauf l'adversaire (« jeu », léger, garde le lancement
+  immédiat d'une partie) ; ne coupe **jamais** un moteur en pleine recherche (son verrou est tenu jusqu'à
+  « bestmove »).
+- `GameManager._repos_au_menu` : appelé à chaque tour du menu ; après **2 minutes** au menu sans autre écran
+  (2 s en mode petit PC), une seule fois ; revenir d'un autre écran remet le compteur à zéro.
+- Rien n'est perdu : les analyses finies sont dans les `.analyse.json` ; seule la table de hachage (brouillon)
+  part ; la revue suivante relance un Stockfish d'analyse (~1 s).
+- Tests : `test_sortie_rapide.py` section 4 bis + 5c (vrais Stockfish). Suite complète : 1068 contrôles, tout vert.
+  Recette R-126 ; t102 pour Julien.
+- À mesurer sur le PC : endurance (`outils/endurance.py`) : mémoire Stockfish au menu après 2 min.
+
+À vérifier par Julien :
+- [ ] t102 / R-126 : 2 min au menu après une revue → stockfish.exe d'analyse fermés, mémoire rendue ; la revue
+  rouverte a toujours ses pastilles.

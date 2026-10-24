@@ -919,11 +919,18 @@
    "ordre": 11504
   },
   {
+   "id": "R-126",
+   "section": "Solidité",
+   "texte": "Faire une revue, revenir au menu et ne rien toucher pendant 3 minutes (Gestionnaire des tâches ouvert)",
+   "detail": "Au bout de 2 minutes, les stockfish.exe d'analyse disparaissent (il en reste un : l'adversaire) et la mémoire redescend de plusieurs Go ; rouvrir la même revue : tout est là (pastilles, précision) ; une nouvelle revue démarre normalement.",
+   "ordre": 11505
+  },
+  {
    "id": "R-125",
    "section": "Solidité",
    "texte": "Quitter une partie pendant que l'ordinateur réfléchit ou que l'analyse tourne, puis relancer une partie contre l'ordinateur",
    "detail": "Retour au menu aussitôt (pas de fenêtre figée) ; Stockfish redescend à 0 % dans le Gestionnaire des tâches ; la nouvelle partie se lance tout de suite et l'ordinateur joue normalement.",
-   "ordre": 11505
+   "ordre": 11506
   },
   {
    "id": "R-130",

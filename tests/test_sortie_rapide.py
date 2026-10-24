@@ -219,6 +219,77 @@ verifier("jeu" in fermetures_apres_cleanup("petit"),
 verifier("_preparer_l_adversaire" in inspect.getsource(game_manager.GameManager.run),
          "l'adversaire demarre en tache de fond au menu")
 
+print("4 bis. Au menu au repos : les Stockfish d'analyse rendent leur memoire (oui de Julien, 24/10)")
+
+
+class MoteurOccupe(MoteurFaux):
+    def __init__(self):
+        MoteurFaux.__init__(self)
+        self._verrou = threading.RLock()
+
+
+sauves = dict(moteurs._moteurs)
+moteurs._moteurs.clear()
+jeu_, ana, ana2, libre, occupe = MoteurFaux(), MoteurFaux(), MoteurFaux(), MoteurFaux(), MoteurOccupe()
+moteurs._moteurs.update({"jeu": jeu_, "analyse": ana, "analyse-2": ana2, "libre": libre, "analyse-3": occupe})
+pret = threading.Event()
+lache = threading.Event()
+
+
+def chercher():
+    with occupe._verrou:                # une recherche en cours (verrou tenu)
+        pret.set()
+        lache.wait(5)
+
+
+threading.Thread(target=chercher, daemon=True).start()
+pret.wait(2)
+try:
+    fermes = moteurs.liberer_au_repos()
+    verifier(ana.ferme and ana2.ferme and libre.ferme, "les Stockfish d'analyse au repos sont fermes (%d)" % fermes)
+    verifier(not jeu_.ferme and "jeu" in moteurs._moteurs, "l'adversaire est garde (partie suivante immediate)")
+    verifier(not occupe.ferme and "analyse-3" in moteurs._moteurs, "un Stockfish en pleine recherche n'est jamais coupe")
+    lache.set()
+    time.sleep(0.1)
+    moteurs.liberer_au_repos()
+    verifier(occupe.ferme, "une fois sa recherche finie, il est ferme aussi")
+finally:
+    lache.set()
+    moteurs._moteurs.clear()
+    moteurs._moteurs.update(sauves)
+
+appels = []
+vrai_repos = moteurs.liberer_au_repos
+moteurs.liberer_au_repos = lambda: appels.append(1) or 2
+try:
+    petit_pc.forcer("normal")
+    gm = game_manager.GameManager.__new__(game_manager.GameManager)
+    gm._repos_au_menu(1000.0, nouveau=True)
+    t = 1000.0
+    while t < 1119.0:
+        t += 0.5
+        gm._repos_au_menu(t)
+    verifier(not appels, "moins de 2 minutes au menu : rien n'est ferme")
+    for _ in range(4):
+        t += 0.5
+        gm._repos_au_menu(t)
+    verifier(len(appels) == 1, "apres 2 minutes au menu : liberation, une seule fois (%d)" % len(appels))
+    gm._repos_au_menu(t + 300.0)        # retour d'un autre ecran (revue...)
+    for _ in range(10):
+        t += 300.0 + 0.5
+        gm._repos_au_menu(t)
+        break
+    verifier(len(appels) == 1, "revenir d'un autre ecran remet le compteur a zero")
+    petit_pc.forcer("petit")
+    appels.clear()
+    gm._repos_au_menu(5000.0, nouveau=True)
+    for i in range(1, 6):
+        gm._repos_au_menu(5000.0 + i * 0.5)
+    verifier(len(appels) == 1, "petit PC : liberation au bout de 2 s")
+finally:
+    moteurs.liberer_au_repos = vrai_repos
+    petit_pc.forcer(None)
+
 chemin = chemin_stockfish()
 if chemin:
     print("5. Avec le vrai Stockfish (%s)" % os.path.basename(chemin))
@@ -249,6 +320,29 @@ if chemin:
              "la recherche de 20 s s'arrete aussitot (%.1f s en tout)" % (time.perf_counter() - debut))
     verifier(sf.est_vivant(), "Stockfish reste vivant apres « stop » (pret pour la suite)")
     sf.quit()
+    # 5c. au menu au repos, avec de vrais Stockfish
+    sauves = dict(moteurs._moteurs)
+    moteurs._moteurs.clear()
+    try:
+        adversaire = moteurs.moteur_de_jeu(chemin)
+        analyse = moteurs.moteur_d_analyse_n(0, chemin, threads=1, hash_mb=64)
+        cherche = StockfishEngine(chemin)
+        moteurs._moteurs["analyse-3"] = cherche
+        fil = threading.Thread(target=lambda: cherche.analyser_position(chess.Board().fen(), 0, 3000, lignes=1),
+                               daemon=True)
+        fil.start()
+        time.sleep(0.8)
+        moteurs.liberer_au_repos()
+        verifier(not analyse.est_vivant() and adversaire.est_vivant() and cherche.est_vivant(),
+                 "vrai Stockfish : analyse fermee, adversaire garde, recherche en cours pas coupee")
+        fil.join(5)
+        moteurs.liberer_au_repos()
+        verifier(not cherche.est_vivant(), "vrai Stockfish : ferme une fois sa recherche finie")
+        neuf = moteurs.moteur_d_analyse_n(0, chemin, threads=1, hash_mb=64)
+        verifier(neuf is not None and neuf.est_vivant(), "la revue suivante relance un Stockfish d'analyse")
+    finally:
+        moteurs.tout_fermer()
+        moteurs._moteurs.update(sauves)
 else:
     print("5. (pas de Stockfish : controles avec le vrai moteur sautes)")
 
