@@ -1046,3 +1046,21 @@ Fait :
 
 À vérifier par Julien :
 - [ ] t96 (voir A_FAIRE), R-124.
+
+## 24/10/2026 (28) – Travail p28 : test d'endurance (Claude Code dans le cloud)
+Demande de Julien : « p28 ».
+Fait :
+- **`outils/endurance.py`** : un robot joue au VRAI jeu (fenêtre invisible, dossier temporaire, vrai Stockfish, 60
+  images/s) pendant 2 h, en boucle : menu → partie contre l'ordinateur (coups au hasard, niveau 800 / 1400 / 2000) →
+  sa revue → partie à deux quittée en cours → problèmes (15 % de mauvais coups) → analyse libre → Options, Mes
+  parties, Statistiques. Après chaque scénario : mémoire du jeu et des Stockfish, nombre de Stockfish, fils, temps
+  d'image, erreurs. Jugement : fuite (pente de la mémoire au menu, seconde moitié du test), Stockfish qui
+  s'accumulent, ralentissement (fin / début), plantages (erreur ou « Traceback » dans le journal).
+  → `tests/endurance/rapport.json`, `journal.txt` et, pour 1 h ou plus, `docs/ENDURANCE.md`.
+- Banc d'essai : 9e section **« endurance »** (hors --rapide ; SICKCHESS_ENDURANCE_MINUTES change la durée).
+- Essais dans le cloud (18 min, 2 fois) : **0 plantage, 0 Traceback, au plus 3 Stockfish (2 au menu, toujours),
+  pas de ralentissement (x1,05 à x1,13)**. Mémoire du jeu au menu : 182 → 199 Mo en 8 min puis plafond (réserves
+  des textes et des tranches de problèmes, bornées) → +19 Mo/h, vert. Le 1er essai avait vu une fausse fuite : le
+  robot gardait lui-même le temps de chaque image (corrigé : 600 au plus par écran).
+- Tests : `tests/test_endurance.py` (10 contrôles du jugement sur des mesures inventées). Suite : 900 contrôles verts.
+- Le vrai passage de 2 h est à faire sur le PC de Julien (demandé à Claude Code du PC, la nuit).

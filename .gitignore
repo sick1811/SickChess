@@ -58,3 +58,6 @@ tests/surveillance.csv
 
 # 24/10 : captures et resultats de outils/recette_auto.py
 /tests/recette_auto/
+
+# 24/10 : mesures du test d'endurance (outils/endurance.py)
+/tests/endurance/

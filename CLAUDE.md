@@ -66,6 +66,11 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
   section « À tester par Julien ». (Dans Cowork, Claude les recopie aussi dans la page
   « SickChess – À faire » : https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5.)
 - Pour un bug : le reproduire dans un test avant de le corriger.
+- **Test d'endurance (2 h, PC Windows)** : `python outils/endurance.py` (un robot joue au vrai jeu, fenêtre
+  invisible ; `--minutes 15` pour un essai) → fuite de mémoire, Stockfish qui s'accumulent, ralentissement,
+  plantages ; `tests/endurance/rapport.json` et `docs/ENDURANCE.md`. Section « endurance » du banc (hors --rapide).
+- **Précision des pastilles** : `python outils/precision.py` (banque `tests/positions_revue.json`, section
+  « precision » du banc). Un « coup N faux » signalé par Julien s'ajoute dans `A_LA_MAIN`.
 - **Recette automatique** : `python outils/recette_auto.py` pilote le vrai jeu (souris, clavier, vrai
   Stockfish, fenêtre invisible) et vérifie les lignes de recette qu'un programme peut juger →
   `tests/recette_auto/resultats.json`. À lancer sur le PC avant de demander une passe à Julien.
