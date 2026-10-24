@@ -1,17 +1,16 @@
 # Vérification du jeu en ligne
 
-Le 24/10/2026 00:21 · dossier vérifié : `C:\Users\mesck\AppData\Local\Temp\SickChessEssai3`
+Le 24/10/2026 04:36 · dossier vérifié : `C:\Users\mesck\Desktop\echequier\echequier\SickChess`
 
 Fabriqué par `python outils/verifier_en_ligne.py`.
 
 - ✅ steam_api64.dll présent à côté du jeu
 - ✅ steam_appid.txt contient un numéro (480)
 - ⚪ Numéro 480 = test de Valve (« Spacewar ») : accepter une invitation quand SickChess est FERMÉ lancerait Spacewar. L'ami doit ouvrir SickChess d'abord, puis accepter (ou taper le code).
-- ✅ SickChess.exe présent (version installée)
 - ✅ Connexion à Steam
 - ✅ Compte : Sick · numéro du jeu : 480
-- ✅ 37 ami(s) Steam visibles (dont 9 en ligne)
-- ✅ Salon créé, code U0W2-PZQ1-N2R
+- ✅ 37 ami(s) Steam visibles (dont 3 en ligne)
+- ✅ Salon créé, code U0W2-Q01X-D6B
 - ✅ Le code redonne bien le même salon
 - ✅ Écriture / lecture des informations du salon
 - ✅ Tu es bien l'hôte du salon
