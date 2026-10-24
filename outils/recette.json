@@ -408,53 +408,60 @@
    "ordre": 10701
   },
   {
+   "id": "R-079",
+   "section": "Mes parties et profil",
+   "texte": "Importer une partie (ou en jouer une à deux), revenir au menu et attendre quelques minutes, puis Mes parties",
+   "detail": "La partie affiche « Revue prête » ; sa revue s'ouvre avec toutes les pastilles tout de suite. Pendant une partie contre l'ordinateur, aucun stockfish.exe de plus (l'analyse de fond est en pause) ; Options → réglage « analyse_de_fond » à faux dans config.json : plus rien ne se calcule au menu.",
+   "ordre": 10702
+  },
+  {
    "id": "R-072",
    "section": "Mes parties et profil",
    "texte": "Revoir une partie de la liste",
    "detail": "La revue s'ouvre au début ; si elle a déjà été analysée, pas de nouvelle analyse.",
-   "ordre": 10702
+   "ordre": 10703
   },
   {
    "id": "R-075",
    "section": "Mes parties et profil",
    "texte": "Copier un PGN (lichess / chess.com) puis Mes parties → Importer (PGN)",
    "detail": "La revue de la partie s'ouvre ; elle apparaît dans la liste avec la pastille PGN (ou V/N/D si ton nom y est) ; l'Elo ne bouge pas.",
-   "ordre": 10703
+   "ordre": 10704
   },
   {
    "id": "R-076",
    "section": "Mes parties et profil",
    "texte": "Copier un lien de partie lichess puis Importer ; glisser un fichier .pgn sur la fenêtre",
    "detail": "La partie est téléchargée / importée et la revue s'ouvre.",
-   "ordre": 10704
+   "ordre": 10705
   },
   {
    "id": "R-077",
    "section": "Mes parties et profil",
    "texte": "Mes parties → Statistiques",
    "detail": "Parties et score (Blancs / Noirs), précision moyenne et tendance, tes ouvertures avec leur score, tes fautes par phase, courbe de précision.",
-   "ordre": 10705
+   "ordre": 10706
   },
   {
    "id": "R-078",
    "section": "Mes parties et profil",
    "texte": "Battre l'ordinateur, puis Mes parties → Statistiques → Succès",
    "detail": "Bandeau « Succès débloqué : Premier sang » en haut de l'écran ; la liste montre les 14 succès, ceux obtenus en couleur avec la date.",
-   "ordre": 10706
+   "ordre": 10707
   },
   {
    "id": "R-073",
    "section": "Mes parties et profil",
    "texte": "Bouton Ouvrir le dossier",
    "detail": "L'explorateur Windows s'ouvre sur le dossier parties.",
-   "ordre": 10707
+   "ordre": 10708
   },
   {
    "id": "R-074",
    "section": "Mes parties et profil",
    "texte": "Partie à deux puis Mes parties",
    "detail": "La partie apparaît avec la pastille « 2J » et ne change pas l'Elo.",
-   "ordre": 10708
+   "ordre": 10709
   },
   {
    "id": "R-080",

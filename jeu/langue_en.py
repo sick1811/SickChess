@@ -175,6 +175,7 @@ EN = {
     "Pas d'indice pendant un défi.": "No hints during a challenge.",
     "Voici la solution.": "Here is the solution.",
     "Raté ! Problème suivant...": "Missed! Next puzzle...",
+    "Revue prête": "Review ready",
     "Raté ! Il fallait %s. Problème suivant...": "Missed! The move was %s. Next puzzle...",
     "Problème suivant": "Next puzzle", "Passer ce problème": "Skip this puzzle",
     "Indice (H)": "Hint (H)", "Solution": "Solution", "Rejouer le défi": "Play again",

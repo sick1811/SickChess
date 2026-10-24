@@ -148,6 +148,8 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
   → Profil (nom, Elo, victoires/nulles/défaites, courbe) et liste des parties, la plus récente en haut.
 - [ ] **R-071** – Changer de nom, valider avec Entrée  
   → Le nouveau nom s'affiche ici et dans les nouvelles parties.
+- [ ] **R-079** – Importer une partie (ou en jouer une à deux), revenir au menu et attendre quelques minutes, puis Mes parties  
+  → La partie affiche « Revue prête » ; sa revue s'ouvre avec toutes les pastilles tout de suite. Pendant une partie contre l'ordinateur, aucun stockfish.exe de plus (l'analyse de fond est en pause) ; Options → réglage « analyse_de_fond » à faux dans config.json : plus rien ne se calcule au menu.
 - [ ] **R-072** – Revoir une partie de la liste  
   → La revue s'ouvre au début ; si elle a déjà été analysée, pas de nouvelle analyse.
 - [ ] **R-075** – Copier un PGN (lichess / chess.com) puis Mes parties → Importer (PGN)  

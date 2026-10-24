@@ -215,6 +215,7 @@ class GameManager:
         self._repos_au_menu(time.time(), nouveau=True)
         while True:
             self._repos_au_menu(time.time())
+            self._analyse_de_fond().reprendre()     # 25/10 (p25)
             # Invitation Steam acceptee (ou jeu lance par une invitation) :
             # on file directement au salon de l'ami.
             if partie_en_ligne.invitation_en_attente():
@@ -236,6 +237,20 @@ class GameManager:
             self.aide.draw(self.screen)
             ui.afficher()
             self.clock.tick(cadence.suivante(evenements))
+
+    def _analyse_de_fond(self):
+        """25/10 (p25) : les parties pas encore analysees se calculent au menu et
+        pendant les Problemes (analyse_de_fond.py) ; en pause ailleurs."""
+        fond = getattr(self, "_fond", None)
+        if fond is None:
+            import analyse_de_fond
+            fond = self._fond = analyse_de_fond.AnalyseDeFond(
+                getattr(self, "stockfish_path", None), getattr(self, "config", {}))
+        return fond
+
+    # Les ecrans ouverts depuis le menu pendant lesquels l'analyse de fond
+    # continue (legers) ; les autres la mettent en pause.
+    ECRANS_AVEC_FOND = ("puzzles", "historique", "signaler", "mise_a_jour", "options")
 
     REPOS_AVANT_LIBERER = 120       # secondes au menu (2 s sur un petit PC)
 
@@ -298,6 +313,8 @@ class GameManager:
                 self.quitter()
             if choix in ecrans or choix == "options":
                 self.au_menu = False          # un autre ecran s'ouvre par-dessus
+                if choix not in self.ECRANS_AVEC_FOND:
+                    self._analyse_de_fond().pause()
                 if choix == "options":
                     self.ouvrir_options()
                     musique.jouer(self.config)
@@ -393,6 +410,7 @@ class GameManager:
                         self.clock, self.evenement_fenetre) == "quitter":
                     self.quitter()
                 continue
+            self._analyse_de_fond().pause()   # 25/10 (p25) : la revue a tout le processeur
             relecture = self._revue_d_une_partie_enregistree(reponse["partie"]) \
                 or EcranRevoir(self.screen, reponse["partie"],
                                self.disposition, self.config)
@@ -422,6 +440,11 @@ class GameManager:
                                     analyse_partie.puissance_de(self.config),
                                     fichier_cache=os.path.splitext(chemin_pgn)[0]
                                     + ".analyse.json" if chemin_pgn else None)
+        # 25/10 (p25) : ce que l'analyse de fond a deja calcule sur cette partie.
+        if chemin_pgn and not analyseur.terminee():
+            reprises = analyseur.reprendre_de(self._analyse_de_fond().prendre(chemin_pgn))
+            if reprises:
+                print("[FOND] la revue reprend %d position(s) deja analysee(s)" % reprises)
         resultat = " ".join(m for m in (partie.get("resultat", ""),
                                         partie.get("date", "")) if m)
         return EcranRevue(self.screen, analyseur, self.config,
@@ -618,7 +641,9 @@ class GameManager:
 
     def _une_partie(self):
         """Menu -> reglages -> partie(s). Revient au menu."""
-        if self.show_menu() == "reprendre":
+        choix = self.show_menu()
+        self._analyse_de_fond().pause()       # 25/10 (p25) : la partie a tout le processeur
+        if choix == "reprendre":
             self.reglages = dict(self.reprise.get("reglages") or {})
         elif not self.demander_reglages():
             return
@@ -889,6 +914,9 @@ class GameManager:
     # ------------------------------------------------------------------ arret
 
     def cleanup_game(self):
+        fond = getattr(self, "_fond", None)
+        if fond is not None:
+            fond.nouvelle_partie()       # 25/10 (p25) : la partie finie est a analyser
         direct = getattr(self, "analyse_en_direct", None)
         if direct is not None:
             direct.arreter()
@@ -934,6 +962,9 @@ class GameManager:
         sys.exit()
 
     def cleanup(self):
+        fond = getattr(self, "_fond", None)
+        if fond is not None:
+            fond.fermer()
         try:
             import moteurs
             moteurs.tout_fermer()

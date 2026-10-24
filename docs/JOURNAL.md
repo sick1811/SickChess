@@ -1387,3 +1387,19 @@ de la recette jamais traités :
   (`signalement.py`, clé `signalement_webhook`) ; **il manque l'adresse du webhook** (le lien discord.gg est une
   invitation, pas une adresse d'envoi). Demandé à Julien.
 - Les bugs et idées postés sur Discord : Claude n'y a pas accès ; Julien les recopiera.
+
+## 25/10/2026 (38) – p25 : analyse des parties en tâche de fond (Claude Code, cloud)
+Travail choisi par Julien (« Je veux ») : « les parties importées ou pas encore analysées se calculent pendant
+que tu es dans le menu ou que tu fais des problèmes ; pastille « Revue prête » dans Mes parties ».
+- `jeu/analyse_de_fond.py` : au menu et pendant les Problèmes (aussi Mes parties, Signaler, Options), la plus
+  récente partie sans `.analyse.json` est analysée, puis la suivante. **Un seul** Stockfish à lui (hors de
+  `moteurs.py` : la libération au repos ne le touche pas), priorité basse, 1/4 des cœurs (1 sur un petit PC),
+  256 Mo ; même puissance que la revue (le fichier écrit est celui que la revue relit).
+- **Pause** (Stockfish fermé, travail gardé en mémoire) dès qu'une partie, une revue, l'analyse libre, les
+  ouvertures ou le jeu en ligne commencent. La revue d'une partie à moitié faite **reprend** ce travail
+  (`AnalyseurPartie.reprendre_de`, seulement d'une analyse au moins aussi forte).
+- Mes parties : étiquette « Revue prête » (relue toutes les 3 s, hors du dessin). Réglage `analyse_de_fond`
+  (vrai par défaut). Recette R-079 ; test t104.
+- Test : `tests/test_analyse_de_fond.py` (vrai Stockfish) : 2 parties analysées toutes seules, pause en 0,01 s
+  avec 15 positions gardées, reprises par la revue, étiquette dans Mes parties. Suite complète : 1111 contrôles
+  verts + ce test (rouge une fois : il comptait trop tôt, corrigé). Version 0.2.0 (pas encore publiée).

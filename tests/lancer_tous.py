@@ -49,6 +49,7 @@ SERIES = [
     ("test_analyse_libre.py", False),
     ("test_sortie_rapide.py", False),
     ("test_revue.py", True),            # True = utilise Stockfish
+    ("test_analyse_de_fond.py", True),
     ("test_analyse_directe.py", True),
     ("test_mes_erreurs.py", True),
     ("test_variantes.py", True),

@@ -169,6 +169,9 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t104 (38) : **analyse de fond (p25)** : importe une partie (ou joues-en une à deux), reste au menu
+      quelques minutes, puis Mes parties : « Revue prête » ; sa revue s'ouvre avec toutes les pastilles.
+      Pendant une partie contre l'ordinateur : pas de stockfish.exe en plus. Le jeu reste fluide au menu ?
 - [ ] t103 (36) : **corrections des défauts trouvés par Cowork** (à confier à Cowork sur ton PC) :
       revue : clic sur un coup de la feuille (même après avoir cliqué une pièce), plus de « Nf3, Nf3 », explication
       d'une gaffe en entier ; Problèmes : messages et record lisibles, Mes erreurs sans les parties de Morphy,

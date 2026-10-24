@@ -1009,6 +1009,29 @@ class AnalyseurPartie:
     def terminee(self):
         return all(v >= self.niveau_final for v in self.niveau)
 
+    def reprendre_de(self, autre):
+        """25/10 (p25) : reprend le travail d'une autre analyse de la MEME
+        partie (l'analyse de fond, mise en pause quand la revue s'ouvre) au lieu
+        de tout recommencer. Seulement si elle est au moins aussi forte.
+        Renvoie le nombre de positions reprises."""
+        if autre is None or autre is self or autre.fens != self.fens \
+                or autre.effort < self.effort or autre.niveau_final != self.niveau_final:
+            return 0
+        reprises = 0
+        for k in range(len(self.fens)):
+            if autre.niveau[k] > self.niveau[k]:
+                for champ in self.CHAMPS_CACHE:
+                    getattr(self, champ)[k] = getattr(autre, champ)[k]
+                self.niveau[k] = autre.niveau[k]
+                if k in autre.allegees:
+                    self.allegees.add(k)
+                reprises += 1
+        if reprises:
+            self._cache = {}
+            if self.terminee():
+                self._ecrire_cache()
+        return reprises
+
     def texte_avancement(self):
         if self.erreur:
             return "Analyse impossible : %s" % self.erreur
