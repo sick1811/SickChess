@@ -313,6 +313,8 @@ RECETTE = [
          "Aucune ligne « Traceback » ni « ERREUR »."),
         ("R-124", "Dans un terminal, dans le dossier du jeu : python SickChess.py --plantage-test (le jeu se ferme tout de suite), puis relancer le jeu normalement",
          "Au lancement : « La dernière fois, SickChess s'est fermé à cause d'une erreur » ; « Envoyer le rapport » ouvre Signaler déjà rempli (message + journal du plantage) ; « Non merci » efface ; Échap : reproposé (3 fois au plus)."),
+        ("R-126", "Faire une revue, revenir au menu et ne rien toucher pendant 3 minutes (Gestionnaire des tâches ouvert)",
+         "Au bout de 2 minutes, les stockfish.exe d'analyse disparaissent (il en reste un : l'adversaire) et la mémoire redescend de plusieurs Go ; rouvrir la même revue : tout est là (pastilles, précision) ; une nouvelle revue démarre normalement."),
         ("R-125", "Quitter une partie pendant que l'ordinateur réfléchit ou que l'analyse tourne, puis relancer une partie contre l'ordinateur",
          "Retour au menu aussitôt (pas de fenêtre figée) ; Stockfish redescend à 0 % dans le Gestionnaire des tâches ; la nouvelle partie se lance tout de suite et l'ordinateur joue normalement."),
     ]),

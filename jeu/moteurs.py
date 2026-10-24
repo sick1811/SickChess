@@ -349,6 +349,31 @@ def liberer(role):
     return False
 
 
+def _en_recherche(moteur):
+    """True si le moteur cherche en ce moment (son verrou est tenu jusqu'a
+    « bestmove »)."""
+    verrou = getattr(moteur, "_verrou", None)
+    if verrou is None:
+        return False
+    if verrou.acquire(blocking=False):
+        verrou.release()
+        return False
+    return True
+
+
+def liberer_au_repos(garder=("jeu",)):
+    """24/10 (oui de Julien) : au menu, sans rien a analyser, les Stockfish
+    d'analyse gardaient ~5,5 Go jusqu'a la fermeture du jeu. On les ferme
+    (ils redemarrent en ~1 s a la prochaine revue). Les analyses finies sont
+    dans les fichiers .analyse.json : rien n'est perdu. On garde l'adversaire
+    (leger, il rend le lancement d'une partie immediat) et on ne coupe jamais
+    un moteur en pleine recherche. Renvoie le nombre de moteurs fermes."""
+    with _verrou:
+        roles = [role for role, m in _moteurs.items()
+                 if role not in garder and not _en_recherche(m)]
+    return sum(1 for role in roles if liberer(role))
+
+
 def tout_fermer():
     """A la fermeture du jeu : aucun stockfish.exe ne doit survivre."""
     with _verrou:

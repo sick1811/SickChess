@@ -157,6 +157,9 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t102 (32) : fais une revue, reviens au menu et ne touche à rien 3 minutes, Gestionnaire des tâches ouvert :
+      au bout de 2 min les stockfish.exe d'analyse disparaissent (il en reste 1, l'adversaire), la mémoire
+      redescend de plusieurs Go ; rouvre la même revue : pastilles et précision sont toujours là.
 → 24/10 : chaque test de la page porte une étiquette « Qui » (Cowork / Claude Code PC / Toi) ;
   répartition et consignes pour Cowork : `docs/TESTS_COWORK.md`. Filtre « Seulement pour moi » dans la page.
 - [ ] t101 (28) : **quitter et lancer vite** : pendant que l'ordinateur réfléchit (niveau Maximum, longue cadence),

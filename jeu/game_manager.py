@@ -10,6 +10,7 @@
 import json
 import os
 import sys
+import time
 
 import chess
 
@@ -211,7 +212,9 @@ class GameManager:
         import musique
         musique.jouer(self.config)          # 17/10, travail p14
         cadence = ui.Cadence()       # 23/10 : 30 images/s au repos
+        self._repos_au_menu(time.time(), nouveau=True)
         while True:
+            self._repos_au_menu(time.time())
             # Invitation Steam acceptee (ou jeu lance par une invitation) :
             # on file directement au salon de l'ami.
             if partie_en_ligne.invitation_en_attente():
@@ -233,6 +236,31 @@ class GameManager:
             self.aide.draw(self.screen)
             ui.afficher()
             self.clock.tick(cadence.suivante(evenements))
+
+    REPOS_AVANT_LIBERER = 120       # secondes au menu (2 s sur un petit PC)
+
+    def _repos_au_menu(self, maintenant, nouveau=False):
+        """24/10 : apres 2 minutes au menu sans rien faire, on rend la memoire
+        des Stockfish d'analyse (~5 Go). Un passage dans un autre ecran (une
+        boucle du menu qui revient apres plus d'une seconde) remet a zero."""
+        dernier = getattr(self, "_menu_dernier_tour", None)
+        if nouveau or dernier is None or maintenant - dernier > 1.0:
+            self._menu_depuis = maintenant
+            self._menu_libere = False
+        self._menu_dernier_tour = maintenant
+        attente = 2 if self._petit_pc() else self.REPOS_AVANT_LIBERER
+        if self._menu_libere or maintenant - self._menu_depuis < attente:
+            return False
+        self._menu_libere = True
+        try:
+            import moteurs
+            fermes = moteurs.liberer_au_repos()
+        except Exception as e:
+            print("[MOTEURS] liberation au repos impossible : %s" % e)
+            return False
+        if fermes:
+            print("[MOTEURS] menu au repos : %d Stockfish d'analyse fermes (memoire rendue)" % fermes)
+        return True
 
     def _retour_force_au_menu(self):
         self.screen = pygame.display.get_surface()
