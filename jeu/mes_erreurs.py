@@ -166,7 +166,10 @@ def coup_presque_aussi_bon(fen_avant, coup, puzzle, chemin_stockfish=None):
         plateau = chess.Board(fen_avant)
         joueur_blanc = plateau.turn == chess.WHITE
         plateau.push(coup)
-        details = moteur.analyser_position(plateau.fen(), 14, 1500)
+        # 24/10 : 1,5 s ne suffisait pas quand le PC etait occupe (analyse en tache de
+        # fond, suite de tests) : la profondeur 14 n'etait pas atteinte et un bon coup
+        # pouvait etre refuse. 5 s de garde-fou ; sur un PC libre, 14 est atteint bien avant.
+        details = moteur.analyser_position(plateau.fen(), 14, 5000)
     except Exception as souci:
         print("[MES ERREURS] verification impossible : %s" % souci)
         return False

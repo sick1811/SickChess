@@ -551,4 +551,9 @@ EN = {
     "Le %s (version %s). Envoie le rapport à Julien : il saura ce qui a cassé et pourra le réparer. Tu verras le message avant de l'envoyer ; rien ne part sans ton accord.":
         "On %s (version %s). Send the report to Julien: he will know what broke and can fix it. You will see the message before sending it; nothing is sent without your consent.",
     "Envoyer le rapport": "Send the report", "Non merci": "No thanks",
+    # --- mode petit PC (24/10, travail p31)
+    "Puissance du PC": "Computer power", "Automatique": "Automatic", "Petit PC": "Small PC",
+    "PC normal": "Normal PC", "Ce PC : %d cœurs, %s → petit PC": "This PC: %d cores, %s → small PC",
+    "Ce PC : %d cœurs, %s → PC normal": "This PC: %d cores, %s → normal PC",
+    "Analyse, mémoire de Stockfish et effets adaptés au PC": "Analysis, Stockfish memory and effects adapted to the PC",
 }

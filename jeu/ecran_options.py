@@ -36,6 +36,12 @@ DEFAUTS_EN_PLUS = {
     "analyse_mode": "calcul",
     "analyse_niveau": "forte",      # 18/10 (14) : Maximale = 17 min de revue
 }
+try:                              # 24/10 (p31) : Rapide par defaut sur un petit PC
+    import petit_pc as _petit_pc
+    if _petit_pc.est_petit():
+        DEFAUTS_EN_PLUS["analyse_niveau"] = "rapide"
+except Exception:
+    pass
 try:                              # 17/10, travail p12 : la langue de Windows par defaut
     import langue as _langue
     DEFAUTS_EN_PLUS["langue"] = _langue.langue()
@@ -151,8 +157,19 @@ def _onglets():
                     [("SickChess", True), ("Système", False)], 2),
             Reglage("langue", "Langue", "Les textes du jeu",
                     [("Français", "fr"), ("English", "en")], 2),
+            Reglage("mode_pc", "Puissance du PC", _description_pc(),
+                    [("Automatique", "auto"), ("Petit PC", "petit"), ("PC normal", "normal")], 3),
         ]),
     ]
+
+
+def _description_pc():
+    """24/10 (p31) : ce que le jeu a detecte (petit_pc.py)."""
+    try:
+        import petit_pc
+        return petit_pc.description()
+    except Exception:
+        return "Analyse, mémoire de Stockfish et effets adaptés au PC"
 
 
 def valeurs_par_defaut():

@@ -731,7 +731,7 @@ class GameManager:
         self._coups_vus = coups
         if maintenant - getattr(self, "_activite_ms", maintenant) < self.REPOS_APRES_MS:
             return 60
-        return 30
+        return ui.images_au_repos()
 
     def _partie_terminee(self):
         """Une seule fois par partie : profil, PGN, et plus rien a reprendre."""

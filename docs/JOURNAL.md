@@ -1083,3 +1083,26 @@ Fait :
 
 À vérifier par Julien / Claude Code (PC) :
 - [ ] t97 (voir A_FAIRE), R-115.
+
+## 24/10/2026 (30) – Travail p31 : mode « petit PC » (Claude Code dans le cloud)
+Demande de Julien : « P31 ».
+Fait :
+- **`jeu/petit_pc.py`** : au lancement, le jeu regarde le PC (cœurs, mémoire). **Petit PC** = 4 cœurs ou moins, ou
+  ~8 Go ou moins. Écrit au journal (« [PC] 4 coeurs, 7.9 Go : PETIT PC »).
+- Sur un petit PC : analyse avec **un seul Stockfish** (au lieu de 2 ou 3), **1 Go** de mémoire au plus (au lieu de
+  4), **un seul cœur pendant la partie** (l'ordinateur adverse reste fluide), puissance **Rapide par défaut** (un
+  choix fait dans Options est toujours respecté) ; **30 confettis** au lieu de 90 ; **24 images/s au repos** au lieu
+  de 30.
+- **Options → Affichage → « Puissance du PC »** : Automatique (par défaut, avec « Ce PC : 12 cœurs, 16 Go → PC
+  normal »), Petit PC, PC normal. Le PC de Julien (i7, 12 cœurs) reste en « PC normal » : rien ne change pour lui.
+- Le cloud (4 cœurs) est un petit PC : toute la suite d'analyse y a tourné avec un seul Stockfish, verte.
+  Les séries qui contrôlent les réglages d'un PC normal le forcent (`petit_pc.forcer`).
+- Tests : `tests/test_petit_pc.py` (20 contrôles). Anglais traduit. Recette : R-09F.
+- En passant : le contrôle instable de `test_mes_erreurs.py` (« un autre coup qui défend f7 », noté le 23/10 (22))
+  a de nouveau été rouge pendant la suite complète, vert 3 fois sur 3 seul. Cause : Stockfish n'avait que 1,5 s
+  pour la profondeur 14 ; PC occupé = profondeur pas atteinte = un BON coup de « Mes erreurs » pouvait être refusé
+  (vrai défaut pour un joueur pendant une analyse en tâche de fond). Garde-fou porté à 5 s
+  (`jeu/mes_erreurs.py`). Suite complète : 950 contrôles verts.
+
+À vérifier par Julien :
+- [ ] t98 (voir A_FAIRE), R-09F.

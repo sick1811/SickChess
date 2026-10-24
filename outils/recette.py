@@ -245,6 +245,8 @@ RECETTE = [
          "Tout est en anglais (boutons, explications, noms d'ouvertures), rien ne déborde ; revenir à Français remet tout."),
         ("R-094", "Valeurs par défaut",
          "Tout revient aux réglages d'origine (plateau Tournoi, accent Or)."),
+        ("R-09F", "Options → Affichage → « Puissance du PC » : lire la ligne « Ce PC : … » ; essayer Petit PC puis une revue ; revenir à Automatique",
+         "La ligne dit tes cœurs, ta mémoire et « PC normal » (ton i7) ; en Petit PC, la revue n'ouvre qu'un seul stockfish.exe (Gestionnaire des tâches) et reste fluide ; un choix de puissance d'analyse fait à la main est gardé."),
     ]),
     ("En ligne (Steam)", [
         ("R-100", "Jouer en ligne sans Steam lancé",

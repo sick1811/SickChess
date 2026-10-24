@@ -702,6 +702,13 @@
    "ordre": 11208
   },
   {
+   "id": "R-09F",
+   "section": "Options",
+   "texte": "Options → Affichage → « Puissance du PC » : lire la ligne « Ce PC : … » ; essayer Petit PC puis une revue ; revenir à Automatique",
+   "detail": "La ligne dit tes cœurs, ta mémoire et « PC normal » (ton i7) ; en Petit PC, la revue n'ouvre qu'un seul stockfish.exe (Gestionnaire des tâches) et reste fluide ; un choix de puissance d'analyse fait à la main est gardé.",
+   "ordre": 11209
+  },
+  {
    "id": "R-100",
    "section": "En ligne (Steam)",
    "texte": "Jouer en ligne sans Steam lancé",

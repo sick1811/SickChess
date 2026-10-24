@@ -341,7 +341,16 @@ class Cadence:
         maintenant = pygame.time.get_ticks()
         if evenements or anime or self._activite_ms is None:
             self._activite_ms = maintenant
-        return 60 if maintenant - self._activite_ms < self.REPOS_APRES_MS else 30
+        return 60 if maintenant - self._activite_ms < self.REPOS_APRES_MS else images_au_repos()
+
+
+def images_au_repos():
+    """30 images/s quand rien ne bouge ; 24 sur un petit PC (24/10, p31)."""
+    try:
+        import petit_pc
+        return petit_pc.IMAGES_AU_REPOS_PETIT if petit_pc.est_petit() else 30
+    except Exception:
+        return 30
 
 
 # ---------------------------------------------------------------- echelle

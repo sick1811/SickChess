@@ -77,7 +77,7 @@ Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/
        2 h, mémoire, plantages, ralentissements ; section « endurance » du banc, hors --rapide).
 3. [x] (24/10, séance 29) **p32 – Vérification avant chaque version** (`outils/verifier_version.py`, appelé par
        CONSTRUIRE_VERSION_AMIS.bat : tests, banc, MODE_TEST, appid, licences, version, .exe neuf).
-4. [ ] **p31 – Mode « petit PC »** (détection cœurs / mémoire au 1er lancement → puissance
+4. [x] (24/10, séance 30) **p31 – Mode « petit PC »** (détection cœurs / mémoire au 1er lancement → puissance
        d'analyse, hachage, animations ; modifiable dans Options).
 5. [ ] **p34 – Niveaux en vrai Elo** (matchs automatiques contre des références, à lancer la nuit
        sur le PC de Julien ; table de calibrage dans le code, test qui la vérifie).
@@ -103,6 +103,9 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t98 (30) : Options → Affichage → « Puissance du PC » : la ligne dit « Ce PC : 12 cœurs, … → PC normal » ;
+      choisis Petit PC, ouvre une revue : un seul stockfish.exe (Gestionnaire des tâches), jeu fluide ; reviens à
+      Automatique. Si un ami a un petit portable : le jeu est-il plus fluide chez lui ?
 - [ ] t97 (29) : double-clic sur CONSTRUIRE_VERSION_AMIS.bat : la vérification passe d'abord (OK / A REVOIR /
       BLOQUANT) ; la version ne se fabrique que sans BLOQUANT ; le .exe est essayé avant l'envoi. Clair ?
 - [ ] Claude Code (PC) : `python outils/endurance.py` (2 h, la nuit) → docs/ENDURANCE.md ; dire à Julien le verdict.
@@ -194,6 +197,7 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
       `steam_appid.txt` (480 = numéro de test de Valve).
 
 ## Fait récemment
+- 24/10 (30) : mode « petit PC » (p31) : détection, Options → Puissance du PC, analyse et effets allégés.
 - 24/10 (29) : vérification avant chaque version (p32), lancée par CONSTRUIRE_VERSION_AMIS.bat.
 - 24/10 (28) : test d'endurance (p28) : robot de 2 h, section « endurance » du banc ; essais cloud verts.
 - 24/10 (27) : rapport de plantage (p29) : erreur + journal gardés, proposés au lancement suivant via Signaler.
