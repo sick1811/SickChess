@@ -133,11 +133,24 @@ def controle_tests(racine, lancer=None):
     lancer = lancer or (lambda cmd: subprocess.run(cmd, cwd=racine, capture_output=True, text=True,
                                                    encoding="utf-8", errors="replace", timeout=3600))
     p = lancer([sys.executable, os.path.join(racine, "tests", "lancer_tous.py")])
-    fin = (p.stdout or "").strip().splitlines()[-1:] or [""]
+    sortie = p.stdout or ""
+    fin = sortie.strip().splitlines()[-1:] or [""]
+    # 25/10 : tout le compte rendu des tests est garde (tests/verification_tests.txt) et
+    # les controles en ECHEC sont montres : avant, on ne voyait que le nom de la serie.
+    try:
+        with open(os.path.join(racine, "tests", "verification_tests.txt"), "w",
+                  encoding="utf-8") as f:
+            f.write(sortie)
+    except OSError:
+        pass
     if p.returncode == 0:
         return OK, "Tests : %s" % fin[0]
-    rouges = [l.split()[0] for l in (p.stdout or "").splitlines() if " ROUGE " in l]
-    return BLOQUANT, "Tests en rouge : %s (%s)." % (", ".join(rouges) or "?", fin[0])
+    rouges = [l.split()[0] for l in sortie.splitlines() if " ROUGE " in l]
+    details = [l.strip() for l in sortie.splitlines() if l.startswith("    ") and "ECHEC" in l][:10]
+    return BLOQUANT, "Tests en rouge : %s (%s).%s" % (
+        ", ".join(rouges) or "?", fin[0],
+        "".join("\n                          " + d for d in details)
+        + "\n                          (tout le detail : tests/verification_tests.txt)")
 
 
 def controle_banc(racine, lancer=None):

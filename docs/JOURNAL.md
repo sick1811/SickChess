@@ -1350,3 +1350,6 @@ Constat du test d'endurance : au menu, 4 Stockfish gardaient ~5,5 Go jusqu'à la
   Correction : **la même règle que la revue** : un coup qui perd moins de 5 points de chances de gagner (« Bon » ou
   mieux) est accepté. Contrôle ajouté avec un faux moteur (toujours le même résultat) : écart 0,39 accepté,
   vrai mauvais coup et mat en 1 refusés. Sous charge : vert 8 fois sur 8.
+- 25/10 : la vérification du `.bat` (verifier_version) bloquait sur PC sur `test_precision_moteur.py` puis aussi
+  `test_revue.py`, verts quand on les lance seuls (37/37). Elle ne montrait que le nom de la série : impossible de savoir
+  quel coup. Elle montre maintenant les contrôles en ECHEC et garde tout dans `tests/verification_tests.txt`.

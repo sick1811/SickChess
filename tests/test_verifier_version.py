@@ -102,8 +102,10 @@ print("6. Tests et banc d'essai (simules)")
 verifier(vv.controle_tests(RACINE, lambda cmd: Resultat(0, "...\n900 controles OK. Tout est vert."))[0] == vv.OK,
          "tests verts : ok")
 etat, phrase = vv.controle_tests(RACINE, lambda cmd: Resultat(
-    1, "test_revue.py              ROUGE   30 OK   2 echec(s)\n2 echec(s)."))
+    1, "test_revue.py              ROUGE   30 OK   2 echec(s)\n"
+       "      ECHEC partie_x, coup 12 (Fxf7) : erreur\n2 echec(s)."))
 verifier(etat == vv.BLOQUANT and "test_revue.py" in phrase, "un test rouge : bloque, et on dit lequel")
+verifier("coup 12 (Fxf7)" in phrase, "et on montre le controle en echec (avant : seulement le nom de la serie)")
 d = projet()
 os.makedirs(os.path.join(d, "tests"))
 
