@@ -142,6 +142,7 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t78 (26) : couper Internet, cliquer Mise à jour → le message dit « pas d'Internet, ou adresse du site … introuvable » (et plus « pas de connexion » quand Internet marche) ; rétablir Internet → la mise à jour marche.
 - [ ] t100 (32) : la revue sur ton écran : les symboles des pastilles (surtout Imprécision jaune, Excellent vert
       clair) ont un fin contour sombre : plus lisibles ? toujours jolis ? Si tu as un écran 2560×1440 ou une télé
       4K : plein écran (F11), tout est-il à la bonne taille ?

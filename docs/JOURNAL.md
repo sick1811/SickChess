@@ -1232,3 +1232,23 @@ Fait :
 - **Version amis n° 4 publiée** (programme et jeu neufs ; moteur, problèmes et finales repris de la n° 1) après essai :
   installeur complet (664 Mo) installé en silence, jeu lancé 25 s sans erreur, vérification en ligne verte,
   désinstallation propre. https://github.com/sick1811/SickChess-amis/releases/tag/v0.1.0-n4
+
+## 24/10/2026 (26) – Mise à jour : la vraie cause d'un échec (Claude Code)
+Retour de Julien : « quand on cliquait Mise à jour sur la v1, ça disait qu'il n'y avait pas de connexion
+Internet ». Vérifié : le code de mise à jour de la v1 est identique à l'actuel, et le jeu installé sur le PC
+est passé tout seul de la n° 3 à la n° 4 ce matin. Mais toute erreur réseau s'affichait « pas de connexion
+Internet » : un fichier absent sur le site (version en cours de publication, erreur 404) le disait aussi.
+Fait :
+- `mise_a_jour.cause_lisible` : fichier introuvable sur le site (404, « réessaie dans quelques minutes »),
+  autre erreur du site (code), pas d'Internet / adresse introuvable, délai dépassé, connexion refusée
+  (pare-feu, antivirus ?), connexion coupée, certificat refusé (date et heure du PC, antivirus), problème
+  d'écriture sur le PC. Le journal du jeu garde aussi l'erreur brute.
+- Message « manifeste illisible » avec accents.
+- Tests : `test_mise_a_jour.py` section 6 bis (chaque cause + un vrai site qui répond 404). Suite complète :
+  1048 contrôles OK ; `test_precision_moteur.py` rouge une fois sur « dame_en_prise » (machine chargée : une
+  autre session lançait les mêmes tests), **vert relancé seul**.
+- Recette : R-116 nouveau, R-121 précisé.
+
+À vérifier par Julien :
+- [ ] R-116 : Internet coupé → « pas d'Internet, ou adresse du site … introuvable » ; Internet rétabli → la
+  mise à jour marche.

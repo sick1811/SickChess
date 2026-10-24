@@ -877,6 +877,13 @@
    "ordre": 11405
   },
   {
+   "id": "R-116",
+   "section": "Version amis et mises à jour",
+   "texte": "Mise à jour qui échoue : cliquer Mise à jour avec Internet coupé, puis Internet rétabli pendant qu'une version se publie",
+   "detail": "Le message dit la vraie cause : « pas d'Internet, ou adresse du site … introuvable » (Internet coupé), « fichier de mise à jour introuvable sur le site (erreur 404) … réessaie dans quelques minutes » (publication en cours) ; plus jamais « pas de connexion » quand Internet marche.",
+   "ordre": 11406
+  },
+  {
    "id": "R-120",
    "section": "Solidité",
    "texte": "Renommer moteur/stockfish.exe puis lancer une partie contre l'ordinateur",
@@ -887,7 +894,7 @@
    "id": "R-121",
    "section": "Solidité",
    "texte": "Couper Internet",
-   "detail": "Tout marche sauf l'en ligne et la mise à jour, qui le disent clairement.",
+   "detail": "Tout marche sauf l'en ligne et la mise à jour, qui le disent clairement (mise à jour : « pas d'Internet, ou adresse du site … introuvable »).",
    "ordre": 11501
   },
   {

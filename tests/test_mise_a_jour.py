@@ -238,6 +238,48 @@ maj.verifier()
 verifier(attendre(maj, "erreur", "a_jour", "disponible") == "erreur"
          and "connexion" in maj.erreur, "pas d'Internet : message clair (%s)" % maj.erreur)
 
+print("6 bis. La vraie cause d'un echec (24/10 : la v1 disait toujours « pas de connexion »)")
+import socket
+import ssl
+import urllib.error
+causes = [
+    (urllib.error.HTTPError("u", 404, "Not Found", None, None), "introuvable"),
+    (urllib.error.HTTPError("u", 503, "Unavailable", None, None), "503"),
+    (urllib.error.URLError(socket.gaierror(11001, "getaddrinfo failed")), "Internet"),
+    (urllib.error.URLError(TimeoutError("timed out")), "ne répond pas"),
+    (TimeoutError("timed out"), "ne répond pas"),
+    (urllib.error.URLError(ConnectionRefusedError(10061, "refused")), "refusée"),
+    (urllib.error.URLError(ssl.SSLCertVerificationError(1, "certificate verify failed")),
+     "sécurisée"),
+    (ValueError("fichier de mise à jour illisible (pas un manifeste SickChess)"), "illisible"),
+]
+for souci, attendu in causes:
+    texte = mise_a_jour.cause_lisible(souci)
+    verifier(attendu in texte, "%s -> %s" % (souci.__class__.__name__, texte))
+verifier(mise_a_jour.cause_lisible(urllib.error.HTTPError("u", 404, "x", None, None))
+         != mise_a_jour.cause_lisible(urllib.error.URLError(socket.gaierror(11001, "x"))),
+         "fichier absent et pas d'Internet ne donnent plus le meme message")
+# Pour de vrai : un site qui repond mais n'a pas maj.json (version en cours de publication)
+class Vide(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_error(404)
+
+    def log_message(self, *args):
+        pass
+
+
+vide = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Vide)
+threading.Thread(target=vide.serve_forever, daemon=True).start()
+maj = mise_a_jour.MiseAJour(dossier=ami,
+                            url="http://127.0.0.1:%d/maj.json" % vide.server_address[1])
+maj.verifier()
+verifier(attendre(maj, "erreur", "a_jour", "disponible") == "erreur"
+         and "introuvable" in maj.erreur and "connexion Internet" not in maj.erreur,
+         "fichier absent sur le site : dit « introuvable », pas « pas d'Internet » (%s)"
+         % maj.erreur)
+vide.shutdown()
+vide.server_close()
+
 print("7. Archive piegee")
 piege = os.path.join(base, "piege.zip")
 with zipfile.ZipFile(piege, "w") as z:

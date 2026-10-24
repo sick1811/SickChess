@@ -33,10 +33,13 @@ import hashlib
 import json
 import os
 import shutil
+import socket
+import ssl
 import subprocess
 import sys
 import threading
 import time
+import urllib.error
 import urllib.request
 import zipfile
 
@@ -110,6 +113,42 @@ def taille_lisible(octets):
     return "%.0f Ko" % max(1, octets / 1024)
 
 
+def cause_lisible(souci):
+    """La vraie raison d'un echec, en mots simples (affichee dans le jeu).
+
+    24/10 : avant, toute erreur reseau donnait « pas de connexion Internet » ;
+    un fichier absent sur le site (version en cours de publication, erreur 404)
+    faisait donc croire a Julien que son Internet etait coupe."""
+    raison = getattr(souci, "reason", None)
+    if isinstance(souci, urllib.error.HTTPError):
+        if souci.code == 404:
+            return ("fichier de mise à jour introuvable sur le site (erreur 404) : "
+                    "une version est peut-être en cours de publication, réessaie "
+                    "dans quelques minutes")
+        return "le site de mise à jour a répondu par une erreur (%d)" % souci.code
+    if isinstance(souci, urllib.error.URLError) and isinstance(raison, BaseException):
+        souci = raison                     # la vraie cause est dedans
+    if isinstance(souci, ssl.SSLError):
+        return ("connexion sécurisée refusée (certificat) : vérifie la date et "
+                "l'heure du PC, ou ton antivirus")
+    if isinstance(souci, socket.gaierror):
+        return ("pas d'Internet, ou adresse du site de mise à jour introuvable "
+                "(vérifie ta connexion)")
+    if isinstance(souci, (TimeoutError, socket.timeout)):
+        return "le site de mise à jour ne répond pas (délai dépassé), réessaie plus tard"
+    if isinstance(souci, ConnectionRefusedError):
+        return "connexion refusée par le site de mise à jour (pare-feu ou antivirus ?)"
+    if isinstance(souci, (ConnectionResetError, ConnectionAbortedError)):
+        return "connexion coupée pendant l'échange avec le site, réessaie"
+    if isinstance(souci, FileNotFoundError):
+        return "fichier introuvable sur le PC : %s" % (souci.filename or souci)
+    if isinstance(souci, PermissionError):
+        return "le jeu n'a pas le droit d'écrire dans son dossier : %s" % (souci.filename or souci)
+    if isinstance(souci, OSError):
+        return "pas de connexion Internet, ou le site ne répond pas"
+    return str(souci) or souci.__class__.__name__
+
+
 def _ouvrir(url, timeout=DELAI_RESEAU):
     requete = urllib.request.Request(url, headers={"User-Agent": "SickChess-maj"})
     return urllib.request.urlopen(requete, timeout=timeout)
@@ -121,7 +160,7 @@ def lire_manifeste(url):
         brut = reponse.read(2 * 1024 * 1024)
     donnees = json.loads(brut.decode("utf-8"))
     if not isinstance(donnees, dict) or not isinstance(donnees.get("paquets"), dict):
-        raise ValueError("maj.json ne ressemble pas a un manifeste SickChess")
+        raise ValueError("fichier de mise à jour illisible (pas un manifeste SickChess)")
     if int(donnees.get("format", 0)) > FORMAT:
         raise ValueError("Cette mise à jour demande une version plus récente du "
                          "programme : redemande le jeu complet à Julien.")
@@ -244,12 +283,10 @@ class MiseAJour:
         self._annuler = True
 
     def _echec(self, quoi, souci):
-        message = str(souci) or souci.__class__.__name__
-        if isinstance(souci, OSError) and not isinstance(souci, FileNotFoundError):
-            message = "pas de connexion Internet, ou le site ne repond pas"
-        self.erreur = "%s : %s" % (quoi, message[:140])
+        self.erreur = "%s : %s" % (quoi, cause_lisible(souci)[:160])
         self.etat = "erreur"
-        print("[MAJ] %s" % self.erreur)
+        # Le journal garde aussi l'erreur brute (pour Claude, s'il faut chercher).
+        print("[MAJ] %s (%s: %s)" % (self.erreur, souci.__class__.__name__, souci))
 
     def _telecharger(self):
         temp = os.path.join(self.dossier, DOSSIER_TEMP)
