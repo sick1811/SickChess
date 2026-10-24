@@ -1145,3 +1145,7 @@ Fait :
 
 À vérifier par Julien :
 - [ ] t100 (voir A_FAIRE), R-09G, R-09H.
+- En passant (séance 32) : « Mes erreurs », contrôle « un autre coup qui défend f7 » encore rouge pendant la suite
+  complète. Vraie cause trouvée : le coup du joueur était comparé à l'évaluation **enregistrée** du meilleur coup,
+  moins profonde quand le PC est chargé. Les deux coups sont maintenant jugés par le même calcul (profondeur 14).
+  Reproduit sous charge (rouge 2 fois sur 3) → vert 7 fois sur 7 après correction.
