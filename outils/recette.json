@@ -737,25 +737,67 @@
    "ordre": 11403
   },
   {
+   "id": "R-140",
+   "section": "Analyse libre",
+   "texte": "Menu → Analyse libre : jouer des coups pour les deux camps",
+   "detail": "Les coups se jouent (glisser ou clic-clic), la feuille se remplit ; en 1 à 3 s la barre d'avantage, l'évaluation, la profondeur et 3 lignes avec leurs flèches bleues apparaissent, la profondeur monte toute seule.",
+   "ordre": 11500
+  },
+  {
+   "id": "R-141",
+   "section": "Analyse libre",
+   "texte": "Revenir en arrière (← ou clic sur un coup) puis jouer un autre coup",
+   "detail": "La suite est remplacée, un message le dit ; → rejoue la suite tant qu'on n'a pas changé de coup.",
+   "ordre": 11501
+  },
+  {
+   "id": "R-142",
+   "section": "Analyse libre",
+   "texte": "E : éditeur de position ; vider, poser rois et pièces, clic droit pour enlever, trait aux Noirs, Valider",
+   "detail": "La position est chargée et analysée ; sans roi (ou position impossible) : refus avec la raison ; roques déduits des rois et des tours.",
+   "ordre": 11502
+  },
+  {
+   "id": "R-143",
+   "section": "Analyse libre",
+   "texte": "Copier un FEN ou un PGN (chess.com, lichess) puis V",
+   "detail": "La position ou la partie entière arrive (à la fin de la partie) ; C recopie le FEN de la position affichée.",
+   "ordre": 11503
+  },
+  {
+   "id": "R-144",
+   "section": "Analyse libre",
+   "texte": "Espace : moteur arrêté puis relancé ; regarder le Gestionnaire des tâches",
+   "detail": "Arrêté : plus de flèches et le processeur retombe ; relancé : l'analyse reprend. Au bout de 90 s sur la même position, « au repos ».",
+   "ordre": 11504
+  },
+  {
+   "id": "R-145",
+   "section": "Analyse libre",
+   "texte": "Dans la revue d'une partie : A",
+   "detail": "L'analyse libre s'ouvre sur la position affichée (variante comprise) ; Retour revient à la revue.",
+   "ordre": 11505
+  },
+  {
    "id": "R-130",
    "section": "Graphisme et textes",
    "texte": "Passer sur tous les écrans (menu, réglages, partie, fin, revue, mes parties, problèmes, options, en ligne)",
    "detail": "Style Onyx & Or partout, accents corrects, aucun texte coupé ou qui dépasse.",
-   "ordre": 11500
+   "ordre": 11600
   },
   {
    "id": "R-132",
    "section": "Graphisme et textes",
    "texte": "Prendre une pièce ; faire mat ; se faire mater ; ouvrir les écrans",
    "detail": "Petite onde blanche sur la case de la prise ; au mat : halo rouge sur le roi maté et confettis si tu gagnes (pas si tu perds) ; chaque écran arrive en fondu.",
-   "ordre": 11501
+   "ordre": 11601
   },
   {
    "id": "R-131",
    "section": "Graphisme et textes",
    "texte": "Essayer les 6 jeux de pièces sur les damiers clairs et sombres",
    "detail": "Toutes les pièces se lisent bien, blanches comme noires.",
-   "ordre": 11502
+   "ordre": 11602
   }
  ]
 }

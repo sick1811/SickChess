@@ -264,6 +264,21 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 23/10
 - [ ] **R-123** – Après chaque test : ouvrir journal_du_jeu.txt  
   → Aucune ligne « Traceback » ni « ERREUR ».
 
+## Analyse libre
+
+- [ ] **R-140** – Menu → Analyse libre : jouer des coups pour les deux camps  
+  → Les coups se jouent (glisser ou clic-clic), la feuille se remplit ; en 1 à 3 s la barre d'avantage, l'évaluation, la profondeur et 3 lignes avec leurs flèches bleues apparaissent, la profondeur monte toute seule.
+- [ ] **R-141** – Revenir en arrière (← ou clic sur un coup) puis jouer un autre coup  
+  → La suite est remplacée, un message le dit ; → rejoue la suite tant qu'on n'a pas changé de coup.
+- [ ] **R-142** – E : éditeur de position ; vider, poser rois et pièces, clic droit pour enlever, trait aux Noirs, Valider  
+  → La position est chargée et analysée ; sans roi (ou position impossible) : refus avec la raison ; roques déduits des rois et des tours.
+- [ ] **R-143** – Copier un FEN ou un PGN (chess.com, lichess) puis V  
+  → La position ou la partie entière arrive (à la fin de la partie) ; C recopie le FEN de la position affichée.
+- [ ] **R-144** – Espace : moteur arrêté puis relancé ; regarder le Gestionnaire des tâches  
+  → Arrêté : plus de flèches et le processeur retombe ; relancé : l'analyse reprend. Au bout de 90 s sur la même position, « au repos ».
+- [ ] **R-145** – Dans la revue d'une partie : A  
+  → L'analyse libre s'ouvre sur la position affichée (variante comprise) ; Retour revient à la revue.
+
 ## Graphisme et textes
 
 - [ ] **R-130** – Passer sur tous les écrans (menu, réglages, partie, fin, revue, mes parties, problèmes, options, en ligne)  

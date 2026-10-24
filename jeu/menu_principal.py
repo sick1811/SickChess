@@ -20,6 +20,7 @@ ENTREES = [
     ("en_ligne", "Jouer en ligne (Steam)", True),
     ("puzzles", "Problèmes", True),
     ("ouvertures", "Entraînement aux ouvertures", True),   # 17/10, travail p06
+    ("analyse", "Analyse libre", True),                    # 24/10, travail p35
     ("historique", "Mes parties et profil", True),
     ("options", "Options", True),
     ("signaler", "Signaler un problème / une idée", True),   # 17/10, travail p16

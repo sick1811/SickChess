@@ -86,6 +86,7 @@ class EcranRevue:
         self.resultat = resultat
         self.raison = raison
         prefs = dict(preferences or {})
+        self._prefs = prefs
 
         self.fen = analyseur.fen_initiale
         self.coups = [chess.Move.from_uci(u) for u in analyseur.coups]
@@ -475,7 +476,7 @@ class EcranRevue:
                       pygame.K_HOME: "debut", pygame.K_END: "fin",
                       pygame.K_UP: "debut", pygame.K_DOWN: "fin",
                       pygame.K_f: "retourner", pygame.K_b: "fleches",
-                      pygame.K_e: "exporter",
+                      pygame.K_e: "exporter", pygame.K_a: "analyse_libre",
                       pygame.K_ESCAPE: "retour"}.get(event.key)
         elif event.type == pygame.MOUSEWHEEL:
             action = "precedent" if getattr(event, "y", 0) > 0 else "suivant"
@@ -511,6 +512,11 @@ class EcranRevue:
                                    % ("affichées" if self.fleches_visibles else "cachées"))
         elif action == "exporter":
             self.exporter()
+        elif action == "analyse_libre":
+            # 24/10 (p35) : la position affichee (variante comprise) part dans
+            # l'analyse libre ; la boucle l'ouvre (elle seule a l'horloge).
+            coups = self.coups[:self.index] + list(self.variante or [])
+            self._demande_analyse = (self.fen, coups)
         return None
 
     def _afficher_message(self, texte, secondes=5):
@@ -906,6 +912,17 @@ class EcranRevue:
                 reponse = self.handle_event(event)
                 if reponse is not None:
                     return reponse
+            demande = getattr(self, "_demande_analyse", None)
+            if demande is not None:
+                self._demande_analyse = None
+                from ecran_analyse_libre import EcranAnalyseLibre
+                chemin = getattr(self.analyseur, "chemin", None)
+                libre = EcranAnalyseLibre(self.screen, getattr(self, "_prefs", None), chemin,
+                                          demande[0], demande[1],
+                                          cote_noir=self.plateau.flipped)
+                if libre.run(clock, evenement_fenetre, apres_dessin) == "quitter":
+                    return "quitter"
+                self._placer(pygame.display.get_surface())
             self.draw()
             if apres_dessin is not None:
                 apres_dessin(self.screen)
