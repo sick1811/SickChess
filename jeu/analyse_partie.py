@@ -1053,6 +1053,20 @@ class AnalyseurPartie:
         except Exception:
             return None
 
+    def coup_de_livre(self, i):
+        """Le coup i est-il de la theorie d'ouverture ? 24/10 (p30, banque de
+        positions) : seulement pour une partie partie de la position initiale.
+        Avant, le 1er coup d'une partie commencee ailleurs (« e3 » au milieu
+        d'une partie) etait pris pour le 1.e3 d'une ouverture : une gaffe
+        devenait « Theorique »."""
+        if chess.Board(self.fen_initiale).board_fen() != chess.Board().board_fen():
+            return False
+        try:
+            import ouvertures
+            return ouvertures.est_un_coup_de_livre(self.sans, i)
+        except Exception:
+            return False
+
     def detail(self, i):
         """Tout ce qu'on sait du coup i. Toujours un dictionnaire."""
         if not 0 <= i < len(self.coups):
@@ -1110,11 +1124,7 @@ class AnalyseurPartie:
         if self.premiers[i] is not None and self.seconds[i] is not None:
             ecart = max(0.0, du_joueur(self.premiers[i])
                         - du_joueur(self.seconds[i]))
-        try:
-            import ouvertures
-            theorique = ouvertures.est_un_coup_de_livre(self.sans, i)
-        except Exception:
-            theorique = False
+        theorique = self.coup_de_livre(i)
         dernier = chess.Move.from_uci(self.coups[i - 1]) if i > 0 else None
         est_le_meilleur = bool(meilleur) and meilleur == joue
         if not est_le_meilleur and self.lignes[i]:

@@ -131,6 +131,8 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
   → En haut : « Analyse fine… 40 % · environ 3 min » ; le temps restant baisse régulièrement ; à la fin « Analyse terminée (profondeur X à Y) ».
 - [ ] **R-06H** – Mes parties → Importer une longue partie (60 coups et plus), ouvrir la revue (Calcul fixe, Forte)  
   → Courbe, flèches et la plupart des pastilles en 1 à 2 minutes ; quelques coups gardent un rond creux (« en vérification ») puis reçoivent leur pastille ; une pastille posée ne change plus ; revue complète en environ 5 minutes pour 70 coups.
+- [ ] **R-06I** – Importer une partie qui commence à une autre position (PGN avec [FEN "…"]) dont le 1er coup est une gaffe, puis sa revue  
+  → Le 1er coup n'est pas « Théorique » : il reçoit sa vraie pastille (Gaffe). Une partie normale garde ses coups « Théorique » au début.
 - [ ] **R-06G** – Changer Options → Partie → Façon d'analyser, puis rouvrir la revue d'une partie déjà analysée  
   → La revue s'affiche tout de suite, sans tout refaire (une analyse assez forte est gardée, quel que soit le mode).
 - [ ] **R-068** – Revue : touche F  

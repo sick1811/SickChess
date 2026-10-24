@@ -340,7 +340,10 @@ def _classer_chances(perte, est_le_meilleur=False, sacrifice=False,
         meilleur_connu = bool(est_le_meilleur) or ecart_second is not None
     # LE LIVRE PASSE AVANT TOUT. Reciter la Najdorf n'est ni un exploit ni une
     # faute : c'est de la theorie, et ca se dit comme ca.
-    if theorique:
+    # 24/10 (p30, banque de positions) : SAUF si le coup perd vraiment (une
+    # Erreur ou pire) : le livre de lichess contient aussi des pieges ou un
+    # camp se trompe ; l'analyse doit rester juste.
+    if theorique and perte < SEUIL_ERREUR:
         return "theorique"
     # BRILLANT, exactement comme EXCELLENT (ta regle : "pareil pour brillant") :
     # il ne faut pas que ce soit le coup exact du moteur. Un sacrifice trouve a

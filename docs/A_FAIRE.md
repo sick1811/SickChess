@@ -69,7 +69,7 @@ Mesures faites dans Cowork (machine Linux plus lente) : à refaire sur le PC de 
 ## Travaux choisis par Julien le 23/10 (statut « veux ») – ORDRE DES SÉANCES
 Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/après, recette mise
 à jour, tests pour Julien dans la page « À faire ». Phrase à Claude Code : « fais le travail pXX ».
-1. [ ] **p30 – Banque de positions** (`tests/positions_revue.json`, 50–100 positions : vrais
+1. [x] (24/10, séance 26) **p30 – Banque de positions** (`tests/positions_revue.json`, 50–100 positions : vrais
        sacrifices, vraies gaffes, mats, finales Syzygy, + m04 « bon sacrifice ») ; 8e contrôle
        « precision » du banc d'essai. À faire en premier : protège tout le reste.
 2. [ ] **p29 – Rapport de plantage** (erreur + fin du journal gardées, proposées au lancement
@@ -103,6 +103,10 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t95 (26) : importe (Mes parties → Importer) une partie qui commence à une autre position (PGN avec
+      [FEN "…"]) dont le 1er coup est une gaffe : sa revue le note Gaffe, pas « Théorique » (R-06I).
+- [ ] Claude Code (PC) : `python outils/recette_auto.py` et `python outils/banc_essai.py --sections precision`
+      (relance programmée à 4 h 20), puis version amis.
 - [ ] t92 (25, Steam ouvert) : Problèmes → « Classements Steam » : les trois classements et les trois vues se
       chargent ; ta ligne « Toi » en or (après un premier score). Lisible ? Rapide ?
 - [ ] t93 (25) : fais un contre la montre puis rouvre les classements : ton score y est (Actualiser si besoin) ;
@@ -184,6 +188,8 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
       `steam_appid.txt` (480 = numéro de test de Valve).
 
 ## Fait récemment
+- 24/10 (26) : banque de positions (p30) : 114 coups jugés justes ; défaut « gaffe notée Théorique » corrigé ;
+  recette automatique (`outils/recette_auto.py`).
 - 24/10 (25) : classements Steam (problèmes, contre la montre, survie ; mondial, amis, autour de moi) et
   succès préparés pour le vrai numéro Steam (rattrapage, icônes, notice) (p37).
 - 24/10 (24) : invitation d'un ami Steam affichée dans le jeu (p36) : bandeau sur tous les écrans,

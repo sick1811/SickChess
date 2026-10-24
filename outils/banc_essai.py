@@ -35,7 +35,8 @@ RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(RACINE)
 sys.path.insert(0, os.path.join(RACINE, "jeu"))
 
-SECTIONS = ["tests", "vitesse", "processeur", "memoire", "moteur", "menage", "conflits"]
+SECTIONS = ["tests", "vitesse", "processeur", "memoire", "moteur", "menage", "conflits",
+            "precision"]
 TITRES = {
     "tests": "Bugs (tests automatiques)",
     "vitesse": "Vitesse d'affichage",
@@ -44,6 +45,7 @@ TITRES = {
     "moteur": "Moteur d'analyse (Stockfish)",
     "menage": "Ménage (code et fichiers inutiles)",
     "conflits": "Conflits et santé du projet",
+    "precision": "Précision des pastilles (banque de positions)",
 }
 # Budget d'une image a 60 images/s : 16,7 ms. Au-dela de 8 ms, le jeu chauffe le
 # processeur pour rien ; au-dela de 16 ms, il saccade.
@@ -487,6 +489,36 @@ def section_moteur(rapide):
             "constats": constats}
 
 
+# ------------------------------------------------------------------ precision
+
+def section_precision(rapide):
+    """24/10 (p30) : les pastilles de la revue sur la banque de positions
+    (tests/positions_revue.json : sacrifices corrects, gaffes nettes, mats,
+    finales). Meme analyse que dans le jeu, a la puissance du jeu (Forte) ;
+    --rapide : puissance Rapide."""
+    ch = chemin_stockfish()
+    if not ch:
+        return {"statut": "gris", "resume": "Stockfish absent ici : à mesurer sur le PC Windows",
+                "mesures": {}, "constats": []}
+    sys.path.insert(0, os.path.join(RACINE, "outils"))
+    import precision
+    puissance = "calcul_rapide" if rapide else "calcul_forte"
+    debut = time.time()
+    resultats = precision.verifier(ch, puissance)
+    faux = [r for r in resultats if not r["ok"]]
+    constats = [constat("precision", "Pastille fausse : %s, coup %d (%s)" % (r["id"], r["coup"], r["san"]),
+                        "Pastille donnée : %s. Attendu : %s.\n%s" % (
+                            r["note"], ", ".join(r["attendus"]), r["pourquoi"]), "grave")
+                for r in faux]
+    justes = len(resultats) - len(faux)
+    return {"statut": "vert" if not faux else ("orange" if len(faux) <= 2 else "rouge"),
+            "resume": "%d coups justes sur %d (%s, %.0f s)" % (justes, len(resultats), puissance,
+                                                            time.time() - debut),
+            "mesures": {"coups": len(resultats), "justes": justes, "puissance": puissance,
+                        "faux": ["%s/%d" % (r["id"], r["coup"]) for r in faux]},
+            "constats": constats}
+
+
 # ------------------------------------------------------------------ menage
 
 def section_menage(rapide):
@@ -816,7 +848,7 @@ def main():
     fonctions = {"tests": section_tests, "vitesse": section_vitesse,
                  "processeur": section_processeur, "memoire": section_memoire,
                  "moteur": section_moteur, "menage": section_menage,
-                 "conflits": section_conflits}
+                 "conflits": section_conflits, "precision": section_precision}
     for nom in choisies:
         print("== %s ..." % TITRES[nom], flush=True)
         debut = time.time()

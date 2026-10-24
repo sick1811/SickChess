@@ -359,25 +359,32 @@
    "ordre": 10614
   },
   {
+   "id": "R-06I",
+   "section": "Fin de partie et revue",
+   "texte": "Importer une partie qui commence à une autre position (PGN avec [FEN \"…\"]) dont le 1er coup est une gaffe, puis sa revue",
+   "detail": "Le 1er coup n'est pas « Théorique » : il reçoit sa vraie pastille (Gaffe). Une partie normale garde ses coups « Théorique » au début.",
+   "ordre": 10615
+  },
+  {
    "id": "R-06G",
    "section": "Fin de partie et revue",
    "texte": "Changer Options → Partie → Façon d'analyser, puis rouvrir la revue d'une partie déjà analysée",
    "detail": "La revue s'affiche tout de suite, sans tout refaire (une analyse assez forte est gardée, quel que soit le mode).",
-   "ordre": 10615
+   "ordre": 10616
   },
   {
    "id": "R-068",
    "section": "Fin de partie et revue",
    "texte": "Revue : touche F",
    "detail": "L'échiquier se retourne.",
-   "ordre": 10616
+   "ordre": 10617
   },
   {
    "id": "R-069",
    "section": "Fin de partie et revue",
    "texte": "Ressortir de la revue, la rouvrir",
    "detail": "Tout s'affiche tout de suite, sans nouvelle analyse.",
-   "ordre": 10617
+   "ordre": 10618
   },
   {
    "id": "R-070",

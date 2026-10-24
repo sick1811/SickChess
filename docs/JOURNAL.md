@@ -996,3 +996,36 @@ Fait :
 
 À vérifier par Julien :
 - [ ] t92 à t94 (voir A_FAIRE), R-08A à R-08C — Steam ouvert, avec steam_api64.dll et steam_appid.txt (480).
+
+## 24/10/2026 (26) – Recette automatique, page « À faire », travail p30 : banque de positions (Claude Code dans le cloud)
+Demande de Julien : publier une version amis, mettre les tests dans la page « À faire », les faire sur son PC
+(« tu dois passer par mon PC obligatoirement »), puis passer au travail suivant.
+Fait :
+- **`outils/recette_auto.py`** : la recette faite par Claude. Pilote le VRAI jeu (clics souris sur les cases et
+  les boutons, clavier, vrai Stockfish, fenêtre invisible) et vérifie 13 lignes de recette (R-140 à R-149,
+  R-10E…). Dans le cloud : tout vert (ex. Stockfish 297 % → 0 % de processeur avec Espace ; arrêt tout seul à
+  60 s ; plus aucun Stockfish après Retour ; Analyser depuis la revue au même coup).
+- **Page « À faire »** : ajout de t82 à t94 et de 20 lignes de recette manquantes (R-08A–C, R-108–109, R-10A–E,
+  R-140–149), avec en commentaire ce que Claude a déjà vérifié et ce qui reste pour Julien. « Fonctionne » pas
+  encore coché : en attente de la même vérification sur le PC Windows.
+- **PC de Julien** : la session Claude Code du PC (« Mesure Stockfish ») a reçu la consigne (fusion de la
+  branche, tests, recette automatique, Steam, version amis), mais elle avait atteint sa limite d'utilisation
+  (jusqu'à 4 h 10) ; une relance automatique est programmée à 4 h 20. **Version amis pas encore publiée.**
+- **p30 – Banque de positions** (`tests/positions_revue.json`, `outils/precision.py`) : 58 petites parties,
+  114 coups jugés : 52 problèmes lichess (22 sacrifices, 10 mats, 10 finales, 10 avantages décisifs) – la gaffe
+  qui crée le problème doit être notée Erreur / Manque / Gaffe, le bon coup (souvent un sacrifice) une bonne
+  pastille – plus 6 positions à la main (mat étouffé, piège de Légal, pat raté, dame en prise, 1.e4). Chaque
+  problème est revérifié à la fabrication par Stockfish en profondeur 20 (gaffe nette : ≥ 40 % de chances avant,
+  ≤ 15 % après ; bon coup : ≥ 75 %) : la banque ne vient pas de notre propre analyse.
+- **Défaut trouvé par la banque et corrigé** : une partie qui commence à une autre position (PGN importé avec
+  [FEN], « Mes erreurs », analyse libre) voyait son 1er coup comparé au livre d'ouvertures comme si elle partait
+  de la position initiale : « e3 », « d3 », « a4 », « h4 », de vraies gaffes, étaient notées **Théorique**. Le
+  livre ne sert plus que pour les parties parties de la position initiale ; et un coup du livre qui perd
+  vraiment (Erreur ou pire) reçoit sa vraie pastille. Avant : 108 justes sur 114 ; après : **114 sur 114** (Forte,
+  686 s dans le cloud ; Rapide : 114 sur 114 en 408 s).
+- Banc d'essai : 8e section **« precision »** (toute la banque, Forte ; --rapide : Rapide). Tests :
+  `tests/test_precision.py` (8 contrôles, sans Stockfish) et `tests/test_precision_moteur.py` (échantillon de 19
+  parties, Rapide, ~2 min). Suite complète : 874 contrôles verts. Recette : R-06I ajouté.
+
+À vérifier par Julien :
+- [ ] t95 (voir A_FAIRE).

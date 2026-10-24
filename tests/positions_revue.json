@@ -1,0 +1,2085 @@
+{
+ "version": 1,
+ "fabrique_le": "24/10/2026",
+ "explication": "Voir outils/precision.py.",
+ "positions": [
+  {
+   "id": "mat_etouffe",
+   "source": "a la main",
+   "fen": "5r1k/6pp/7N/3Q4/8/8/8/6K1 w - - 0 1",
+   "coups": [
+    "d5g8",
+    "f8g8",
+    "h6f7"
+   ],
+   "attendus": [
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Sacrifice de dame Dg8+ ! Txg8 Cf7# (mat etouffe) : sacrifice correct = bonne pastille."
+  },
+  {
+   "id": "piege_de_legal",
+   "source": "a la main",
+   "fen": "rn1qkbnr/ppp2p1p/3p2p1/4p3/2B1P1b1/2N2N2/PPPP1PPP/R1BQK2R w KQkq - 0 5",
+   "coups": [
+    "f3e5",
+    "g4d1"
+   ],
+   "attendus": [
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ],
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ]
+   ],
+   "pourquoi": "Piege de Legal : 5.Cxe5 ! (la dame est donnee) puis 5...Fxd1 ?? permet Fxf7+ Re7 Cd5#."
+  },
+  {
+   "id": "pat_rate",
+   "source": "a la main",
+   "fen": "7k/5K2/8/6Q1/8/8/8/8 w - - 0 1",
+   "coups": [
+    "g5g6"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ]
+   ],
+   "pourquoi": "Dg6 ?? pat : la partie gagnee devient nulle (Dg7# etait mat)."
+  },
+  {
+   "id": "mat_en_un",
+   "source": "a la main",
+   "fen": "7k/5K2/8/6Q1/8/8/8/8 w - - 0 1",
+   "coups": [
+    "g5g7"
+   ],
+   "attendus": [
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Dg7# : le mat."
+  },
+  {
+   "id": "dame_en_prise",
+   "source": "a la main",
+   "fen": "rnbqkbnr/pppp1ppp/8/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R b KQkq - 1 2",
+   "coups": [
+    "d8g5",
+    "f3g5"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "2...Dg5 ?? : la dame est prise par le cavalier pour rien."
+  },
+  {
+   "id": "ouverture",
+   "source": "a la main",
+   "fen": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+   "coups": [
+    "e2e4"
+   ],
+   "attendus": [
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "1.e4 : coup d'ouverture, jamais une faute."
+  },
+  {
+   "id": "lichess_rvpqt",
+   "source": "https://lichess.org/training/rvpqt",
+   "fen": "r4rk1/ppq1b1pp/2n5/2pp4/5N2/3P2QB/PPP4P/R3K1R1 b Q - 2 19",
+   "coups": [
+    "e7d6",
+    "h3e6"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess rvpqt (1761, sacrifice) : Bd6 est la gaffe qui cree le probleme (chances 82 % -> 2 %), Be6+ le bon coup (98 %).",
+   "themes": [
+    "kingsideAttack",
+    "long",
+    "mate",
+    "mateIn3",
+    "middlegame",
+    "sacrifice"
+   ],
+   "chances_stockfish_p20": [
+    81.6,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_cKEn9",
+   "source": "https://lichess.org/training/cKEn9",
+   "fen": "r7/1pp1qp2/1p5k/4pQ2/1P5r/6R1/P4KP1/R7 b - - 2 31",
+   "coups": [
+    "h4f4",
+    "f5f4"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess cKEn9 (1607, sacrifice) : Rf4+ est la gaffe qui cree le probleme (chances 76 % -> 2 %), Qxf4+ le bon coup (98 %).",
+   "themes": [
+    "endgame",
+    "exposedKing",
+    "long",
+    "mate",
+    "mateIn3",
+    "sacrifice"
+   ],
+   "chances_stockfish_p20": [
+    75.8,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_XA9ct",
+   "source": "https://lichess.org/training/XA9ct",
+   "fen": "8/4b3/2P1k3/1p1p2p1/3B2P1/5K2/8/8 b - - 1 42",
+   "coups": [
+    "e6d6",
+    "d4c5"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess XA9ct (1535, sacrifice) : Kd6 est la gaffe qui cree le probleme (chances 52 % -> 12 %), Bc5+ le bon coup (90 %).",
+   "themes": [
+    "advancedPawn",
+    "bishopEndgame",
+    "crushing",
+    "endgame",
+    "sacrifice",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    52.0,
+    12.3,
+    89.6
+   ]
+  },
+  {
+   "id": "lichess_uL2Nv",
+   "source": "https://lichess.org/training/uL2Nv",
+   "fen": "6r1/Q6p/2P2k2/2p2b2/8/6q1/PP3RP1/6K1 b - - 5 36",
+   "coups": [
+    "g8e8",
+    "f2f5"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess uL2Nv (1839, sacrifice) : Re8 est la gaffe qui cree le probleme (chances 71 % -> 15 %), Rxf5+ le bon coup (85 %).",
+   "themes": [
+    "attraction",
+    "crushing",
+    "endgame",
+    "sacrifice",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    71.1,
+    14.9,
+    84.6
+   ]
+  },
+  {
+   "id": "lichess_jWjYK",
+   "source": "https://lichess.org/training/jWjYK",
+   "fen": "7R/2p2kp1/4p3/2b1Q2p/2P1B1n1/3P2P1/5q1P/1R5K w - - 2 38",
+   "coups": [
+    "e4g2",
+    "f2g1"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess jWjYK (1327, sacrifice) : Bg2 est la gaffe qui cree le probleme (chances 98 % -> 2 %), Qg1+ le bon coup (98 %).",
+   "themes": [
+    "mate",
+    "mateIn2",
+    "middlegame",
+    "sacrifice",
+    "short",
+    "smotheredMate"
+   ],
+   "chances_stockfish_p20": [
+    97.5,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_Bs8Ce",
+   "source": "https://lichess.org/training/Bs8Ce",
+   "fen": "4rk1q/1p6/p2b2p1/4npB1/8/1Q6/5PPP/R4RK1 w - - 2 29",
+   "coups": [
+    "b3b7",
+    "e5f3"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess Bs8Ce (1089, sacrifice) : Qxb7 est la gaffe qui cree le probleme (chances 82 % -> 2 %), Nf3+ le bon coup (98 %).",
+   "themes": [
+    "mate",
+    "mateIn2",
+    "middlegame",
+    "sacrifice",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    81.7,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_sFtb6",
+   "source": "https://lichess.org/training/sFtb6",
+   "fen": "4r1k1/Qp3ppp/p5q1/2p4n/2Pb4/1PNP4/P2B2PP/3R1R1K w - - 3 26",
+   "coups": [
+    "c3d5",
+    "h5g3"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess sFtb6 (1437, sacrifice) : Nd5 est la gaffe qui cree le probleme (chances 85 % -> 2 %), Ng3+ le bon coup (98 %).",
+   "themes": [
+    "clearance",
+    "kingsideAttack",
+    "mate",
+    "mateIn2",
+    "middlegame",
+    "sacrifice",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    85.4,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_xEdzD",
+   "source": "https://lichess.org/training/xEdzD",
+   "fen": "8/2R3p1/1P3k1p/8/3n4/3b4/4p1P1/4K3 b - - 1 43",
+   "coups": [
+    "d4c2",
+    "c7c2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess xEdzD (1747, sacrifice) : Nc2+ est la gaffe qui cree le probleme (chances 49 % -> 14 %), Rxc2 le bon coup (87 %).",
+   "themes": [
+    "advancedPawn",
+    "advantage",
+    "endgame",
+    "sacrifice",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    49.4,
+    13.7,
+    87.2
+   ]
+  },
+  {
+   "id": "lichess_e739W",
+   "source": "https://lichess.org/training/e739W",
+   "fen": "r3r1k1/2R3p1/2p2p1p/Pq2p3/1b2Q3/5N2/5PPP/3R2K1 b - - 2 26",
+   "coups": [
+    "b4a5",
+    "c7g7"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess e739W (2060, sacrifice) : Bxa5 est la gaffe qui cree le probleme (chances 53 % -> 11 %), Rxg7+ le bon coup (89 %).",
+   "themes": [
+    "attraction",
+    "crushing",
+    "middlegame",
+    "sacrifice",
+    "veryLong"
+   ],
+   "chances_stockfish_p20": [
+    52.6,
+    11.0,
+    89.4
+   ]
+  },
+  {
+   "id": "lichess_WsZ1x",
+   "source": "https://lichess.org/training/WsZ1x",
+   "fen": "r3r3/pp3pk1/2p3p1/4P3/4Q1Pq/P1P4n/1P3PK1/1B1RR3 w - - 2 26",
+   "coups": [
+    "e1h1",
+    "h4f2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess WsZ1x (1377, sacrifice) : Rh1 est la gaffe qui cree le probleme (chances 75 % -> 2 %), Qxf2+ le bon coup (98 %).",
+   "themes": [
+    "mate",
+    "mateIn2",
+    "middlegame",
+    "sacrifice",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    75.3,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_5QsfB",
+   "source": "https://lichess.org/training/5QsfB",
+   "fen": "6k1/4rp2/pq1p1RpB/1p6/1P4PP/P2P1Q1K/2r5/8 b - - 2 30",
+   "coups": [
+    "b6g1",
+    "f6g6"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess 5QsfB (2062, sacrifice) : Qg1 est la gaffe qui cree le probleme (chances 80 % -> 2 %), Rxg6+ le bon coup (98 %).",
+   "themes": [
+    "clearance",
+    "crushing",
+    "endgame",
+    "fork",
+    "sacrifice",
+    "veryLong"
+   ],
+   "chances_stockfish_p20": [
+    80.3,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_HvuDZ",
+   "source": "https://lichess.org/training/HvuDZ",
+   "fen": "3k1r2/pp4pp/2nP1rq1/2Q5/2N1P3/1P5b/P1B2RPP/5RK1 w - - 1 25",
+   "coups": [
+    "c4e5",
+    "g6g2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess HvuDZ (1858, sacrifice) : Ne5 est la gaffe qui cree le probleme (chances 76 % -> 2 %), Qxg2+ le bon coup (98 %).",
+   "themes": [
+    "deflection",
+    "kingsideAttack",
+    "mate",
+    "mateIn2",
+    "middlegame",
+    "sacrifice",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    76.1,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_sE6Fb",
+   "source": "https://lichess.org/training/sE6Fb",
+   "fen": "2r3k1/5ppp/ppr1p3/2Pp4/1P6/4P1P1/P1R2PP1/2R3K1 b - - 0 23",
+   "coups": [
+    "a6a5",
+    "c5b6"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess sE6Fb (1892, sacrifice) : a5 est la gaffe qui cree le probleme (chances 52 % -> 10 %), cxb6 le bon coup (91 %).",
+   "themes": [
+    "advancedPawn",
+    "advantage",
+    "endgame",
+    "long",
+    "master",
+    "rookEndgame",
+    "sacrifice"
+   ],
+   "chances_stockfish_p20": [
+    51.7,
+    10.2,
+    91.1
+   ]
+  },
+  {
+   "id": "lichess_RjAvB",
+   "source": "https://lichess.org/training/RjAvB",
+   "fen": "r5k1/4Rp2/4p3/2B4p/1P4np/4PbPQ/4qP2/5RK1 w - - 6 42",
+   "coups": [
+    "h3h4",
+    "e2f1"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess RjAvB (1618, sacrifice) : Qxh4 est la gaffe qui cree le probleme (chances 50 % -> 2 %), Qxf1+ le bon coup (98 %).",
+   "themes": [
+    "attraction",
+    "mate",
+    "mateIn2",
+    "middlegame",
+    "sacrifice",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    50.0,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_0PU2S",
+   "source": "https://lichess.org/training/0PU2S",
+   "fen": "r4bk1/2pb1p2/p2p2pp/1p1P2q1/P3P3/1P5r/1BB2P1N/R2QR2K w - - 0 23",
+   "coups": [
+    "e1g1",
+    "h3h2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess 0PU2S (1319, sacrifice) : Rg1 est la gaffe qui cree le probleme (chances 76 % -> 2 %), Rxh2+ le bon coup (98 %).",
+   "themes": [
+    "attraction",
+    "dovetailMate",
+    "exposedKing",
+    "kingsideAttack",
+    "long",
+    "mate",
+    "mateIn3",
+    "middlegame",
+    "sacrifice"
+   ],
+   "chances_stockfish_p20": [
+    75.9,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_WUyne",
+   "source": "https://lichess.org/training/WUyne",
+   "fen": "2r5/pk4p1/2nRN1p1/1p1R4/6P1/q7/2P4P/1K6 b - - 23 40",
+   "coups": [
+    "c6b4",
+    "d5b5"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess WUyne (1663, sacrifice) : Nb4 est la gaffe qui cree le probleme (chances 84 % -> 2 %), Rxb5+ le bon coup (98 %).",
+   "themes": [
+    "endgame",
+    "mate",
+    "mateIn4",
+    "sacrifice",
+    "veryLong"
+   ],
+   "chances_stockfish_p20": [
+    84.2,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_ZmP4E",
+   "source": "https://lichess.org/training/ZmP4E",
+   "fen": "rnbqr1k1/pp2bppp/2p2n2/4Q3/2BP1B2/2N2N2/PPP3PP/2K1R2R b - - 5 12",
+   "coups": [
+    "b8d7",
+    "c4f7"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess ZmP4E (2067, sacrifice) : Nbd7 est la gaffe qui cree le probleme (chances 44 % -> 14 %), Bxf7+ le bon coup (86 %).",
+   "themes": [
+    "attraction",
+    "crushing",
+    "kingsideAttack",
+    "long",
+    "middlegame",
+    "sacrifice"
+   ],
+   "chances_stockfish_p20": [
+    43.7,
+    14.3,
+    85.9
+   ]
+  },
+  {
+   "id": "lichess_tCkot",
+   "source": "https://lichess.org/training/tCkot",
+   "fen": "r2q1rk1/1b3pp1/pp2pb1n/2p4p/2Np1P2/1P1PPNQP/PB1P4/2K3RR b - - 0 18",
+   "coups": [
+    "d4e3",
+    "g3g7"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess tCkot (1987, sacrifice) : dxe3 est la gaffe qui cree le probleme (chances 76 % -> 13 %), Qxg7+ le bon coup (87 %).",
+   "themes": [
+    "crushing",
+    "deflection",
+    "discoveredAttack",
+    "kingsideAttack",
+    "long",
+    "middlegame",
+    "sacrifice"
+   ],
+   "chances_stockfish_p20": [
+    76.0,
+    13.4,
+    86.9
+   ]
+  },
+  {
+   "id": "lichess_kft0l",
+   "source": "https://lichess.org/training/kft0l",
+   "fen": "r1b2qk1/ppp4p/3p2pb/3Pp3/4P3/2NQn1P1/PPP1N1BP/R5K1 w - - 0 16",
+   "coups": [
+    "c3d1",
+    "e3g2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess kft0l (2033, sacrifice) : Nd1 est la gaffe qui cree le probleme (chances 40 % -> 13 %), Nxg2 le bon coup (89 %).",
+   "themes": [
+    "attraction",
+    "crushing",
+    "kingsideAttack",
+    "long",
+    "middlegame",
+    "sacrifice"
+   ],
+   "chances_stockfish_p20": [
+    40.5,
+    13.4,
+    88.8
+   ]
+  },
+  {
+   "id": "lichess_mMGgI",
+   "source": "https://lichess.org/training/mMGgI",
+   "fen": "8/8/1p6/1P6/3P2n1/5N1p/4K1k1/8 w - - 3 46",
+   "coups": [
+    "d4d5",
+    "g4e5"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess mMGgI (1819, sacrifice) : d5 est la gaffe qui cree le probleme (chances 46 % -> 12 %), Ne5 le bon coup (90 %).",
+   "themes": [
+    "advancedPawn",
+    "crushing",
+    "endgame",
+    "knightEndgame",
+    "long",
+    "promotion",
+    "sacrifice"
+   ],
+   "chances_stockfish_p20": [
+    46.0,
+    12.2,
+    89.8
+   ]
+  },
+  {
+   "id": "lichess_pEV0w",
+   "source": "https://lichess.org/training/pEV0w",
+   "fen": "r2q1rk1/p1p1bppp/5n2/3p4/8/1PN1BP2/1PP3PP/R2Q1RK1 w - - 0 14",
+   "coups": [
+    "e3a7",
+    "a8a7"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess pEV0w (1375, sacrifice) : Bxa7 est la gaffe qui cree le probleme (chances 51 % -> 15 %), Rxa7 le bon coup (86 %).",
+   "themes": [
+    "attraction",
+    "crushing",
+    "fork",
+    "long",
+    "middlegame",
+    "sacrifice"
+   ],
+   "chances_stockfish_p20": [
+    50.6,
+    14.6,
+    85.8
+   ]
+  },
+  {
+   "id": "lichess_yc8le",
+   "source": "https://lichess.org/training/yc8le",
+   "fen": "7k/pp5P/n2p1N1b/3Pp3/1P1q4/P1rB4/K3Q2P/R6R w - - 3 27",
+   "coups": [
+    "h1g1",
+    "c3a3"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess yc8le (2098, sacrifice) : Rhg1 est la gaffe qui cree le probleme (chances 85 % -> 2 %), Rxa3+ le bon coup (98 %).",
+   "themes": [
+    "attraction",
+    "deflection",
+    "mate",
+    "mateIn5",
+    "middlegame",
+    "sacrifice",
+    "veryLong"
+   ],
+   "chances_stockfish_p20": [
+    84.9,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_5jWWR",
+   "source": "https://lichess.org/training/5jWWR",
+   "fen": "k7/Pp3p2/1q1p4/nN2p3/B3P1K1/2P1r3/P7/7R b - - 1 34",
+   "coups": [
+    "e3e2",
+    "h1h8"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess 5jWWR (946, mate) : Re2 est la gaffe qui cree le probleme (chances 97 % -> 2 %), Rh8+ le bon coup (98 %).",
+   "themes": [
+    "endgame",
+    "mate",
+    "mateIn2",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    97.4,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_k17mZ",
+   "source": "https://lichess.org/training/k17mZ",
+   "fen": "2r1r1k1/p4p1p/1q4p1/4PN2/3p4/nP4Q1/P1P3PP/2KR3R w - - 1 24",
+   "coups": [
+    "h1f1",
+    "c8c2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess k17mZ (911, mate) : Rhf1 est la gaffe qui cree le probleme (chances 50 % -> 2 %), Rxc2# le bon coup (100 %).",
+   "themes": [
+    "mate",
+    "mateIn1",
+    "middlegame",
+    "oneMove",
+    "queensideAttack"
+   ],
+   "chances_stockfish_p20": [
+    50.0,
+    2.5,
+    100.0
+   ]
+  },
+  {
+   "id": "lichess_42X9d",
+   "source": "https://lichess.org/training/42X9d",
+   "fen": "r4r2/pp3pp1/7k/3bP3/3q1P2/7P/PP4P1/R3QR1K b - - 4 26",
+   "coups": [
+    "d4b2",
+    "e1h4"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess 42X9d (1722, mate) : Qxb2 est la gaffe qui cree le probleme (chances 67 % -> 2 %), Qh4+ le bon coup (98 %).",
+   "themes": [
+    "mate",
+    "mateIn2",
+    "middlegame",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    66.7,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_7NTB2",
+   "source": "https://lichess.org/training/7NTB2",
+   "fen": "5R2/p1p5/Pp1p2pk/3P2q1/8/8/5R1K/2r5 b - - 17 53",
+   "coups": [
+    "h6g7",
+    "f2f7"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess 7NTB2 (945, mate) : Kg7 est la gaffe qui cree le probleme (chances 98 % -> 2 %), R2f7+ le bon coup (98 %).",
+   "themes": [
+    "endgame",
+    "mate",
+    "mateIn2",
+    "queenRookEndgame",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    97.5,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_KpAV5",
+   "source": "https://lichess.org/training/KpAV5",
+   "fen": "r4rk1/2p1ppb1/p1Qp4/6pp/2PP2n1/2N1PNPq/PP3P2/R1BR2K1 w - - 0 15",
+   "coups": [
+    "f3g5",
+    "h3h2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess KpAV5 (1025, mate) : Nxg5 est la gaffe qui cree le probleme (chances 78 % -> 2 %), Qh2+ le bon coup (98 %).",
+   "themes": [
+    "kingsideAttack",
+    "mate",
+    "mateIn2",
+    "middlegame",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    77.8,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_MFJ2i",
+   "source": "https://lichess.org/training/MFJ2i",
+   "fen": "r5k1/5rp1/4Q2R/2q1P3/p2pPP2/1p6/PP6/1K1R4 w - - 1 35",
+   "coups": [
+    "a2a3",
+    "c5c2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess MFJ2i (945, mate) : a3 est la gaffe qui cree le probleme (chances 86 % -> 2 %), Qc2+ le bon coup (98 %).",
+   "themes": [
+    "endgame",
+    "fork",
+    "mate",
+    "mateIn2",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    86.2,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_tSWLW",
+   "source": "https://lichess.org/training/tSWLW",
+   "fen": "r4k1r/ppqb4/2n1pb2/2Np2p1/3n2B1/4BN2/PP3PPP/R2Q1RK1 w - - 0 19",
+   "coups": [
+    "f3d4",
+    "c7h2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess tSWLW (1124, mate) : Nxd4 est la gaffe qui cree le probleme (chances 85 % -> 2 %), Qxh2# le bon coup (100 %).",
+   "themes": [
+    "kingsideAttack",
+    "mate",
+    "mateIn1",
+    "middlegame",
+    "oneMove"
+   ],
+   "chances_stockfish_p20": [
+    84.7,
+    2.5,
+    100.0
+   ]
+  },
+  {
+   "id": "lichess_dtUrF",
+   "source": "https://lichess.org/training/dtUrF",
+   "fen": "5r1k/6pp/7r/p1p3q1/3pP3/P4P2/1PQ3PP/R5RK w - - 1 27",
+   "coups": [
+    "c2e2",
+    "h6h2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess dtUrF (1231, mate) : Qe2 est la gaffe qui cree le probleme (chances 50 % -> 2 %), Rxh2+ le bon coup (98 %).",
+   "themes": [
+    "attraction",
+    "endgame",
+    "mate",
+    "mateIn2",
+    "sacrifice",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    50.0,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_4WmPt",
+   "source": "https://lichess.org/training/4WmPt",
+   "fen": "r1bq4/2b1nQpk/ppnp3p/4p1P1/PPBpP3/3P4/2PB3P/RN4K1 b - - 0 18",
+   "coups": [
+    "d8d7",
+    "g5g6"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess 4WmPt (1695, mate) : Qd7 est la gaffe qui cree le probleme (chances 74 % -> 2 %), g6+ le bon coup (98 %).",
+   "themes": [
+    "long",
+    "mate",
+    "mateIn3",
+    "middlegame"
+   ],
+   "chances_stockfish_p20": [
+    73.5,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_5SCMj",
+   "source": "https://lichess.org/training/5SCMj",
+   "fen": "4r2r/6p1/6p1/k2q1p2/8/4n2P/1R3PP1/2R3K1 b - - 1 36",
+   "coups": [
+    "e3c4",
+    "c1a1"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess 5SCMj (1090, mate) : Nc4 est la gaffe qui cree le probleme (chances 98 % -> 2 %), Ra1+ le bon coup (98 %).",
+   "themes": [
+    "endgame",
+    "mate",
+    "mateIn2",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    97.5,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_DZyXs",
+   "source": "https://lichess.org/training/DZyXs",
+   "fen": "4Q3/6kp/6p1/5pP1/3qpP2/1P5P/1P4K1/8 w - - 1 35",
+   "coups": [
+    "e8e5",
+    "d4e5"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess DZyXs (1465, endgame) : Qe5+ est la gaffe qui cree le probleme (chances 50 % -> 10 %), Qxe5 le bon coup (93 %).",
+   "themes": [
+    "crushing",
+    "defensiveMove",
+    "endgame",
+    "queenEndgame",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    50.0,
+    9.8,
+    93.2
+   ]
+  },
+  {
+   "id": "lichess_QeRAF",
+   "source": "https://lichess.org/training/QeRAF",
+   "fen": "8/pQ3bk1/3qBpp1/7p/8/4b2P/PP2NPPK/8 w - - 3 37",
+   "coups": [
+    "e2g3",
+    "e3f2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess QeRAF (2200, endgame) : Ng3 est la gaffe qui cree le probleme (chances 48 % -> 14 %), Bxf2 le bon coup (88 %).",
+   "themes": [
+    "crushing",
+    "endgame",
+    "long",
+    "master",
+    "sacrifice"
+   ],
+   "chances_stockfish_p20": [
+    48.4,
+    13.6,
+    88.3
+   ]
+  },
+  {
+   "id": "lichess_Vvjq2",
+   "source": "https://lichess.org/training/Vvjq2",
+   "fen": "5R2/8/8/8/3kp3/4p3/5p2/5K2 w - - 2 68",
+   "coups": [
+    "f8f2",
+    "e3f2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess Vvjq2 (1608, endgame) : Rxf2 est la gaffe qui cree le probleme (chances 86 % -> 8 %), exf2 le bon coup (96 %).",
+   "themes": [
+    "advancedPawn",
+    "crushing",
+    "defensiveMove",
+    "endgame",
+    "long"
+   ],
+   "chances_stockfish_p20": [
+    86.0,
+    8.2,
+    95.9
+   ]
+  },
+  {
+   "id": "lichess_FM0OB",
+   "source": "https://lichess.org/training/FM0OB",
+   "fen": "8/p7/Pp6/1P2k3/2b4P/4K3/6p1/6N1 w - - 0 51",
+   "coups": [
+    "h4h5",
+    "c4b5"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess FM0OB (2170, endgame) : h5 est la gaffe qui cree le probleme (chances 47 % -> 14 %), Bxb5 le bon coup (88 %).",
+   "themes": [
+    "crushing",
+    "endgame",
+    "master",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    47.3,
+    13.7,
+    87.9
+   ]
+  },
+  {
+   "id": "lichess_r8LXV",
+   "source": "https://lichess.org/training/r8LXV",
+   "fen": "8/1PR5/6k1/5np1/2N4p/1r2p2P/5KP1/8 w - - 0 59",
+   "coups": [
+    "f2e2",
+    "f5d4"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess r8LXV (2143, endgame) : Ke2 est la gaffe qui cree le probleme (chances 49 % -> 2 %), Nd4+ le bon coup (98 %).",
+   "themes": [
+    "endgame",
+    "mate",
+    "mateIn2",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    49.1,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_6Swpk",
+   "source": "https://lichess.org/training/6Swpk",
+   "fen": "4r1k1/p5pp/8/3p1p2/3Pr3/1P3N2/P3nPPP/3RR2K w - - 0 27",
+   "coups": [
+    "f3g5",
+    "e2g3"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess 6Swpk (1251, endgame) : Ng5 est la gaffe qui cree le probleme (chances 52 % -> 12 %), Ng3+ le bon coup (89 %).",
+   "themes": [
+    "crushing",
+    "discoveredAttack",
+    "endgame",
+    "long"
+   ],
+   "chances_stockfish_p20": [
+    51.9,
+    11.6,
+    89.0
+   ]
+  },
+  {
+   "id": "lichess_FrXt7",
+   "source": "https://lichess.org/training/FrXt7",
+   "fen": "6k1/p5p1/1p5p/8/5qnP/2Q3R1/PP4PK/8 w - - 2 41",
+   "coups": [
+    "h2g1",
+    "f4f2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess FrXt7 (1032, endgame) : Kg1 est la gaffe qui cree le probleme (chances 50 % -> 2 %), Qf2+ le bon coup (98 %).",
+   "themes": [
+    "endgame",
+    "mate",
+    "mateIn2",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    50.0,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_2qJPy",
+   "source": "https://lichess.org/training/2qJPy",
+   "fen": "8/4r3/8/6kP/8/5K2/4R1P1/8 b - - 0 46",
+   "coups": [
+    "e7e2",
+    "f3e2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess 2qJPy (1915, endgame) : Rxe2 est la gaffe qui cree le probleme (chances 50 % -> 12 %), Kxe2 le bon coup (89 %).",
+   "themes": [
+    "crushing",
+    "defensiveMove",
+    "endgame",
+    "long",
+    "zugzwang"
+   ],
+   "chances_stockfish_p20": [
+    50.0,
+    12.3,
+    89.3
+   ]
+  },
+  {
+   "id": "lichess_innZR",
+   "source": "https://lichess.org/training/innZR",
+   "fen": "6k1/pQ4pp/5p2/3P4/2P3P1/1P3q1K/P7/8 w - - 1 40",
+   "coups": [
+    "h3h4",
+    "g7g5"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess innZR (1333, endgame) : Kh4 est la gaffe qui cree le probleme (chances 50 % -> 2 %), g5+ le bon coup (98 %).",
+   "themes": [
+    "endgame",
+    "mate",
+    "mateIn2",
+    "queenEndgame",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    50.0,
+    2.5,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_0TlSg",
+   "source": "https://lichess.org/training/0TlSg",
+   "fen": "8/1p6/2n2k2/3p1p1p/p2P1K1P/P1P2N2/1P6/8 w - - 0 41",
+   "coups": [
+    "f3e5",
+    "c6e5"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess 0TlSg (1102, endgame) : Ne5 est la gaffe qui cree le probleme (chances 50 % -> 6 %), Nxe5 le bon coup (95 %).",
+   "themes": [
+    "crushing",
+    "endgame",
+    "knightEndgame",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    50.0,
+    6.4,
+    95.3
+   ]
+  },
+  {
+   "id": "lichess_Qfevd",
+   "source": "https://lichess.org/training/Qfevd",
+   "fen": "rnb1kb1r/pp3pPp/4p3/q2p4/8/7P/PpPB1PP1/R2QKBNR b KQkq - 2 9",
+   "coups": [
+    "b2a1q",
+    "d1a1"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess Qfevd (1786, crushing) : bxa1=Q est la gaffe qui cree le probleme (chances 72 % -> 14 %), Qxa1 le bon coup (86 %).",
+   "themes": [
+    "crushing",
+    "hangingPiece",
+    "opening",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    72.5,
+    13.6,
+    86.3
+   ]
+  },
+  {
+   "id": "lichess_VO8sF",
+   "source": "https://lichess.org/training/VO8sF",
+   "fen": "2r2rk1/Q4ppp/8/4p3/4b2q/2P5/P1P2PPP/R1B2RK1 w - - 0 20",
+   "coups": [
+    "c1b2",
+    "e4g2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess VO8sF (2255, crushing) : Bb2 est la gaffe qui cree le probleme (chances 52 % -> 15 %), Bxg2 le bon coup (85 %).",
+   "themes": [
+    "attraction",
+    "crushing",
+    "kingsideAttack",
+    "long",
+    "middlegame",
+    "sacrifice"
+   ],
+   "chances_stockfish_p20": [
+    52.2,
+    14.8,
+    84.9
+   ]
+  },
+  {
+   "id": "lichess_wGjmt",
+   "source": "https://lichess.org/training/wGjmt",
+   "fen": "8/8/1p2k1pp/pp2p3/1P2K1PP/2P1P3/P7/8 b - - 0 39",
+   "coups": [
+    "a5b4",
+    "c3b4"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess wGjmt (1984, crushing) : axb4 est la gaffe qui cree le probleme (chances 50 % -> 14 %), cxb4 le bon coup (91 %).",
+   "themes": [
+    "crushing",
+    "endgame",
+    "long",
+    "pawnEndgame"
+   ],
+   "chances_stockfish_p20": [
+    50.0,
+    13.5,
+    91.0
+   ]
+  },
+  {
+   "id": "lichess_se6bR",
+   "source": "https://lichess.org/training/se6bR",
+   "fen": "1r6/5k2/2p2p2/2P2P2/p2P1P1P/1p3K2/P7/1R6 w - - 0 54",
+   "coups": [
+    "a2b3",
+    "b8b3"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess se6bR (1260, crushing) : axb3 est la gaffe qui cree le probleme (chances 52 % -> 9 %), Rxb3+ le bon coup (94 %).",
+   "themes": [
+    "crushing",
+    "endgame",
+    "rookEndgame",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    52.1,
+    8.8,
+    94.4
+   ]
+  },
+  {
+   "id": "lichess_k6V2S",
+   "source": "https://lichess.org/training/k6V2S",
+   "fen": "4rrk1/6pn/4p2p/p1b1N3/PpNq4/1P5P/4QPP1/R4RK1 w - - 0 23",
+   "coups": [
+    "c4a5",
+    "f8f2"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess k6V2S (1802, crushing) : Nxa5 est la gaffe qui cree le probleme (chances 79 % -> 10 %), Rxf2 le bon coup (90 %).",
+   "themes": [
+    "crushing",
+    "deflection",
+    "discoveredAttack",
+    "kingsideAttack",
+    "long",
+    "middlegame",
+    "pin"
+   ],
+   "chances_stockfish_p20": [
+    78.7,
+    10.2,
+    90.0
+   ]
+  },
+  {
+   "id": "lichess_CS2Wh",
+   "source": "https://lichess.org/training/CS2Wh",
+   "fen": "4r1k1/p2q2pp/1p6/3pp3/1P2P2P/P3Q3/2r2PP1/R4RK1 b - - 1 26",
+   "coups": [
+    "d5d4",
+    "e3b3"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess CS2Wh (1140, crushing) : d4 est la gaffe qui cree le probleme (chances 49 % -> 15 %), Qb3+ le bon coup (86 %).",
+   "themes": [
+    "crushing",
+    "endgame",
+    "fork",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    49.3,
+    15.0,
+    86.0
+   ]
+  },
+  {
+   "id": "lichess_s3lE3",
+   "source": "https://lichess.org/training/s3lE3",
+   "fen": "6k1/4q2p/p2PP1p1/1p2Qp2/8/1P4P1/r7/3R3K b - - 0 43",
+   "coups": [
+    "e7b7",
+    "e5d5"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess s3lE3 (1716, crushing) : Qb7+ est la gaffe qui cree le probleme (chances 98 % -> 3 %), Qd5 le bon coup (98 %).",
+   "themes": [
+    "crushing",
+    "defensiveMove",
+    "endgame",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    97.5,
+    3.1,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_lTNb9",
+   "source": "https://lichess.org/training/lTNb9",
+   "fen": "2r5/8/8/p1p1Pk2/3P2p1/P3K3/2R5/8 w - - 0 43",
+   "coups": [
+    "c2c5",
+    "c8c5"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess lTNb9 (1434, crushing) : Rxc5 est la gaffe qui cree le probleme (chances 51 % -> 5 %), Rxc5 le bon coup (98 %).",
+   "themes": [
+    "crushing",
+    "endgame",
+    "rookEndgame",
+    "veryLong"
+   ],
+   "chances_stockfish_p20": [
+    50.7,
+    4.6,
+    97.5
+   ]
+  },
+  {
+   "id": "lichess_iSDBQ",
+   "source": "https://lichess.org/training/iSDBQ",
+   "fen": "2kr4/pppb4/3p1q2/4n3/2B1P1p1/2P5/PP1Q1PPP/R4RK1 w - - 0 19",
+   "coups": [
+    "c4d5",
+    "e5f3"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess iSDBQ (1558, crushing) : Bd5 est la gaffe qui cree le probleme (chances 72 % -> 4 %), Nf3+ le bon coup (97 %).",
+   "themes": [
+    "crushing",
+    "kingsideAttack",
+    "middlegame",
+    "sacrifice",
+    "short"
+   ],
+   "chances_stockfish_p20": [
+    71.7,
+    4.5,
+    96.6
+   ]
+  },
+  {
+   "id": "lichess_J4gxp",
+   "source": "https://lichess.org/training/J4gxp",
+   "fen": "5r2/R4pkp/4b1pq/2pN4/2PnPR2/1r1B2P1/3Q3P/7K b - - 0 27",
+   "coups": [
+    "f8b8",
+    "f4f7"
+   ],
+   "attendus": [
+    [
+     "erreur",
+     "manque",
+     "gaffe"
+    ],
+    [
+     "brillant",
+     "tres_bon",
+     "meilleur",
+     "theorique",
+     "excellent",
+     "bon"
+    ]
+   ],
+   "pourquoi": "Probleme lichess J4gxp (1374, crushing) : Rfb8 est la gaffe qui cree le probleme (chances 76 % -> 8 %), Rfxf7+ le bon coup (93 %).",
+   "themes": [
+    "crushing",
+    "deflection",
+    "long",
+    "middlegame"
+   ],
+   "chances_stockfish_p20": [
+    75.9,
+    7.8,
+    93.1
+   ]
+  }
+ ]
+}

@@ -29,6 +29,7 @@ SERIES = [
     ("test_en_ligne_revue.py", False),
     ("test_invitations.py", False),
     ("test_classements.py", False),
+    ("test_precision.py", False),
     ("test_cache_analyse.py", False),
     ("test_statistiques.py", False),
     ("test_entrainement.py", False),
@@ -45,6 +46,7 @@ SERIES = [
     ("test_mes_erreurs.py", True),
     ("test_variantes.py", True),
     ("test_analyse_libre_moteur.py", True),
+    ("test_precision_moteur.py", True),
 ]
 
 
