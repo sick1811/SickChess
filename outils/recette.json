@@ -620,8 +620,8 @@
   {
    "id": "R-148",
    "section": "Analyse libre",
-   "texte": "Finale à 5 pièces ou moins (ex. coller 8/8/8/4k3/8/8/4P3/4K3 w - - 0 1), dossier syzygy/ présent",
-   "detail": "Sous les lignes : « Tables de finale : les Blancs gagnent / nulle » ; sans le dossier syzygy/, rien ne s'affiche et tout marche.",
+   "texte": "Finale à 5 pièces ou moins (ex. coller 8/8/8/4k3/8/8/4P3/4K3 w - - 0 1 : nulle, roi noir devant le pion ; puis 8/8/8/4k3/8/8/8/3QK3 w - - 0 1 : les Blancs gagnent), dossier syzygy/ présent",
+   "detail": "Sous les lignes : « Tables de finale : nulle » pour la première, « les Blancs gagnent » pour la seconde ; sans le dossier syzygy/, rien ne s'affiche et tout marche.",
    "ordre": 11008
   },
   {

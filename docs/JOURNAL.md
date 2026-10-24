@@ -1296,3 +1296,22 @@ Causes et corrections :
   mémoire +5 Mo/h (jeu stable ~165-172 Mo), Stockfish max 5, ralentissement x1,12, 0 plantage.
 - Version testée : celle du PC (sans le travail « quitter / lancer vite » de la séance 28).
 - À décider par Julien : 4 Stockfish gardent ~5,5 Go de mémoire même au menu (libérer quand on n'analyse pas ?).
+
+## 24/10/2026 (30) – Tests faits par Cowork sur le PC de Julien ; deux plantages corrigés (Claude Code, cloud)
+Cowork a pris la main sur le PC de Julien et passé les tests « Cowork » de la page « À faire » (étiquette
+« Qui », `docs/TESTS_COWORK.md`) : 19 validés (m04, r02, t01, t12, t50, t55, t56, t63, t64, t68, t82–t84, t86,
+t88, t92, t93, t95, t96, t101). Défauts listés dans `docs/A_FAIRE.md` (« Défauts trouvés par Cowork »).
+Corrigé (chaque fois reproduit d'abord dans un test) :
+- **Plantage de l'éditeur de l'analyse libre** en 1920×1080 : la largeur du panneau (32 % de l'écran) n'était pas
+  arrondie, donc l'échiquier commençait à x = 211.0 et la case cliquée était un nombre à virgule. `layout.py`
+  arrondit le panneau (tous les écrans en pixels entiers) ; `_case_sous` arrondit aussi. Tests : `test_analyse_libre.py`
+  (1920×1080, 1366×768, 2560×1440, 1600×900).
+- **Plantage en rouvrant le Problème du jour déjà fait** : sans problème à tirer, le dessin lisait une solution
+  jamais préparée. `nouveau_puzzle` la remet à vide. Test : `test_modes_problemes.py`.
+- Suite complète : 1056 contrôles OK ; `test_mes_erreurs.py` (« un autre coup qui défend f7 ») rouge sous charge pour la 2e fois, vert seul : à rendre plus robuste.
+- Recette R-148 et t87 : l'exemple `8/8/8/4k3/8/8/4P3/4K3 w` est **nul** (Cowork avait raison) ; ajout d'une finale
+  gagnante (roi + dame).
+
+À vérifier par Julien :
+- [ ] Analyse libre en plein écran → Éditer (E) → poser une tour : plus de plantage.
+- [ ] Problèmes → Problème du jour déjà fait → le rouvrir : « Reviens demain », le jeu reste ouvert.

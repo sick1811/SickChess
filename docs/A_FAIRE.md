@@ -6,6 +6,21 @@ Fichier partagé entre Cowork et Claude Code. **À relire au début de chaque s�
 Mis à jour le 24/10/2026.
 
 ## Retours de Julien à traiter (priorité)
+- [ ] **24/10 – Défauts trouvés par Cowork sur le PC de Julien** (page « À faire », commentaires « Vérifié par Cowork ») :
+      - [x] PLANTAGE t85 : éditeur de l'analyse libre en 1920×1080 (cases en nombres à virgule) → corrigé (séance 30).
+      - [x] PLANTAGE t52 : rouvrir le Problème du jour déjà fait → corrigé (séance 30).
+      - [ ] Textes coupés : t51 (« Ta pièce va sur une case où elle se fait prendre :… »), t52 (« Rec… » record
+            illisible), r01 (« tu as joué… », « Indice : 0 points… »), t62 (« BLA… », aide F1).
+      - [ ] t65 : cliquer un coup dans la feuille de la revue ne fait rien ; « aussi bon : Nf3, Nf3 » en double
+            (et « aussi bon » mieux noté que « meilleur »).
+      - [ ] t57 : « Ligne suivante » ne réagit pas ; nom « Ouverture King's du cavalier » mi-anglais.
+      - [ ] t54 : coller (Ctrl+V) dans Signaler remplace tout le texte et perd les accents (« à »).
+      - [ ] r01 : une partie importée où Julien ne joue pas (Morphy) donne des « Mes erreurs ».
+      - [ ] t62 : anglais : « 55 %10olved » cassé, restes en français (menu, haut de la revue), aide F1 : A = analyse libre.
+      - [ ] t52 : contre la montre, après une faute la solution ne se voit pas (le suivant arrive aussitôt).
+      - [ ] t71 / t99 : revue lente (17 coups : 7 min) et temps annoncé faux ; précision définitive ~2 min 30.
+      - [ ] t98 : la flèche « → » s'affiche en carré (police) ; t100 : petites pastilles « ?! » / « ! » peu lisibles.
+      - [ ] t56 : une partie à deux compte dans « Tes ouvertures » (voulu ?) ; t68 : Enregistrer pas réagi une fois.
 - [x] Analyses gardées (fichier `.analyse.json` à côté du PGN), pastilles stables, analyse
       pendant la partie, revue au coup 1, sacrifices non punis – faits et validés le 17/10.
 - [x] Sons des pièces : chocs de bois enregistrés (Kenney CC0) – validés.
@@ -193,8 +208,8 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
       (message), coche un roque, « Analyser ». L'éditeur est-il facile à utiliser ?
 - [ ] t86 (23) : revue d'une partie → un coup → « Analyser (A) » : même position ; Retour : la revue revient
       au même coup. Les 4 boutons du bas de la revue tiennent bien sur ton écran ?
-- [ ] t87 (23) : avec le dossier syzygy/ : colle `8/8/8/4k3/8/8/4P3/4K3 w - - 0 1` → « Tables de finale :
-      les Blancs gagnent » ; laisse 2 min sur une position : « analyse terminée », plus de stockfish.exe
+- [x] t87 (23) : avec le dossier syzygy/ : colle `8/8/8/4k3/8/8/4P3/4K3 w - - 0 1` → « Tables de finale :
+      nulle » (24/10 : vérifié par Cowork ; c'est bien nulle, l'ancien texte « les Blancs gagnent » était faux) ; laisse 2 min sur une position : « analyse terminée », plus de stockfish.exe
       d'analyse libre après Retour.
 - [ ] Claude Code (PC) : commit / envoi de la séance (23) si pas fait dans le cloud, puis version amis.
 - [ ] t78 (21, à deux) : finir une partie en ligne : la carte montre « Analyse en cours… » puis

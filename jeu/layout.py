@@ -44,7 +44,9 @@ class Disposition:
         self.grand = max(1.0, self.echelle / ECHELLE_NORMALE_MAX)
         g, marge = self.grand, int(MARGE * self.grand)
 
-        largeur_panneau = _borne(self.largeur * 0.32, PANNEAU_MIN * g, PANNEAU_MAX * g)
+        # 24/10 (plantage trouve par Cowork en 1920x1080) : des pixels entiers,
+        # sinon plateau_x etait 211.0 et les cases calculees au clic des flottants.
+        largeur_panneau = int(_borne(self.largeur * 0.32, PANNEAU_MIN * g, PANNEAU_MAX * g))
 
         hauteur_dispo = self.hauteur - 2 * marge
         largeur_dispo = self.largeur - largeur_panneau - 3 * marge

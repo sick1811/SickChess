@@ -288,6 +288,10 @@ class EcranProblemes:
         self.chrono_debut = 0
         self.temps_final = None
         self.index_solution = None
+        # 24/10 (plantage trouve par Cowork) : sans probleme a tirer (Probleme du
+        # jour deja fait), draw() lisait une solution qui n'existait pas.
+        self.solution = []
+        self.positions = []
         self.coup_en_attente = None
         self.fondu_debut = pygame.time.get_ticks()
 

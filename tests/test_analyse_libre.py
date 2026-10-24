@@ -282,6 +282,29 @@ for taille in ((1024, 640), (1920, 1080)):
              and max(r.bottom for r in rects) <= taille[1],
              "menu %dx%d : aucune entree ne chevauche ni ne sort" % taille)
 
+print("Grands ecrans : des pixels entiers (plantage de l'editeur trouve par Cowork en 1920x1080)")
+from ecran_revue import DispositionRevue
+for l, h in ((1920, 1080), (1366, 768), (2560, 1440), (1600, 900)):
+    d = DispositionRevue(l, h)
+    verifier(all(isinstance(v, int) for v in (d.plateau_x, d.plateau_y, d.taille_case, d.panneau_x, d.panneau_l)),
+             "%dx%d : plateau et panneau en pixels entiers (%r, %r)" % (l, h, d.plateau_x, d.panneau_x))
+ecran = pygame.display.set_mode((1920, 1080))
+grand = EcranAnalyseLibre(ecran, {}, moteur=moteur)
+grand.ouvrir_l_editeur()
+grand.edition.choisir_outil("R")
+d = grand.disposition
+case = grand._case_sous((d.plateau_x + 3.5 * d.taille_case, d.plateau_y + 6.5 * d.taille_case))
+verifier(isinstance(case, int) and 0 <= case < 64, "1920x1080 : la case sous la souris est un vrai numero (%r)" % case)
+try:
+    grand.edition.clic(case)
+    grand.draw()
+    ok = grand.plateau.board.piece_at(case) is not None if hasattr(grand.plateau, "board") else True
+except Exception as erreur:
+    ok = False
+    print("    " + repr(erreur))
+verifier(ok, "1920x1080 : poser une tour dans l'editeur ne plante pas")
+grand.analyse.arreter()
+
 print()
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))
 pygame.quit()

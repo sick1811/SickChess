@@ -161,6 +161,20 @@ verifier(ecr.session.terminee() and "Trois fautes" in ecr.message, "survie : %s"
 ecr.draw()
 pygame.image.save(ecran, "tests/capture_survie.png")
 
+print("Probleme du jour deja fait, rouvert (plantage trouve par Cowork, 24/10)")
+s = mp.SessionDefi(mp.DU_JOUR)
+s.noter_un_puzzle(s.tirer_un_puzzle(), True)
+ecr = EcranProblemes(ecran, {})
+try:
+    ecr.commencer("jour")
+    ecr.draw()
+    ecr.draw()
+    ok = True
+except Exception as erreur:
+    ok = False
+    print("    " + repr(erreur))
+verifier(ok and ecr.fini and ecr.puzzle is None, "rouvrir le probleme du jour fait : pas de plantage (%s)" % ecr.message)
+
 print("Records gardes en memoire (banc d'essai 23/10)")
 import builtins
 import json

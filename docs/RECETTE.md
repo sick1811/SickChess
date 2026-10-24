@@ -217,8 +217,8 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
   → « FEN copié » ; lichess affiche la même position.
 - [ ] **R-147** – Revue d'une partie → aller à un coup → « Analyser (A) » ; puis Retour  
   → L'analyse libre s'ouvre sur la même position (variante comprise), avec la partie dans la feuille ; Retour revient à la revue au même coup.
-- [ ] **R-148** – Finale à 5 pièces ou moins (ex. coller 8/8/8/4k3/8/8/4P3/4K3 w - - 0 1), dossier syzygy/ présent  
-  → Sous les lignes : « Tables de finale : les Blancs gagnent / nulle » ; sans le dossier syzygy/, rien ne s'affiche et tout marche.
+- [ ] **R-148** – Finale à 5 pièces ou moins (ex. coller 8/8/8/4k3/8/8/4P3/4K3 w - - 0 1 : nulle, roi noir devant le pion ; puis 8/8/8/4k3/8/8/8/3QK3 w - - 0 1 : les Blancs gagnent), dossier syzygy/ présent  
+  → Sous les lignes : « Tables de finale : nulle » pour la première, « les Blancs gagnent » pour la seconde ; sans le dossier syzygy/, rien ne s'affiche et tout marche.
 - [ ] **R-149** – Laisser l'analyse libre ouverte 2 minutes sur la même position, puis Retour  
   → Au bout d'une minute « analyse terminée » et le processeur redescend ; après Retour, plus de stockfish.exe d'analyse libre dans le Gestionnaire des tâches.
 
