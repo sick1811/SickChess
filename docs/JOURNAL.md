@@ -1106,3 +1106,21 @@ Fait :
 
 À vérifier par Julien :
 - [ ] t98 (voir A_FAIRE), R-09F.
+
+## 24/10/2026 (31) – Travail p27 : résumé du coach sur la carte de fin (Claude Code dans le cloud)
+Demande de Julien : « p27 ».
+Fait :
+- **`jeu/resume_coach.py`** : dès la fin de la partie, la carte de fin montre trois lignes à lire tout de suite :
+  **l'ouverture** (« Ouverture : C60 - Partie espagnole (4 coups de théorie) ») ; **ton plus gros moment** (ta
+  pire faute et le coup qu'il fallait jouer, « 23. Fxh7 ?? (gaffe), mieux : Cf3 » ; sans faute : ton plus beau
+  coup, ou « Aucune faute : bravo ! ») ; **ta précision**, « provisoire » tant que l'analyse tourne, puis comparée
+  à tes **10 dernières parties analysées** (« ta meilleure de tes 10 dernières parties », « au-dessus / sous /
+  comme ta moyenne (78 %) »).
+- Les précisions passées sont lues une fois, dans un fil (la carte ne bloque pas) ; lignes recalculées 3 fois par
+  seconde au plus. Contre l'ordinateur et en ligne (ton camp) ; partie à deux : ouverture et plus gros moment.
+- Carte un peu plus haute (390 au lieu de 300, 460 de large) ; la ligne « toi X % – ordinateur Y % » reste,
+  plus discrète, dessous.
+- Tests : `tests/test_resume_coach.py` (31 contrôles). Anglais traduit. Recette : R-06J.
+
+À vérifier par Julien :
+- [ ] t99 (voir A_FAIRE), R-06J.

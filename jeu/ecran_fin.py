@@ -3,6 +3,8 @@
 # Version simple (V8_TURBO_3000 avait un ecran de fin avec analyse, profil,
 # historique et revanche en ligne : ces morceaux reviendront avec la revue de
 # partie). Ici : le resultat, la raison, et deux boutons REJOUER / MENU.
+# 24/10 (p27) : le resume du coach (resume_coach.py) : ouverture, plus gros
+# moment, precision comparee aux 10 dernieres parties.
 # board_render.py appelle draw() tout seul quand la partie est finie.
 
 import chess
@@ -24,6 +26,46 @@ class EcranFin:
         self.analyseur = None          # AnalyseurPartie, voir lancer_analyse()
         self.rect = pygame.Rect(0, 0, 10, 10)
         self.ligne_classement = ""    # "Classement : 1200 -> 1214 (+14)"
+        self.passees = None           # resume_coach.PrecisionsPassees
+        self._coach = (-1, [])        # (instant, lignes) : recalcule 3 fois/s
+
+    def camp_du_joueur(self):
+        """True (Blancs) / False (Noirs) / None (partie a deux sur ce PC)."""
+        if self.mode == "stockfish":
+            return not getattr(self.plateau, "ia_joue_blancs", False)
+        return None
+
+    def preparer_le_coach(self, chemin_pgn=""):
+        """A la fin de la partie : lit (dans un fil) les precisions des
+        parties precedentes, pour la comparaison du coach."""
+        if self.passees is None and self.camp_du_joueur() is not None:
+            import resume_coach
+            self.passees = resume_coach.PrecisionsPassees(chemin_pgn)
+
+    def lignes_du_coach(self):
+        maintenant = pygame.time.get_ticks()
+        instant, lignes = self._coach
+        if instant >= 0 and maintenant - instant < 300:
+            return lignes
+        import resume_coach
+        try:
+            lignes = resume_coach.lignes(self.analyseur, self.camp_du_joueur(),
+                                         self.passees.valeurs if self.passees else None)
+        except Exception as e:
+            print("[COACH] %s" % e)
+            lignes = []
+        self._coach = (maintenant, lignes)
+        return lignes
+
+    def _dessiner_coach(self, screen, t, y):
+        """Les lignes du coach a partir de y ; renvoie le y suivant."""
+        for ligne in self.lignes_du_coach():
+            if y + 20 >= self.bouton_revue.rect.y:      # petite fenetre : on coupe
+                break
+            ui.texte(screen, ligne, self.rect.centerx, y, 15, t["texte"],
+                     ancre="centre", largeur_max=self.rect.width - 30, ajuster=True)
+            y += 24
+        return y
 
     # ------------------------------------------------------------------ texte
 
@@ -87,12 +129,13 @@ class EcranFin:
 
     def _placer(self, screen):
         largeur, hauteur = screen.get_size()
-        carte_l, carte_h = min(420, largeur - 40), 300
+        carte_l = min(460, largeur - 40)
         dispo = getattr(self.plateau, "disposition", None)
         if dispo is not None and hasattr(dispo, "rect_plateau"):
             zone = pygame.Rect(*dispo.rect_plateau())
         else:
             zone = screen.get_rect()
+        carte_h = max(300, min(390, zone.height - 10))
         self.rect = pygame.Rect(0, 0, carte_l, carte_h)
         self.rect.center = zone.center
         bl = (carte_l - 60) // 2
@@ -119,10 +162,11 @@ class EcranFin:
             ui.texte(screen, self.ligne_classement, self.rect.centerx,
                      self.rect.y + 104, 16, t["accent"], gras=True, ancre="centre",
                      largeur_max=self.rect.width - 30, ajuster=True)
+        y = self._dessiner_coach(screen, t, self.rect.y + 132)
         ligne = self.ligne_analyse()
-        if ligne:
-            ui.texte(screen, ligne, self.rect.centerx, self.rect.y + 132, 15,
-                     t["texte"], ancre="centre",
+        if ligne and y + 20 < self.bouton_revue.rect.y:
+            ui.texte(screen, ligne, self.rect.centerx, y + 2, 14,
+                     t["texte_discret"], ancre="centre",
                      largeur_max=self.rect.width - 30, ajuster=True)
         for bouton in self.boutons:
             bouton.dessiner(screen, t, rayon=10)

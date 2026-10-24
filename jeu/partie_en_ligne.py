@@ -84,6 +84,9 @@ class EcranFinEnLigne(EcranFin):
         self.bouton_revanche = ui.Bouton((0, 0, 10, 10), "Revanche", "revanche")
         self.boutons = [self.bouton_revue, self.bouton_revanche, self.bouton_menu]
 
+    def camp_du_joueur(self):
+        return self.mode.couleur_locale == chess.WHITE
+
     def titre(self):
         resultat = getattr(self.plateau, "result", None)
         if resultat not in ("1-0", "0-1"):
@@ -110,12 +113,13 @@ class EcranFinEnLigne(EcranFin):
 
     def _placer(self, screen):
         largeur, hauteur = screen.get_size()
-        carte_l, carte_h = min(440, largeur - 40), 330
+        carte_l = min(460, largeur - 40)
         dispo = getattr(self.plateau, "disposition", None)
         if dispo is not None and hasattr(dispo, "rect_plateau"):
             zone = pygame.Rect(*dispo.rect_plateau())
         else:
             zone = screen.get_rect()
+        carte_h = max(330, min(402, zone.height - 10))   # 24/10 (p27) : le coach
         self.rect = pygame.Rect(0, 0, carte_l, carte_h)
         self.rect.center = zone.center
         bl = (carte_l - 60) // 2
@@ -140,13 +144,14 @@ class EcranFinEnLigne(EcranFin):
         ui.texte(screen, raison, self.rect.centerx, self.rect.y + 72, 16,
                  t["texte_discret"], ancre="centre",
                  largeur_max=self.rect.width - 30, ajuster=True)
+        y = self._dessiner_coach(screen, t, self.rect.y + 100)
         ligne = self.ligne_analyse()
         if ligne:
-            ui.texte(screen, ligne, self.rect.centerx, self.rect.y + 100, 15,
-                     t["texte"], ancre="centre",
+            ui.texte(screen, ligne, self.rect.centerx, y, 14,
+                     t["texte_discret"], ancre="centre",
                      largeur_max=self.rect.width - 30, ajuster=True)
         ui.paragraphe(screen, revanche.explication(),
-                      (self.rect.x + 20, self.rect.y + 128, self.rect.width - 40, 54),
+                      (self.rect.x + 20, y + 26, self.rect.width - 40, 54),
                       14, t["accent"])
         for bouton in self.boutons:
             bouton.dessiner(screen, t, rayon=10)

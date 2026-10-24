@@ -103,6 +103,8 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
 
 - [ ] **R-060** – Finir une partie contre l'ordinateur  
   → Carte de fin : résultat, raison, Elo « 1200 -> 1215 (+15) », précision des deux joueurs presque tout de suite.
+- [ ] **R-06J** – Finir une partie contre l'ordinateur : lire le résumé du coach sur la carte de fin  
+  → Trois lignes tout de suite : l'ouverture (« Ouverture : C60 - Partie espagnole (4 coups de théorie) »), ton plus gros moment (ta pire faute et le coup qu'il fallait jouer, ou ton plus beau coup), ta précision « provisoire » qui devient définitive, comparée à tes 10 dernières parties (« ta meilleure… », « au-dessus de ta moyenne… »). Rien ne chevauche les boutons.
 - [ ] **R-061** – Carte de fin → Rejouer, puis → Menu  
   → Rejouer relance avec les mêmes réglages ; Menu revient au menu.
 - [ ] **R-062** – Carte de fin → Revue de la partie  

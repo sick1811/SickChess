@@ -81,7 +81,7 @@ Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/
        d'analyse, hachage, animations ; modifiable dans Options).
 5. [ ] **p34 – Niveaux en vrai Elo** (matchs automatiques contre des références, à lancer la nuit
        sur le PC de Julien ; table de calibrage dans le code, test qui la vérifie).
-6. [ ] **p27 – Résumé du coach immédiat** (carte de fin : ouverture, plus gros moment, précision
+6. [x] **p27 – Résumé du coach immédiat** (**fait le 24/10, séance (31)**) (carte de fin : ouverture, plus gros moment, précision
        provisoire, comparaison avec les 10 dernières parties).
 7. [ ] **p33 – Lisibilité pour tous** (pastilles reconnaissables sans couleur, contrastes,
        1366×768 et 4K ; relecteur-interface).
@@ -103,6 +103,9 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t99 (31) : finis une partie contre l'ordinateur : sur la carte de fin, trois lignes du coach (ouverture, ton
+      plus gros moment avec le coup qu'il fallait jouer, précision « provisoire » puis comparée à tes 10 dernières
+      parties). Utile ? Lisible ? Rien ne chevauche les boutons ?
 - [ ] t98 (30) : Options → Affichage → « Puissance du PC » : la ligne dit « Ce PC : 12 cœurs, … → PC normal » ;
       choisis Petit PC, ouvre une revue : un seul stockfish.exe (Gestionnaire des tâches), jeu fluide ; reviens à
       Automatique. Si un ami a un petit portable : le jeu est-il plus fluide chez lui ?
