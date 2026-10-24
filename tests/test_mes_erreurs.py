@@ -123,6 +123,45 @@ verifier(not os.path.exists(os.path.join(RACINE, "puzzles_score.json.tmp")),
 
 import moteurs
 moteurs.tout_fermer()
+print("4. La regle « presque aussi bon » (faux moteur : resultat toujours le meme)")
+# 25/10 : avec le vrai Stockfish sur plusieurs coeurs, 3...De7 et 3...g6 s'ecartaient
+# de 0,10 a 0,39 pion d'un calcul a l'autre ; l'ancienne marge de 0,30 pion refusait
+# alors un bon coup une fois sur 4. Regle de la revue : moins de 5 points de chances
+# de gagner perdus (« Bon » ou mieux) = accepte.
+import moteurs
+
+
+class FauxMoteur:
+    def __init__(self, valeurs):
+        self.valeurs = valeurs                  # uci -> (evaluation, mat), cote des Blancs au trait
+
+    def analyser_position(self, fen, profondeur, temps):
+        evaluation, mat = self.valeurs[coup_qui_mene_a(fen)]
+        return {"evaluation": evaluation, "mat": mat, "profondeur": profondeur}
+
+
+def coup_qui_mene_a(fen):
+    """Le coup joue depuis fen_avant pour arriver a fen."""
+    for m in chess.Board(fen_avant).legal_moves:
+        b = chess.Board(fen_avant)
+        b.push(m)
+        if b.fen() == fen:
+            return m.uci()
+
+
+ancien = moteurs.moteur_d_analyse
+fen_avant = "r1bqkbnr/pppp1ppp/2n5/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 3 3"
+pb = {"coups": ["f1c4", "g7g6"], "source": {"eval_meilleur": 0.3}}
+for e7, g6, attendu, quoi in ((-0.04, -0.43, True, "ecart de 0,39 pion (le pire vu) : accepte"),
+                              (-0.15, -0.25, True, "ecart de 0,10 pion : accepte"),
+                              (1.20, -0.30, False, "un vrai mauvais coup (1,5 pion perdu) : refuse")):
+    moteurs.moteur_d_analyse = lambda *a, _v={"d8e7": (e7, None), "g7g6": (g6, None)}, **k: FauxMoteur(_v)
+    verifier(mes_erreurs.coup_presque_aussi_bon(fen_avant, chess.Move.from_uci("d8e7"), pb) == attendu, quoi)
+moteurs.moteur_d_analyse = lambda *a, **k: FauxMoteur({"g8f6": (None, 1), "g7g6": (-0.3, None)})
+verifier(not mes_erreurs.coup_presque_aussi_bon(fen_avant, chess.Move.from_uci("g8f6"), pb),
+         "un coup qui laisse un mat en 1 : refuse")
+moteurs.moteur_d_analyse = ancien
+
 print()
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))
 pygame.quit()

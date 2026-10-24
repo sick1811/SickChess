@@ -21,11 +21,13 @@ import os
 
 import chess
 
+import annotations
+
 NOTES_RETENUES = ("gaffe", "erreur", "manque")
 NOM_DU_MODE = "Mes erreurs"
 FICHIER_SUIVI = "mes_erreurs.json"
-# Un coup different de celui du moteur est accepte s'il ne perd presque rien.
-TOLERANCE_PIONS = 0.30
+# Un coup different de celui du moteur est accepte s'il ne perd presque rien
+# (moins de 5 points de chances de gagner, comme « Bon » dans la revue).
 
 
 def _dossier_ecriture():
@@ -140,7 +142,6 @@ def description(puzzle):
     s = (puzzle or {}).get("source") or {}
     if not s:
         return ""
-    import annotations
     import notation
     numero = "%d%s" % (s.get("numero", 0), "." if s.get("par_les_blancs") else "...")
     date = str(s.get("date", "")).split(" ")[0]
@@ -201,7 +202,13 @@ def coup_presque_aussi_bon(fen_avant, coup, puzzle, chemin_stockfish=None):
     except Exception as souci:
         print("[MES ERREURS] verification impossible : %s" % souci)
         return False
-    return pour_le_joueur >= joue_meilleur - TOLERANCE_PIONS
+    # 25/10 : la meme regle que la revue. Un coup qui perd moins de 5 points de
+    # chances de gagner y est « Bon » (ou mieux) : ici aussi il est accepte.
+    # L'ancienne marge fixe de 0,30 pion etait plus petite que le hasard de
+    # Stockfish sur plusieurs coeurs (3...De7 contre 3...g6 : ecart de 0,10 a
+    # 0,39 pion d'un calcul a l'autre) : un bon coup etait refuse une fois sur 4.
+    perte = annotations.chances_de_gagner(joue_meilleur) - annotations.chances_de_gagner(pour_le_joueur)
+    return perte < annotations.SEUIL_IMPRECISION
 
 
 class SessionErreurs:
