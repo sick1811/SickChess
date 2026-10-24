@@ -65,3 +65,5 @@ tests/surveillance.csv
 # 24/10 : mesures du test d'endurance (outils/endurance.py)
 /tests/endurance/
 /tests/verification_tests.txt
+/rapports/
+/_sauvegarde_cowork_*/

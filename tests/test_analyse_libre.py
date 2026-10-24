@@ -305,6 +305,36 @@ except Exception as erreur:
 verifier(ok, "1920x1080 : poser une tour dans l'editeur ne plante pas")
 grand.analyse.arreter()
 
+
+print("Editeur : poser une piece a la vraie souris, 8 tailles d'ecran dont 4K (test ecrit sur le PC de Julien)")
+# Defaut Cowork 24/10 : en plein ecran sur le PC de Julien, le jeu se fermait
+# (TypeError ... not float) : la largeur du panneau, un nombre a virgule,
+# rendait plateau_x a virgule, puis le numero de case aussi.
+for taille in ((1024, 640), (1280, 720), (1366, 768), (1600, 900), (1920, 1080),
+               (2560, 1440), (2560, 1080), (3840, 2160)):
+    ecran = pygame.display.set_mode(taille)
+    ecr._placer(ecran)
+    d = ecr.disposition
+    entiers = all(isinstance(v, int) for v in (d.plateau_x, d.plateau_y, d.taille_case,
+                                                d.panneau_x, d.panneau_l))
+    ecr.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_e, mod=0, unicode=""))
+    plante = None
+    try:
+        ecr.edition.vider()
+        ecr.edition.choisir_outil("R")
+        # le centre de e4, calcule comme le ferait la souris (coordonnees de l'ecran)
+        tc = d.taille_case
+        col, rang = (3, 4) if ecr.plateau.flipped else (4, 3)
+        pos = (d.plateau_x + col * tc + tc // 2, d.plateau_y + (7 - rang) * tc + tc // 2)
+        ecr.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=pos))
+        posee = ecr.edition.plateau.piece_at(chess.E4)
+    except Exception as erreur:
+        plante, posee = "%s: %s" % (type(erreur).__name__, erreur), None
+    verifier(entiers and plante is None and posee == chess.Piece(chess.ROOK, chess.WHITE),
+             "%dx%d : positions en entiers (%s), tour posee en e4 sans planter (%s)"
+             % (taille[0], taille[1], entiers, plante))
+    ecr.fermer_l_editeur(False)
+
 print()
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))
 pygame.quit()
