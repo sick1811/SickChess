@@ -79,5 +79,5 @@ def description():
     c, m = materiel()
     memoire = ("%.0f Go" % (m / 1024.0)).replace(".", ",") if m else "mémoire inconnue"
     if detecter() == "petit":                 # phrases entieres : traduites en anglais
-        return "Ce PC : %d cœurs, %s → petit PC" % (c, memoire)
-    return "Ce PC : %d cœurs, %s → PC normal" % (c, memoire)
+        return "Ce PC : %d cœurs, %s : petit PC" % (c, memoire)
+    return "Ce PC : %d cœurs, %s : PC normal" % (c, memoire)

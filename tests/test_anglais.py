@@ -52,6 +52,19 @@ verifier(langue.traduire("OPTIONS") == "OPTIONS" and langue.traduire("QUITTER") 
 verifier(ouvertures.nom_de_l_ouverture(["e4", "c5"]).startswith("Sicilian"),
          "ouvertures en anglais : %s" % ouvertures.nom_de_l_ouverture(["e4", "c5"]))
 
+verifier(langue.traduire("111 problèmes joues, 55 % réussis, meilleure série 7 - enregistré")
+         == "111 puzzles played, 55 % solved, best streak 7 - saved",
+         "« %% » suivi d'un mot (Cowork, t62 : « 55 %%10olved ») : %r" % langue.traduire(
+             "111 problèmes joues, 55 % réussis, meilleure série 7 - enregistré"))
+verifier(langue.traduire("Ordinateur (400) - Toi") == "Computer (400) - You",
+         "haut de la revue : %r" % langue.traduire("Ordinateur (400) - Toi"))
+verifier(langue.traduire("Contre l'ordinateur (3000 Elo)  -  coup 2  -  24/10/2026 13:02").startswith("Against the computer (3000 Elo)  -  move 2"),
+         "reprise au menu en anglais")
+
+import ui
+verifier(ui.mesurer("NOIRS", 15, True) == ui.mesurer("BLACK", 15, True),
+         "on mesure le texte traduit (pendule : « BLA… » coupe)")
+
 print("2. Tous les ecrans")
 from menu_principal import MainMenu
 m = MainMenu(ecran, "0.1.0"); m.annoncer_reprise(True, "Two players on this PC")

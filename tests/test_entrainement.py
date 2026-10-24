@@ -111,6 +111,18 @@ ancienne = ecr.entr.coups
 ecr.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=ecr.btn_suivante.rect.center))
 verifier(ecr.entr.coups != ancienne and not ecr.entr.termine(), "ligne suivante : une autre variante")
 
+print("4 bis. Noms des ouvertures en francais (Cowork, t57 : « Ouverture King's du cavalier »)")
+import ouvertures
+import ouvertures_fr
+import re as _re
+restes = sorted({ouvertures_fr.traduire(nom) for _eco, nom in ouvertures.livre().values()
+                 if _re.search(r"\b(King's|Queen's|roi's|dame's)", ouvertures_fr.traduire(nom))})
+verifier(not restes, "plus de King's / Queen's dans les noms traduits (%d : %s)" % (len(restes), restes[:3]))
+verifier(ouvertures_fr.traduire("King's Knight Opening") == "Ouverture du cavalier roi",
+         "King's Knight Opening : %s" % ouvertures_fr.traduire("King's Knight Opening"))
+verifier(ouvertures_fr.traduire("King's Gambit Declined: Keene's Defense") == "Gambit du roi refusé, Défense Keene",
+         "le « 's » anglais d'un nom propre disparait : %s" % ouvertures_fr.traduire("King's Gambit Declined: Keene's Defense"))
+
 print("5. Le menu")
 from menu_principal import MainMenu
 m = MainMenu(ecran)

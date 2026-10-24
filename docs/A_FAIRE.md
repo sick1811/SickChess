@@ -9,17 +9,22 @@ Mis à jour le 24/10/2026.
 - [ ] **24/10 – Défauts trouvés par Cowork sur le PC de Julien** (page « À faire », commentaires « Vérifié par Cowork ») :
       - [x] PLANTAGE t85 : éditeur de l'analyse libre en 1920×1080 (cases en nombres à virgule) → corrigé (séance 30).
       - [x] PLANTAGE t52 : rouvrir le Problème du jour déjà fait → corrigé (séance 30).
-      - [ ] Textes coupés : t51 (« Ta pièce va sur une case où elle se fait prendre :… »), t52 (« Rec… » record
-            illisible), r01 (« tu as joué… », « Indice : 0 points… »), t62 (« BLA… », aide F1).
-      - [ ] t65 : cliquer un coup dans la feuille de la revue ne fait rien ; « aussi bon : Nf3, Nf3 » en double
-            (et « aussi bon » mieux noté que « meilleur »).
-      - [ ] t57 : « Ligne suivante » ne réagit pas ; nom « Ouverture King's du cavalier » mi-anglais.
-      - [ ] t54 : coller (Ctrl+V) dans Signaler remplace tout le texte et perd les accents (« à »).
-      - [ ] r01 : une partie importée où Julien ne joue pas (Morphy) donne des « Mes erreurs ».
-      - [ ] t62 : anglais : « 55 %10olved » cassé, restes en français (menu, haut de la revue), aide F1 : A = analyse libre.
-      - [ ] t52 : contre la montre, après une faute la solution ne se voit pas (le suivant arrive aussitôt).
+      - [x] Textes coupés (séance 36) : t51 explication des gaffes (cadre plus haut, 3 lignes), t52 / r01 messages
+            et « tu as joué… » sur plusieurs lignes, t62 « BLA… » (mesure du texte traduit), aide F1 de la revue.
+      - [x] t65 (séance 36) : « Nf3, Nf3 » en double et ordre des meilleurs coups ; clic sur un coup de la feuille :
+            une pièce sélectionnée « mangeait » le clic → corrigé. ⚠ Le cas exact de Cowork n'est pas reproduit :
+            à revérifier sur le PC.
+      - [x] t57 (séance 36) : noms d'ouvertures (King's / Queen's / « Keene's » → français). « Ligne suivante » :
+            **non reproduit** (marche en 1920×1080 et dans les tests) → à revérifier par Cowork.
+      - [x] t54 (séance 36) : Ctrl+V ajoute au message (remplace toujours dans un champ court : code de salon) ;
+            accents gardés (presse-papiers Windows en cp1252).
+      - [x] r01 (séance 36) : une partie importée sans ton nom ne donne plus de « Mes erreurs ».
+      - [x] t62 (séance 36) : « 55 %10olved » corrigé (« %% » mal lu), restes en français (reprise, haut de la revue).
+      - [x] t52 (séance 36) : contre la montre / survie : après une faute, le bon coup est joué sous tes yeux
+            (« Raté ! Il fallait Qxh2#… ») pendant 2,2 s.
+      - [x] t98 (séance 36) : « → » remplacé par « : » (la police n'a pas ce signe).
       - [ ] t71 / t99 : revue lente (17 coups : 7 min) et temps annoncé faux ; précision définitive ~2 min 30.
-      - [ ] t98 : la flèche « → » s'affiche en carré (police) ; t100 : petites pastilles « ?! » / « ! » peu lisibles.
+      - [ ] t100 : petites pastilles « ?! » / « ! » peu lisibles dans la feuille de coups.
       - [ ] t56 : une partie à deux compte dans « Tes ouvertures » (voulu ?) ; t68 : Enregistrer pas réagi une fois.
 - [x] Analyses gardées (fichier `.analyse.json` à côté du PGN), pastilles stables, analyse
       pendant la partie, revue au coup 1, sacrifices non punis – faits et validés le 17/10.
@@ -157,6 +162,12 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t103 (36) : **corrections des défauts trouvés par Cowork** (à confier à Cowork sur ton PC) :
+      revue : clic sur un coup de la feuille (même après avoir cliqué une pièce), plus de « Nf3, Nf3 », explication
+      d'une gaffe en entier ; Problèmes : messages et record lisibles, Mes erreurs sans les parties de Morphy,
+      contre la montre : le bon coup montré après une faute ; Ouvertures : noms en français, « Ligne suivante » ;
+      Signaler : Ctrl+V ajoute au texte avec les accents ; anglais : plus de « %10olved », pendule « BLACK » entière,
+      aide F1 de la revue à jour ; Options : « Ce PC : 12 cœurs, 16 Go : PC normal ».
 - [ ] t102 (32) : fais une revue, reviens au menu et ne touche à rien 3 minutes, Gestionnaire des tâches ouvert :
       au bout de 2 min les stockfish.exe d'analyse disparaissent (il en reste 1, l'adversaire), la mémoire
       redescend de plusieurs Go ; rouvre la même revue : pastilles et précision sont toujours là.

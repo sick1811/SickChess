@@ -35,6 +35,7 @@ from move_history import MoveHistory
 
 PAUSE_ADVERSE = 550        # ms avant que l'adversaire joue
 PAUSE_REUSSITE = 900       # ms avant d'enchainer apres une reussite
+PAUSE_FAUTE = 2200         # 24/10 (Cowork, t52) : le temps de voir le bon coup
 DUREE_FLASH = 600          # clignotement rouge / vert du plateau
 DUREE_FONDU = 240          # fondu d'arrivee d'un nouveau probleme
 
@@ -420,13 +421,19 @@ class EcranProblemes:
             self.coup_en_attente = None
             self.fini = True
             p.game_over = True
-            self.index_solution = 2 * self.avance
-            self.aller_au_coup(len(self.solution), son=False)
+            # 24/10 (Cowork, t52 : « la solution ne se voit pas ») : on joue
+            # sous tes yeux LE coup qu'il fallait jouer (anime, case en
+            # couleur), et on le laisse 2 s avant le probleme suivant.
+            index_bon = min(len(self.solution), 2 * self.avance + 2)
+            self.index_solution = index_bon - 1
+            self.aller_au_coup(index_bon, son=True)
+            bon = self.solution[index_bon - 1][0] if self.solution else ""
             if self.session.terminee():
                 self._dire(self.session.resume(), AMBRE)
             else:
-                self._dire("Raté ! Problème suivant...", ROUGE)
-                self.enchainer_a = pygame.time.get_ticks() + PAUSE_REUSSITE
+                self._dire("Raté ! Il fallait %s. Problème suivant..." % notation.afficher(bon)
+                           if bon else "Raté ! Problème suivant...", ROUGE)
+                self.enchainer_a = pygame.time.get_ticks() + PAUSE_FAUTE
             return
         self._dire("Ce n'est pas ça. Réessaie.", ROUGE)
 
@@ -850,17 +857,22 @@ class EcranProblemes:
         # Le probleme
         if self.puzzle and self.puzzle.get("source"):
             import mes_erreurs
+            # 24/10 (Cowork, r01 : « tu as joué… » coupe) : la hauteur fixe ne
+            # laissait qu'une ligne ; jusqu'a 3 lignes, toute la phrase.
             y += ui.paragraphe(ecran, mes_erreurs.description(self.puzzle),
-                               (x, y, l, ui.t(40, ech)), ui.t(14, ech), t["texte"],
-                               max_lignes=2) + int(4 * ech)
+                               (x, y, l, 0), ui.t(14, ech), t["texte"],
+                               max_lignes=3) + int(4 * ech)
         elif self.puzzle:
             ui.texte(ecran, "Niveau %d  -  %s" % (self.puzzle["classement"],
                                                  puzzles.description(self.puzzle)),
                      x, y, ui.t(14, ech), t["texte"], largeur_max=l)
             y += ui.t(22, ech)
-        ui.texte(ecran, self.message, x, y, ui.t(16, ech),
-                 self.couleur_message or t["texte"], gras=True, largeur_max=l)
-        y += ui.t(26, ech)
+        # 24/10 (Cowork, t52 / r01 : « Rec… », « ne rap… ») : le message passe
+        # a la ligne au lieu d'etre rogne.
+        hauteur = ui.paragraphe(ecran, self.message, (x, y, l, 0), ui.t(16, ech),
+                                self.couleur_message or t["texte"], gras=True,
+                                interligne=1.2, max_lignes=3)
+        y += max(ui.t(26, ech), hauteur + int(6 * ech))
         if self.explication and not self.fini:
             y += ui.paragraphe(ecran, self.explication,
                                (x, y, l, max(0, self.bas_texte - y)),

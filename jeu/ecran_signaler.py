@@ -24,7 +24,7 @@ class EcranSignaler:
         self.type = "probleme"
         self.journal = journal
         self.apres_envoi = apres_envoi
-        self.champ = ui.ChampTexte(longueur_max=1500).activer(True)
+        self.champ = ui.ChampTexte(longueur_max=1500, coller_remplace=False).activer(True)
         if message_initial:
             self.champ.ajouter(message_initial)
         self.etat = "saisie"           # saisie -> envoi -> fini

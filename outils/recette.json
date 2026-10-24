@@ -502,7 +502,7 @@
    "id": "R-087",
    "section": "Problèmes",
    "texte": "Problèmes → Contre la montre",
-   "detail": "3:00 qui descend ; les problèmes deviennent plus durs ; une faute = solution puis problème suivant ; à 0:00 « Temps écoulé ! », score et record ; « Rejouer le défi ».",
+   "detail": "3:00 qui descend ; les problèmes deviennent plus durs ; une faute = le bon coup joué sous tes yeux (« Raté ! Il fallait … ») pendant 2 s, puis problème suivant ; à 0:00 « Temps écoulé ! », score et record ; « Rejouer le défi ».",
    "ordre": 10806
   },
   {
@@ -639,11 +639,18 @@
    "ordre": 11100
   },
   {
+   "id": "R-099",
+   "section": "Signaler un problème",
+   "texte": "Signaler : écrire « Bonjour, » puis coller (Ctrl+V) un texte copié ailleurs avec des accents (« à côté »)",
+   "detail": "Le texte collé s'ajoute à la suite de « Bonjour, » (rien n'est effacé) et garde ses accents.",
+   "ordre": 11101
+  },
+  {
    "id": "R-096",
    "section": "Signaler un problème",
    "texte": "Ouvrir le fichier du rapport",
    "detail": "Ton message, la version, le système et (pour un problème) la fin du journal du jeu.",
-   "ordre": 11101
+   "ordre": 11102
   },
   {
    "id": "R-090",

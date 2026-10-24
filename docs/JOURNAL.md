@@ -1350,3 +1350,29 @@ Constat du test d'endurance : au menu, 4 Stockfish gardaient ~5,5 Go jusqu'à la
 À vérifier par Julien :
 - [ ] t102 / R-126 : 2 min au menu après une revue → stockfish.exe d'analyse fermés, mémoire rendue ; la revue
   rouverte a toujours ses pastilles.
+
+## 25/10/2026 (36) – Défauts trouvés par Cowork corrigés (Claude Code, cloud)
+Demande de Julien : « mets à jour À faire et corrige ». Fusion de `main` (Mes erreurs stable, séance 34) dans
+`main-phsero`. Chaque défaut reproduit d'abord par un test :
+- **Revue (t65)** : « aussi bon : Nf3, Nf3 » → un coup une seule fois, le mieux noté d'abord
+  (`meilleurs_depuis_lignes`). Clic sur un coup de la feuille : une pièce sélectionnée sur l'échiquier
+  « mangeait » le clic → elle est désélectionnée ET le coup s'affiche. Le cas exact de Cowork (5 clics sans effet)
+  n'est pas reproduit ici (14 clics sur 14 marchent, 1280×720 et 1920×1080) : à revérifier.
+- **Explication d'une gaffe coupée (t51)** : le cadre n'avait de place pour AUCUNE ligne ; il grandit (tant que la
+  feuille garde 5 lignes) et la « Suite prévue » s'efface quand il y a une explication → 3 lignes.
+- **Problèmes (t52, r01)** : messages et description de « Mes erreurs » sur plusieurs lignes au lieu d'être rognés ;
+  contre la montre / survie : après une faute, le bon coup est joué (animé) et nommé, 2,2 s avant la suite.
+- **Mes erreurs (r01)** : une partie importée sans ton nom (Morphy 1858) ne donne plus d'erreurs « à toi ».
+- **Ouvertures (t57)** : King's / Queen's / « Keene's » traduits (0 nom à moitié anglais sur 3 175) ; « Ligne
+  suivante » non reproduit (marche dans les tests, aussi en 1920×1080).
+- **Signaler (t54)** : Ctrl+V ajoute au message (un champ court, comme le code d'un salon, est toujours remplacé) ;
+  presse-papiers Windows (cp1252 / UTF-16) décodé sans perdre les accents.
+- **Anglais (t62)** : « 55 %10olved » (« %% » lu comme « % s ») ; « Ordinateur (400) - Toi », reprise au menu ;
+  `ui.mesurer` mesure le texte traduit (« BLA… » sur la pendule) ; aide F1 de la revue à jour (A = analyse libre).
+- **Options (t98)** : « → » (absent de la police) remplacé par « : ».
+- Suite complète : 1093 contrôles, tout vert. Version toujours 0.2.0 (pas encore publiée).
+- Tests ajoutés : test_variantes, test_modes_analyse, test_entrainement, test_signaler, test_mes_erreurs,
+  test_anglais, test_modes_problemes.
+
+À vérifier par Julien (à confier à Cowork) :
+- [ ] t103 : la liste des corrections ci-dessus, sur le PC.

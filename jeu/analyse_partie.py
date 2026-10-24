@@ -1280,6 +1280,15 @@ def _calculer_meilleurs(fen, lignes, maximum):
         return c if blancs else 100.0 - c
 
     plateau = chess.Board(fen)
+    # 24/10 (Cowork, t65) : « Meilleur ici : e4 (+0.33)  aussi bon : Nf3 (+0.35),
+    # Nf3 (+0.35) » : des lignes de deux calculs melangees. Un coup une seule
+    # fois (la premiere ligne qui le donne), et le mieux note d'abord.
+    vus, uniques = set(), []
+    for ligne in lignes:
+        if ligne[0] not in vus:
+            vus.add(ligne[0])
+            uniques.append(ligne)
+    lignes = sorted(uniques, key=lambda l: -du_joueur(l[1]))
     reference = du_joueur(lignes[0][1])
     choisis = []
     for uci, valeur, mat, suite in lignes[:maximum]:

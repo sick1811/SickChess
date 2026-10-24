@@ -175,6 +175,7 @@ EN = {
     "Pas d'indice pendant un défi.": "No hints during a challenge.",
     "Voici la solution.": "Here is the solution.",
     "Raté ! Problème suivant...": "Missed! Next puzzle...",
+    "Raté ! Il fallait %s. Problème suivant...": "Missed! The move was %s. Next puzzle...",
     "Problème suivant": "Next puzzle", "Passer ce problème": "Skip this puzzle",
     "Indice (H)": "Hint (H)", "Solution": "Solution", "Rejouer le défi": "Play again",
     "ce problème %+d": "this puzzle %+d", "séance %+d": "session %+d", "gain x%.1f": "gain x%.1f",
@@ -359,7 +360,7 @@ EN = {
     "PARTIE EN RESEAU": "ONLINE GAME", "MENU PRINCIPAL": "MAIN MENU", "FENÊTRE": "WINDOW",
     "REPLAY (après la partie)": "REVIEW (after the game)", "F1 ou un clic pour fermer": "F1 or a click to close",
     "Clic gauche": "Left click", "Glisser-deposer": "Drag and drop", "Clic droit": "Right click",
-    "Maj + clic droit": "Shift + right click", "Clic droit sur une pièce prise": "Right-click while dragging",
+    "Maj + clic droit": "Shift + right click", "Clic droit sur une pièce prise": "Right-click (drag)",
     "Sélectionner une pièce, puis sa case d'arrivée": "Select a piece, then its target square",
     "Déplacer une pièce directement": "Move a piece directly",
     "Annuler le déplacement en cours": "Cancel the current move",
@@ -381,6 +382,18 @@ EN = {
     "Aller au premier ou au dernier coup": "Go to the first or last move",
     "Clic sur un coup": "Click a move", "Aller directement a ce coup": "Jump to that move",
     "Relancer ou interrompre l'analyse Stockfish": "Restart or stop the Stockfish analysis",
+    # 24/10 (Cowork, t62) : aide de la revue a jour, restes en francais.
+    "REVUE (après la partie)": "REVIEW (after the game)",
+    "Début / Fin (ou haut / bas)": "Home / End (or up / down)",
+    "Aller directement à ce coup": "Jump straight to that move",
+    "Cacher ou montrer les flèches des meilleurs coups": "Hide or show the best-move arrows",
+    "Analyse libre sur cette position": "Free analysis of this position",
+    "Exporter la revue (PGN annoté)": "Export the review (annotated PGN)",
+    "Ordinateur (%s)": "Computer (%s)",
+    "Contre l'ordinateur (%s Elo)": "Against the computer (%s Elo)",
+    "Contre l'ordinateur": "Against the computer",
+    "À deux sur ce PC": "Two players on this PC",
+    "%s  -  coup %d  -  %s": "%s  -  move %d  -  %s",
     "Revenir à l'écran de fin": "Back to the end screen", "Échap": "Esc", "Entrée": "Enter",
 
     # --- en ligne
@@ -553,8 +566,8 @@ EN = {
     "Envoyer le rapport": "Send the report", "Non merci": "No thanks",
     # --- mode petit PC (24/10, travail p31)
     "Puissance du PC": "Computer power", "Automatique": "Automatic", "Petit PC": "Small PC",
-    "PC normal": "Normal PC", "Ce PC : %d cœurs, %s → petit PC": "This PC: %d cores, %s → small PC",
-    "Ce PC : %d cœurs, %s → PC normal": "This PC: %d cores, %s → normal PC",
+    "PC normal": "Normal PC", "Ce PC : %d cœurs, %s : petit PC": "This PC: %d cores, %s: small PC",
+    "Ce PC : %d cœurs, %s : PC normal": "This PC: %d cores, %s: normal PC",
     "Analyse, mémoire de Stockfish et effets adaptés au PC": "Analysis, Stockfish memory and effects adapted to the PC",
     # --- resume du coach sur la carte de fin (24/10, travail p27)
     "Ouverture : sortie du livre dès le premier coup": "Opening: out of the book from the first move",

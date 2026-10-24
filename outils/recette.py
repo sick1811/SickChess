@@ -180,7 +180,7 @@ RECETTE = [
         ("R-085", "Problème avec promotion (thème Promotion)",
          "Le choix de la pièce s'affiche et la bonne pièce est acceptée."),
         ("R-087", "Problèmes → Contre la montre",
-         "3:00 qui descend ; les problèmes deviennent plus durs ; une faute = solution puis problème suivant ; à 0:00 « Temps écoulé ! », score et record ; « Rejouer le défi »."),
+         "3:00 qui descend ; les problèmes deviennent plus durs ; une faute = le bon coup joué sous tes yeux (« Raté ! Il fallait … ») pendant 2 s, puis problème suivant ; à 0:00 « Temps écoulé ! », score et record ; « Rejouer le défi »."),
         ("R-088", "Problèmes → Survie",
          "Vies 3/3 ; chaque faute en retire une ; à 0 : « Trois fautes : fini ! » et le record."),
         ("R-089", "Problèmes → Problème du jour, puis le rouvrir",
@@ -225,6 +225,8 @@ RECETTE = [
     ("Signaler un problème", [
         ("R-095", "Menu → Signaler un problème / une idée : écrire un message, Envoyer",
          "Sans adresse d'envoi réglée : « Message enregistré dans le dossier rapports et copié », le dossier rapports s'ouvre avec le fichier."),
+        ("R-099", "Signaler : écrire « Bonjour, » puis coller (Ctrl+V) un texte copié ailleurs avec des accents (« à côté »)",
+         "Le texte collé s'ajoute à la suite de « Bonjour, » (rien n'est effacé) et garde ses accents."),
         ("R-096", "Ouvrir le fichier du rapport",
          "Ton message, la version, le système et (pour un problème) la fin du journal du jeu."),
     ]),

@@ -72,6 +72,11 @@ def _camps_du_joueur(partie):
         return {chess.WHITE}
     if camp.startswith("noir"):
         return {chess.BLACK}
+    if partie.get("importee"):
+        # 24/10 (Cowork, r01) : une partie importee ou Julien ne joue pas (ton
+        # nom n'est ni aux Blancs ni aux Noirs, ex. Morphy 1858) n'est pas une
+        # de « tes » erreurs. L'import reconnait tes parties a ton nom.
+        return set()
     return {chess.WHITE, chess.BLACK}
 
 

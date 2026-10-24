@@ -111,6 +111,33 @@ verifier(e.btn_annuler.libelle == "Fermer", "bouton Fermer")
 verifier(e.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE, mod=0, unicode="")) == "retour",
          "Echap ferme")
 
+print("4 bis. Coller (Ctrl+V) : ajoute au texte, garde les accents (Cowork, t54)")
+import ui
+verifier(ui.decoder_presse_papiers("Voilà à côté".encode("cp1252")) == "Voilà à côté",
+         "presse-papiers Windows (cp1252) : les accents restent")
+verifier(ui.decoder_presse_papiers("Voilà à côté".encode("utf-8")) == "Voilà à côté", "UTF-8 : pareil")
+verifier(ui.decoder_presse_papiers("Voilà à côté".encode("utf-16-le") + b"\x00\x00") == "Voilà à côté",
+         "UTF-16 : pareil")
+e2 = EcranSignaler(ecran, "0.1.0")
+for car in "Début. ":
+    e2.handle_event(pygame.event.Event(pygame.TEXTINPUT, text=car))
+vrai_coller = ui.coller
+ui.coller = lambda: "Le son coupe à la fin"
+try:
+    e2.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_v, mod=pygame.KMOD_CTRL, unicode=""))
+finally:
+    ui.coller = vrai_coller
+verifier(e2.champ.contenu.startswith("Début.") and e2.champ.contenu.endswith("Le son coupe à la fin"),
+         "Ctrl+V ajoute au texte deja ecrit : %r" % e2.champ.contenu)
+court = ui.ChampTexte().activer(True)
+court.contenu = "ancien"
+ui.coller = lambda: "ABCD-1234"
+try:
+    court.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_v, mod=pygame.KMOD_CTRL, unicode=""))
+finally:
+    ui.coller = vrai_coller
+verifier(court.contenu == "ABCD-1234", "champ court (code d'un salon) : Ctrl+V remplace toujours")
+
 print("5. Le menu")
 from menu_principal import MainMenu
 m = MainMenu(ecran)
