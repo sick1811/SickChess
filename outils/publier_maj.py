@@ -388,9 +388,8 @@ def publier(notes, racine=RACINE, dossier_publier=DOSSIER_PUBLIER, dist=None,
         "paquets": paquets,
     }
     chemin_manifeste = os.path.join(sortie, "maj.json")
-    for chemin in (chemin_manifeste, os.path.join(dossier_publier, "maj.json")):
-        with open(chemin, "w", encoding="utf-8") as f:
-            json.dump(manifeste, f, indent=2, ensure_ascii=False)
+    with open(chemin_manifeste, "w", encoding="utf-8") as f:
+        json.dump(manifeste, f, indent=2, ensure_ascii=False)
     a_envoyer.append(chemin_manifeste)
 
     # -- le jeu a donner a un nouvel ami (programme + jeu)
@@ -413,8 +412,13 @@ def publier(notes, racine=RACINE, dossier_publier=DOSSIER_PUBLIER, dist=None,
         dire("  essai du .exe : %s - %s" % (etat, phrase))
         if etat == verifier_version.BLOQUANT:
             raise SystemExit("Le .exe ne demarre pas correctement : rien n'est envoye.")
-    if envoyer:
-        _envoyer_sur_github(depot, etiquette, manifeste, a_envoyer, sortie)
+    if envoyer and not _envoyer_sur_github(depot, etiquette, manifeste, a_envoyer, sortie):
+        return manifeste
+    # 25/10 : la copie locale (« derniere version publiee ») n'est ecrite qu'APRES
+    # l'envoi. Avant, elle l'etait avant l'essai du .exe : la n° 6 bloquee par l'essai
+    # passait pour publiee (« Rien n'a change depuis la version n°6 »).
+    with open(os.path.join(dossier_publier, "maj.json"), "w", encoding="utf-8") as f:
+        json.dump(manifeste, f, indent=2, ensure_ascii=False)
     return manifeste
 
 
@@ -468,12 +472,12 @@ def _envoyer_sur_github(depot, etiquette, manifeste, fichiers, sortie):
         dire("  3. Glisse TOUS les fichiers du dossier qui va s'ouvrir, puis Publish.")
         if sys.platform == "win32":
             os.startfile(sortie)
-        return
+        return True
     if subprocess.run(["gh", "repo", "view", depot], capture_output=True).returncode != 0:
         reponse = input("Le depot %s n'existe pas. Le creer (public) ? [o/n] " % depot)
         if reponse.strip().lower() not in ("o", "oui", "y"):
             dire("Rien n'est envoye. Les fichiers restent dans %s" % sortie)
-            return
+            return False
         subprocess.run(["gh", "repo", "create", depot, "--public", "--description",
                         "Versions de SickChess pour les amis (mises a jour du jeu)"],
                        check=True)
@@ -489,6 +493,7 @@ def _envoyer_sur_github(depot, etiquette, manifeste, fichiers, sortie):
          "download/SickChess_Installation.exe" % depot)
     dire("  (ou le zip : https://github.com/%s/releases/latest/download/SickChess_amis.zip)"
          % depot)
+    return True
 
 
 def installeur_seul(racine=RACINE, dossier_publier=DOSSIER_PUBLIER, envoyer=True):

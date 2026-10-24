@@ -1358,3 +1358,6 @@ Constat du test d'endurance : au menu, 4 Stockfish gardaient ~5,5 Go jusqu'à la
   les deux sont toujours ensemble. `publier_maj.dossier_d_essai` assemble maintenant programme + jeu + moteur comme
   chez un ami avant l'essai (test : `test_verifier_version.py`, partie 7b). Vérification de la n° 6 : 1074 contrôles
   verts, banc d'essai vert.
+- 25/10 : ensuite, « Rien n'a change depuis la version n°6 » alors que GitHub n'avait que la n° 5 : la copie locale
+  `publier/maj.json` était écrite AVANT l'essai du `.exe` et l'envoi. Elle ne l'est plus qu'après un envoi réussi
+  (test : `test_mise_a_jour.py`, partie 4b). Sur le PC : supprimer `publier\maj.json` (copie de la n° 6 jamais envoyée).
