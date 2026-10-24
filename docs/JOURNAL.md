@@ -1219,3 +1219,16 @@ Fait :
   complète. Vraie cause trouvée : le coup du joueur était comparé à l'évaluation **enregistrée** du meilleur coup,
   moins profonde quand le PC est chargé. Les deux coups sont maintenant jugés par le même calcul (profondeur 14).
   Reproduit sous charge (rouge 2 fois sur 3) → vert 7 fois sur 7 après correction.
+
+## 24/10/2026 (33) – Fusion du cloud vérifiée sur Windows, version amis n° 4 (Claude Code)
+- Branche `claude/great-cori-vewo3e` fusionnée dans main, puis main du PC réuni avec celui de GitHub (`c91e975`,
+  qui ajoutait p27, p33 et la correction de « Mes erreurs ») : rien perdu ; journal réuni sans doublon.
+  Une autre version de p35 (écrite sur le PC vers 00:30) est gardée sur la branche `sauvegarde/p35-analyse-libre-pc`.
+- Sur le PC (Windows, vrai Stockfish) : **1025 contrôles verts** ; banc rapide sans rouge (précision des pastilles
+  verte ; à revoir : partie au repos 12 % d'un cœur, ménage) ; **recette automatique 33/33** (13 lignes : R-140 à
+  R-149, R-10E, t86, t88) ; vérification en ligne toute verte ; classements Steam : état « prêt » (liste vide) ;
+  rapport de plantage : `--plantage-test` garde bien le rapport (carte au prochain lancement).
+- `verifier_version.py --amis` : rien de bloquant (à revoir : licences Classique / ouvertures, un .xlsx non suivi).
+- **Version amis n° 4 publiée** (programme et jeu neufs ; moteur, problèmes et finales repris de la n° 1) après essai :
+  installeur complet (664 Mo) installé en silence, jeu lancé 25 s sans erreur, vérification en ligne verte,
+  désinstallation propre. https://github.com/sick1811/SickChess-amis/releases/tag/v0.1.0-n4

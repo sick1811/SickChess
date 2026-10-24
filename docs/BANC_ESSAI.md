@@ -1,6 +1,6 @@
 # Banc d'essai – SickChess
 
-Dernier passage : 2026-10-24 04:43 · Windows 11 · 12 cœurs · Python 3.13.7 · pygame 2.6.1 · rapide
+Dernier passage : 2026-10-24 11:21 · Windows 11 · 12 cœurs · Python 3.13.7 · pygame 2.6.1 · complet
 
 Fabriqué par `python outils/banc_essai.py` (ne pas modifier à la main).
 
@@ -11,18 +11,17 @@ Fabriqué par `python outils/banc_essai.py` (ne pas modifier à la main).
 
 ## 🟢 Vitesse d'affichage
 
-Démarrage 1.2 s · écran le plus lent : Mes parties (4.4 ms/image)
+Démarrage 1.06 s · écran le plus lent : Mes parties (4.2 ms/image)
 
 
-## 🟠 Charge du processeur au repos
+## 🟢 Charge du processeur au repos
 
-Menu : 5 % d'un cœur (61 img/s) · Partie : 12 % d'un cœur (55 img/s) · 12 cœurs logiques
+Menu : 5 % d'un cœur (44 img/s) · Partie : 10 % d'un cœur (31 img/s) · 12 cœurs logiques
 
-- **« Partie » occupe le processeur sans rien faire** (moyen) – 12 % d'un cœur à 55 images/s alors que rien ne bouge. Pistes : ne redessiner que si quelque chose change, descendre à 30 images/s au repos, mettre en cache le fond et les textes (skill performance-pygame).
 
 ## 🟢 Mémoire
 
-Jeu au menu : 76.3 Mo
+Jeu au menu : 75.0 Mo
 
 
 ## 🟢 Moteur d'analyse (Stockfish)
@@ -44,11 +43,10 @@ Jeu au menu : 76.3 Mo
 
 0 conflit(s) Git · 0 erreur(s) de syntaxe · dépendances OK · 1 fichier(s) non enregistré(s)
 
-- **Commits pas encore envoyés sur GitHub** (info) – 4 commit(s) d'avance : penser au push.
 
 ## 🟢 Précision des pastilles (banque de positions)
 
-114 coups justes sur 114 (calcul_rapide, 305 s)
+114 coups justes sur 114 (calcul_forte, 467 s)
 
 
 ## ⚪ Endurance (un robot joue 2 heures)
