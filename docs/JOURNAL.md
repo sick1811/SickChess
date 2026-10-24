@@ -1120,7 +1120,7 @@ Fait :
   seconde au plus. Contre l'ordinateur et en ligne (ton camp) ; partie à deux : ouverture et plus gros moment.
 - Carte un peu plus haute (390 au lieu de 300, 460 de large) ; la ligne « toi X % – ordinateur Y % » reste,
   plus discrète, dessous.
-- Tests : `tests/test_resume_coach.py` (31 contrôles). Anglais traduit. Recette : R-06J.
+- Tests : `tests/test_resume_coach.py` (36 contrôles). Anglais traduit. Recette : R-06J.
 
 À vérifier par Julien :
 - [ ] t99 (voir A_FAIRE), R-06J.
