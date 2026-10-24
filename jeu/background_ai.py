@@ -95,6 +95,15 @@ class BackgroundAI:
             self.pending_ai_move = None
         thread = self.thread
         if thread is not None and thread.is_alive():
+            # 24/10 (« quitter une partie est long ») : on interrompt la
+            # recherche de Stockfish (« stop ») au lieu d'attendre qu'elle
+            # finisse : le fil voit _stop et jette le coup.
+            interrompre = getattr(self.engine, "interrompre", None)
+            if interrompre is not None:
+                try:
+                    interrompre()
+                except Exception:
+                    pass
             thread.join(timeout=2.0)
 
     def reprendre(self):

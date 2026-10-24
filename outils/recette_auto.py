@@ -191,9 +191,17 @@ ok = attendre(e, lambda: len(e.lignes()) >= 1, 15)
 note("R-145", ok, "Stockfish analyse la position fabriquee (%s %s)" % (e.lignes()[0]["san"] if e.lignes() else "-", e.lignes()[0]["texte"] if e.lignes() else ""))
 touche(pygame.K_e); images(e, 1); bouton(e.btn_vider); touche(pygame.K_ESCAPE); images(e, 2)
 note("R-145", e.edition is None and e.fen_depart == "4k3/8/8/8/8/4P3/8/4K2R b K - 0 1", "Echap annule l'editeur, la position revient")
-# R-148 : pas de dossier syzygy/ dans le cloud
+# R-148 : tables de finale. 24/10 : le controle passait sans rien verifier quand
+# syzygy/ est la (PC de Julien) ; il lit maintenant le verdict des tables.
 e.coller_texte("8/8/8/4k3/8/8/4P3/4K3 w - - 0 1"); images(e, 2)
-note("R-148", os.path.isdir("syzygy") or "Tables" not in e.position()["fen"], "sans dossier syzygy/ : aucune ligne « Tables de finale », aucune erreur (avec les tables : a voir sur ton PC)")
+import analyse_continue
+verdict = analyse_continue.finale_des_tables(e.plateau.board)
+if analyse_continue._dossier_tables():
+    note("R-148", bool(verdict) and verdict.startswith("Tables de finale"),
+         "avec le dossier syzygy/ : finale roi + pion contre roi, verdict des tables affiche (« %s »)" % verdict)
+else:
+    note("R-148", verdict is None,
+         "sans dossier syzygy/ : aucune ligne « Tables de finale », aucune erreur")
 # R-149 : arret tout seul apres 1 minute, sur une vraie position de milieu de partie
 e.coller_texte("r1bq1rk1/pp2bppp/2n1pn2/2pp4/3P4/2PBPN2/PP1N1PPP/R1BQ1RK1 w - - 0 8")
 t0 = time.time()

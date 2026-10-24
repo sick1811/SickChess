@@ -160,6 +160,10 @@ class StockfishEngine:
         self.process = None
         self.verbeux = verbeux
         self._verrou = threading.RLock()
+        # 24/10 : _verrou est tenu pendant TOUTE une recherche (jusqu'a
+        # « bestmove ») ; « stop » et « quit » ne doivent pas l'attendre. Ce
+        # petit verrou-ci protege seulement l'ecriture d'une ligne.
+        self._verrou_ecriture = threading.Lock()
         self.options_disponibles = {}   # nom -> dict(min, max, type)
         self.elo_courant = None
         # V7.2 : quand le classement vise est SOUS le minimum de Stockfish, ce
@@ -265,21 +269,34 @@ class StockfishEngine:
 
     def est_vivant(self):
         """True si le processus Stockfish tourne toujours."""
-        return self.process is not None and self.process.poll() is None
+        processus = self.process          # quit() peut le vider en meme temps
+        return processus is not None and processus.poll() is None
 
     def _send_command(self, cmd):
         with self._verrou:
-            if not self.est_vivant():
-                return False
-            if self.verbeux:
-                print("ENGINE SEND -> " + cmd)
-            try:
-                self.process.stdin.write(cmd + "\n")
-                self.process.stdin.flush()
-                return True
-            except (OSError, ValueError) as e:
-                print("ENGINE : ecriture impossible (" + str(e) + ")")
-                return False
+            return self._ecrire(cmd)
+
+    def _ecrire(self, cmd):
+        """Ecrit une ligne a Stockfish (sans attendre une recherche en cours)."""
+        processus = self.process
+        if processus is None or processus.poll() is not None:
+            return False
+        if self.verbeux:
+            print("ENGINE SEND -> " + cmd)
+        try:
+            with self._verrou_ecriture:
+                processus.stdin.write(cmd + "\n")
+                processus.stdin.flush()
+            return True
+        except (OSError, ValueError, AttributeError) as e:
+            print("ENGINE : ecriture impossible (" + str(e) + ")")
+            return False
+
+    def interrompre(self):
+        """24/10 : arrete TOUT DE SUITE la recherche en cours (« stop »), sans
+        attendre qu'elle finisse. Le fil qui l'a lancee recoit son « bestmove »
+        et rend la main. Sans effet si Stockfish ne cherche pas."""
+        return self._ecrire("stop")
 
     def send_command(self, cmd):
         """Version publique de _send_command (utilisee par CacheManager)."""
@@ -287,11 +304,12 @@ class StockfishEngine:
 
     def _lire_ligne(self):
         """Lit une ligne du moteur. Renvoie None si le processus est mort."""
-        if not self.est_vivant():
+        processus = self.process          # quit() peut le vider en meme temps
+        if processus is None or processus.poll() is not None:
             return None
         try:
-            ligne = self.process.stdout.readline()
-        except (OSError, ValueError):
+            ligne = processus.stdout.readline()
+        except (OSError, ValueError, AttributeError):
             return None
         if ligne == "":          # flux ferme = processus termine
             return None
@@ -962,8 +980,13 @@ class StockfishEngine:
             return
         print("ENGINE : fermeture stockfish")
         try:
-            self._send_command("quit")
-            self.process.wait(timeout=2)
+            # 24/10 (« le jeu ne repond pas quand on quitte ») : avant, « quit »
+            # attendait la fin de la recherche en cours (le verrou est tenu
+            # jusqu'a « bestmove ») : jusqu'a plusieurs secondes de fenetre
+            # figee. Maintenant : stop + quit tout de suite, et 1 s au plus.
+            self._ecrire("stop")
+            self._ecrire("quit")
+            self.process.wait(timeout=1)
         except Exception:
             try:
                 self.process.terminate()
