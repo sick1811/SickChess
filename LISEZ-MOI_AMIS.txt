@@ -8,9 +8,8 @@ Installer
    Si Windows affiche "Windows a protégé votre ordinateur" :
    clique "Informations complémentaires" puis "Exécuter quand même"
    (le jeu n'est pas encore signé, c'est normal pour un jeu en test).
-2. Lance SickChess. Reste quelques minutes dans le menu au premier
-   lancement : le jeu télécharge tout seul les problèmes et les tables
-   de finales (environ 600 Mo, une seule fois), puis redémarre.
+2. Lance SickChess : tout est déjà là (problèmes, analyse, tables de
+   finales, jeu en ligne).
 (Avec le zip : dézippe-le dans Documents, pas dans "Program Files",
 et lance SickChess.exe.)
 

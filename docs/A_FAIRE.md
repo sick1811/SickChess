@@ -39,24 +39,63 @@ page Steam, démarches Steamworks, licence des pièces Classique.
 ## Performance et ménage (banc d'essai du 23/10, page « SickChess – Banc d'essai »)
 Mesures faites dans Cowork (machine Linux plus lente) : à refaire sur le PC de Julien
 (`python outils/banc_essai.py`, puis `python outils/surveiller.py` en jouant).
-- [ ] **Fichiers relus à chaque image** (le plus rentable) : `entrainement.charger_progression`
+- [x] (23/10, journal 17) **Fichiers relus à chaque image** (le plus rentable) : `entrainement.charger_progression`
       (24 lectures par image dans Ouvertures, 44–51 ms par image), `modes_problemes.charger`
       (Problèmes), `succes.obtenus` (Statistiques). Lire une fois, garder en mémoire.
-- [ ] **Cache des textes** dans `ui.py` (`texte` / `rogner`) : `font.size` + `font.render` =
+- [x] (23/10, journal 17-18) **Cache des textes** dans `ui.py` (`texte` / `rogner`) : `font.size` + `font.render` =
       40 à 60 % du temps d'une image sur Partie, Revue, Options, Mes parties.
-- [ ] **Ne pas redessiner au repos** : une partie arrêtée prend ~50 % d'un cœur (machine
+- [x] (23/10, journal 17-19 : 30 images/s au repos, partie 9 % d'un cœur) **Ne pas redessiner au repos** : une partie arrêtée prend ~50 % d'un cœur (machine
       Cowork) ; redessiner seulement si quelque chose change, 30 images/s au repos.
-- [ ] Stockfish d'analyse en priorité basse (le jeu reste fluide pendant une revue).
-- [ ] Ménage : 8 imports/variables inutiles (correction automatique), `jeu/fond_anime.py` jamais
+- [x] (23/10, journal 19) Stockfish d'analyse en priorité basse (le jeu reste fluide pendant une revue).
+- [ ] Ménage : ~~8 imports/variables inutiles~~ faits le 23/10 ; `jeu/fond_anime.py` jamais
       importé, ~100 fonctions peut-être mortes à vérifier une par une (skill `menage-code`).
-- [ ] Réglage `ia_suivre_la_pendule` de config.json lu nulle part : le reprendre ou l'enlever.
-- [ ] Commit : 34 fichiers modifiés non enregistrés + 1 commit pas encore envoyé sur GitHub.
+- [x] (23/10, retiré) Réglage `ia_suivre_la_pendule` de config.json lu nulle part : le reprendre ou l'enlever.
+- [x] (23/10) Commit : 34 fichiers modifiés non enregistrés + 1 commit pas encore envoyé sur GitHub.
 → Avant de commencer, lire les décisions de Julien dans la page (Corriger / OK / Ignorer).
 
 → 23/10 (soir) : banc d'essai tout vert sur le PC de Julien (sauf ménage). 7 nouvelles propositions
   qualité (p28 à p34) : test d'endurance de 2 h, rapport de plantage, banque de positions pour la
   précision des pastilles, mode « petit PC », vérification avant chaque version, lisibilité
   (daltoniens, petits écrans), niveaux de l'ordinateur calibrés en vrai Elo. Julien choisit.
+
+## Demandes de Julien du 24/10 (testé avec l'installeur) – EN PREMIER
+0. [x] (24/10, publié en n° 3) **Installeur complet** (fait côté code le 24/10 dans Cowork : problèmes + finales dans
+       l'installeur, ~700 Mo). Claude Code : `py outils/publier_maj.py --installeur-seul` (refait
+       l'installeur de la n° 2 et le remplace en ligne), puis essai silencieux comme d'habitude
+       (skill `version-amis`) : Problèmes et finales disponibles dès le premier lancement.
+1. [ ] **p35 – Analyse libre** (nouvelle entrée du menu, recette + tests) :
+       - un échiquier où l'on joue librement les deux camps (glisser, clic-clic, retour arrière,
+         flèches ← →, retournement F), avec une **feuille de coups à variantes** ;
+       - **éditeur de position** : palette des 12 pièces, gomme, « position de départ »,
+         « vider », trait aux Blancs / Noirs, roques et prise en passant déduits ou cochés,
+         position illégale refusée avec la raison (python-chess `is_valid`) ;
+       - **coller un FEN ou un PGN** (presse-papiers), et « Analyser cette position » depuis la
+         revue, Mes erreurs et les problèmes ;
+       - **moteur en continu** : barre d'avantage, évaluation, 3 meilleures lignes (MultiPV)
+         avec profondeur qui monte, flèche du meilleur coup, tables Syzygy en finale ;
+         marche / arrêt (touche Espace), puissance des Options ; Stockfish en priorité basse,
+         arrêté en quittant l'écran (banc d'essai : processeur à l'arrêt quand le moteur est coupé) ;
+       - reprendre ce qui existe : plateau de la partie, `ecran_revue` (barre, flèches),
+         `analyse_partie` / `moteurs.py`, `charger_position.py` de V8 pour le FEN ;
+       - enregistrer la ligne dans Mes parties (PGN) et copier le FEN.
+2. [ ] **p36 – Invitation d'un ami visible dans le jeu** : quand un ami Steam t'invite pendant
+       que SickChess est ouvert (menu, partie, problèmes…), un bandeau en jeu « <nom> t'invite à
+       une partie – Rejoindre / Plus tard » (son discret). Steam : rappel `LobbyInvite_t` (n° 503 :
+       ami, salon, jeu ; 24 octets) à ajouter dans `jeu/steam.py` (`_lire`) → évènement
+       « invitation_recue ». Rejoindre en pleine partie contre l'ordinateur = demander
+       confirmation (la partie est sauvegardée). Plus tard = rappel dans l'écran « Jouer en
+       ligne » (liste des invitations reçues). Ne marche qu'avec Steam ouvert ; testable seul avec
+       un 2e compte sur un autre PC, sinon test automatique avec un faux Steam.
+3. [ ] **p37 – Classements et succès Steam** :
+       - **classements** (classement des problèmes, meilleur score Contre la montre et Survie) via
+         `ISteamUserStats` FindOrCreateLeaderboard / UploadLeaderboardScore /
+         DownloadLeaderboardEntries (Global, Amis, Autour de moi) ; écran « Classements » dans
+         Problèmes avec les noms Steam ; ces appels marchent déjà avec le numéro de test 480,
+         donc testables dès maintenant ;
+       - **succès** : les 14 de `docs/SUCCES_STEAM.md` sont déjà gérés dans le jeu (écran Succès) ;
+         pour qu'ils s'affichent DANS Steam, il faut le vrai numéro du jeu et les déclarer dans
+         Steamworks (p21 : compte + 100 $). Préparer le fichier de déclaration
+         (noms, descriptions, icônes 64×64 dorées) pour que ce soit 10 minutes de travail ce jour-là.
 
 ## Version amis et jeu en ligne (23/10 soir) – AVANT les travaux p30…
 1. [x] Claude Code : `winget install JRSoftware.InnoSetup` et `winget install GitHub.cli` + `gh auth login`.

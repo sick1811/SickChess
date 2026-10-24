@@ -471,6 +471,26 @@ Fait :
   « Fais la version amis avec l'installeur, vérifie-la, puis publie ».
 - [ ] Une vraie partie en ligne avec un ami sur deux PC.
 
+## 24/10/2026 (25) – Installeur complet ; analyse libre, invitations, classements à faire (Cowork)
+Retour de Julien sur la version installée : « il reste beaucoup d'éléments manquants : les problèmes,
+l'analyse en partie, Steam ». Précisé : installeur → tout dedans ; analyse = **analyse libre** ;
+Steam = **succès et classements** + **notification en jeu de l'invitation d'un ami**.
+Cause pour les problèmes : l'installeur n° 2 n'avait que programme + jeu + Stockfish, problèmes et
+finales (~600 Mo) arrivaient ensuite par la mise à jour automatique.
+Fait :
+- `outils/publier_maj.py` : installeur **complet** (programme, jeu, Stockfish, problèmes, finales,
+  ~700 Mo ; `SICKCHESS_INSTALLEUR_LEGER=1` pour l'ancien) ; option **`--installeur-seul`** (refait
+  l'installeur de la dernière version publiée et le remplace dans sa release, refuse si le jeu a
+  changé). Essayé avec un faux Inno Setup : contenu et `paquets_installes.json` justes.
+- `outils/installeur_amis.iss` : compression normale non solide (données déjà compressées).
+- Docs (VERSION_AMIS, LISEZ-MOI_AMIS, skill version-amis) mises à jour.
+- Nouveaux travaux dans A_FAIRE (en premier) et la page : p35 analyse libre, p36 invitation
+  affichée dans le jeu (rappel Steam LobbyInvite_t), p37 classements Steam (testables avec 480) +
+  succès Steam préparés (affichage dans Steam seulement avec le vrai numéro, p21).
+À faire par Julien (page « À faire ») :
+- [ ] v05 : Claude Code refait l'installeur complet ; réinstaller et vérifier Problèmes / finales.
+- [ ] Puis « fais le travail p35 », p36, p37.
+
 ## Bugs connus (repris de « a debug.txt »)
 - [x] Pendule ne clignote pas à 30 s → fonctionne (testé).
 - [x] Fin de partie à 00:00 → corrigé (affichage du temps final).
@@ -903,6 +923,56 @@ Fait :
 À faire par Julien :
 - [ ] Recoller `outils/cloud/configuration.sh` (100 lignes) dans l'environnement claude.ai/code.
 - [ ] Plus tard : rendre fiable le contrôle « autre coup qui défend f7 » de `test_mes_erreurs.py`.
+
+## 23/10/2026 (23) – Cloud prêt (Claude Code)
+- Environnement claude.ai/code « SickChess » mis à jour avec le script corrigé (100 lignes).
+- 2e session cloud de test : pygame 2.6.1, python-chess 1.11.2 (Python 3.13), Stockfish 17.1, puzzles/
+  présents ; `python tests/lancer_tous.py` → **686 contrôles verts** en 1 min 50.
+- `tests/ecrans_en/` n'est plus suivi par Git (`.gitignore`) : `test_anglais.py` refait ces 20 captures à
+  chaque passage, elles apparaissaient toujours « modifiées » (PC et cloud). Les images restent sur le disque.
+
+## 24/10/2026 (24) – Version amis n° 2 publiée (Claude Code)
+Fait :
+- Avant : `python tests/lancer_tous.py` → 687 contrôles verts ; banc d'essai rapide : rien en rouge.
+- Version **n° 2** (`v0.1.0-n2` sur `sick1811/SickChess-amis`) : seul le paquet « jeu » change (fin de partie et
+  revue en ligne comme contre l'ordinateur, jeu plus fluide, analyse en priorité basse qui libère la mémoire) ;
+  programme, moteur, problèmes et finales reprennent ceux de la n° 1. Aucun fichier personnel dans les paquets.
+- Installeur vérifié avant l'envoi : installation silencieuse dans un dossier d'essai, jeu lancé 25 s sans erreur
+  (Steam connecté), `outils/verifier_en_ligne.py` sur la version installée → tout ✅, désinstallation propre.
+- En ligne : `maj.json` « latest » = n° 2, les 5 paquets et l'installeur répondent. Les amis la reçoivent par la
+  mise à jour automatique du menu.
+- `docs/A_FAIRE.md` : section performance et ménage cochée (faite le 23/10).
+
+À vérifier par Julien :
+- [ ] R-102 à R-107 : vraie partie en ligne avec un ami (il ouvre SickChess AVANT d'accepter l'invitation),
+  puis la fin de partie : précision, bouton Revue, revue complète.
+
+## 24/10/2026 (24) – GitHub toujours à jour (Claude Code)
+Demande de Julien : « redépose toutes les fonctionnalités travaillées en Cowork et avec Claude Code ; ça doit être
+mis en ligne dans le cloud à chaque modification acceptée localement ».
+- Vérifié : tout le travail (Cowork + Claude Code) était déjà sur GitHub (PC et GitHub au même commit) ;
+  hors GitHub, seulement ce qui doit y rester (parties, profil, sauvegardes, stockfish.exe, puzzles/,
+  syzygy/, fabrications, captures de tests).
+- **Envoi automatique** : `outils/git/post-commit` (crochet Git : après chaque commit, envoie la branche sur
+  GitHub, sans forcer, sans jamais bloquer ; journal `.git/envoi_github.log` ; `SICKCHESS_SANS_ENVOI=1`
+  pour un commit qui reste local) et `outils/git/installer_envoi_auto.py`. Essayé dans un dépôt jetable :
+  envoi réussi, envoi raté (commit gardé + message), envoi coupé.
+- Règle changée dans CLAUDE.md, le skill seance-sickchess, TRAVAILLER_AVEC_CLAUDE.md et CLAUDE_CLOUD.md.
+- Branche `seance-13-analyse-calcul-fixe` supprimée (fusionnée dans main le 18/10).
+À faire par Julien (une fois, la sécurité de Claude Code refuse qu'un crochet s'installe sans lui) :
+- [ ] `python outils/git/installer_envoi_auto.py` dans le dossier SickChess.
+
+## 24/10/2026 (25) – Installeur complet, version amis n° 3 (Claude Code)
+Fait :
+- Installeur complet préparé par Cowork (`publier_maj.py`, `installeur_amis.iss`, `LISEZ-MOI_AMIS.txt`) :
+  programme, jeu, Stockfish, problèmes ET tables de finales dans `SickChess_Installation.exe` (664 Mo).
+- `--installeur-seul` a refusé de remplacer l'installeur de la n° 2 : `LISEZ-MOI_AMIS.txt` (dans le paquet
+  « jeu ») avait changé. Publié donc en **version n° 3** (seul le paquet « jeu » change ; le lien
+  `releases/latest/download/SickChess_Installation.exe` donne le nouvel installeur).
+- Vérifié avant l'envoi : installation silencieuse en ~1 min, problèmes (65 fichiers) et finales (145) présents,
+  jeu lancé sans erreur (Steam connecté, 4 180 151 problèmes chargés au démarrage), vérification en ligne de la
+  version installée toute verte, désinstallation propre. Aucun fichier personnel dans les paquets.
+- En ligne : `maj.json` « latest » = n° 3 ; paquets et installeur répondent.
 
 ## 24/10/2026 (23) – Travail p35 : l'analyse libre (Claude Code dans le cloud)
 Demande de Julien (page « À faire », « Demandes du 24/10 ») : « fais le travail p35 ».

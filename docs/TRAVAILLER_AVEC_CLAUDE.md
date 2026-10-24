@@ -6,7 +6,7 @@
 | Idées, plan, décisions | Lancer le vrai jeu, Stockfish.exe |
 | Graphisme, Blender, logo, sons | Compiler le .exe (PyInstaller) |
 | Page Steam, textes, captures (Canva) | Tester Steam (steam_api64.dll, overlay) |
-| Page « À faire » à cocher | Commits Git (et push quand tu le demandes) |
+| Page « À faire » à cocher | Commits Git (envoyés seuls sur GitHub) |
 
 Les deux lisent le même dossier SickChess. Ils se passent le relais par trois fichiers :
 `CLAUDE.md` (les règles), `docs/A_FAIRE.md` (la liste), `docs/JOURNAL.md` (l'historique).

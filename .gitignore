@@ -28,6 +28,9 @@ tests/*.png
 # Steamworks SDK (a prendre dans son propre SDK, voir docs/MULTIJOUEUR_STEAM.md)
 steam_api64.dll
 tests/ecrans/
+# Captures refaites a chaque passage des tests (23/10 : elles apparaissaient
+# toujours « modifiees », sur le PC comme dans le cloud)
+tests/ecrans_en/
 
 # Restes de tests
 *.test_bak

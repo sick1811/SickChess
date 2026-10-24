@@ -38,8 +38,9 @@ Envoie-lui une fois ce lien (il donne toujours la dernière version) :
   (`%LOCALAPPDATA%\Programs\SickChess`, un dossier où la mise à jour peut écrire) avec une
   **icône sur le Bureau** et dans le menu Démarrer. Désinstallation par Windows (Paramètres →
   Applications) ; ses parties et son profil ne sont pas effacés.
-- Contient le programme, le jeu et Stockfish : on joue contre l'ordinateur et en ligne tout de
-  suite. Problèmes et tables de finales arrivent seuls par la mise à jour automatique.
+- **Installeur complet (24/10)** : programme, jeu, Stockfish, problèmes et tables de finales
+  (~700 Mo) : tout marche dès l'installation. (Installeur léger possible :
+  `SICKCHESS_INSTALLEUR_LEGER=1`, problèmes et finales arrivent alors par la mise à jour.)
 - Fabriqué par `CONSTRUIRE_VERSION_AMIS.bat` si **Inno Setup** est installé
   (une fois : `winget install JRSoftware.InnoSetup`). Recette : `outils/installeur_amis.iss`.
 

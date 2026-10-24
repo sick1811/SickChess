@@ -244,9 +244,11 @@ def trouver_iscc():
 
 
 def _installeur(manifeste, contenus, racine, dist, sortie, depot):
-    """SickChess_Installation.exe : installeur Windows pour un NOUVEL ami
-    (programme + jeu + moteur : on peut jouer contre l'ordinateur et en ligne
-    tout de suite ; problemes et finales arrivent par la mise a jour)."""
+    """SickChess_Installation.exe : installeur Windows COMPLET pour un NOUVEL ami
+    (24/10, choix de Julien : programme, jeu, Stockfish, problemes ET tables de
+    finales - environ 700 Mo, tout marche des l'installation, rien a attendre).
+    SICKCHESS_INSTALLEUR_LEGER=1 : sans problemes ni finales (ils arrivent alors
+    par la mise a jour automatique)."""
     iscc = trouver_iscc()
     if iscc is None:
         dire("  (Installeur non fabrique : Inno Setup absent. Pour l'avoir :"
@@ -261,8 +263,13 @@ def _installeur(manifeste, contenus, racine, dist, sortie, depot):
         programme = fichiers_du_paquet(dossier, sorted(os.listdir(dossier)))
     scene = os.path.join(DOSSIER_BUILD, "installeur", "SickChess")
     shutil.rmtree(os.path.dirname(scene), ignore_errors=True)
-    inclus = ["programme", "jeu"] + (["moteur"] if contenus.get("moteur") else [])
-    for absolu, nom in programme + (contenus.get("jeu") or []) + (contenus.get("moteur") or []):
+    leger = os.environ.get("SICKCHESS_INSTALLEUR_LEGER") == "1"
+    autres = ["jeu", "moteur"] + ([] if leger else ["puzzles", "syzygy"])
+    inclus = ["programme"] + [n for n in autres if contenus.get(n)]
+    tous = list(programme)
+    for n in inclus[1:]:
+        tous += contenus[n]
+    for absolu, nom in tous:
         cible = os.path.join(scene, nom)
         os.makedirs(os.path.dirname(cible), exist_ok=True)
         shutil.copy2(absolu, cible)
@@ -272,7 +279,8 @@ def _installeur(manifeste, contenus, racine, dist, sortie, depot):
                             for n in inclus if n in manifeste["paquets"]}}
     with open(os.path.join(scene, "paquets_installes.json"), "w", encoding="utf-8") as f:
         json.dump(installe, f, indent=2, ensure_ascii=False)
-    dire("  installeur : Inno Setup compresse le jeu (1 a 3 minutes)...")
+    dire("  installeur %s : Inno Setup compresse %s (2 a 6 minutes)..."
+         % ("leger" if leger else "complet", ", ".join(inclus)))
     r = subprocess.run([iscc, "/Q", "/DVersion=%s" % manifeste["version"],
                         "/DNumero=%d" % manifeste["numero"], "/DSource=%s" % scene,
                         "/DSortie=%s" % sortie, ISS])
@@ -463,12 +471,51 @@ def _envoyer_sur_github(depot, etiquette, manifeste, fichiers, sortie):
          % depot)
 
 
+def installeur_seul(racine=RACINE, dossier_publier=DOSSIER_PUBLIER, envoyer=True):
+    """Refait SEULEMENT l'installeur de la derniere version publiee (sans nouvelle
+    version) et le remplace dans sa release GitHub. Sert quand l'installeur change
+    (ex. 24/10 : installeur complet) alors que le jeu, lui, n'a pas bouge."""
+    config = lire_config()
+    depot = config["depot"]
+    manifeste = manifeste_precedent(depot, dossier_publier)
+    if not manifeste:
+        raise SystemExit("Aucune version publiee : lance d'abord CONSTRUIRE_VERSION_AMIS.bat.")
+    contenus = {}
+    for nom in ORDRE[1:]:
+        fichiers = fichiers_du_paquet(racine, PAQUETS[nom])
+        if fichiers:
+            if empreinte(fichiers) != manifeste["paquets"].get(nom, {}).get("empreinte"):
+                raise SystemExit("Le paquet « %s » a change depuis la version n°%s : publie "
+                                 "plutot une nouvelle version." % (nom, manifeste["numero"]))
+            contenus[nom] = fichiers
+    contenus["programme"] = None          # pris dans build_amis/dist/SickChess
+    sortie = os.path.join(dossier_publier, manifeste["etiquette"])
+    os.makedirs(sortie, exist_ok=True)
+    dire("Installeur seul pour SickChess %s (n°%s)" % (manifeste["version"], manifeste["numero"]))
+    chemin = _installeur(manifeste, contenus, racine, None, sortie, depot)
+    if not chemin:
+        raise SystemExit("Installeur non fabrique.")
+    if envoyer and _gh_pret():
+        subprocess.run(["gh", "release", "upload", manifeste["etiquette"], chemin,
+                        "--clobber", "--repo", depot], check=True)
+        dire("Installeur remplace en ligne : https://github.com/%s/releases/latest/download/"
+             "SickChess_Installation.exe" % depot)
+    elif envoyer:
+        dire("GitHub CLI absent : glisse %s dans la release %s." % (chemin, manifeste["etiquette"]))
+    return chemin
+
+
 def main():
     parser = argparse.ArgumentParser(description="Publie une version amis de SickChess")
     parser.add_argument("--notes", default="", help="ce qui change (separe par ;)")
     parser.add_argument("--sans-envoi", action="store_true",
                         help="prepare les fichiers sans les envoyer sur GitHub")
+    parser.add_argument("--installeur-seul", action="store_true",
+                        help="refait seulement l'installeur de la derniere version publiee")
     args = parser.parse_args()
+    if args.installeur_seul:
+        installeur_seul(envoyer=not args.sans_envoi)
+        return
     publier(args.notes, envoyer=not args.sans_envoi)
 
 

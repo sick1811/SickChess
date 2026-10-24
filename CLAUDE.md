@@ -84,7 +84,11 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
   version amis / Steam : `python tests/lancer_tous.py` tout vert, puis Julien repasse la
   recette (page « À faire », groupe « Recette complète », bouton « Nouvelle passe »).
   Un test « Ne fonctionne pas » devient un contrôle automatique dans `tests/` avant d'être corrigé.
-- Ne pas pousser sur GitHub (`git push`) sans que Julien l'ait demandé.
+- **GitHub toujours à jour (demande de Julien, 24/10)** : chaque commit est envoyé sur GitHub
+  tout seul par le crochet `post-commit` (`outils/git/post-commit`, installé avec
+  `python outils/git/installer_envoi_auto.py` ; journal `.git/envoi_github.log`). Donc : ne
+  commiter que du travail accepté (tests verts). Sans le crochet (nouveau PC, nouveau clone),
+  faire `git push` après chaque commit. Jamais `git push --force`.
 
 ## Deux Claude, un seul dossier
 - **Cowork** (application Claude, onglet discussion) : idées, graphisme, Blender, page Steam,
