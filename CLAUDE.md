@@ -44,6 +44,8 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
   des amis se met à jour **tout seul** dans le menu. Voir `docs/VERSION_AMIS.md` et la skill
   `version-amis`. **Demande de Julien : publier une version amis à la fin de chaque séance
   où le jeu a changé et où tout est vert.**
+  **Numéro de version** (`VERSION` dans `SickChess.py`) : nouveautés → 0.x+1.0, corrections seules →
+  0.x.y+1, 1.0.0 = sortie Steam (règle dans `docs/VERSION_AMIS.md`).
 - Jeu en ligne : `python outils/verifier_en_ligne.py` (Steam ouvert) → `docs/VERIFICATION_EN_LIGNE.md`.
 - **Banc d'essai : `python outils/banc_essai.py`** (bugs, vitesse, processeur, mémoire,
   Stockfish, ménage, conflits ; `--rapide`, `--sections vitesse,menage`) → `docs/BANC_ESSAI.md`

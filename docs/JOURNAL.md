@@ -1315,3 +1315,11 @@ Corrigé (chaque fois reproduit d'abord dans un test) :
 À vérifier par Julien :
 - [ ] Analyse libre en plein écran → Éditer (E) → poser une tour : plus de plantage.
 - [ ] Problèmes → Problème du jour déjà fait → le rouvrir : « Reviens demain », le jeu reste ouvert.
+
+## 24/10/2026 (31) – Numéro de version : 0.2.0 (Claude Code, cloud)
+Question de Julien : « pourquoi tu ne changes pas le numéro de version 0.1.0 comme les vraies applications ? ».
+- `VERSION = "0.2.0"` (nouveautés depuis la n° 5 en 0.1.0 : quitter / lancer vite, plantages corrigés ; et depuis
+  la 0.1.0 du départ : analyse libre, invitations, classements Steam…). Règle écrite dans `docs/VERSION_AMIS.md`
+  et `CLAUDE.md` : nouveautés → MINEUR +1, corrections seules → CORRECTIF +1, 1.0.0 = sortie Steam.
+- Le n° amis (compteur des mises à jour) ne change pas de rôle. La n° 5 en ligne est en 0.1.0 et n'a **pas**
+  le travail des séances 28 à 30 : **à publier en n° 6 (0.2.0)** par Claude Code sur le PC.

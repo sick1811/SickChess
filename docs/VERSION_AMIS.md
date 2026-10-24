@@ -85,3 +85,16 @@ tables de finales se téléchargent (~700 Mo, une fois). Mode d'emploi : `LISEZ-
 - `jeu/ecran_mise_a_jour.py` – l'écran du bouton.
 - `outils/publier_maj.py` + `outils/sickchess_amis.spec` – fabrication et publication.
 - `tests/test_mise_a_jour.py` – tout le circuit avec un faux serveur (36 contrôles).
+
+## Le numéro de version (24/10/2026)
+Deux numéros, comme les vraies applications :
+- **La version** (`VERSION` dans `SickChess.py`, affichée dans le menu) : `MAJEUR.MINEUR.CORRECTIF`.
+  - `0.x.y` tant que le jeu n'est pas sorti sur Steam ; **1.0.0 = la sortie sur Steam**.
+  - **MINEUR** +1 (0.2.0 → 0.3.0) quand la version apporte des **nouveautés** (un écran, un mode, une fonction).
+  - **CORRECTIF** +1 (0.2.0 → 0.2.1) quand elle ne fait que **corriger** des défauts.
+  - C'est Claude qui l'augmente, dans la séance où il change le jeu, et l'écrit dans le journal.
+- **Le n° amis** (n° 1, 2, 3…) : il augmente **tout seul** à chaque publication (`publier_maj.py`) ; c'est lui
+  que le jeu des amis compare pour proposer « Mise à jour disponible ». Il sert de compteur, pas de nom.
+
+Historique : 0.1.0 = n° 1 à n° 5. **0.2.0** = depuis le 24/10 (analyse libre, invitations, classements Steam,
+quitter / lancer vite, plantages corrigés) – à publier en n° 6.
