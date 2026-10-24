@@ -66,6 +66,8 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
   section « À tester par Julien ». (Dans Cowork, Claude les recopie aussi dans la page
   « SickChess – À faire » : https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5.)
 - Pour un bug : le reproduire dans un test avant de le corriger.
+- **Avant chaque version** : `python outils/verifier_version.py --amis` (ou `--steam`) : tests, banc, MODE_TEST,
+  numéro Steam, licences, version, Git, `.exe` (`--exe`). Lancé tout seul par CONSTRUIRE_VERSION_AMIS.bat.
 - **Test d'endurance (2 h, PC Windows)** : `python outils/endurance.py` (un robot joue au vrai jeu, fenêtre
   invisible ; `--minutes 15` pour un essai) → fuite de mémoire, Stockfish qui s'accumulent, ralentissement,
   plantages ; `tests/endurance/rapport.json` et `docs/ENDURANCE.md`. Section « endurance » du banc (hors --rapide).

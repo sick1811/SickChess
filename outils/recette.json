@@ -842,6 +842,13 @@
    "ordre": 11404
   },
   {
+   "id": "R-115",
+   "section": "Version amis et mises à jour",
+   "texte": "Double-clic sur CONSTRUIRE_VERSION_AMIS.bat",
+   "detail": "D'abord « Vérification avant une version pour les amis » : une ligne OK / A REVOIR / BLOQUANT par point (mode test, numéro Steam, licences, version, Git, tests, banc d'essai) ; s'il y a un BLOQUANT, rien n'est fabriqué ; sinon la version se fabrique, et le .exe est essayé dans un dossier neuf avant l'envoi.",
+   "ordre": 11405
+  },
+  {
    "id": "R-120",
    "section": "Solidité",
    "texte": "Renommer moteur/stockfish.exe puis lancer une partie contre l'ordinateur",

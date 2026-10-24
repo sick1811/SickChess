@@ -32,6 +32,7 @@ SERIES = [
     ("test_precision.py", False),
     ("test_plantage.py", False),
     ("test_endurance.py", False),
+    ("test_verifier_version.py", False),
     ("test_cache_analyse.py", False),
     ("test_statistiques.py", False),
     ("test_entrainement.py", False),

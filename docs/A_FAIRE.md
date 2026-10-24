@@ -75,7 +75,7 @@ Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/
 2. [x] (24/10, séances 27 et 28) **p29 – Rapport de plantage** (erreur + fin du journal gardées, proposées au lancement
        suivant via « Signaler »), puis **p28 – Test d'endurance** (`outils/endurance.py` : robot
        2 h, mémoire, plantages, ralentissements ; section « endurance » du banc, hors --rapide).
-3. [ ] **p32 – Vérification avant chaque version** (`outils/verifier_version.py`, appelé par
+3. [x] (24/10, séance 29) **p32 – Vérification avant chaque version** (`outils/verifier_version.py`, appelé par
        CONSTRUIRE_VERSION_AMIS.bat : tests, banc, MODE_TEST, appid, licences, version, .exe neuf).
 4. [ ] **p31 – Mode « petit PC »** (détection cœurs / mémoire au 1er lancement → puissance
        d'analyse, hachage, animations ; modifiable dans Options).
@@ -103,6 +103,8 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t97 (29) : double-clic sur CONSTRUIRE_VERSION_AMIS.bat : la vérification passe d'abord (OK / A REVOIR /
+      BLOQUANT) ; la version ne se fabrique que sans BLOQUANT ; le .exe est essayé avant l'envoi. Clair ?
 - [ ] Claude Code (PC) : `python outils/endurance.py` (2 h, la nuit) → docs/ENDURANCE.md ; dire à Julien le verdict.
 - [ ] t96 (27) : dans un terminal, dossier du jeu : `python SickChess.py --plantage-test` (le jeu se ferme), puis
       relance le jeu : carte « La dernière fois, SickChess s'est fermé… » ; « Envoyer le rapport » ouvre Signaler
@@ -192,6 +194,7 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
       `steam_appid.txt` (480 = numéro de test de Valve).
 
 ## Fait récemment
+- 24/10 (29) : vérification avant chaque version (p32), lancée par CONSTRUIRE_VERSION_AMIS.bat.
 - 24/10 (28) : test d'endurance (p28) : robot de 2 h, section « endurance » du banc ; essais cloud verts.
 - 24/10 (27) : rapport de plantage (p29) : erreur + journal gardés, proposés au lancement suivant via Signaler.
 - 24/10 (26) : banque de positions (p30) : 114 coups jugés justes ; défaut « gaffe notée Théorique » corrigé ;

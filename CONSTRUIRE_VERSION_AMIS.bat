@@ -28,6 +28,18 @@ if errorlevel 1 (
     echo.
 )
 
+REM 24/10 (p32) : la verification avant chaque version (tests, banc d'essai,
+REM MODE_TEST, numero Steam, licences, version, Git). Rien ne se fabrique si un
+REM point est BLOQUANT.
+echo  Verification avant la version (tests et banc d'essai : quelques minutes)...
+%PY% outils\verifier_version.py --amis
+if errorlevel 1 (
+    echo.
+    echo  La version n'est PAS fabriquee : corrige d'abord les points BLOQUANT ci-dessus.
+    pause
+    exit /b 1
+)
+
 echo  Pense a changer VERSION dans SickChess.py si c'est une grosse nouveaute
 echo  (sinon le numero de version amis augmente tout seul).
 echo.

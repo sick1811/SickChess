@@ -1064,3 +1064,22 @@ Fait :
   robot gardait lui-même le temps de chaque image (corrigé : 600 au plus par écran).
 - Tests : `tests/test_endurance.py` (10 contrôles du jugement sur des mesures inventées). Suite : 900 contrôles verts.
 - Le vrai passage de 2 h est à faire sur le PC de Julien (demandé à Claude Code du PC, la nuit).
+
+## 24/10/2026 (29) – Travail p32 : vérification avant chaque version (Claude Code dans le cloud)
+Demande de Julien : « P32 ».
+Fait :
+- **`outils/verifier_version.py`** (`--amis` ou `--steam`) : une ligne OK / A REVOIR / BLOQUANT par point :
+  MODE_TEST (permis pour les amis, bloquant pour Steam), steam_appid.txt (480 pour les amis, le vrai numéro pour
+  Steam, avec le rappel de ne pas l'envoyer à Steam), licences (fichiers présents ; lignes « à vérifier » de
+  docs/CREDITS.md : à revoir pour les amis, bloquantes pour Steam), VERSION jamais plus petite que la version déjà
+  publiée (lue en ligne), Git (tout enregistré, hors données de Julien), tests/lancer_tous.py tout vert, banc
+  d'essai sans rouge (vitesse, processeur, mémoire, conflits, précision), et le .exe (`--exe`) qui démarre depuis
+  une COPIE neuve et tourne 25 s sans erreur.
+- **CONSTRUIRE_VERSION_AMIS.bat** lance d'abord la vérification : s'il y a un BLOQUANT, rien n'est fabriqué.
+  **publier_maj.py** essaie le .exe dans un dossier neuf AVANT tout envoi sur GitHub (Windows).
+- Essai dans le cloud (`--amis --sans-banc`, 3 min 40) : rien de bloquant ; à revoir : licences des pièces
+  « Classique » et des ouvertures encore « à vérifier » (bloquant pour Steam), fichiers pas encore enregistrés.
+- Tests : `tests/test_verifier_version.py` (33 contrôles, faux projets). Suite : 931 contrôles verts. Recette : R-115.
+
+À vérifier par Julien / Claude Code (PC) :
+- [ ] t97 (voir A_FAIRE), R-115.
