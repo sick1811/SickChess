@@ -1252,3 +1252,15 @@ Fait :
 À vérifier par Julien :
 - [ ] R-116 : Internet coupé → « pas d'Internet, ou adresse du site … introuvable » ; Internet rétabli → la
   mise à jour marche.
+
+## 24/10/2026 (27) – Version amis n° 5 publiée (Claude Code)
+- Fabriquée depuis une copie propre du dépôt au commit `ae5aeba` (une autre session avait du code non
+  commité dans le dossier : moteurs, analyse, game_manager — il n'est PAS dans la n° 5).
+- `outils/verifier_version.py --amis` : rien de bloquant (1035 contrôles verts, banc vert ; licences
+  « Classique » et ouvertures toujours à revoir dans CREDITS.md).
+- Paquets nouveaux : jeu (vraie cause d'un échec de mise à jour), et aussi programme et moteur (fins de ligne
+  des petits fichiers texte de la copie propre : contenu identique, ~100 Mo à télécharger pour les amis).
+- Installeur complet essayé : installation, problèmes et finales présents, jeu lancé sans erreur ; installation
+  d'essai pointée vers un fichier absent sur GitHub → le vrai jeu affiche « introuvable (erreur 404) … réessaie
+  dans quelques minutes » ; vérification en ligne toute verte ; désinstallation propre.
+- En ligne : `maj.json` « latest » = n° 5, paquets et installeur répondent. `publier/maj.json` local = n° 5.
