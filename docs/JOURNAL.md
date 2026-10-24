@@ -1029,3 +1029,20 @@ Fait :
 
 À vérifier par Julien :
 - [ ] t95 (voir A_FAIRE).
+
+## 24/10/2026 (27) – Travail p29 : rapport de plantage (Claude Code dans le cloud)
+Demande de Julien : « FAIS p29 ».
+Fait :
+- **Au plantage** (`SickChess.py` → `jeu/plantage.py`) : l'erreur, son détail technique (fichier, ligne), la fin du
+  journal de CE lancement, la version et le système sont gardés dans `plantage.json` (à côté du jeu, hors GitHub,
+  hors paquets amis). Avant, `journal_du_jeu.txt` était remis à zéro au lancement suivant : l'erreur était perdue.
+- **Au lancement suivant** (`jeu/ecran_plantage.py`) : carte « La dernière fois, SickChess s'est fermé à cause
+  d'une erreur » : **Envoyer le rapport** ouvre « Signaler un problème » déjà rempli (message + erreur + journal
+  du lancement qui a planté ; on peut compléter) ; **Non merci** l'efface ; Échap = plus tard (3 fois au plus).
+  Rien ne part sans clic du joueur. Une fois envoyé (ou rangé dans rapports/), il n'est plus proposé.
+- `python SickChess.py --plantage-test` : plantage volontaire pour essayer (recette R-124).
+- Tests : `tests/test_plantage.py` (18 contrôles, dont un VRAI plantage du lanceur copié dans un dossier
+  temporaire avec un faux jeu qui plante). Suite complète : 891 contrôles verts. Anglais traduit.
+
+À vérifier par Julien :
+- [ ] t96 (voir A_FAIRE), R-124.

@@ -546,4 +546,9 @@ EN = {
     "Les classements Steam ont besoin de Steam ouvert. Tes scores sont gardés dans le jeu et partiront à la prochaine connexion :":
         "Steam leaderboards need Steam to be running. Your scores are kept in the game and will be sent next time:",
     "Le multijoueur Steam n'existe que sous Windows.": "Steam multiplayer only exists on Windows.",
+    # --- rapport de plantage (24/10, travail p29)
+    "La dernière fois, SickChess s'est fermé à cause d'une erreur": "Last time, SickChess closed because of an error",
+    "Le %s (version %s). Envoie le rapport à Julien : il saura ce qui a cassé et pourra le réparer. Tu verras le message avant de l'envoyer ; rien ne part sans ton accord.":
+        "On %s (version %s). Send the report to Julien: he will know what broke and can fix it. You will see the message before sending it; nothing is sent without your consent.",
+    "Envoyer le rapport": "Send the report", "Non merci": "No thanks",
 }

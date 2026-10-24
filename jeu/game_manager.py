@@ -528,8 +528,38 @@ class GameManager:
         except Exception as e:
             print("[ACCUEIL] %s" % e)
 
+    def _proposer_le_rapport_de_plantage(self):
+        """24/10 (p29) : le lancement precedent a plante (plantage.py) : on propose
+        d'envoyer le rapport avec « Signaler », deja rempli."""
+        try:
+            import plantage
+            d = plantage.en_attente()
+            if d is None:
+                return
+            from ecran_plantage import EcranPlantage
+            reponse = EcranPlantage(self.screen, d).run(self.clock, self.evenement_fenetre)
+            if reponse == "quitter":
+                self.quitter()
+            if reponse == "non":
+                plantage.oublier()
+            elif reponse == "plus_tard":
+                plantage.propose_une_fois_de_plus()
+            elif reponse == "envoyer":
+                from ecran_signaler import EcranSignaler
+                if EcranSignaler(self.screen, self.version, plantage.message(d),
+                                 plantage.journal(d), apres_envoi=plantage.oublier).run(
+                        self.clock, self.evenement_fenetre) == "quitter":
+                    self.quitter()
+                if plantage.en_attente() is not None:     # Annuler : on reproposera
+                    plantage.propose_une_fois_de_plus()
+            self.screen = pygame.display.get_surface()
+            self._appliquer_taille(*self.screen.get_size())
+        except Exception as e:
+            print("[PLANTAGE] %s" % e)
+
     def run(self):
         self._premier_lancement()
+        self._proposer_le_rapport_de_plantage()
         while True:
             try:
                 self._une_partie()

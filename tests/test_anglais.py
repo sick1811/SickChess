@@ -135,6 +135,9 @@ m.draw(); bandeau.dessiner(ecran); photo("invitation")
 invitations.vider()
 from ecran_classements import EcranClassements      # 24/10 (p37)
 EcranClassements(ecran, {}).draw(); photo("classements")
+from ecran_plantage import EcranPlantage               # 24/10 (p29)
+EcranPlantage(ecran, {"date": "24/10/2026 10:00", "version": "0.2.0", "erreur": "KeyError: 'x'"}).draw()
+photo("plantage")
 from ecran_signaler import EcranSignaler
 EcranSignaler(ecran, "0.1").draw(); photo("signaler")
 import premier_lancement

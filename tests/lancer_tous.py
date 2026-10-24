@@ -30,6 +30,7 @@ SERIES = [
     ("test_invitations.py", False),
     ("test_classements.py", False),
     ("test_precision.py", False),
+    ("test_plantage.py", False),
     ("test_cache_analyse.py", False),
     ("test_statistiques.py", False),
     ("test_entrainement.py", False),

@@ -299,6 +299,8 @@ RECETTE = [
          "Pas de ralentissement, pas de son qui disparaît, l'ordinateur reste rapide."),
         ("R-123", "Après chaque test : ouvrir journal_du_jeu.txt",
          "Aucune ligne « Traceback » ni « ERREUR »."),
+        ("R-124", "Dans un terminal, dans le dossier du jeu : python SickChess.py --plantage-test (le jeu se ferme tout de suite), puis relancer le jeu normalement",
+         "Au lancement : « La dernière fois, SickChess s'est fermé à cause d'une erreur » ; « Envoyer le rapport » ouvre Signaler déjà rempli (message + journal du plantage) ; « Non merci » efface ; Échap : reproposé (3 fois au plus)."),
     ]),
     ("Graphisme et textes", [
         ("R-130", "Passer sur tous les écrans (menu, réglages, partie, fin, revue, mes parties, problèmes, options, en ligne)",

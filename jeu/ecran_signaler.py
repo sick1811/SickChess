@@ -15,11 +15,18 @@ ROUGE = (232, 118, 108)
 
 
 class EcranSignaler:
-    def __init__(self, screen, version=""):
+    def __init__(self, screen, version="", message_initial="", journal=None, apres_envoi=None):
+        """24/10 (p29) : message_initial et journal viennent d'un rapport de
+        plantage (plantage.py) ; apres_envoi est appele une fois le rapport
+        envoye ou range dans rapports/."""
         self.screen = screen
         self.version = version
         self.type = "probleme"
+        self.journal = journal
+        self.apres_envoi = apres_envoi
         self.champ = ui.ChampTexte(longueur_max=1500).activer(True)
+        if message_initial:
+            self.champ.ajouter(message_initial)
         self.etat = "saisie"           # saisie -> envoi -> fini
         self.message = ""
         self.couleur = None
@@ -60,7 +67,8 @@ class EcranSignaler:
     # --- envoi
     def envoyer(self, adresse=None, ouvrir=None):
         """Construit, range et (si une adresse est reglee) envoie le rapport."""
-        texte = signalement.construire(self.type, self.champ.contenu, self.version)
+        texte = signalement.construire(self.type, self.champ.contenu, self.version,
+                                       journal=self.journal)
         self.chemin = signalement.enregistrer(texte, self.type)
         adresse = signalement.adresse_d_envoi() if adresse is None else adresse
         if not adresse:
@@ -69,9 +77,11 @@ class EcranSignaler:
                 signalement.ouvrir_le_dossier(self.chemin)
             self._resultat = (True, "Message enregistré dans le dossier rapports et "
                                     "copié : envoie-le à Julien (Discord ou e-mail).")
-            return self._resultat
-        self._resultat = signalement.envoyer(adresse, self.type, self.champ.contenu,
-                                             texte, ouvrir=ouvrir)
+        else:
+            self._resultat = signalement.envoyer(adresse, self.type, self.champ.contenu,
+                                                 texte, ouvrir=ouvrir)
+        if self.apres_envoi is not None and (self._resultat[0] or self.chemin):
+            self.apres_envoi()           # envoye, ou au moins garde dans rapports/
         return self._resultat
 
     def _lancer_l_envoi(self):

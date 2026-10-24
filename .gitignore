@@ -49,6 +49,7 @@ rapports/
 signalement.json
 entrainement.json
 succes.json
+plantage.json
 
 # Banc d essai (resultats locaux ; le rapport lisible est docs/BANC_ESSAI.md)
 tests/banc_essai.json

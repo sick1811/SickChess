@@ -72,7 +72,7 @@ Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/
 1. [x] (24/10, séance 26) **p30 – Banque de positions** (`tests/positions_revue.json`, 50–100 positions : vrais
        sacrifices, vraies gaffes, mats, finales Syzygy, + m04 « bon sacrifice ») ; 8e contrôle
        « precision » du banc d'essai. À faire en premier : protège tout le reste.
-2. [ ] **p29 – Rapport de plantage** (erreur + fin du journal gardées, proposées au lancement
+2. [~] (24/10, séance 27 : p29 fait) **p29 – Rapport de plantage** (erreur + fin du journal gardées, proposées au lancement
        suivant via « Signaler »), puis **p28 – Test d'endurance** (`outils/endurance.py` : robot
        2 h, mémoire, plantages, ralentissements ; section « endurance » du banc, hors --rapide).
 3. [ ] **p32 – Vérification avant chaque version** (`outils/verifier_version.py`, appelé par
@@ -103,6 +103,9 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t96 (27) : dans un terminal, dossier du jeu : `python SickChess.py --plantage-test` (le jeu se ferme), puis
+      relance le jeu : carte « La dernière fois, SickChess s'est fermé… » ; « Envoyer le rapport » ouvre Signaler
+      déjà rempli ; envoie (ou Non merci) : la carte ne revient plus.
 - [ ] t95 (26) : importe (Mes parties → Importer) une partie qui commence à une autre position (PGN avec
       [FEN "…"]) dont le 1er coup est une gaffe : sa revue le note Gaffe, pas « Théorique » (R-06I).
 - [ ] Claude Code (PC) : `python outils/recette_auto.py` et `python outils/banc_essai.py --sections precision`
@@ -188,6 +191,7 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
       `steam_appid.txt` (480 = numéro de test de Valve).
 
 ## Fait récemment
+- 24/10 (27) : rapport de plantage (p29) : erreur + journal gardés, proposés au lancement suivant via Signaler.
 - 24/10 (26) : banque de positions (p30) : 114 coups jugés justes ; défaut « gaffe notée Théorique » corrigé ;
   recette automatique (`outils/recette_auto.py`).
 - 24/10 (25) : classements Steam (problèmes, contre la montre, survie ; mondial, amis, autour de moi) et
