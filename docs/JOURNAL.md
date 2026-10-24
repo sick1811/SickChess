@@ -1296,3 +1296,24 @@ Causes et corrections :
   mémoire +5 Mo/h (jeu stable ~165-172 Mo), Stockfish max 5, ralentissement x1,12, 0 plantage.
 - Version testée : celle du PC (sans le travail « quitter / lancer vite » de la séance 28).
 - À décider par Julien : 4 Stockfish gardent ~5,5 Go de mémoire même au menu (libérer quand on n'analyse pas ?).
+
+
+## 24/10/2026 (30) – Cowork fait les tests « Cowork » de la page sur le PC de Julien
+Fait (Cowork, jeu piloté souris + clavier sur le vrai PC, Steam ouvert) :
+- Données de Julien sauvegardées avant (`_sauvegarde_cowork_2026-10-24/`) et remises à l'identique après
+  (empreintes vérifiées : config, profil, puzzles_score, mes_erreurs, succes, entrainement, modes_problemes ;
+  parties/ identique). Les 12 fichiers de parties créés par les tests sont rangés dans
+  `_sauvegarde_cowork_2026-10-24/parties_ajoutees_par_cowork/` (Cowork ne peut pas supprimer).
+- 36 tests : résultat écrit dans chaque commentaire de la page. Bons (cochés) : m04, r02, t01, t12, t50, t55,
+  t56, t63, t64, t68, t82, t83, t84, t86, t88, t92, t93, t95, t96, t101.
+  Avec défaut : r01, t51, t52, t54, t57, t62, t65, t71, t85, t98. Pour l'avis de Julien : t60, t99, t100.
+  Pas faits : t61 (bandeau de succès non vu), t87 et t98 (compter les stockfish.exe : le Gestionnaire des
+  tâches ne répond pas aux clics de Cowork), t94 (il faut fermer Steam).
+- **2 plantages trouvés** (Problème du jour rouvert ; éditeur de l'analyse libre) et une quinzaine de petits
+  défauts : liste dans `docs/A_FAIRE.md`, section « Défauts trouvés par Cowork ».
+- Reste sur Steam : le classement Contre la montre de Julien est passé à 1 (son ancien record 0).
+- `rapports/` : deux rapports écrits par les tests (dont la trace du plantage du Problème du jour).
+
+À vérifier par Julien :
+- [ ] t60, t99, t100 : ton avis (joli ? utile ? lisible ?).
+- [ ] t94 (Steam fermé puis ouvert), t61 (bandeau de succès), t53, t58, q01, t66, t13, t59, t89–t91.

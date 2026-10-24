@@ -512,8 +512,8 @@ class EcranAnalyseLibre:
         d = self.disposition
         if not pygame.Rect(d.rect_plateau()).collidepoint(pos):
             return None
-        colonne = (pos[0] - d.plateau_x) // d.taille_case
-        rangee = (pos[1] - d.plateau_y) // d.taille_case
+        colonne = int((pos[0] - d.plateau_x) // d.taille_case)   # 24/10 : entier
+        rangee = int((pos[1] - d.plateau_y) // d.taille_case)
         if self.plateau.flipped:
             return chess.square(7 - colonne, rangee)
         return chess.square(colonne, 7 - rangee)

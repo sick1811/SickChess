@@ -44,7 +44,10 @@ class Disposition:
         self.grand = max(1.0, self.echelle / ECHELLE_NORMALE_MAX)
         g, marge = self.grand, int(MARGE * self.grand)
 
-        largeur_panneau = _borne(self.largeur * 0.32, PANNEAU_MIN * g, PANNEAU_MAX * g)
+        # 24/10 (defaut Cowork) : un nombre a virgule ici rendait plateau_x et
+        # panneau_x a virgule, et le numero de case de l'editeur aussi (plantage
+        # en plein ecran). Toujours des pixels entiers.
+        largeur_panneau = int(_borne(self.largeur * 0.32, PANNEAU_MIN * g, PANNEAU_MAX * g))
 
         hauteur_dispo = self.hauteur - 2 * marge
         largeur_dispo = self.largeur - largeur_panneau - 3 * marge

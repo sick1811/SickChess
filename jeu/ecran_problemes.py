@@ -289,6 +289,11 @@ class EcranProblemes:
         self.temps_final = None
         self.index_solution = None
         self.coup_en_attente = None
+        # 24/10 (defaut Cowork) : sans probleme a donner (probleme du jour deja
+        # fait), on sortait avant _preparer_la_solution et le dessin plantait
+        # sur self.solution. Toujours vide au depart.
+        self.solution = []
+        self.positions = []
         self.fondu_debut = pygame.time.get_ticks()
 
         p.annuler_selection()
