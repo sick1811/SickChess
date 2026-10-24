@@ -873,7 +873,7 @@
    "id": "R-114",
    "section": "Version amis et mises à jour",
    "texte": "Publier une nouvelle version, l'ami ouvre le jeu et reste dans le menu",
-   "detail": "Le bouton affiche « Mise à jour : X % », puis « Nouvelle version prête », le jeu redémarre tout seul sur la nouvelle version ; profil et parties gardés ; jamais de redémarrage en pleine partie.",
+   "detail": "Au plus 3 minutes après la publication, le bouton affiche « Mise à jour : X % », puis « Nouvelle version prête », le jeu redémarre tout seul sur la nouvelle version ; profil et parties gardés ; jamais de redémarrage en pleine partie.",
    "ordre": 11404
   },
   {

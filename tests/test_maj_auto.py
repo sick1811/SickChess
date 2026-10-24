@@ -49,11 +49,12 @@ a, _ = m.pas_automatique(Faux("pret"), {}, 104.0, etat)
 verifier(a is None, "une seule tentative d'installation (pas une par image)")
 etat = {}
 verifier(m.pas_automatique(Faux("a_jour"), {}, 0, etat)[0] is None, "a jour : rien tout de suite")
-verifier(m.pas_automatique(Faux("a_jour"), {}, 10 * 60, etat)[0] is None, "rien avant 20 min")
-verifier(m.pas_automatique(Faux("a_jour"), {}, 20 * 60 + 1, etat)[0] == "verifier",
-         "jeu reste ouvert : reverification apres 20 min")
-verifier(m.pas_automatique(Faux("a_jour"), {}, 20 * 60 + 2, etat)[0] is None,
-         "puis attend de nouveau 20 min")
+verifier(m.pas_automatique(Faux("a_jour"), {}, 60, etat)[0] is None, "rien avant 3 min")
+verifier(m.REVERIFIER_TOUTES_LES <= 5 * 60, "au menu, une nouvelle version est vue en 5 min au plus (R-114)")
+verifier(m.pas_automatique(Faux("a_jour"), {}, m.REVERIFIER_TOUTES_LES + 1, etat)[0] == "verifier",
+         "jeu reste ouvert : reverification apres 3 min")
+verifier(m.pas_automatique(Faux("a_jour"), {}, m.REVERIFIER_TOUTES_LES + 2, etat)[0] is None,
+         "puis attend de nouveau 3 min")
 verifier(m.pas_automatique(Faux("erreur"), {}, 0, {})[0] is None, "erreur reseau : on ne boucle pas")
 
 print("%d controle(s) en echec" % len(echecs) if echecs else "Tout est bon.")

@@ -298,7 +298,7 @@ RECETTE = [
         ("R-113", "Chez un ami : double-clic sur SickChess_Installation.exe",
          "Aucune demande d'administrateur ; installation dans ses programmes, icône sur le Bureau ; le jeu démarre et on peut jouer contre l'ordinateur tout de suite. (Si Windows prévient « éditeur inconnu » : Informations complémentaires → Exécuter quand même.)"),
         ("R-114", "Publier une nouvelle version, l'ami ouvre le jeu et reste dans le menu",
-         "Le bouton affiche « Mise à jour : X % », puis « Nouvelle version prête », le jeu redémarre tout seul sur la nouvelle version ; profil et parties gardés ; jamais de redémarrage en pleine partie."),
+         "Au plus 3 minutes après la publication, le bouton affiche « Mise à jour : X % », puis « Nouvelle version prête », le jeu redémarre tout seul sur la nouvelle version ; profil et parties gardés ; jamais de redémarrage en pleine partie."),
         ("R-115", "Double-clic sur CONSTRUIRE_VERSION_AMIS.bat",
          "D'abord « Vérification avant une version pour les amis » : une ligne OK / A REVOIR / BLOQUANT par point (mode test, numéro Steam, licences, version, Git, tests, banc d'essai) ; s'il y a un BLOQUANT, rien n'est fabriqué ; sinon la version se fabrique, et le .exe est essayé dans un dossier neuf avant l'envoi."),
         ("R-116", "Mise à jour qui échoue : cliquer Mise à jour avec Internet coupé, puis Internet rétabli pendant qu'une version se publie",

@@ -6,6 +6,13 @@ Fichier partagé entre Cowork et Claude Code. **À relire au début de chaque s�
 Mis à jour le 24/10/2026.
 
 ## Retours de Julien à traiter (priorité)
+- [ ] **25/10 – Recette, points rouges** :
+      - [ ] R-095 / R-096 « Signaler » doit arriver dans le salon Discord de Julien (discord.gg/AvHY2NxTz) :
+            le jeu sait déjà envoyer ; **il faut l'adresse du webhook** (Discord → salon → Modifier → Intégrations →
+            Webhooks → Nouveau → Copier l'URL), clé `signalement_webhook`. En attente de Julien.
+      - [x] R-114 « ne fonctionne pas en version 4 » (l'ami au menu ne reçoit pas la nouvelle version) : le jeu ne
+            revérifiait que toutes les 20 min → 3 min (séance 37). À revérifier à la publication de la n° 7.
+      - [ ] Bugs et idées postés dans le salon Discord : Claude n'a pas accès à Discord → Julien les recopie.
 - [ ] **24/10 – Défauts trouvés par Cowork sur le PC de Julien** (page « À faire », commentaires « Vérifié par Cowork ») :
       - [x] PLANTAGE t85 : éditeur de l'analyse libre en 1920×1080 (cases en nombres à virgule) → corrigé (séance 30).
       - [x] PLANTAGE t52 : rouvrir le Problème du jour déjà fait → corrigé (séance 30).

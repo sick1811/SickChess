@@ -413,8 +413,11 @@ def verifier_en_arriere_plan():
 # nouvelle modification »). Dans le menu, une nouvelle version publiee est
 # telechargee toute seule, puis installee (le jeu redemarre) - jamais pendant une
 # partie, puisque seul le menu appelle ceci. Reglage "maj_auto" de config.json
-# (vrai par defaut). Le jeu reverifie toutes les 20 minutes s'il reste ouvert.
-REVERIFIER_TOUTES_LES = 20 * 60
+# (vrai par defaut). Le jeu reverifie toutes les 3 minutes au menu s'il reste
+# ouvert. 25/10 (recette R-114 « ne fonctionne pas en version 4 ») : c'etait
+# toutes les 20 minutes ; publier puis regarder le jeu d'un ami au menu ne
+# donnait rien avant 20 minutes. Un petit fichier (maj.json) seulement.
+REVERIFIER_TOUTES_LES = 3 * 60
 ATTENTE_AVANT_REDEMARRAGE = 3.0
 
 

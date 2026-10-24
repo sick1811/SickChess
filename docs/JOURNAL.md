@@ -1376,3 +1376,14 @@ Demande de Julien : « mets à jour À faire et corrige ». Fusion de `main` (Me
 
 À vérifier par Julien (à confier à Cowork) :
 - [ ] t103 : la liste des corrections ci-dessus, sur le PC.
+
+## 25/10/2026 (37) – Relecture complète de la page « À faire » ; mise à jour vue en 3 min (Claude Code, cloud)
+Julien : « tu as lu les À faire ? ». Relecture des 266 lignes (avant : seulement « Tester sur ton PC »). Points rouges
+de la recette jamais traités :
+- **R-114** « fonctionne pas en version 4 » : l'ami resté au menu ne voyait la nouvelle version qu'au bout de
+  20 minutes (`REVERIFIER_TOUTES_LES`). Passé à **3 minutes** (au menu seulement, un petit fichier). Cause la plus
+  probable, pas prouvée : à revérifier à la prochaine publication. Test : `test_maj_auto.py`.
+- **R-095 / R-096** : Signaler doit écrire dans le salon Discord de Julien. Le code d'envoi existe
+  (`signalement.py`, clé `signalement_webhook`) ; **il manque l'adresse du webhook** (le lien discord.gg est une
+  invitation, pas une adresse d'envoi). Demandé à Julien.
+- Les bugs et idées postés sur Discord : Claude n'y a pas accès ; Julien les recopiera.
