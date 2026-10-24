@@ -1288,3 +1288,11 @@ Causes et corrections :
 - [ ] t101 / R-125 : quitter pendant que l'ordinateur réfléchit ou pendant une revue → menu aussitôt, Stockfish à
   0 % ; nouvelle partie immédiate ; Quitter le jeu en moins d'une seconde.
 
+
+## 24/10/2026 (29) – Test d'endurance de 2 h sur le PC de Julien
+- Essai 15 min (7 Days to Die ouvert) : ORANGE « mémoire +76 Mo/h », trop peu de mesures (échauffement compté) ;
+  0 plantage, images ≤ 6,5 ms.
+- **2 h** (7 Days to Die ouvert les 35 premières minutes, puis PC au calme) : **VERT** – 257 scénarios,
+  mémoire +5 Mo/h (jeu stable ~165-172 Mo), Stockfish max 5, ralentissement x1,12, 0 plantage.
+- Version testée : celle du PC (sans le travail « quitter / lancer vite » de la séance 28).
+- À décider par Julien : 4 Stockfish gardent ~5,5 Go de mémoire même au menu (libérer quand on n'analyse pas ?).
