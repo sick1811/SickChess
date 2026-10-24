@@ -1353,3 +1353,8 @@ Constat du test d'endurance : au menu, 4 Stockfish gardaient ~5,5 Go jusqu'à la
 - 25/10 : la vérification du `.bat` (verifier_version) bloquait sur PC sur `test_precision_moteur.py` puis aussi
   `test_revue.py`, verts quand on les lance seuls (37/37). Elle ne montrait que le nom de la série : impossible de savoir
   quel coup. Elle montre maintenant les contrôles en ECHEC et garde tout dans `tests/verification_tests.txt`.
+- 25/10 : n° 6 bloquée à la toute fin par l'essai du `.exe` (« No module named 'game_manager' »). Faux problème : l'essai
+  copiait le programme SEUL dans un dossier neuf, sans le paquet « jeu » (le code est livré à côté de l'exe). Chez un ami
+  les deux sont toujours ensemble. `publier_maj.dossier_d_essai` assemble maintenant programme + jeu + moteur comme
+  chez un ami avant l'essai (test : `test_verifier_version.py`, partie 7b). Vérification de la n° 6 : 1074 contrôles
+  verts, banc d'essai vert.

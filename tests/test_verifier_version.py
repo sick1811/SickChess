@@ -150,6 +150,29 @@ verifier(vv.controle_exe(dist, 25, lancer_exe("[SICKCHESS] Demarrage\n", vivant=
 verifier(vv.controle_exe(os.path.join(dist, "rien"))[0] == vv.BLOQUANT, "pas de .exe : bloque")
 shutil.rmtree(dist, ignore_errors=True)
 
+print("7b. Le dossier d'essai = le jeu d'un ami (programme + jeu + moteur)")
+# 25/10 : l'essai se faisait sur le programme seul : « No module named 'game_manager' »,
+# et la n° 6 a ete bloquee a tort.
+import publier_maj
+dist = tempfile.mkdtemp(prefix="sickchess_dist_")
+with open(os.path.join(dist, "SickChess.exe"), "w") as f:
+    f.write("exe")
+racine = tempfile.mkdtemp(prefix="sickchess_racine_")
+for chemin in ("jeu/game_manager.py", "jeu/notes.txt", "moteur/stockfish.exe", "assets/logo.png"):
+    os.makedirs(os.path.join(racine, os.path.dirname(chemin)), exist_ok=True)
+    with open(os.path.join(racine, chemin), "w") as f:
+        f.write("x")
+base = tempfile.mkdtemp(prefix="sickchess_essai_")
+d = publier_maj.dossier_d_essai({}, racine, dist, base=base)
+verifier(os.path.isfile(os.path.join(d, "SickChess.exe")) and os.path.isfile(os.path.join(d, "jeu", "game_manager.py"))
+         and os.path.isfile(os.path.join(d, "moteur", "stockfish.exe")) and os.path.isfile(os.path.join(d, "assets", "logo.png")),
+         "le .exe, le code du jeu, les images et Stockfish sont dans le dossier d'essai")
+verifier(not os.path.exists(os.path.join(d, "jeu", "notes.txt")), "comme chez un ami : seulement les .py du code")
+verifier(publier_maj.dossier_d_essai({}, racine, os.path.join(dist, "rien")) == os.path.join(dist, "rien"),
+         "pas d'exe : on ne fabrique rien (l'essai dira BLOQUANT)")
+for dossier in (dist, racine, base):
+    shutil.rmtree(dossier, ignore_errors=True)
+
 print("8. Le vrai projet (sans tests ni banc)")
 controles = vv.verifier("amis", RACINE, tests=False, banc=False, version_publiee="0.1.0", afficher=False)
 verifier(not [c for c in controles if c[1] == vv.BLOQUANT],
