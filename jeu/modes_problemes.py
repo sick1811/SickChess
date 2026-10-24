@@ -160,6 +160,9 @@ class SessionDefi:
                              "survie_10": self.mode == SURVIE and self._reussis >= 10})
         except Exception as e:
             print("[SUCCES] %s" % e)
+        if self.mode in (CHRONO, SURVIE) and self._reussis > 0:
+            import classements                 # 24/10 (p37) : Steam garde le meilleur
+            classements.envoyer(self.mode, self._reussis)
         if self._reussis > self.record_avant:
             self.nouveau_record = True
             d = charger()

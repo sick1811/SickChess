@@ -52,12 +52,26 @@ CANAL = 0
 
 # Numeros des evenements Steam utilises (k_iCallback)
 CB_INVITATION_ACCEPTEE = 333       # GameLobbyJoinRequested_t
+CB_INVITATION_RECUE = 503          # LobbyInvite_t (24/10, p36 : jeu ouvert)
 CB_SALON_ENTRE = 504               # LobbyEnter_t
 CB_SALON_INFOS = 505               # LobbyDataUpdate_t
 CB_SALON_MEMBRE = 506              # LobbyChatUpdate_t
 CB_SALON_CREE = 513                # LobbyCreated_t
 CB_APPEL_TERMINE = 703             # SteamAPICallCompleted_t
 CB_DEMANDE_SESSION = 1251          # SteamNetworkingMessagesSessionRequest_t
+CB_CLASSEMENT_TROUVE = 1104        # LeaderboardFindResult_t      (24/10, p37)
+CB_CLASSEMENT_TELECHARGE = 1105    # LeaderboardScoresDownloaded_t
+CB_SCORE_ENVOYE = 1106             # LeaderboardScoreUploaded_t
+
+# Classements (ELeaderboardSortMethod, ELeaderboardDisplayType,
+# ELeaderboardUploadScoreMethod, ELeaderboardDataRequest)
+TRI_DECROISSANT = 2                # le plus grand score en premier
+AFFICHAGE_NOMBRE = 1
+SCORE_GARDER_LE_MEILLEUR = 1       # records (contre la montre, survie)
+SCORE_REMPLACER = 2                # classement des problemes : la valeur du jour
+DEMANDE_MONDIAL = 0
+DEMANDE_AUTOUR_DE_MOI = 1
+DEMANDE_AMIS = 2
 
 # Changement d'un membre du salon (EChatMemberStateChange)
 MEMBRE_ENTRE = 1
@@ -103,6 +117,28 @@ class InvitationAcceptee(Structure):       # GameLobbyJoinRequested_t
     _fields_ = [("salon", c_uint64), ("ami", c_uint64)]
 
 
+class InvitationRecue(Structure):          # LobbyInvite_t
+    _fields_ = [("ami", c_uint64), ("salon", c_uint64), ("jeu", c_uint64)]
+
+
+class ClassementTrouve(Structure):         # LeaderboardFindResult_t
+    _fields_ = [("classement", c_uint64), ("trouve", c_ubyte)]
+
+
+class ClassementTelecharge(Structure):     # LeaderboardScoresDownloaded_t
+    _fields_ = [("classement", c_uint64), ("lignes", c_uint64), ("nombre", c_int)]
+
+
+class ScoreEnvoye(Structure):              # LeaderboardScoreUploaded_t
+    _fields_ = [("reussi", c_ubyte), ("classement", c_uint64), ("score", c_int),
+                ("change", c_ubyte), ("rang", c_int), ("rang_avant", c_int)]
+
+
+class LigneDeClassement(Structure):        # LeaderboardEntry_t
+    _fields_ = [("joueur", c_uint64), ("rang", c_int), ("score", c_int),
+                ("details", c_int), ("ugc", c_uint64)]
+
+
 class MembreChange(Structure):             # LobbyChatUpdate_t
     _fields_ = [("salon", c_uint64), ("membre", c_uint64),
                 ("auteur", c_uint64), ("changement", c_uint32)]
@@ -119,6 +155,11 @@ assert sizeof(MessageReseau) == 216
 assert sizeof(MessageRappel) == 24
 assert sizeof(SalonEntre) == 24
 assert sizeof(MembreChange) == 32
+assert sizeof(InvitationRecue) == 24
+assert sizeof(ClassementTrouve) == 16
+assert sizeof(ClassementTelecharge) == 24
+assert sizeof(ScoreEnvoye) == 32
+assert sizeof(LigneDeClassement) == 32
 assert sizeof(InfoJeuAmi) == 24
 
 
@@ -240,7 +281,18 @@ class Steam:
         self.actif = True
         self.erreur = ""
         print("[STEAM] connecte : %s (jeu %d)" % (self.mon_nom(), self.appid))
+        self._rattraper()
         return True
+
+    def _rattraper(self):
+        """24/10 (p37) : ce qui a ete gagne pendant que Steam etait absent
+        (succes, records des problemes) part maintenant. Le jour ou SickChess
+        aura son vrai numero Steam, tous les succes deja gagnes y apparaitront."""
+        for nom in ("succes", "classements"):
+            try:
+                __import__(nom).rattraper(self)
+            except Exception as souci:
+                print("[STEAM] rattrapage %s : %s" % (nom, souci))
 
     def _echec(self, erreur, conseil=""):
         self.erreur = erreur
@@ -328,6 +380,17 @@ class Steam:
         f("SteamAPI_ISteamUser_GetSteamID", U64, P)
         f("SteamAPI_ISteamUserStats_SetAchievement", c_bool, P, c_char_p, facultative=True)
         f("SteamAPI_ISteamUserStats_StoreStats", c_bool, P, facultative=True)
+        # 24/10 (p37) : les classements Steam (facultatifs, comme les succes).
+        f("SteamAPI_ISteamUserStats_FindOrCreateLeaderboard", U64, P, c_char_p, c_int, c_int,
+          facultative=True)
+        f("SteamAPI_ISteamUserStats_UploadLeaderboardScore", U64, P, U64, c_int, c_int,
+          POINTER(c_int), c_int, facultative=True)
+        f("SteamAPI_ISteamUserStats_DownloadLeaderboardEntries", U64, P, U64, c_int, c_int,
+          c_int, facultative=True)
+        f("SteamAPI_ISteamUserStats_GetDownloadedLeaderboardEntry", c_bool, P, U64, c_int,
+          POINTER(LigneDeClassement), POINTER(c_int), c_int, facultative=True)
+        f("SteamAPI_ISteamFriends_RequestUserInformation", c_bool, P, U64, c_bool,
+          facultative=True)
         f("SteamAPI_ISteamUtils_GetAppID", c_uint32, P)
         f("SteamAPI_ISteamFriends_GetPersonaName", c_char_p, P)
         f("SteamAPI_ISteamFriends_GetFriendPersonaName", c_char_p, P, U64)
@@ -397,6 +460,7 @@ class Steam:
     def _resultat_d_appel(self, rappel):
         termine = AppelTermine.from_buffer_copy(
             ctypes.string_at(rappel.parametre, sizeof(AppelTermine)))
+        self._appel_courant = int(termine.appel)   # p37 : quel appel a repondu
         tampon = ctypes.create_string_buffer(max(1, termine.taille))
         rate = c_bool(False)
         if self.dll.SteamAPI_ManualDispatch_GetAPICallResult(
@@ -405,6 +469,11 @@ class Steam:
             if rate.value and termine.numero == CB_SALON_CREE:
                 self._evenements.append({"type": "salon_cree", "ok": False,
                                          "salon": 0})
+                return
+            if rate.value and termine.numero in (CB_CLASSEMENT_TROUVE, CB_SCORE_ENVOYE,
+                                                 CB_CLASSEMENT_TELECHARGE):
+                self._evenements.append({"type": "classement_rate",
+                                         "appel": int(termine.appel)})
                 return
             self._lire(termine.numero, ctypes.addressof(tampon), termine.taille)
 
@@ -435,6 +504,36 @@ class Steam:
                 self._evenements.append({"type": "invitation_acceptee",
                                          "salon": int(s.salon),
                                          "ami": int(s.ami)})
+        elif numero == CB_INVITATION_RECUE:
+            # 24/10 (p36) : un ami nous invite PENDANT que SickChess est ouvert
+            # (Steam l'ecrit aussi dans sa discussion). Le jeu affiche un
+            # bandeau « X t'invite » (invitations.py). On ne garde que les
+            # invitations pour CE jeu (les 24 bits bas de l'identifiant de jeu).
+            s = copie(InvitationRecue)
+            if s is not None and (not s.jeu or not self.appid
+                                  or int(s.jeu) & 0xFFFFFF == int(self.appid)):
+                self._evenements.append({"type": "invitation_recue",
+                                         "salon": int(s.salon),
+                                         "ami": int(s.ami)})
+        elif numero == CB_CLASSEMENT_TROUVE:
+            s = copie(ClassementTrouve)
+            if s is not None:
+                self._evenements.append({"type": "classement_trouve",
+                                         "appel": getattr(self, "_appel_courant", 0),
+                                         "ok": bool(s.trouve), "classement": int(s.classement)})
+        elif numero == CB_SCORE_ENVOYE:
+            s = copie(ScoreEnvoye)
+            if s is not None:
+                self._evenements.append({"type": "score_envoye",
+                                         "appel": getattr(self, "_appel_courant", 0),
+                                         "ok": bool(s.reussi), "score": int(s.score),
+                                         "rang": int(s.rang), "rang_avant": int(s.rang_avant)})
+        elif numero == CB_CLASSEMENT_TELECHARGE:
+            s = copie(ClassementTelecharge)
+            if s is not None:
+                self._evenements.append({"type": "classement_telecharge",
+                                         "appel": getattr(self, "_appel_courant", 0),
+                                         "lignes": self._lire_les_lignes(s.lignes, s.nombre)})
         elif numero == CB_SALON_MEMBRE:
             s = copie(MembreChange)
             if s is not None:
@@ -629,10 +728,16 @@ class Steam:
 
     # ------------------------------------------------------------ succes
 
-    def debloquer_succes(self, nom):
+    def succes_possibles(self):
+        """Les succes n'existent que pour le vrai numero du jeu : avec 480
+        (Spacewar, le numero de test de Valve), Steam ne connait pas les notres."""
+        return self.actif and bool(self._i.get("stats")) and self.appid != APPID_DE_TEST
+
+    def debloquer_succes(self, nom, enregistrer=True):
         """Debloque un succes Steam (nom API, ex. 'PREMIERE_VICTOIRE'). Il doit
-        exister dans la page Steamworks du jeu ; sinon Steam l'ignore."""
-        if not self.actif or not self._i.get("stats"):
+        exister dans la page Steamworks du jeu ; sinon Steam l'ignore.
+        enregistrer=False : on en debloque plusieurs, puis ranger_les_succes()."""
+        if not self.succes_possibles():
             return False
         fixer = getattr(self.dll, "SteamAPI_ISteamUserStats_SetAchievement", None)
         ranger = getattr(self.dll, "SteamAPI_ISteamUserStats_StoreStats", None)
@@ -640,10 +745,70 @@ class Steam:
             return False
         try:
             ok = bool(fixer(self._i["stats"], nom.encode("ascii")))
-            return bool(ranger(self._i["stats"])) and ok
+            return (bool(ranger(self._i["stats"])) if enregistrer else True) and ok
         except Exception as souci:
             print("[STEAM] succes %s : %s" % (nom, souci))
             return False
+
+    def ranger_les_succes(self):
+        fonction = self._stats("StoreStats") if self.succes_possibles() else None
+        return bool(fonction(self._i["stats"])) if fonction is not None else False
+
+    # ------------------------------------------------------------ classements
+    # 24/10 (p37). Tout passe par des « appels » Steam : la fonction rend tout
+    # de suite un numero d'appel, la reponse arrive plus tard dans pomper()
+    # (evenements classement_trouve / score_envoye / classement_telecharge,
+    # avec ce numero dans "appel"). classements.py fait le suivi.
+
+    def _stats(self, nom):
+        if not self.actif or not self._i.get("stats"):
+            return None
+        return getattr(self.dll, "SteamAPI_ISteamUserStats_" + nom, None)
+
+    def chercher_classement(self, nom):
+        """Trouve (ou cree) le classement 'nom'. Renvoie le numero d'appel (0 = rate)."""
+        fonction = self._stats("FindOrCreateLeaderboard")
+        if fonction is None:
+            return 0
+        return int(fonction(self._i["stats"], nom.encode("ascii"), TRI_DECROISSANT,
+                            AFFICHAGE_NOMBRE) or 0)
+
+    def envoyer_score(self, classement, score, methode=SCORE_GARDER_LE_MEILLEUR):
+        fonction = self._stats("UploadLeaderboardScore")
+        if fonction is None or not classement:
+            return 0
+        return int(fonction(self._i["stats"], c_uint64(classement), int(methode), int(score),
+                            None, 0) or 0)
+
+    def telecharger_classement(self, classement, demande, debut, fin):
+        fonction = self._stats("DownloadLeaderboardEntries")
+        if fonction is None or not classement:
+            return 0
+        return int(fonction(self._i["stats"], c_uint64(classement), int(demande),
+                            int(debut), int(fin)) or 0)
+
+    def _lire_les_lignes(self, poignee, nombre):
+        """Les lignes telechargees : [{rang, joueur, score}] (lues tout de suite :
+        Steam libere la liste ensuite)."""
+        fonction = self._stats("GetDownloadedLeaderboardEntry")
+        lignes = []
+        if fonction is None:
+            return lignes
+        for i in range(max(0, min(int(nombre), 100))):
+            ligne = LigneDeClassement()
+            if fonction(self._i["stats"], c_uint64(poignee), i, byref(ligne), None, 0):
+                lignes.append({"rang": int(ligne.rang), "joueur": int(ligne.joueur),
+                               "score": int(ligne.score)})
+        return lignes
+
+    def demander_le_nom(self, joueur):
+        """Un joueur qui n'est pas ton ami : Steam envoie son nom un peu plus
+        tard (nom_de le rendra alors). True si le nom est deja connu."""
+        fonction = getattr(self.dll, "SteamAPI_ISteamFriends_RequestUserInformation", None) \
+            if self.actif else None
+        if fonction is None or not joueur:
+            return True
+        return not bool(fonction(self._i["amis"], c_uint64(joueur), True))
 
     # ------------------------------------------------------------ arret
 

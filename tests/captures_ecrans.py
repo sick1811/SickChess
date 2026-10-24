@@ -94,5 +94,20 @@ if sf:
     revue.draw(); photo(gm.screen, "06_revue")
     a.arreter() if hasattr(a, "arreter") else None
 
+# 7. analyse libre (24/10, p35) : avec Stockfish, ses 3 lignes ; l'editeur.
+from ecran_analyse_libre import EcranAnalyseLibre
+libre = EcranAnalyseLibre(gm.screen, gm.config, coups=PARTIE[:10], stockfish_path=sf,
+                          threads=2)
+if sf:
+    fin = time.time() + 20
+    while libre.analyse.resultat()["profondeur"] < 18 and time.time() < fin:
+        libre.draw(); time.sleep(0.05)
+else:
+    libre.analyse.mettre_en_pause(True)
+libre.draw(); photo(gm.screen, "07_analyse_libre")
+libre.ouvrir_l_editeur(); libre.edition.choisir_outil("Q")
+libre.draw(); photo(gm.screen, "08_editeur_position")
+libre.analyse.arreter()
+
 print("captures dans", SORTIE)
 pygame.quit()

@@ -20,6 +20,8 @@ os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
 
 import chess
 import analyse_partie as A
+import petit_pc
+petit_pc.forcer("normal")      # 24/10 (p31) : ces controles supposent un PC normal (12 coeurs, 16 Go)
 
 echecs = []
 

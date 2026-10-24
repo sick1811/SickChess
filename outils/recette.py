@@ -16,7 +16,7 @@
 import json
 import os
 
-VERSION_RECETTE = "23/10/2026"
+VERSION_RECETTE = "24/10/2026"
 
 # (section, [(id, a faire, ce qu'on doit voir)])
 RECETTE = [
@@ -135,6 +135,8 @@ RECETTE = [
          "En haut : « Analyse fine… 40 % · environ 3 min » ; le temps restant baisse régulièrement ; à la fin « Analyse terminée (profondeur X à Y) »."),
         ("R-06H", "Mes parties → Importer une longue partie (60 coups et plus), ouvrir la revue (Calcul fixe, Forte)",
          "Courbe, flèches et la plupart des pastilles en 1 à 2 minutes ; quelques coups gardent un rond creux (« en vérification ») puis reçoivent leur pastille ; une pastille posée ne change plus ; revue complète en environ 5 minutes pour 70 coups."),
+        ("R-06I", "Importer une partie qui commence à une autre position (PGN avec [FEN \"…\"]) dont le 1er coup est une gaffe, puis sa revue",
+         "Le 1er coup n'est pas « Théorique » : il reçoit sa vraie pastille (Gaffe). Une partie normale garde ses coups « Théorique » au début."),
         ("R-06G", "Changer Options → Partie → Façon d'analyser, puis rouvrir la revue d'une partie déjà analysée",
          "La revue s'affiche tout de suite, sans tout refaire (une analyse assez forte est gardée, quel que soit le mode)."),
         ("R-068", "Revue : touche F",
@@ -183,12 +185,40 @@ RECETTE = [
          "Un seul essai ; ensuite « Tu as déjà fait le problème du jour. Reviens demain ! » ; le bouton affiche « fait »."),
         ("R-086", "Problèmes → Mes erreurs",
          "Tes gaffes de parties analysées reviennent en problèmes ; « Ta partie du … » ; un autre très bon coup est accepté."),
+        ("R-08A", "Steam ouvert : Problèmes → « Classements Steam » ; Problèmes / Contre la montre / Survie ; Mondial / Amis / Autour de moi",
+         "Les listes se chargent (rang, joueur, score) ; ta ligne « Toi » est en or ; flèches gauche/droite changent de classement ; Échap revient aux Problèmes."),
+        ("R-08B", "Faire un contre la montre (ou une survie, ou un problème classé), puis rouvrir les classements",
+         "Ton nouveau score y est (Actualiser si besoin) ; un moins bon record ne remplace pas le meilleur ; le classement des problèmes suit ta valeur du jour."),
+        ("R-08C", "Steam fermé : Problèmes → « Classements Steam » ; jouer un contre la montre ; puis relancer le jeu avec Steam ouvert",
+         "Sans Steam : message clair et tes scores du jeu ; une fois Steam ouvert, ton record apparaît dans le classement sans rien refaire."),
     ]),
     ("Entraînement aux ouvertures", [
         ("R-097", "Menu → Entraînement aux ouvertures : choisir Blancs ou Noirs puis une ouverture",
          "Le jeu joue les coups adverses de la théorie ; à toi de trouver les tiens ; un coup faux = rouge, on réessaie."),
         ("R-098", "« Montrer le coup (H) », finir la ligne, « Ligne suivante »",
          "Flèche du bon coup ; à la fin : score et nom exact de la variante ; la suivante est une autre variante ; le % s'affiche sur l'ouverture dans la liste."),
+    ]),
+    ("Analyse libre", [
+        ("R-140", "Menu → Analyse libre",
+         "Position de départ ; en quelques secondes, 3 lignes de Stockfish à droite (évaluation + coups), « profondeur » qui monte, flèche bleue du meilleur coup, barre d'avantage à gauche."),
+        ("R-141", "Jouer des coups des deux camps (glisser ou clic-clic), puis flèches gauche/droite, Début/Fin, clic sur un coup de la feuille",
+         "Les deux camps se jouent ; Stockfish repart aussitôt sur chaque nouvelle position ; on navigue dans les coups ; un autre coup joué au milieu remplace la suite."),
+        ("R-142", "Cliquer sur une des 3 lignes de Stockfish",
+         "Son premier coup est joué sur l'échiquier."),
+        ("R-143", "Espace (ou bouton Pause), attendre, puis Espace encore",
+         "« Stockfish à l'arrêt », bouton « Relancer » en or, le processeur redescend (Gestionnaire des tâches) ; Espace : l'analyse reprend."),
+        ("R-144", "Copier un FEN (ex. lichess → Partager → FEN) puis Ctrl+V ; puis copier une partie PGN et Ctrl+V",
+         "« Position collée » : la position s'affiche et s'analyse ; « Partie collée : N coups » : la partie s'affiche depuis le début, flèches pour avancer. Un texte quelconque : message clair, rien ne casse."),
+        ("R-145", "Éditer (E) : Vider, poser rois, tours, pions ; Déplacer ; Gomme ; clic droit ; trait ; roques ; Analyser",
+         "Les pièces se posent / s'enlèvent ; les roques ne se cochent que si roi et tour sont à leur place ; une position impossible (pas de roi, pion sur la 1re rangée…) est refusée avec la raison ; « Analyser » lance Stockfish dessus ; Échap annule."),
+        ("R-146", "Copier le FEN (C), le coller dans lichess.org/analysis",
+         "« FEN copié » ; lichess affiche la même position."),
+        ("R-147", "Revue d'une partie → aller à un coup → « Analyser (A) » ; puis Retour",
+         "L'analyse libre s'ouvre sur la même position (variante comprise), avec la partie dans la feuille ; Retour revient à la revue au même coup."),
+        ("R-148", "Finale à 5 pièces ou moins (ex. coller 8/8/8/4k3/8/8/4P3/4K3 w - - 0 1), dossier syzygy/ présent",
+         "Sous les lignes : « Tables de finale : les Blancs gagnent / nulle » ; sans le dossier syzygy/, rien ne s'affiche et tout marche."),
+        ("R-149", "Laisser l'analyse libre ouverte 2 minutes sur la même position, puis Retour",
+         "Au bout d'une minute « analyse terminée » et le processeur redescend ; après Retour, plus de stockfish.exe d'analyse libre dans le Gestionnaire des tâches."),
     ]),
     ("Signaler un problème", [
         ("R-095", "Menu → Signaler un problème / une idée : écrire un message, Envoyer",
@@ -215,6 +245,8 @@ RECETTE = [
          "Tout est en anglais (boutons, explications, noms d'ouvertures), rien ne déborde ; revenir à Français remet tout."),
         ("R-094", "Valeurs par défaut",
          "Tout revient aux réglages d'origine (plateau Tournoi, accent Or)."),
+        ("R-09F", "Options → Affichage → « Puissance du PC » : lire la ligne « Ce PC : … » ; essayer Petit PC puis une revue ; revenir à Automatique",
+         "La ligne dit tes cœurs, ta mémoire et « PC normal » (ton i7) ; en Petit PC, la revue n'ouvre qu'un seul stockfish.exe (Gestionnaire des tâches) et reste fluide ; un choix de puissance d'analyse fait à la main est gardé."),
     ]),
     ("En ligne (Steam)", [
         ("R-100", "Jouer en ligne sans Steam lancé",
@@ -237,6 +269,16 @@ RECETTE = [
          "Carte : résultat, raison, « Précision : toi … – <ami> … » (après « Analyse en cours… »), boutons Revue, Revanche, Menu ; la revue s'ouvre de ton côté (plateau dans ton sens, noms « Toi » et ton ami), pastilles, flèches et variantes comme contre l'ordinateur ; l'ami ne voit pas ta revue."),
         ("R-109", "Pendant ta revue, l'ami demande une revanche ou écrit dans le chat ; puis Retour",
          "Un bandeau en haut de la revue annonce la revanche ; au retour, la carte propose « Accepter la revanche » et le chat contient son message ; la partie compte dans Statistiques et ses fautes dans « Mes erreurs » une fois l'analyse finie."),
+        ("R-10A", "SickChess ouvert au menu : un ami Steam t'invite (depuis son salon SickChess ou Maj+Tab)",
+         "Un petit son, et en haut « <ami> t'invite à jouer » avec Rejoindre / Plus tard ; Rejoindre : tu arrives dans son salon."),
+        ("R-10B", "Même chose pendant les Problèmes, une revue ou l'analyse libre ; cliquer Rejoindre",
+         "L'écran se ferme et tu arrives dans le salon de l'ami."),
+        ("R-10C", "Même chose pendant une partie contre l'ordinateur ; Rejoindre, puis « Rester » ; recommencer et confirmer « Rejoindre »",
+         "Une fenêtre demande « Rejoindre <ami> ? », la pendule s'arrête ; Rester : la partie continue ; Rejoindre : salon de l'ami, et plus tard « Reprendre la partie » dans le menu la retrouve."),
+        ("R-10D", "« Plus tard » sur le bandeau (ou ne rien faire 45 s), puis Menu → Jouer en ligne",
+         "Le bandeau disparaît ; « INVITATIONS REÇUES » liste l'invitation (« il y a N min ») avec Rejoindre, pendant 10 minutes."),
+        ("R-10E", "Sans ami : Jouer en ligne → « Test : invitation », puis Retour au menu",
+         "« Ami de test t'invite à jouer » apparaît dans le menu (Rejoindre mène à un salon qui n'existe pas : message clair)."),
     ]),
     ("Version amis et mises à jour", [
         ("R-110", "CONSTRUIRE_VERSION_AMIS.bat",
@@ -249,6 +291,8 @@ RECETTE = [
          "Aucune demande d'administrateur ; installation dans ses programmes, icône sur le Bureau ; le jeu démarre et on peut jouer contre l'ordinateur tout de suite. (Si Windows prévient « éditeur inconnu » : Informations complémentaires → Exécuter quand même.)"),
         ("R-114", "Publier une nouvelle version, l'ami ouvre le jeu et reste dans le menu",
          "Le bouton affiche « Mise à jour : X % », puis « Nouvelle version prête », le jeu redémarre tout seul sur la nouvelle version ; profil et parties gardés ; jamais de redémarrage en pleine partie."),
+        ("R-115", "Double-clic sur CONSTRUIRE_VERSION_AMIS.bat",
+         "D'abord « Vérification avant une version pour les amis » : une ligne OK / A REVOIR / BLOQUANT par point (mode test, numéro Steam, licences, version, Git, tests, banc d'essai) ; s'il y a un BLOQUANT, rien n'est fabriqué ; sinon la version se fabrique, et le .exe est essayé dans un dossier neuf avant l'envoi."),
     ]),
     ("Solidité", [
         ("R-120", "Renommer moteur/stockfish.exe puis lancer une partie contre l'ordinateur",
@@ -259,6 +303,8 @@ RECETTE = [
          "Pas de ralentissement, pas de son qui disparaît, l'ordinateur reste rapide."),
         ("R-123", "Après chaque test : ouvrir journal_du_jeu.txt",
          "Aucune ligne « Traceback » ni « ERREUR »."),
+        ("R-124", "Dans un terminal, dans le dossier du jeu : python SickChess.py --plantage-test (le jeu se ferme tout de suite), puis relancer le jeu normalement",
+         "Au lancement : « La dernière fois, SickChess s'est fermé à cause d'une erreur » ; « Envoyer le rapport » ouvre Signaler déjà rempli (message + journal du plantage) ; « Non merci » efface ; Échap : reproposé (3 fois au plus)."),
     ]),
     ("Graphisme et textes", [
         ("R-130", "Passer sur tous les écrans (menu, réglages, partie, fin, revue, mes parties, problèmes, options, en ligne)",

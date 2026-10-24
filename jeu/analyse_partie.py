@@ -107,8 +107,9 @@ def puissance_de(config):
         mode = "calcul"
     niveau = config.get("analyse_niveau")
     if niveau not in NIVEAUX:
+        # 24/10 (p31) : rien de choisi -> Forte, ou Rapide sur un petit PC.
         niveau = {"rapide": "rapide", "normale": "rapide", "forte": "forte"}.get(
-            config.get("analyse_puissance"), "forte")
+            config.get("analyse_puissance"), "rapide" if _petit_pc() else "forte")
     return "%s_%s" % (mode, niveau)
 
 
@@ -168,9 +169,23 @@ def hachage_total_mo(memoire=None):
     """Le hachage total de l'analyse : 4 Go, sauf si le PC n'a pas assez de
     memoire (voir HASH_ANALYSE_MB)."""
     memoire = memoire_totale_mo() if memoire is None else memoire
-    if not memoire:
-        return HASH_ANALYSE_MB
-    return int(min(HASH_ANALYSE_MB, max(512, (memoire - 4096) // 2)))
+    total = HASH_ANALYSE_MB if not memoire else int(min(HASH_ANALYSE_MB, max(512, (memoire - 4096) // 2)))
+    if _petit_pc():
+        total = min(total, _module_petit_pc().HACHAGE_PETIT_MO)    # 24/10 (p31)
+    return total
+
+
+def _module_petit_pc():
+    import petit_pc
+    return petit_pc
+
+
+def _petit_pc():
+    """24/10 (p31) : PC modeste (petit_pc.py) : un seul Stockfish, 1 Go, 1 coeur en partie."""
+    try:
+        return _module_petit_pc().est_petit()
+    except Exception:
+        return False
 
 # Pour juger un coup en pions, une evaluation est bornee a +/- 15 : au-dela, la
 # partie est jouee, et un mat (20) ne doit pas compter comme "15 pions de plus".
@@ -510,7 +525,7 @@ class AnalyseurPartie:
         jusqu'a 3 moteurs selon les coeurs. Stockfish monte mal en threads :
         trois moteurs sur des positions differentes vont bien plus vite qu'un
         seul moteur avec tous les coeurs."""
-        if self._moteur_fourni is not None or self.suivi:
+        if self._moteur_fourni is not None or self.suivi or _petit_pc():
             return 1
         coeurs = os.cpu_count() or 2
         return 1 if coeurs < 4 else (2 if coeurs < 8 else 3)
@@ -528,7 +543,9 @@ class AnalyseurPartie:
         coeurs = os.cpu_count() or 2
         if self.suivi:
             # Pendant la partie : un seul moteur, la moitie des coeurs
-            # (l'adversaire a besoin du reste).
+            # (l'adversaire a besoin du reste) ; un seul coeur sur un petit PC.
+            if _petit_pc():
+                return 1
             return self.threads or max(1, coeurs // 2)
         prevus = self._moteurs_prevus()
         if prevus == 1:
@@ -599,7 +616,7 @@ class AnalyseurPartie:
 
     def _moteurs_prevus(self):
         """Le nombre de moteurs d'analyse une fois la partie finie."""
-        if self._moteur_fourni is not None:
+        if self._moteur_fourni is not None or _petit_pc():
             return 1
         coeurs = os.cpu_count() or 2
         return 1 if coeurs < 4 else (2 if coeurs < 8 else 3)
@@ -1053,6 +1070,20 @@ class AnalyseurPartie:
         except Exception:
             return None
 
+    def coup_de_livre(self, i):
+        """Le coup i est-il de la theorie d'ouverture ? 24/10 (p30, banque de
+        positions) : seulement pour une partie partie de la position initiale.
+        Avant, le 1er coup d'une partie commencee ailleurs (« e3 » au milieu
+        d'une partie) etait pris pour le 1.e3 d'une ouverture : une gaffe
+        devenait « Theorique »."""
+        if chess.Board(self.fen_initiale).board_fen() != chess.Board().board_fen():
+            return False
+        try:
+            import ouvertures
+            return ouvertures.est_un_coup_de_livre(self.sans, i)
+        except Exception:
+            return False
+
     def detail(self, i):
         """Tout ce qu'on sait du coup i. Toujours un dictionnaire."""
         if not 0 <= i < len(self.coups):
@@ -1110,11 +1141,7 @@ class AnalyseurPartie:
         if self.premiers[i] is not None and self.seconds[i] is not None:
             ecart = max(0.0, du_joueur(self.premiers[i])
                         - du_joueur(self.seconds[i]))
-        try:
-            import ouvertures
-            theorique = ouvertures.est_un_coup_de_livre(self.sans, i)
-        except Exception:
-            theorique = False
+        theorique = self.coup_de_livre(i)
         dernier = chess.Move.from_uci(self.coups[i - 1]) if i > 0 else None
         est_le_meilleur = bool(meilleur) and meilleur == joue
         if not est_le_meilleur and self.lignes[i]:

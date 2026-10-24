@@ -973,3 +973,206 @@ Fait :
   jeu lancé sans erreur (Steam connecté, 4 180 151 problèmes chargés au démarrage), vérification en ligne de la
   version installée toute verte, désinstallation propre. Aucun fichier personnel dans les paquets.
 - En ligne : `maj.json` « latest » = n° 3 ; paquets et installeur répondent.
+
+## 24/10/2026 (23) – Travail p35 : l'analyse libre (Claude Code dans le cloud)
+Demande de Julien (page « À faire », « Demandes du 24/10 ») : « fais le travail p35 ».
+Fait :
+- **Nouvelle entrée du menu « Analyse libre »** (`jeu/ecran_analyse_libre.py`) : un échiquier où tu joues
+  **les deux camps** ; flèches, Début/Fin et clic sur la feuille pour naviguer ; un autre coup joué au
+  milieu remplace la suite.
+- **Stockfish en continu** (`jeu/analyse_continue.py`), comme sur lichess : les **3 meilleures lignes**
+  s'affinent en direct (profondeur qui monte), **flèche bleue** du meilleur coup (plus fines : les coups
+  presque aussi bons), **barre d'avantage** (la même que la revue). Un clic sur une ligne joue son premier
+  coup. Changement de position : Stockfish repart aussitôt (0,1 s). Espace = pause / relance.
+  Pour ne pas chauffer : arrêt tout seul après 1 minute (ou profondeur 40) sur une même position ; un seul
+  Stockfish à lui, en priorité basse, fermé en quittant l'écran.
+- **Éditeur de position** (E) : palette de pièces, Déplacer, Gomme, clic droit pour enlever, trait, roques
+  (cochables seulement si roi et tour sont en place), Vider / Départ. Une position impossible est refusée
+  avec la raison (« Il manque le roi noir », « pion sur la première rangée »…).
+- **Coller un FEN ou une partie PGN** (Ctrl+V) ; **copier le FEN** (C).
+- **Tables de finale Syzygy** : si le dossier `syzygy/` est là, « Tables de finale : les Blancs gagnent /
+  nulle » sous les lignes (5 pièces ou moins). Sans le dossier : rien ne s'affiche.
+- **Revue → « Analyser (A) »** : la position regardée (variante comprise) s'ouvre dans l'analyse libre ;
+  Retour revient à la revue au même coup. Les boutons du bas de la revue passent sur deux rangées.
+- Anglais : tous les nouveaux textes traduits (« Analysis board »).
+- Tests : `tests/test_analyse_libre.py` (64 contrôles, faux Stockfish) et `tests/test_analyse_libre_moteur.py`
+  (14, vrai Stockfish : mat en 1 trouvé en 0,1 s, dame en prise prise, arrêt tout seul, moteur fermé en
+  sortant). Suite complète : 766 contrôles verts (686 avant).
+- Banc (mesure à part, dans le cloud, même machine avant / après ; `tests/banc_essai.json` du PC de Julien
+  pas touché) : revue 3,29 → 3,31 ms/image et menu 0,90 → 0,86 ms (inchangés) ; analyse libre 4,24 →
+  **2,44 ms/image** après mise en cache (−42 %), 16 % → 11 % d'un cœur au repos, Stockfish à l'arrêt.
+  « Analyse libre » ajoutée aux écrans mesurés par `outils/banc_essai.py`.
+- Recette : R-140 à R-149 ajoutés (section « Analyse libre »).
+- Vu en passant (pas corrigé) : dans le cloud, un Stockfish met ~4,5 s à démarrer (réservation de sa
+  mémoire, 512 Mo) ; à mesurer sur le PC de Julien.
+- Pas de version amis : impossible dans le cloud (Windows seulement) ; à publier par Claude Code sur le PC.
+
+À vérifier par Julien :
+- [ ] t82 à t87 (voir A_FAIRE), R-140 à R-149.
+
+## 24/10/2026 (24) – Travail p36 : l'invitation d'un ami affichée dans le jeu (Claude Code dans le cloud)
+Demande de Julien : « fais le travail p36 ».
+Fait :
+- Le jeu écoute maintenant l'**invitation reçue** de Steam (`LobbyInvite_t`, `steam.py`) : avant, il ne
+  savait réagir qu'à une invitation **acceptée** dans Steam.
+- **Bandeau en haut, sur tous les écrans** (`jeu/invitations.py`) : « Paul t'invite à jouer – Rejoindre /
+  Plus tard », avec un petit son (celui du début de partie, déjà dans le jeu).
+  - au menu : Rejoindre → salon de l'ami ;
+  - dans un autre écran (problèmes, revue, options, analyse libre…) : l'écran se ferme, puis salon de l'ami ;
+  - **pendant une partie** contre l'ordinateur ou à deux : fenêtre « Rejoindre Paul ? » (Rester / Rejoindre),
+    pendule arrêtée pendant la question ; si Rejoindre : la partie est **gardée** (« Reprendre la partie »
+    dans le menu) ;
+  - Plus tard (ou 45 s sans réponse) : le bandeau s'en va.
+- **« Jouer en ligne » : liste « INVITATIONS REÇUES »** (10 minutes), avec « il y a N min » et Rejoindre.
+  Pas de bandeau pendant le jeu en ligne lui-même (le salon a sa liste).
+- Mode test : bouton **« Test : invitation »** dans Jouer en ligne (fausse invitation, pour voir le bandeau
+  sans ami). Disparaît avec `MODE_TEST = False`.
+- Comment : tous les écrans lisent maintenant la souris / le clavier par `ui.evenements()` et affichent par
+  `ui.afficher()` (au lieu de `pygame.event.get()` / `pygame.display.flip()`, 17 endroits). Sans invitation
+  c'est exactement pareil ; le bandeau coûte 1,7 microseconde par image (négligeable).
+- Anglais : textes traduits. Tests : nouvelle série `tests/test_invitations.py` (31 contrôles : Steam,
+  bandeau au menu / dans un écran / en partie, Plus tard, en ligne, liste du salon, retour au menu).
+  Suite complète : 797 contrôles verts.
+- Recette : R-10A à R-10E ajoutés (section « En ligne (Steam) »).
+- Vu en passant (pas corrigé) : l'accueil de « Jouer en ligne » a deux textes sans accents (« Cree une
+  partie et invite-le… ») ; corrigé seulement pour « Test : héberger » et « fenêtres ».
+- Pas de version amis (impossible dans le cloud).
+
+À vérifier par Julien :
+- [ ] t88 à t91 (voir A_FAIRE), R-10A à R-10E — il faut un ami Steam (ou deux comptes Steam).
+
+## 24/10/2026 (25) – Travail p37 : classements Steam, succès préparés (Claude Code dans le cloud)
+Demande de Julien : « fais le travail p37 », puis pousser sur GitHub.
+Fait :
+- **Classements Steam** (`jeu/classements.py`, `jeu/ecran_classements.py`) : Problèmes → « Classements
+  Steam ». Trois classements (Problèmes = ton classement du jour ; Contre la montre et Survie = ton
+  record, Steam garde le meilleur), trois vues (Mondial = 10 premiers, Amis, Autour de moi), ta ligne en
+  or, Actualiser. Ils marchent **dès maintenant** avec le numéro de test 480 (Steam les crée à la
+  première demande).
+- Les scores partent tout seuls : après chaque problème classé, à la fin de chaque contre la montre /
+  survie. Sans Steam, ils restent dans le jeu et partent à la connexion suivante (rattrapage). Rien
+  n'attend jamais Steam (réponses lues à chaque image ; message si Steam ne répond pas en 15 s).
+- **Succès préparés pour le vrai numéro Steam** : à chaque connexion, le jeu renvoie à Steam tous les
+  succès déjà gagnés (personne ne perd ses succès d'avant) ; avec 480, rien n'est envoyé (Steam ne les
+  connaît pas). **28 icônes** (débloqué + grisé, 256 px, Onyx & Or) dans `docs/steam_succes/`, faites par
+  `outils/generer_icones_succes.py` avec les pièces « Tournoi plat » et Barlow (noté dans CREDITS).
+  `docs/SUCCES_STEAM.md` réécrit : les 4 étapes du jour J dans Steamworks, les 14 succès, les 3 classements.
+- `steam.py` : appels Steam des classements (FindOrCreateLeaderboard, UploadLeaderboardScore,
+  DownloadLeaderboardEntries…), tailles des structures vérifiées au chargement.
+- Anglais : textes traduits. Tests : nouvelle série `tests/test_classements.py` (32 contrôles, faux Steam qui
+  répond comme le vrai). Suite complète : 829 contrôles verts.
+- Recette : R-08A à R-08C ajoutés (section « Problèmes »).
+- Pas de version amis (impossible dans le cloud).
+
+À vérifier par Julien :
+- [ ] t92 à t94 (voir A_FAIRE), R-08A à R-08C — Steam ouvert, avec steam_api64.dll et steam_appid.txt (480).
+
+## 24/10/2026 (26) – Recette automatique, page « À faire », travail p30 : banque de positions (Claude Code dans le cloud)
+Demande de Julien : publier une version amis, mettre les tests dans la page « À faire », les faire sur son PC
+(« tu dois passer par mon PC obligatoirement »), puis passer au travail suivant.
+Fait :
+- **`outils/recette_auto.py`** : la recette faite par Claude. Pilote le VRAI jeu (clics souris sur les cases et
+  les boutons, clavier, vrai Stockfish, fenêtre invisible) et vérifie 13 lignes de recette (R-140 à R-149,
+  R-10E…). Dans le cloud : tout vert (ex. Stockfish 297 % → 0 % de processeur avec Espace ; arrêt tout seul à
+  60 s ; plus aucun Stockfish après Retour ; Analyser depuis la revue au même coup).
+- **Page « À faire »** : ajout de t82 à t94 et de 20 lignes de recette manquantes (R-08A–C, R-108–109, R-10A–E,
+  R-140–149), avec en commentaire ce que Claude a déjà vérifié et ce qui reste pour Julien. « Fonctionne » pas
+  encore coché : en attente de la même vérification sur le PC Windows.
+- **PC de Julien** : la session Claude Code du PC (« Mesure Stockfish ») a reçu la consigne (fusion de la
+  branche, tests, recette automatique, Steam, version amis), mais elle avait atteint sa limite d'utilisation
+  (jusqu'à 4 h 10) ; une relance automatique est programmée à 4 h 20. **Version amis pas encore publiée.**
+- **p30 – Banque de positions** (`tests/positions_revue.json`, `outils/precision.py`) : 58 petites parties,
+  114 coups jugés : 52 problèmes lichess (22 sacrifices, 10 mats, 10 finales, 10 avantages décisifs) – la gaffe
+  qui crée le problème doit être notée Erreur / Manque / Gaffe, le bon coup (souvent un sacrifice) une bonne
+  pastille – plus 6 positions à la main (mat étouffé, piège de Légal, pat raté, dame en prise, 1.e4). Chaque
+  problème est revérifié à la fabrication par Stockfish en profondeur 20 (gaffe nette : ≥ 40 % de chances avant,
+  ≤ 15 % après ; bon coup : ≥ 75 %) : la banque ne vient pas de notre propre analyse.
+- **Défaut trouvé par la banque et corrigé** : une partie qui commence à une autre position (PGN importé avec
+  [FEN], « Mes erreurs », analyse libre) voyait son 1er coup comparé au livre d'ouvertures comme si elle partait
+  de la position initiale : « e3 », « d3 », « a4 », « h4 », de vraies gaffes, étaient notées **Théorique**. Le
+  livre ne sert plus que pour les parties parties de la position initiale ; et un coup du livre qui perd
+  vraiment (Erreur ou pire) reçoit sa vraie pastille. Avant : 108 justes sur 114 ; après : **114 sur 114** (Forte,
+  686 s dans le cloud ; Rapide : 114 sur 114 en 408 s).
+- Banc d'essai : 8e section **« precision »** (toute la banque, Forte ; --rapide : Rapide). Tests :
+  `tests/test_precision.py` (8 contrôles, sans Stockfish) et `tests/test_precision_moteur.py` (échantillon de 19
+  parties, Rapide, ~2 min). Suite complète : 874 contrôles verts. Recette : R-06I ajouté.
+
+À vérifier par Julien :
+- [ ] t95 (voir A_FAIRE).
+
+## 24/10/2026 (27) – Travail p29 : rapport de plantage (Claude Code dans le cloud)
+Demande de Julien : « FAIS p29 ».
+Fait :
+- **Au plantage** (`SickChess.py` → `jeu/plantage.py`) : l'erreur, son détail technique (fichier, ligne), la fin du
+  journal de CE lancement, la version et le système sont gardés dans `plantage.json` (à côté du jeu, hors GitHub,
+  hors paquets amis). Avant, `journal_du_jeu.txt` était remis à zéro au lancement suivant : l'erreur était perdue.
+- **Au lancement suivant** (`jeu/ecran_plantage.py`) : carte « La dernière fois, SickChess s'est fermé à cause
+  d'une erreur » : **Envoyer le rapport** ouvre « Signaler un problème » déjà rempli (message + erreur + journal
+  du lancement qui a planté ; on peut compléter) ; **Non merci** l'efface ; Échap = plus tard (3 fois au plus).
+  Rien ne part sans clic du joueur. Une fois envoyé (ou rangé dans rapports/), il n'est plus proposé.
+- `python SickChess.py --plantage-test` : plantage volontaire pour essayer (recette R-124).
+- Tests : `tests/test_plantage.py` (18 contrôles, dont un VRAI plantage du lanceur copié dans un dossier
+  temporaire avec un faux jeu qui plante). Suite complète : 891 contrôles verts. Anglais traduit.
+
+À vérifier par Julien :
+- [ ] t96 (voir A_FAIRE), R-124.
+
+## 24/10/2026 (28) – Travail p28 : test d'endurance (Claude Code dans le cloud)
+Demande de Julien : « p28 ».
+Fait :
+- **`outils/endurance.py`** : un robot joue au VRAI jeu (fenêtre invisible, dossier temporaire, vrai Stockfish, 60
+  images/s) pendant 2 h, en boucle : menu → partie contre l'ordinateur (coups au hasard, niveau 800 / 1400 / 2000) →
+  sa revue → partie à deux quittée en cours → problèmes (15 % de mauvais coups) → analyse libre → Options, Mes
+  parties, Statistiques. Après chaque scénario : mémoire du jeu et des Stockfish, nombre de Stockfish, fils, temps
+  d'image, erreurs. Jugement : fuite (pente de la mémoire au menu, seconde moitié du test), Stockfish qui
+  s'accumulent, ralentissement (fin / début), plantages (erreur ou « Traceback » dans le journal).
+  → `tests/endurance/rapport.json`, `journal.txt` et, pour 1 h ou plus, `docs/ENDURANCE.md`.
+- Banc d'essai : 9e section **« endurance »** (hors --rapide ; SICKCHESS_ENDURANCE_MINUTES change la durée).
+- Essais dans le cloud (18 min, 2 fois) : **0 plantage, 0 Traceback, au plus 3 Stockfish (2 au menu, toujours),
+  pas de ralentissement (x1,05 à x1,13)**. Mémoire du jeu au menu : 182 → 199 Mo en 8 min puis plafond (réserves
+  des textes et des tranches de problèmes, bornées) → +19 Mo/h, vert. Le 1er essai avait vu une fausse fuite : le
+  robot gardait lui-même le temps de chaque image (corrigé : 600 au plus par écran).
+- Tests : `tests/test_endurance.py` (10 contrôles du jugement sur des mesures inventées). Suite : 900 contrôles verts.
+- Le vrai passage de 2 h est à faire sur le PC de Julien (demandé à Claude Code du PC, la nuit).
+
+## 24/10/2026 (29) – Travail p32 : vérification avant chaque version (Claude Code dans le cloud)
+Demande de Julien : « P32 ».
+Fait :
+- **`outils/verifier_version.py`** (`--amis` ou `--steam`) : une ligne OK / A REVOIR / BLOQUANT par point :
+  MODE_TEST (permis pour les amis, bloquant pour Steam), steam_appid.txt (480 pour les amis, le vrai numéro pour
+  Steam, avec le rappel de ne pas l'envoyer à Steam), licences (fichiers présents ; lignes « à vérifier » de
+  docs/CREDITS.md : à revoir pour les amis, bloquantes pour Steam), VERSION jamais plus petite que la version déjà
+  publiée (lue en ligne), Git (tout enregistré, hors données de Julien), tests/lancer_tous.py tout vert, banc
+  d'essai sans rouge (vitesse, processeur, mémoire, conflits, précision), et le .exe (`--exe`) qui démarre depuis
+  une COPIE neuve et tourne 25 s sans erreur.
+- **CONSTRUIRE_VERSION_AMIS.bat** lance d'abord la vérification : s'il y a un BLOQUANT, rien n'est fabriqué.
+  **publier_maj.py** essaie le .exe dans un dossier neuf AVANT tout envoi sur GitHub (Windows).
+- Essai dans le cloud (`--amis --sans-banc`, 3 min 40) : rien de bloquant ; à revoir : licences des pièces
+  « Classique » et des ouvertures encore « à vérifier » (bloquant pour Steam), fichiers pas encore enregistrés.
+- Tests : `tests/test_verifier_version.py` (33 contrôles, faux projets). Suite : 931 contrôles verts. Recette : R-115.
+
+À vérifier par Julien / Claude Code (PC) :
+- [ ] t97 (voir A_FAIRE), R-115.
+
+## 24/10/2026 (30) – Travail p31 : mode « petit PC » (Claude Code dans le cloud)
+Demande de Julien : « P31 ».
+Fait :
+- **`jeu/petit_pc.py`** : au lancement, le jeu regarde le PC (cœurs, mémoire). **Petit PC** = 4 cœurs ou moins, ou
+  ~8 Go ou moins. Écrit au journal (« [PC] 4 coeurs, 7.9 Go : PETIT PC »).
+- Sur un petit PC : analyse avec **un seul Stockfish** (au lieu de 2 ou 3), **1 Go** de mémoire au plus (au lieu de
+  4), **un seul cœur pendant la partie** (l'ordinateur adverse reste fluide), puissance **Rapide par défaut** (un
+  choix fait dans Options est toujours respecté) ; **30 confettis** au lieu de 90 ; **24 images/s au repos** au lieu
+  de 30.
+- **Options → Affichage → « Puissance du PC »** : Automatique (par défaut, avec « Ce PC : 12 cœurs, 16 Go → PC
+  normal »), Petit PC, PC normal. Le PC de Julien (i7, 12 cœurs) reste en « PC normal » : rien ne change pour lui.
+- Le cloud (4 cœurs) est un petit PC : toute la suite d'analyse y a tourné avec un seul Stockfish, verte.
+  Les séries qui contrôlent les réglages d'un PC normal le forcent (`petit_pc.forcer`).
+- Tests : `tests/test_petit_pc.py` (20 contrôles). Anglais traduit. Recette : R-09F.
+- En passant : le contrôle instable de `test_mes_erreurs.py` (« un autre coup qui défend f7 », noté le 23/10 (22))
+  a de nouveau été rouge pendant la suite complète, vert 3 fois sur 3 seul. Cause : Stockfish n'avait que 1,5 s
+  pour la profondeur 14 ; PC occupé = profondeur pas atteinte = un BON coup de « Mes erreurs » pouvait être refusé
+  (vrai défaut pour un joueur pendant une analyse en tâche de fond). Garde-fou porté à 5 s
+  (`jeu/mes_erreurs.py`). Suite complète : 950 contrôles verts.
+
+À vérifier par Julien :
+- [ ] t98 (voir A_FAIRE), R-09F.

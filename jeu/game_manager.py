@@ -17,6 +17,7 @@ import pygame
 
 import analyse_partie
 import apparence
+import invitations
 import sauvegarde
 import mise_a_jour
 import partie_en_ligne
@@ -73,6 +74,12 @@ class GameManager:
         self.sauvegardeur = sauvegarde.Sauvegardeur()
         self.menu.annoncer_reprise(sauvegarde.lire() is not None,
                                    sauvegarde.resume(sauvegarde.lire()))
+        # 24/10 (p36) : le bandeau « X t'invite » sur tous les ecrans.
+        self.au_menu = False          # le menu lui-meme est a l'ecran
+        self.en_partie = False        # une partie contre l'ordinateur / a deux
+        self.en_ligne = False         # le parcours en ligne (salon, partie)
+        self.bandeau = invitations.BandeauInvitation(self)
+        ui.installer_crochet(self.bandeau)
 
         if self.config.get("plein_ecran"):       # reglage de l'ecran Options
             self.screen = ui.basculer_plein_ecran()
@@ -200,7 +207,7 @@ class GameManager:
         self._appliquer_taille(*self.screen.get_size())
 
     def show_menu(self):
-        """Boucle du menu. Renvoie 'stockfish' ou 'hotseat'."""
+        """Boucle du menu. Renvoie 'stockfish', 'hotseat' ou 'reprendre'."""
         import musique
         musique.jouer(self.config)          # 17/10, travail p14
         cadence = ui.Cadence()       # 23/10 : 30 images/s au repos
@@ -208,65 +215,81 @@ class GameManager:
             # Invitation Steam acceptee (ou jeu lance par une invitation) :
             # on file directement au salon de l'ami.
             if partie_en_ligne.invitation_en_attente():
+                self.au_menu = False
                 self.ouvrir_en_ligne()
             self._badge_maj()
-            evenements = pygame.event.get()
-            for event in evenements:
-                if event.type == pygame.QUIT:
-                    self.quitter()
-                if self.evenement_fenetre(event):
-                    continue
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
-                    # M : couper / remettre la musique (aide F1)
-                    self.config["musique"] = not self.config.get("musique", True)
-                    try:
-                        import ecran_options
-                        ecran_options.enregistrer({"musique": self.config["musique"],
-                                                   "volume_sons": self.config.get("volume_sons", 0.6)})
-                    except Exception:
-                        pass
-                    musique.jouer(self.config)
-                    continue
-                choix = self.menu.handle_event(event)
-                if choix == "quitter":
-                    self.quitter()
-                if choix == "en_ligne":
-                    self.ouvrir_en_ligne()
-                    continue
-                if choix == "mise_a_jour":
-                    self.ouvrir_mise_a_jour()
-                    continue
+            self.au_menu = True
+            evenements = ui.evenements()
+            try:
+                self._evenements_du_menu(evenements)
+            except invitations.RetourAuMenu:
+                # « Rejoindre » d'une invitation dans un ecran ouvert depuis le
+                # menu : l'ecran est ferme, on file au salon de l'ami.
+                self._retour_force_au_menu()
+                continue
+            if self.game_mode_choisi is not None:
+                return self.game_mode_choisi
+            self.menu.draw()
+            self.aide.draw(self.screen)
+            ui.afficher()
+            self.clock.tick(cadence.suivante(evenements))
+
+    def _retour_force_au_menu(self):
+        self.screen = pygame.display.get_surface()
+        self._appliquer_taille(*self.screen.get_size())
+        self.menu.annoncer_reprise(sauvegarde.lire() is not None,
+                                   sauvegarde.resume(sauvegarde.lire()))
+
+    def _evenements_du_menu(self, evenements):
+        """Les evenements du menu. Range dans self.game_mode_choisi le choix
+        qui lance une partie ('stockfish', 'hotseat' ou 'reprendre')."""
+        import musique
+        self.game_mode_choisi = None
+        ecrans = {"en_ligne": self.ouvrir_en_ligne, "mise_a_jour": self.ouvrir_mise_a_jour,
+                  "signaler": self.ouvrir_signaler, "historique": self.ouvrir_mes_parties,
+                  "puzzles": self.ouvrir_problemes, "ouvertures": self.ouvrir_entrainement,
+                  "analyse": self.ouvrir_analyse_libre}
+        for event in evenements:
+            if event.type == pygame.QUIT:
+                self.quitter()
+            if self.evenement_fenetre(event):
+                continue
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_m:
+                # M : couper / remettre la musique (aide F1)
+                self.config["musique"] = not self.config.get("musique", True)
+                try:
+                    import ecran_options
+                    ecran_options.enregistrer({"musique": self.config["musique"],
+                                               "volume_sons": self.config.get("volume_sons", 0.6)})
+                except Exception:
+                    pass
+                musique.jouer(self.config)
+                continue
+            choix = self.menu.handle_event(event)
+            if choix == "quitter":
+                self.quitter()
+            if choix in ecrans or choix == "options":
+                self.au_menu = False          # un autre ecran s'ouvre par-dessus
                 if choix == "options":
                     self.ouvrir_options()
                     musique.jouer(self.config)
+                else:
+                    ecrans[choix]()
+                self.au_menu = True
+                continue
+            if choix == "reprendre":
+                donnees = sauvegarde.lire()
+                if donnees is None:
+                    self.menu.annoncer_reprise(False)
                     continue
-                if choix == "signaler":
-                    self.ouvrir_signaler()
-                    continue
-                if choix == "historique":
-                    self.ouvrir_mes_parties()
-                    continue
-                if choix == "puzzles":
-                    self.ouvrir_problemes()
-                    continue
-                if choix == "ouvertures":
-                    self.ouvrir_entrainement()
-                    continue
-                if choix == "reprendre":
-                    donnees = sauvegarde.lire()
-                    if donnees is None:
-                        self.menu.annoncer_reprise(False)
-                        continue
-                    self.reprise = donnees
-                    self.game_mode = donnees["mode"]
-                    return choix
-                if choix in ("stockfish", "hotseat"):
-                    self.game_mode = choix
-                    return choix
-            self.menu.draw()
-            self.aide.draw(self.screen)
-            pygame.display.flip()
-            self.clock.tick(cadence.suivante(evenements))
+                self.reprise = donnees
+                self.game_mode = donnees["mode"]
+                self.game_mode_choisi = choix
+                return
+            if choix in ("stockfish", "hotseat"):
+                self.game_mode = choix
+                self.game_mode_choisi = choix
+                return
 
     def ouvrir_signaler(self):
         """« Signaler un problème / une idée » (17/10, travail p16)."""
@@ -308,6 +331,16 @@ class GameManager:
         from ecran_entrainement import EcranEntrainement
         if EcranEntrainement(self.screen, self.config).run(
                 self.clock, self.evenement_fenetre) == "quitter":
+            self.quitter()
+        self.screen = pygame.display.get_surface()
+        self._appliquer_taille(*self.screen.get_size())
+
+    def ouvrir_analyse_libre(self):
+        """Analyse libre : les deux camps, editeur, FEN / PGN (24/10, travail p35)."""
+        from ecran_analyse_libre import EcranAnalyseLibre
+        if EcranAnalyseLibre(self.screen, self.config,
+                             stockfish_path=self.stockfish_path).run(
+                self.clock, self.evenement_fenetre, self._dessiner_aide) == "quitter":
             self.quitter()
         self.screen = pygame.display.get_surface()
         self._appliquer_taille(*self.screen.get_size())
@@ -446,7 +479,7 @@ class GameManager:
         t = apparence.theme(self.config.get("theme_plateau"))
         fin = pygame.time.get_ticks() + 8000
         while pygame.time.get_ticks() < fin:
-            for event in pygame.event.get():
+            for event in ui.evenements():
                 if event.type == pygame.QUIT:
                     self.quitter()
                 if event.type in (pygame.KEYDOWN, pygame.MOUSEBUTTONDOWN):
@@ -460,7 +493,7 @@ class GameManager:
                          gras=(i == 0), ancre="centre")
             ui.texte(self.screen, "Clique pour revenir au menu", largeur // 2,
                      hauteur // 2 + 90, 17, t["texte_discret"], ancre="centre")
-            pygame.display.flip()
+            ui.afficher()
             self.clock.tick(60)
 
     # ------------------------------------------------------------------ boucles
@@ -470,7 +503,11 @@ class GameManager:
         Tout le parcours vit dans partie_en_ligne.py."""
         import musique
         musique.arreter()
-        partie_en_ligne.lancer(self)
+        self.en_ligne = True          # p36 : le salon a sa liste, pas de bandeau
+        try:
+            partie_en_ligne.lancer(self)
+        finally:
+            self.en_ligne = False
         self.board = None
         self._appliquer_taille(*self.screen.get_size())
 
@@ -491,21 +528,67 @@ class GameManager:
         except Exception as e:
             print("[ACCUEIL] %s" % e)
 
+    def _proposer_le_rapport_de_plantage(self):
+        """24/10 (p29) : le lancement precedent a plante (plantage.py) : on propose
+        d'envoyer le rapport avec « Signaler », deja rempli."""
+        try:
+            import plantage
+            d = plantage.en_attente()
+            if d is None:
+                return
+            from ecran_plantage import EcranPlantage
+            reponse = EcranPlantage(self.screen, d).run(self.clock, self.evenement_fenetre)
+            if reponse == "quitter":
+                self.quitter()
+            if reponse == "non":
+                plantage.oublier()
+            elif reponse == "plus_tard":
+                plantage.propose_une_fois_de_plus()
+            elif reponse == "envoyer":
+                from ecran_signaler import EcranSignaler
+                if EcranSignaler(self.screen, self.version, plantage.message(d),
+                                 plantage.journal(d), apres_envoi=plantage.oublier).run(
+                        self.clock, self.evenement_fenetre) == "quitter":
+                    self.quitter()
+                if plantage.en_attente() is not None:     # Annuler : on reproposera
+                    plantage.propose_une_fois_de_plus()
+            self.screen = pygame.display.get_surface()
+            self._appliquer_taille(*self.screen.get_size())
+        except Exception as e:
+            print("[PLANTAGE] %s" % e)
+
     def run(self):
         self._premier_lancement()
+        self._proposer_le_rapport_de_plantage()
         while True:
-            if self.show_menu() == "reprendre":
-                self.reglages = dict(self.reprise.get("reglages") or {})
-            elif not self.demander_reglages():
-                continue
-            rejouer = True
-            while rejouer:
-                rejouer = False
-                if self.preparer_partie():
-                    rejouer = self.boucle_de_partie() == "rejouer"
+            try:
+                self._une_partie()
+            except invitations.RetourAuMenu:
+                # p36 : « Rejoindre » une invitation pendant les reglages, la
+                # partie (deja gardee par le bandeau) ou sa revue : retour au
+                # menu, qui file au salon de l'ami.
+                self.en_partie = False
                 self.cleanup_game()
+                self._retour_force_au_menu()
             self.menu.annoncer_reprise(sauvegarde.lire() is not None,
                                        sauvegarde.resume(sauvegarde.lire()))
+
+    def _une_partie(self):
+        """Menu -> reglages -> partie(s). Revient au menu."""
+        if self.show_menu() == "reprendre":
+            self.reglages = dict(self.reprise.get("reglages") or {})
+        elif not self.demander_reglages():
+            return
+        rejouer = True
+        while rejouer:
+            rejouer = False
+            if self.preparer_partie():
+                self.en_partie = True
+                try:
+                    rejouer = self.boucle_de_partie() == "rejouer"
+                finally:
+                    self.en_partie = False
+            self.cleanup_game()
 
     # ------------------------------------------------------------------ pause
 
@@ -587,7 +670,7 @@ class GameManager:
             nulle_possible=self.game_mode in ("stockfish", "hotseat"))
         self._activite_ms, self._coups_vus = pygame.time.get_ticks(), -1
         while True:
-            evenements = pygame.event.get()
+            evenements = ui.evenements()
             for event in evenements:
                 if event.type == pygame.QUIT:
                     self.quitter()
@@ -629,7 +712,7 @@ class GameManager:
             self.board.draw()
             self.pause.draw()
             self.aide.draw(self.screen, self.board.theme_plateau)
-            pygame.display.flip()
+            ui.afficher()
             self.clock.tick(self.cadence_de_partie(evenements))
 
     # 23/10 (banc d'essai) : au repos, la partie prenait ~40 % d'un coeur en
@@ -648,7 +731,7 @@ class GameManager:
         self._coups_vus = coups
         if maintenant - getattr(self, "_activite_ms", maintenant) < self.REPOS_APRES_MS:
             return 60
-        return 30
+        return ui.images_au_repos()
 
     def _partie_terminee(self):
         """Une seule fois par partie : profil, PGN, et plus rien a reprendre."""

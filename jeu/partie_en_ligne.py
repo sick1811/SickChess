@@ -50,7 +50,15 @@ def invitation_en_attente():
         s.pomper()
         for evenement in s.evenements("invitation_acceptee"):
             _INVITATION["salon"] = evenement["salon"]
+            import invitations
+            invitations.oublier(evenement["salon"])   # acceptee dans Steam
     return _INVITATION["salon"]
+
+
+def demander_a_rejoindre(salon):
+    """24/10 (p36) : « Rejoindre » du bandeau d'invitation. Le menu lit ce
+    salon (invitation_en_attente) et file au salon de l'ami."""
+    _INVITATION["salon"] = int(salon)
 
 
 def _prendre_invitation():
@@ -290,7 +298,7 @@ def _bandeau_revue(ecran, board, mode):
 
 def _boucle(manager, board, mode):
     while True:
-        for event in pygame.event.get():
+        for event in ui.evenements():
             if event.type == pygame.QUIT:
                 mode.quitter()
                 return "quitter"
@@ -329,7 +337,7 @@ def _boucle(manager, board, mode):
         board.draw()
         _dessiner_bandeau(board, mode)
         manager.aide.draw(manager.screen, board.theme_plateau)
-        pygame.display.flip()
+        ui.afficher()
         manager.clock.tick(60)
 
 

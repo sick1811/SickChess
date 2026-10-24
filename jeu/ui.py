@@ -284,6 +284,46 @@ def _rendu_de(pol, chaine, couleur):
     return rendu
 
 
+# ---------------------------------------------------------------- crochets
+# 24/10 (travail p36) : tous les ecrans lisent les evenements par
+# ui.evenements() et affichent l'image par ui.afficher(). Un « crochet » (le
+# bandeau d'invitation Steam, invitations.py) peut ainsi se dessiner par-dessus
+# N'IMPORTE QUEL ecran et prendre ses propres clics, sans toucher aux ecrans.
+# Sans crochet installe, c'est exactement pygame.event.get() et
+# pygame.display.flip().
+
+_CROCHETS = []
+
+
+def installer_crochet(crochet):
+    """crochet.filtrer(evenements) -> evenements restants ;
+    crochet.dessiner(surface) -> dessine juste avant l'affichage."""
+    if crochet not in _CROCHETS:
+        _CROCHETS.append(crochet)
+
+
+def retirer_crochet(crochet):
+    if crochet in _CROCHETS:
+        _CROCHETS.remove(crochet)
+
+
+def evenements():
+    """pygame.event.get(), moins les evenements pris par un crochet."""
+    liste = pygame.event.get()
+    for crochet in _CROCHETS:
+        liste = crochet.filtrer(liste)
+    return liste
+
+
+def afficher():
+    """pygame.display.flip(), apres le dessin des crochets."""
+    surface = pygame.display.get_surface()
+    if surface is not None:
+        for crochet in _CROCHETS:
+            crochet.dessiner(surface)
+    pygame.display.flip()
+
+
 class Cadence:
     """23/10 (surveillance en direct) : les menus et les ecrans dessinaient 60
     images/s meme quand rien ne bougeait (jeu a ~30 % d'un coeur). 60 images/s
@@ -301,7 +341,16 @@ class Cadence:
         maintenant = pygame.time.get_ticks()
         if evenements or anime or self._activite_ms is None:
             self._activite_ms = maintenant
-        return 60 if maintenant - self._activite_ms < self.REPOS_APRES_MS else 30
+        return 60 if maintenant - self._activite_ms < self.REPOS_APRES_MS else images_au_repos()
+
+
+def images_au_repos():
+    """30 images/s quand rien ne bouge ; 24 sur un petit PC (24/10, p31)."""
+    try:
+        import petit_pc
+        return petit_pc.IMAGES_AU_REPOS_PETIT if petit_pc.est_petit() else 30
+    except Exception:
+        return 30
 
 
 # ---------------------------------------------------------------- echelle

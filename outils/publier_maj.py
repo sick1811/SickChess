@@ -384,6 +384,15 @@ def publier(notes, racine=RACINE, dossier_publier=DOSSIER_PUBLIER, dist=None,
 
     dire()
     dire("Fichiers prets dans %s" % sortie)
+    if envoyer and os.name == "nt":
+        # 24/10 (p32) : le .exe doit demarrer chez un ami (dossier neuf) AVANT
+        # d'etre envoye : sinon, rien ne part.
+        import verifier_version
+        dossier_exe = dist or os.path.join(DOSSIER_BUILD, "dist", "SickChess")
+        etat, phrase = verifier_version.controle_exe(dossier_exe)
+        dire("  essai du .exe : %s - %s" % (etat, phrase))
+        if etat == verifier_version.BLOQUANT:
+            raise SystemExit("Le .exe ne demarre pas correctement : rien n'est envoye.")
     if envoyer:
         _envoyer_sur_github(depot, etiquette, manifeste, a_envoyer, sortie)
     return manifeste

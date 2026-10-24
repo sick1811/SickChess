@@ -34,7 +34,13 @@ class Effets:
         h = hasard or random.Random()
         effet = {"type": "mat", "case": case_du_roi, "debut": _maintenant(), "particules": []}
         if confettis:
-            for _ in range(90):
+            # 24/10 (p31) : moins de confettis sur un petit PC.
+            try:
+                import petit_pc
+                nombre = petit_pc.CONFETTIS_PETIT if petit_pc.est_petit() else 90
+            except Exception:
+                nombre = 90
+            for _ in range(nombre):
                 effet["particules"].append({
                     "x": h.random(), "y": -h.random() * 0.3,
                     "vx": (h.random() - 0.5) * 0.25, "vy": 0.35 + h.random() * 0.45,

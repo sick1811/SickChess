@@ -1,5 +1,5 @@
 {
- "version": "23/10/2026",
+ "version": "24/10/2026",
  "tests": [
   {
    "id": "R-001",
@@ -359,25 +359,32 @@
    "ordre": 10614
   },
   {
+   "id": "R-06I",
+   "section": "Fin de partie et revue",
+   "texte": "Importer une partie qui commence à une autre position (PGN avec [FEN \"…\"]) dont le 1er coup est une gaffe, puis sa revue",
+   "detail": "Le 1er coup n'est pas « Théorique » : il reçoit sa vraie pastille (Gaffe). Une partie normale garde ses coups « Théorique » au début.",
+   "ordre": 10615
+  },
+  {
    "id": "R-06G",
    "section": "Fin de partie et revue",
    "texte": "Changer Options → Partie → Façon d'analyser, puis rouvrir la revue d'une partie déjà analysée",
    "detail": "La revue s'affiche tout de suite, sans tout refaire (une analyse assez forte est gardée, quel que soit le mode).",
-   "ordre": 10615
+   "ordre": 10616
   },
   {
    "id": "R-068",
    "section": "Fin de partie et revue",
    "texte": "Revue : touche F",
    "detail": "L'échiquier se retourne.",
-   "ordre": 10616
+   "ordre": 10617
   },
   {
    "id": "R-069",
    "section": "Fin de partie et revue",
    "texte": "Ressortir de la revue, la rouvrir",
    "detail": "Tout s'affiche tout de suite, sans nouvelle analyse.",
-   "ordre": 10617
+   "ordre": 10618
   },
   {
    "id": "R-070",
@@ -513,6 +520,27 @@
    "ordre": 10809
   },
   {
+   "id": "R-08A",
+   "section": "Problèmes",
+   "texte": "Steam ouvert : Problèmes → « Classements Steam » ; Problèmes / Contre la montre / Survie ; Mondial / Amis / Autour de moi",
+   "detail": "Les listes se chargent (rang, joueur, score) ; ta ligne « Toi » est en or ; flèches gauche/droite changent de classement ; Échap revient aux Problèmes.",
+   "ordre": 10810
+  },
+  {
+   "id": "R-08B",
+   "section": "Problèmes",
+   "texte": "Faire un contre la montre (ou une survie, ou un problème classé), puis rouvrir les classements",
+   "detail": "Ton nouveau score y est (Actualiser si besoin) ; un moins bon record ne remplace pas le meilleur ; le classement des problèmes suit ta valeur du jour.",
+   "ordre": 10811
+  },
+  {
+   "id": "R-08C",
+   "section": "Problèmes",
+   "texte": "Steam fermé : Problèmes → « Classements Steam » ; jouer un contre la montre ; puis relancer le jeu avec Steam ouvert",
+   "detail": "Sans Steam : message clair et tes scores du jeu ; une fois Steam ouvert, ton record apparaît dans le classement sans rien refaire.",
+   "ordre": 10812
+  },
+  {
    "id": "R-097",
    "section": "Entraînement aux ouvertures",
    "texte": "Menu → Entraînement aux ouvertures : choisir Blancs ou Noirs puis une ouverture",
@@ -527,235 +555,361 @@
    "ordre": 10901
   },
   {
+   "id": "R-140",
+   "section": "Analyse libre",
+   "texte": "Menu → Analyse libre",
+   "detail": "Position de départ ; en quelques secondes, 3 lignes de Stockfish à droite (évaluation + coups), « profondeur » qui monte, flèche bleue du meilleur coup, barre d'avantage à gauche.",
+   "ordre": 11000
+  },
+  {
+   "id": "R-141",
+   "section": "Analyse libre",
+   "texte": "Jouer des coups des deux camps (glisser ou clic-clic), puis flèches gauche/droite, Début/Fin, clic sur un coup de la feuille",
+   "detail": "Les deux camps se jouent ; Stockfish repart aussitôt sur chaque nouvelle position ; on navigue dans les coups ; un autre coup joué au milieu remplace la suite.",
+   "ordre": 11001
+  },
+  {
+   "id": "R-142",
+   "section": "Analyse libre",
+   "texte": "Cliquer sur une des 3 lignes de Stockfish",
+   "detail": "Son premier coup est joué sur l'échiquier.",
+   "ordre": 11002
+  },
+  {
+   "id": "R-143",
+   "section": "Analyse libre",
+   "texte": "Espace (ou bouton Pause), attendre, puis Espace encore",
+   "detail": "« Stockfish à l'arrêt », bouton « Relancer » en or, le processeur redescend (Gestionnaire des tâches) ; Espace : l'analyse reprend.",
+   "ordre": 11003
+  },
+  {
+   "id": "R-144",
+   "section": "Analyse libre",
+   "texte": "Copier un FEN (ex. lichess → Partager → FEN) puis Ctrl+V ; puis copier une partie PGN et Ctrl+V",
+   "detail": "« Position collée » : la position s'affiche et s'analyse ; « Partie collée : N coups » : la partie s'affiche depuis le début, flèches pour avancer. Un texte quelconque : message clair, rien ne casse.",
+   "ordre": 11004
+  },
+  {
+   "id": "R-145",
+   "section": "Analyse libre",
+   "texte": "Éditer (E) : Vider, poser rois, tours, pions ; Déplacer ; Gomme ; clic droit ; trait ; roques ; Analyser",
+   "detail": "Les pièces se posent / s'enlèvent ; les roques ne se cochent que si roi et tour sont à leur place ; une position impossible (pas de roi, pion sur la 1re rangée…) est refusée avec la raison ; « Analyser » lance Stockfish dessus ; Échap annule.",
+   "ordre": 11005
+  },
+  {
+   "id": "R-146",
+   "section": "Analyse libre",
+   "texte": "Copier le FEN (C), le coller dans lichess.org/analysis",
+   "detail": "« FEN copié » ; lichess affiche la même position.",
+   "ordre": 11006
+  },
+  {
+   "id": "R-147",
+   "section": "Analyse libre",
+   "texte": "Revue d'une partie → aller à un coup → « Analyser (A) » ; puis Retour",
+   "detail": "L'analyse libre s'ouvre sur la même position (variante comprise), avec la partie dans la feuille ; Retour revient à la revue au même coup.",
+   "ordre": 11007
+  },
+  {
+   "id": "R-148",
+   "section": "Analyse libre",
+   "texte": "Finale à 5 pièces ou moins (ex. coller 8/8/8/4k3/8/8/4P3/4K3 w - - 0 1), dossier syzygy/ présent",
+   "detail": "Sous les lignes : « Tables de finale : les Blancs gagnent / nulle » ; sans le dossier syzygy/, rien ne s'affiche et tout marche.",
+   "ordre": 11008
+  },
+  {
+   "id": "R-149",
+   "section": "Analyse libre",
+   "texte": "Laisser l'analyse libre ouverte 2 minutes sur la même position, puis Retour",
+   "detail": "Au bout d'une minute « analyse terminée » et le processeur redescend ; après Retour, plus de stockfish.exe d'analyse libre dans le Gestionnaire des tâches.",
+   "ordre": 11009
+  },
+  {
    "id": "R-095",
    "section": "Signaler un problème",
    "texte": "Menu → Signaler un problème / une idée : écrire un message, Envoyer",
    "detail": "Sans adresse d'envoi réglée : « Message enregistré dans le dossier rapports et copié », le dossier rapports s'ouvre avec le fichier.",
-   "ordre": 11000
+   "ordre": 11100
   },
   {
    "id": "R-096",
    "section": "Signaler un problème",
    "texte": "Ouvrir le fichier du rapport",
    "detail": "Ton message, la version, le système et (pour un problème) la fin du journal du jeu.",
-   "ordre": 11001
+   "ordre": 11101
   },
   {
    "id": "R-090",
    "section": "Options",
    "texte": "Options → Échiquier : changer damier, accent, pièces, coordonnées",
    "detail": "L'aperçu change tout de suite ; Enregistrer garde, Annuler remet comme avant.",
-   "ordre": 11100
+   "ordre": 11200
   },
   {
    "id": "R-091",
    "section": "Options",
    "texte": "Options → Partie : vitesse des pièces, retournement, pré-mouvement, notation française",
    "detail": "Les coups s'écrivent Cf3/Fc4 partout ; retour en anglais possible.",
-   "ordre": 11101
+   "ordre": 11201
   },
   {
    "id": "R-092",
    "section": "Options",
    "texte": "Options → Son : volume (cliquer pour entendre), Muet",
    "detail": "Le volume change vraiment ; Muet coupe tout.",
-   "ordre": 11102
+   "ordre": 11202
   },
   {
    "id": "R-09A",
    "section": "Options",
    "texte": "Options → Son : Sons des pièces Bois / Feutre / Muet sauf alertes (cliquer pour entendre)",
    "detail": "Feutre est plus doux ; « Muet sauf alertes » : plus de bruit de pièce, mais l'échec, le temps et la fin sonnent.",
-   "ordre": 11103
+   "ordre": 11203
   },
   {
    "id": "R-09B",
    "section": "Options",
    "texte": "Menu : la musique d'ambiance ; Options → Son → Musique Non ; touche M dans le menu",
    "detail": "Musique douce dans le menu, les problèmes et l'entraînement, coupée en partie ; Non ou M la coupent ; le volume change.",
-   "ordre": 11104
+   "ordre": 11204
   },
   {
    "id": "R-09E",
    "section": "Options",
    "texte": "Options → Partie → Façon d'analyser (Calcul fixe / Profondeur / Temps) et Puissance (Rapide / Forte / Maximale)",
    "detail": "Calcul fixe et Forte par défaut (analyse rapide de toutes les positions, puis vérification à 15 / 25 / 50 millions des seuls coups dont la pastille hésite) ; Profondeur Maximale = l'ancienne profondeur 30 ; Temps : chaque position prend le temps choisi (3 / 7 / 15 s).",
-   "ordre": 11105
+   "ordre": 11205
   },
   {
    "id": "R-093",
    "section": "Options",
    "texte": "Options → Affichage : taille des textes, police, plein écran",
    "detail": "Tous les écrans suivent, rien ne déborde.",
-   "ordre": 11106
+   "ordre": 11206
   },
   {
    "id": "R-09C",
    "section": "Options",
    "texte": "Options → Affichage → Langue → English, puis Enregistrer ; parcourir menu, partie, revue, problèmes, aide F1",
    "detail": "Tout est en anglais (boutons, explications, noms d'ouvertures), rien ne déborde ; revenir à Français remet tout.",
-   "ordre": 11107
+   "ordre": 11207
   },
   {
    "id": "R-094",
    "section": "Options",
    "texte": "Valeurs par défaut",
    "detail": "Tout revient aux réglages d'origine (plateau Tournoi, accent Or).",
-   "ordre": 11108
+   "ordre": 11208
+  },
+  {
+   "id": "R-09F",
+   "section": "Options",
+   "texte": "Options → Affichage → « Puissance du PC » : lire la ligne « Ce PC : … » ; essayer Petit PC puis une revue ; revenir à Automatique",
+   "detail": "La ligne dit tes cœurs, ta mémoire et « PC normal » (ton i7) ; en Petit PC, la revue n'ouvre qu'un seul stockfish.exe (Gestionnaire des tâches) et reste fluide ; un choix de puissance d'analyse fait à la main est gardé.",
+   "ordre": 11209
   },
   {
    "id": "R-100",
    "section": "En ligne (Steam)",
    "texte": "Jouer en ligne sans Steam lancé",
    "detail": "Message clair « Ouvre Steam… », le jeu ne plante pas.",
-   "ordre": 11200
+   "ordre": 11300
   },
   {
    "id": "R-101",
    "section": "En ligne (Steam)",
    "texte": "Lancer le jeu deux fois : Test : héberger / Test : rejoindre",
    "detail": "Les deux fenêtres se connectent, la partie démarre.",
-   "ordre": 11201
+   "ordre": 11301
   },
   {
    "id": "R-102",
    "section": "En ligne (Steam)",
    "texte": "Avec un ami (deux PC) : inviter, choisir cadence et couleur, jouer",
    "detail": "Coups, pendules et chat synchronisés ; overlay Maj+Tab.",
-   "ordre": 11202
+   "ordre": 11302
   },
   {
    "id": "R-104",
    "section": "En ligne (Steam)",
    "texte": "En ligne : bouton NULLE (à la place de MENU), l'ami accepte avec son bouton NULLE",
    "detail": "Partie nulle des deux côtés ; si l'ami joue un coup au lieu d'accepter, la proposition est oubliée.",
-   "ordre": 11203
+   "ordre": 11303
   },
   {
    "id": "R-105",
    "section": "En ligne (Steam)",
    "texte": "Après une partie en ligne : Mes parties",
    "detail": "La partie y est (avec ton camp et le résultat) et se revoit avec l'analyse ; l'Elo ne bouge pas.",
-   "ordre": 11204
+   "ordre": 11304
   },
   {
    "id": "R-103",
    "section": "En ligne (Steam)",
    "texte": "Revanche, abandon, un joueur qui ferme le jeu",
    "detail": "Revanche couleurs inversées ; abandon et départ donnent le bon résultat.",
-   "ordre": 11205
+   "ordre": 11305
   },
   {
    "id": "R-106",
    "section": "En ligne (Steam)",
    "texte": "Ton ami (SickChess déjà OUVERT) accepte ton invitation Steam, ou tape le code",
    "detail": "Il arrive dans ton salon en quelques secondes ; avec le numéro de test 480, accepter quand SickChess est fermé ouvrirait « Spacewar » : c'est normal.",
-   "ordre": 11206
+   "ordre": 11306
   },
   {
    "id": "R-107",
    "section": "En ligne (Steam)",
    "texte": "Claude Code : python outils/verifier_en_ligne.py (Steam ouvert)",
    "detail": "Fichiers, connexion Steam, salon créé avec son code, tests réseau : tout en ✅ dans docs/VERIFICATION_EN_LIGNE.md.",
-   "ordre": 11207
+   "ordre": 11307
   },
   {
    "id": "R-108",
    "section": "En ligne (Steam)",
    "texte": "Fin d'une partie en ligne : regarder la carte de fin, puis cliquer « Revue de la partie »",
    "detail": "Carte : résultat, raison, « Précision : toi … – <ami> … » (après « Analyse en cours… »), boutons Revue, Revanche, Menu ; la revue s'ouvre de ton côté (plateau dans ton sens, noms « Toi » et ton ami), pastilles, flèches et variantes comme contre l'ordinateur ; l'ami ne voit pas ta revue.",
-   "ordre": 11208
+   "ordre": 11308
   },
   {
    "id": "R-109",
    "section": "En ligne (Steam)",
    "texte": "Pendant ta revue, l'ami demande une revanche ou écrit dans le chat ; puis Retour",
    "detail": "Un bandeau en haut de la revue annonce la revanche ; au retour, la carte propose « Accepter la revanche » et le chat contient son message ; la partie compte dans Statistiques et ses fautes dans « Mes erreurs » une fois l'analyse finie.",
-   "ordre": 11209
+   "ordre": 11309
+  },
+  {
+   "id": "R-10A",
+   "section": "En ligne (Steam)",
+   "texte": "SickChess ouvert au menu : un ami Steam t'invite (depuis son salon SickChess ou Maj+Tab)",
+   "detail": "Un petit son, et en haut « <ami> t'invite à jouer » avec Rejoindre / Plus tard ; Rejoindre : tu arrives dans son salon.",
+   "ordre": 11310
+  },
+  {
+   "id": "R-10B",
+   "section": "En ligne (Steam)",
+   "texte": "Même chose pendant les Problèmes, une revue ou l'analyse libre ; cliquer Rejoindre",
+   "detail": "L'écran se ferme et tu arrives dans le salon de l'ami.",
+   "ordre": 11311
+  },
+  {
+   "id": "R-10C",
+   "section": "En ligne (Steam)",
+   "texte": "Même chose pendant une partie contre l'ordinateur ; Rejoindre, puis « Rester » ; recommencer et confirmer « Rejoindre »",
+   "detail": "Une fenêtre demande « Rejoindre <ami> ? », la pendule s'arrête ; Rester : la partie continue ; Rejoindre : salon de l'ami, et plus tard « Reprendre la partie » dans le menu la retrouve.",
+   "ordre": 11312
+  },
+  {
+   "id": "R-10D",
+   "section": "En ligne (Steam)",
+   "texte": "« Plus tard » sur le bandeau (ou ne rien faire 45 s), puis Menu → Jouer en ligne",
+   "detail": "Le bandeau disparaît ; « INVITATIONS REÇUES » liste l'invitation (« il y a N min ») avec Rejoindre, pendant 10 minutes.",
+   "ordre": 11313
+  },
+  {
+   "id": "R-10E",
+   "section": "En ligne (Steam)",
+   "texte": "Sans ami : Jouer en ligne → « Test : invitation », puis Retour au menu",
+   "detail": "« Ami de test t'invite à jouer » apparaît dans le menu (Rejoindre mène à un salon qui n'existe pas : message clair).",
+   "ordre": 11314
   },
   {
    "id": "R-110",
    "section": "Version amis et mises à jour",
    "texte": "CONSTRUIRE_VERSION_AMIS.bat",
    "detail": "Une version est fabriquée ; SickChess_Installation.exe (ou SickChess_amis.zip) est le fichier à donner à un nouvel ami.",
-   "ordre": 11300
+   "ordre": 11400
   },
   {
    "id": "R-111",
    "section": "Version amis et mises à jour",
    "texte": "Sur un PC sans Python : dézipper, lancer SickChess.exe",
    "detail": "Le jeu démarre ; Windows ne le bloque pas (ou propose « Exécuter quand même »).",
-   "ordre": 11301
+   "ordre": 11401
   },
   {
    "id": "R-112",
    "section": "Version amis et mises à jour",
    "texte": "Bouton Mise à jour après une nouvelle version",
    "detail": "Il s'allume, ne télécharge que ce qui a changé, garde profil et réglages.",
-   "ordre": 11302
+   "ordre": 11402
   },
   {
    "id": "R-113",
    "section": "Version amis et mises à jour",
    "texte": "Chez un ami : double-clic sur SickChess_Installation.exe",
    "detail": "Aucune demande d'administrateur ; installation dans ses programmes, icône sur le Bureau ; le jeu démarre et on peut jouer contre l'ordinateur tout de suite. (Si Windows prévient « éditeur inconnu » : Informations complémentaires → Exécuter quand même.)",
-   "ordre": 11303
+   "ordre": 11403
   },
   {
    "id": "R-114",
    "section": "Version amis et mises à jour",
    "texte": "Publier une nouvelle version, l'ami ouvre le jeu et reste dans le menu",
    "detail": "Le bouton affiche « Mise à jour : X % », puis « Nouvelle version prête », le jeu redémarre tout seul sur la nouvelle version ; profil et parties gardés ; jamais de redémarrage en pleine partie.",
-   "ordre": 11304
+   "ordre": 11404
+  },
+  {
+   "id": "R-115",
+   "section": "Version amis et mises à jour",
+   "texte": "Double-clic sur CONSTRUIRE_VERSION_AMIS.bat",
+   "detail": "D'abord « Vérification avant une version pour les amis » : une ligne OK / A REVOIR / BLOQUANT par point (mode test, numéro Steam, licences, version, Git, tests, banc d'essai) ; s'il y a un BLOQUANT, rien n'est fabriqué ; sinon la version se fabrique, et le .exe est essayé dans un dossier neuf avant l'envoi.",
+   "ordre": 11405
   },
   {
    "id": "R-120",
    "section": "Solidité",
    "texte": "Renommer moteur/stockfish.exe puis lancer une partie contre l'ordinateur",
    "detail": "Message clair, retour au menu ; la partie à deux et les problèmes marchent toujours. (Remettre le nom.)",
-   "ordre": 11400
+   "ordre": 11500
   },
   {
    "id": "R-121",
    "section": "Solidité",
    "texte": "Couper Internet",
    "detail": "Tout marche sauf l'en ligne et la mise à jour, qui le disent clairement.",
-   "ordre": 11401
+   "ordre": 11501
   },
   {
    "id": "R-122",
    "section": "Solidité",
    "texte": "Jouer 5 parties à la suite sans relancer le jeu",
    "detail": "Pas de ralentissement, pas de son qui disparaît, l'ordinateur reste rapide.",
-   "ordre": 11402
+   "ordre": 11502
   },
   {
    "id": "R-123",
    "section": "Solidité",
    "texte": "Après chaque test : ouvrir journal_du_jeu.txt",
    "detail": "Aucune ligne « Traceback » ni « ERREUR ».",
-   "ordre": 11403
+   "ordre": 11503
+  },
+  {
+   "id": "R-124",
+   "section": "Solidité",
+   "texte": "Dans un terminal, dans le dossier du jeu : python SickChess.py --plantage-test (le jeu se ferme tout de suite), puis relancer le jeu normalement",
+   "detail": "Au lancement : « La dernière fois, SickChess s'est fermé à cause d'une erreur » ; « Envoyer le rapport » ouvre Signaler déjà rempli (message + journal du plantage) ; « Non merci » efface ; Échap : reproposé (3 fois au plus).",
+   "ordre": 11504
   },
   {
    "id": "R-130",
    "section": "Graphisme et textes",
    "texte": "Passer sur tous les écrans (menu, réglages, partie, fin, revue, mes parties, problèmes, options, en ligne)",
    "detail": "Style Onyx & Or partout, accents corrects, aucun texte coupé ou qui dépasse.",
-   "ordre": 11500
+   "ordre": 11600
   },
   {
    "id": "R-132",
    "section": "Graphisme et textes",
    "texte": "Prendre une pièce ; faire mat ; se faire mater ; ouvrir les écrans",
    "detail": "Petite onde blanche sur la case de la prise ; au mat : halo rouge sur le roi maté et confettis si tu gagnes (pas si tu perds) ; chaque écran arrive en fondu.",
-   "ordre": 11501
+   "ordre": 11601
   },
   {
    "id": "R-131",
    "section": "Graphisme et textes",
    "texte": "Essayer les 6 jeux de pièces sur les damiers clairs et sombres",
    "detail": "Toutes les pièces se lisent bien, blanches comme noires.",
-   "ordre": 11502
+   "ordre": 11602
   }
  ]
 }

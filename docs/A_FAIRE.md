@@ -3,7 +3,7 @@
 Fichier partagé entre Cowork et Claude Code. **À relire au début de chaque séance,
 à mettre à jour à la fin.** La page « SickChess – À faire »
 (https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5) en est la version à cocher pour Julien.
-Mis à jour le 18/10/2026.
+Mis à jour le 24/10/2026.
 
 ## Retours de Julien à traiter (priorité)
 - [x] Analyses gardées (fichier `.analyse.json` à côté du PGN), pastilles stables, analyse
@@ -108,15 +108,15 @@ Mesures faites dans Cowork (machine Linux plus lente) : à refaire sur le PC de 
 ## Travaux choisis par Julien le 23/10 (statut « veux ») – ORDRE DES SÉANCES
 Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/après, recette mise
 à jour, tests pour Julien dans la page « À faire ». Phrase à Claude Code : « fais le travail pXX ».
-1. [ ] **p30 – Banque de positions** (`tests/positions_revue.json`, 50–100 positions : vrais
+1. [x] (24/10, séance 26) **p30 – Banque de positions** (`tests/positions_revue.json`, 50–100 positions : vrais
        sacrifices, vraies gaffes, mats, finales Syzygy, + m04 « bon sacrifice ») ; 8e contrôle
        « precision » du banc d'essai. À faire en premier : protège tout le reste.
-2. [ ] **p29 – Rapport de plantage** (erreur + fin du journal gardées, proposées au lancement
+2. [x] (24/10, séances 27 et 28) **p29 – Rapport de plantage** (erreur + fin du journal gardées, proposées au lancement
        suivant via « Signaler »), puis **p28 – Test d'endurance** (`outils/endurance.py` : robot
        2 h, mémoire, plantages, ralentissements ; section « endurance » du banc, hors --rapide).
-3. [ ] **p32 – Vérification avant chaque version** (`outils/verifier_version.py`, appelé par
+3. [x] (24/10, séance 29) **p32 – Vérification avant chaque version** (`outils/verifier_version.py`, appelé par
        CONSTRUIRE_VERSION_AMIS.bat : tests, banc, MODE_TEST, appid, licences, version, .exe neuf).
-4. [ ] **p31 – Mode « petit PC »** (détection cœurs / mémoire au 1er lancement → puissance
+4. [x] (24/10, séance 30) **p31 – Mode « petit PC »** (détection cœurs / mémoire au 1er lancement → puissance
        d'analyse, hachage, animations ; modifiable dans Options).
 5. [ ] **p34 – Niveaux en vrai Elo** (matchs automatiques contre des références, à lancer la nuit
        sur le PC de Julien ; table de calibrage dans le code, test qui la vérifie).
@@ -124,8 +124,11 @@ Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/
        provisoire, comparaison avec les 10 dernières parties).
 7. [ ] **p33 – Lisibilité pour tous** (pastilles reconnaissables sans couleur, contrastes,
        1366×768 et 4K ; relecteur-interface).
+→ 24/10 : nouvelles demandes de Julien (page « À faire », statut « veux ») : p35 Analyse libre (**faite le
+  24/10, séance (23)**), p36 invitation d'un ami affichée dans le jeu
+  (**faite le 24/10, séance (24)**), p37 classements et succès Steam (**faite le 24/10, séance (25)**).
 Toujours en attente de décision : p21 Steamworks (le délai de 30 jours ne démarre qu'au paiement),
-p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
+p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence des pièces Classique, p02, p09, p17, p23–p26.
 
 ## Prochaines étapes (dans l'ordre)
 1. **Compilation en .exe** (PyInstaller, skill `compiler-exe`) – à faire dans Claude Code
@@ -139,6 +142,48 @@ p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t98 (30) : Options → Affichage → « Puissance du PC » : la ligne dit « Ce PC : 12 cœurs, … → PC normal » ;
+      choisis Petit PC, ouvre une revue : un seul stockfish.exe (Gestionnaire des tâches), jeu fluide ; reviens à
+      Automatique. Si un ami a un petit portable : le jeu est-il plus fluide chez lui ?
+- [ ] t97 (29) : double-clic sur CONSTRUIRE_VERSION_AMIS.bat : la vérification passe d'abord (OK / A REVOIR /
+      BLOQUANT) ; la version ne se fabrique que sans BLOQUANT ; le .exe est essayé avant l'envoi. Clair ?
+- [ ] Claude Code (PC) : `python outils/endurance.py` (2 h, la nuit) → docs/ENDURANCE.md ; dire à Julien le verdict.
+- [ ] t96 (27) : dans un terminal, dossier du jeu : `python SickChess.py --plantage-test` (le jeu se ferme), puis
+      relance le jeu : carte « La dernière fois, SickChess s'est fermé… » ; « Envoyer le rapport » ouvre Signaler
+      déjà rempli ; envoie (ou Non merci) : la carte ne revient plus.
+- [ ] t95 (26) : importe (Mes parties → Importer) une partie qui commence à une autre position (PGN avec
+      [FEN "…"]) dont le 1er coup est une gaffe : sa revue le note Gaffe, pas « Théorique » (R-06I).
+- [ ] Claude Code (PC) : `python outils/recette_auto.py` et `python outils/banc_essai.py --sections precision`
+      (relance programmée à 4 h 20), puis version amis.
+- [ ] t92 (25, Steam ouvert) : Problèmes → « Classements Steam » : les trois classements et les trois vues se
+      chargent ; ta ligne « Toi » en or (après un premier score). Lisible ? Rapide ?
+- [ ] t93 (25) : fais un contre la montre puis rouvre les classements : ton score y est (Actualiser si besoin) ;
+      même chose avec une survie et un problème classé.
+- [ ] t94 (25) : Steam fermé : l'écran le dit et montre tes scores ; joue un contre la montre ; relance le jeu
+      Steam ouvert : ton record apparaît dans le classement sans rien refaire.
+- [ ] Regarder `docs/steam_succes/apercu.png` : les icônes des succès te plaisent ? (à refaire avec Cowork sinon)
+- [ ] t88 (24, sans ami) : Jouer en ligne → « Test : invitation », puis Retour : dans le menu, « Ami de test
+      t'invite à jouer » avec un petit son ; « Plus tard » le range ; Jouer en ligne le montre dans
+      « INVITATIONS REÇUES ».
+- [ ] t89 (24, avec un ami) : SickChess ouvert au menu, ton ami t'invite depuis son salon : bandeau en haut ;
+      « Rejoindre » → tu arrives dans son salon et la partie se lance normalement.
+- [ ] t90 (24, avec un ami) : même chose pendant les Problèmes (ou une revue) : l'écran se ferme, salon de l'ami.
+- [ ] t91 (24, avec un ami) : même chose pendant une partie contre l'ordinateur : « Rejoindre <ami> ? »,
+      pendule arrêtée ; Rester continue ; Rejoindre → salon, et ensuite « Reprendre la partie » dans le menu.
+- [ ] t82 (23) : Menu → Analyse libre : en quelques secondes, 3 lignes de Stockfish, « profondeur » qui monte,
+      flèche bleue ; joue des coups des deux camps : Stockfish suit chaque coup aussitôt ; le jeu reste fluide.
+- [ ] t83 (23) : clique sur une des 3 lignes (son premier coup est joué) ; Espace : « Relancer » en or et le
+      processeur redescend (Gestionnaire des tâches) ; Espace : ça repart.
+- [ ] t84 (23) : copie un FEN sur lichess (Partager) puis Ctrl+V ; copie une partie PGN puis Ctrl+V ; C copie
+      le FEN et lichess.org/analysis affiche la même position.
+- [ ] t85 (23) : Éditer (E) : vide le plateau, pose rois / tours / pions, essaie une position impossible
+      (message), coche un roque, « Analyser ». L'éditeur est-il facile à utiliser ?
+- [ ] t86 (23) : revue d'une partie → un coup → « Analyser (A) » : même position ; Retour : la revue revient
+      au même coup. Les 4 boutons du bas de la revue tiennent bien sur ton écran ?
+- [ ] t87 (23) : avec le dossier syzygy/ : colle `8/8/8/4k3/8/8/4P3/4K3 w - - 0 1` → « Tables de finale :
+      les Blancs gagnent » ; laisse 2 min sur une position : « analyse terminée », plus de stockfish.exe
+      d'analyse libre après Retour.
+- [ ] Claude Code (PC) : commit / envoi de la séance (23) si pas fait dans le cloud, puis version amis.
 - [ ] t78 (21, à deux) : finir une partie en ligne : la carte montre « Analyse en cours… » puis
       « Précision : toi … – <ami> … », et les boutons Revue de la partie / Revanche / Menu (R-108).
 - [ ] t79 (21, à deux) : cliquer « Revue de la partie » : revue dans ton sens, noms « Toi » et ton ami,
@@ -191,6 +236,18 @@ p20 page Steam, p22 licence des pièces Classique, p02, p09, p17, p23–p26.
       `steam_appid.txt` (480 = numéro de test de Valve).
 
 ## Fait récemment
+- 24/10 (30) : mode « petit PC » (p31) : détection, Options → Puissance du PC, analyse et effets allégés.
+- 24/10 (29) : vérification avant chaque version (p32), lancée par CONSTRUIRE_VERSION_AMIS.bat.
+- 24/10 (28) : test d'endurance (p28) : robot de 2 h, section « endurance » du banc ; essais cloud verts.
+- 24/10 (27) : rapport de plantage (p29) : erreur + journal gardés, proposés au lancement suivant via Signaler.
+- 24/10 (26) : banque de positions (p30) : 114 coups jugés justes ; défaut « gaffe notée Théorique » corrigé ;
+  recette automatique (`outils/recette_auto.py`).
+- 24/10 (25) : classements Steam (problèmes, contre la montre, survie ; mondial, amis, autour de moi) et
+  succès préparés pour le vrai numéro Steam (rattrapage, icônes, notice) (p37).
+- 24/10 (24) : invitation d'un ami Steam affichée dans le jeu (p36) : bandeau sur tous les écrans,
+  confirmation en partie (partie gardée), liste « Invitations reçues » dans Jouer en ligne.
+- 24/10 (23) : analyse libre (p35) : les deux camps, Stockfish en continu (3 lignes), éditeur de position,
+  FEN / PGN, tables de finale, « Analyser » depuis la revue.
 - 18/10 (13) : analyse en calcul fixe par défaut (comme lichess), profondeur et temps au choix,
   temps restant affiché, outil de mesure de Stockfish.
 - 17/10 : son réparé chez Julien, analyse en tâche de fond (précision immédiate),

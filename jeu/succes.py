@@ -80,6 +80,20 @@ def debloquer(cle, steam=None):
     return True
 
 
+def rattraper(steam):
+    """24/10 (p37) : a la connexion a Steam, les succes gagnes sans Steam (ou
+    avant que SickChess ait son vrai numero) y partent tous. Renvoie leur nombre."""
+    if not steam.succes_possibles():
+        return 0
+    d = obtenus()
+    envoyes = sum(1 for cle, api, _titre, _desc in SUCCES
+                  if cle in d and steam.debloquer_succes(api, enregistrer=False))
+    if envoyes:
+        steam.ranger_les_succes()
+        print("[SUCCES] %d succes envoyes a Steam" % envoyes)
+    return envoyes
+
+
 def verifier(conditions):
     """{cle: bool} -> debloque toutes les cles vraies. Renvoie les nouvelles."""
     return [cle for cle, vrai in conditions.items() if vrai and debloquer(cle)]

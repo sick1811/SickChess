@@ -372,6 +372,7 @@ DEFAUTS = {
     "premouvement": True,
     "volume_sons": 0.6,
     "notation": "anglaise",         # ou "francaise" (Cf3, Fc4...) : notation.py
+    "mode_pc": "auto",              # 24/10 (p31) : auto / petit / normal (petit_pc.py)
 }
 
 _PREFERENCES = None

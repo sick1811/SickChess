@@ -35,7 +35,8 @@ RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(RACINE)
 sys.path.insert(0, os.path.join(RACINE, "jeu"))
 
-SECTIONS = ["tests", "vitesse", "processeur", "memoire", "moteur", "menage", "conflits"]
+SECTIONS = ["tests", "vitesse", "processeur", "memoire", "moteur", "menage", "conflits",
+            "precision", "endurance"]
 TITRES = {
     "tests": "Bugs (tests automatiques)",
     "vitesse": "Vitesse d'affichage",
@@ -44,6 +45,8 @@ TITRES = {
     "moteur": "Moteur d'analyse (Stockfish)",
     "menage": "Ménage (code et fichiers inutiles)",
     "conflits": "Conflits et santé du projet",
+    "precision": "Précision des pastilles (banque de positions)",
+    "endurance": "Endurance (un robot joue 2 heures)",
 }
 # Budget d'une image a 60 images/s : 16,7 ms. Au-dela de 8 ms, le jeu chauffe le
 # processeur pour rien ; au-dela de 16 ms, il saccade.
@@ -190,6 +193,14 @@ def _ecrans(gm):
             r.draw()
         return image
     ecrans.append(("Revue", revue))
+
+    def analyse_libre():
+        # 24/10 (p35) : Stockfish a l'arret, on ne mesure que le dessin.
+        from ecran_analyse_libre import EcranAnalyseLibre
+        e = EcranAnalyseLibre(gm.screen, gm.config, coups=PARTIE[:12])
+        e.analyse.mettre_en_pause(True)
+        return e.draw
+    ecrans.append(("Analyse libre", analyse_libre))
 
     def simple(module, classe, *args):
         def fabrique():
@@ -477,6 +488,67 @@ def section_moteur(rapide):
                 "{:,}".format(nps).replace(",", " ") if nps else "?", threads, coeurs),
             "mesures": {"noeuds_par_s": nps, "threads": threads, "coeurs_logiques": coeurs},
             "constats": constats}
+
+
+# ------------------------------------------------------------------ precision
+
+def section_precision(rapide):
+    """24/10 (p30) : les pastilles de la revue sur la banque de positions
+    (tests/positions_revue.json : sacrifices corrects, gaffes nettes, mats,
+    finales). Meme analyse que dans le jeu, a la puissance du jeu (Forte) ;
+    --rapide : puissance Rapide."""
+    ch = chemin_stockfish()
+    if not ch:
+        return {"statut": "gris", "resume": "Stockfish absent ici : à mesurer sur le PC Windows",
+                "mesures": {}, "constats": []}
+    sys.path.insert(0, os.path.join(RACINE, "outils"))
+    import precision
+    puissance = "calcul_rapide" if rapide else "calcul_forte"
+    debut = time.time()
+    resultats = precision.verifier(ch, puissance)
+    faux = [r for r in resultats if not r["ok"]]
+    constats = [constat("precision", "Pastille fausse : %s, coup %d (%s)" % (r["id"], r["coup"], r["san"]),
+                        "Pastille donnée : %s. Attendu : %s.\n%s" % (
+                            r["note"], ", ".join(r["attendus"]), r["pourquoi"]), "grave")
+                for r in faux]
+    justes = len(resultats) - len(faux)
+    return {"statut": "vert" if not faux else ("orange" if len(faux) <= 2 else "rouge"),
+            "resume": "%d coups justes sur %d (%s, %.0f s)" % (justes, len(resultats), puissance,
+                                                            time.time() - debut),
+            "mesures": {"coups": len(resultats), "justes": justes, "puissance": puissance,
+                        "faux": ["%s/%d" % (r["id"], r["coup"]) for r in faux]},
+            "constats": constats}
+
+
+# ------------------------------------------------------------------ endurance
+
+def section_endurance(rapide):
+    """24/10 (p28) : outils/endurance.py, un robot joue 2 heures (fuite de memoire,
+    Stockfish qui s'accumulent, ralentissement, plantages). Hors --rapide.
+    SICKCHESS_ENDURANCE_MINUTES change la duree."""
+    if rapide:
+        return {"statut": "gris", "resume": "Pas en mode rapide (2 heures) : python outils/endurance.py",
+                "mesures": {}, "constats": []}
+    if not chemin_stockfish():
+        return {"statut": "gris", "resume": "Stockfish absent ici : à faire sur le PC Windows",
+                "mesures": {}, "constats": []}
+    minutes = float(os.environ.get("SICKCHESS_ENDURANCE_MINUTES", "120"))
+    sortie = os.path.join(RACINE, "tests", "endurance")
+    code, texte = lancer([sys.executable, os.path.join(RACINE, "outils", "endurance.py"),
+                          "--minutes", str(minutes), "--sortie", sortie],
+                         timeout=int(minutes * 60 + 900))
+    try:
+        with open(os.path.join(sortie, "rapport.json"), encoding="utf-8") as f:
+            j = json.load(f)["jugement"]
+    except (OSError, ValueError, KeyError):
+        return {"statut": "rouge", "resume": "Le robot n'a pas fini (%s)" % (texte or "")[-120:],
+                "mesures": {}, "constats": [constat("endurance", "Le test d'endurance n'a pas abouti",
+                                                    (texte or "")[-800:], "grave")]}
+    return {"statut": j["statut"], "resume": j["resume"],
+            "mesures": {k: j[k] for k in ("fuite_mo_par_heure", "memoire_debut_mo", "memoire_fin_mo",
+                                          "stockfish_max", "lenteurs", "plantages")},
+            "constats": [constat("endurance", c["titre"], c["detail"], c["gravite"])
+                         for c in j["constats"]]}
 
 
 # ------------------------------------------------------------------ menage
@@ -808,7 +880,8 @@ def main():
     fonctions = {"tests": section_tests, "vitesse": section_vitesse,
                  "processeur": section_processeur, "memoire": section_memoire,
                  "moteur": section_moteur, "menage": section_menage,
-                 "conflits": section_conflits}
+                 "conflits": section_conflits, "precision": section_precision,
+                 "endurance": section_endurance}
     for nom in choisies:
         print("== %s ..." % TITRES[nom], flush=True)
         debut = time.time()

@@ -23,6 +23,8 @@ pygame.init()
 pygame.display.set_mode((1024, 640))
 
 import menu_pause
+import petit_pc
+petit_pc.forcer("normal")      # 24/10 (p31) : la cadence controlee ici est celle d'un PC normal
 import sauvegarde
 
 sauvegarde.FICHIER = os.path.join(tempfile.mkdtemp(), "partie_en_cours.json")

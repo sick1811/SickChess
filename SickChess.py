@@ -97,12 +97,23 @@ def main():
     try:
         from game_manager import GameManager
         manager = GameManager(VERSION)
+        if "--plantage-test" in sys.argv:
+            # 24/10 (p29, recette R-124) : un plantage volontaire, pour essayer le
+            # rapport de plantage. Relancer ensuite le jeu normalement.
+            raise RuntimeError("Plantage de test (--plantage-test)")
         manager.run()
     except SystemExit:
         pass
     except Exception as e:
         print("[SICKCHESS] Erreur : %s" % e)
         traceback.print_exc()
+        # 24/10 (p29) : l'erreur et la fin du journal sont gardees ; le jeu
+        # proposera de les envoyer au prochain lancement (jeu/plantage.py).
+        try:
+            import plantage
+            plantage.noter(e, VERSION)
+        except Exception:
+            pass
         return 1
     finally:
         if manager is not None:
