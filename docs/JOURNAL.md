@@ -1323,3 +1323,13 @@ Question de Julien : « pourquoi tu ne changes pas le numéro de version 0.1.0 c
   et `CLAUDE.md` : nouveautés → MINEUR +1, corrections seules → CORRECTIF +1, 1.0.0 = sortie Steam.
 - Le n° amis (compteur des mises à jour) ne change pas de rôle. La n° 5 en ligne est en 0.1.0 et n'a **pas**
   le travail des séances 28 à 30 : **à publier en n° 6 (0.2.0)** par Claude Code sur le PC.
+
+## 25/10/2026 (34) – Fusion de main-phsero (0.2.0) ; « Mes erreurs » enfin stable (Claude Code, cloud)
+- `main-phsero` (deux plantages corrigés par Cowork, version **0.2.0**) fusionnée dans main (avance rapide, sans
+  conflit). Suite complète : 1056 contrôles verts, un seul rouge : `test_mes_erreurs.py`.
+- **Vraie cause du contrôle instable « un autre coup qui défend f7 »** (3e fois) : ni la charge ni la profondeur.
+  Stockfish sur plusieurs cœurs ne donne pas deux fois la même évaluation : 3...De7 / 3...g6 s'écartent de 0,10 à
+  0,39 pion selon le calcul, et la marge fixe était de 0,30 pion → un bon coup refusé ~1 fois sur 4.
+  Correction : **la même règle que la revue** : un coup qui perd moins de 5 points de chances de gagner (« Bon » ou
+  mieux) est accepté. Contrôle ajouté avec un faux moteur (toujours le même résultat) : écart 0,39 accepté,
+  vrai mauvais coup et mat en 1 refusés. Sous charge : vert 8 fois sur 8.
