@@ -1361,3 +1361,7 @@ Constat du test d'endurance : au menu, 4 Stockfish gardaient ~5,5 Go jusqu'à la
 - 25/10 : ensuite, « Rien n'a change depuis la version n°6 » alors que GitHub n'avait que la n° 5 : la copie locale
   `publier/maj.json` était écrite AVANT l'essai du `.exe` et l'envoi. Elle ne l'est plus qu'après un envoi réussi
   (test : `test_mise_a_jour.py`, partie 4b). Sur le PC : supprimer `publier\maj.json` (copie de la n° 6 jamais envoyée).
+- 25/10 : **version amis n° 6 publiée (0.2.0)** par Julien depuis son PC (`publier_maj.py`, après vérification verte :
+  1074 contrôles, banc vert ; essai du .exe OK). Vérifié en ligne depuis le cloud : `maj.json` = n° 6 / 0.2.0, nouveaux
+  paquets programme (19,5 Mo), jeu (8,4 Mo), moteur (76,6 Mo) ; problèmes et finales repris de la n° 1 ; installeur
+  complet 696 Mo derrière le lien « latest ». https://github.com/sick1811/SickChess-amis/releases/tag/v0.2.0-n6
