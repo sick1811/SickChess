@@ -142,6 +142,8 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+→ 24/10 : chaque test de la page porte une étiquette « Qui » (Cowork / Claude Code PC / Toi) ;
+  répartition et consignes pour Cowork : `docs/TESTS_COWORK.md`. Filtre « Seulement pour moi » dans la page.
 - [ ] t101 (28) : **quitter et lancer vite** : pendant que l'ordinateur réfléchit (niveau Maximum, longue cadence),
       clique Quitter la partie → le menu revient aussitôt ; dans le Gestionnaire des tâches, stockfish.exe redescend
       à 0 % ; relance une partie contre l'ordinateur → elle démarre tout de suite. Même chose pendant une revue, puis
