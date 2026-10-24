@@ -702,18 +702,32 @@
    "ordre": 11207
   },
   {
+   "id": "R-09G",
+   "section": "Options",
+   "texte": "Plein écran (F11) sur un grand écran (2560×1440 ou 4K) ; puis fenêtre réduite au minimum",
+   "detail": "En 4K, panneau, boutons, pendules et textes grandissent avec l'écran (rien de minuscule) ; en petite fenêtre et en 1366×768 rien ne déborde.",
+   "ordre": 11208
+  },
+  {
+   "id": "R-09H",
+   "section": "Options",
+   "texte": "Revue : regarder les pastilles (ou une capture en noir et blanc)",
+   "detail": "Chaque pastille se reconnaît à son symbole, même sans les couleurs (!!, !, étoile, livre, coche, rond, ?!, ?, X, ??) ; le symbole se lit aussi sur le jaune et le vert clair (contour sombre).",
+   "ordre": 11209
+  },
+  {
    "id": "R-094",
    "section": "Options",
    "texte": "Valeurs par défaut",
    "detail": "Tout revient aux réglages d'origine (plateau Tournoi, accent Or).",
-   "ordre": 11208
+   "ordre": 11210
   },
   {
    "id": "R-09F",
    "section": "Options",
    "texte": "Options → Affichage → « Puissance du PC » : lire la ligne « Ce PC : … » ; essayer Petit PC puis une revue ; revenir à Automatique",
    "detail": "La ligne dit tes cœurs, ta mémoire et « PC normal » (ton i7) ; en Petit PC, la revue n'ouvre qu'un seul stockfish.exe (Gestionnaire des tâches) et reste fluide ; un choix de puissance d'analyse fait à la main est gardé.",
-   "ordre": 11209
+   "ordre": 11211
   },
   {
    "id": "R-100",

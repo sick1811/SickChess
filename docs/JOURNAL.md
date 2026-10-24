@@ -1124,3 +1124,24 @@ Fait :
 
 À vérifier par Julien :
 - [ ] t99 (voir A_FAIRE), R-06J.
+
+## 24/10/2026 (32) – Travail p33 : lisibilité pour tous (Claude Code dans le cloud)
+Demande de Julien : « p33 ».
+Fait :
+- **Pastilles sans la couleur (daltoniens)** : elles avaient déjà un symbole chacune (!!, !, étoile, livre, coche,
+  rond, ?!, ?, X, ??). Mesuré : le symbole blanc était peu lisible sur les pastilles claires (contraste 1,6 sur
+  Imprécision jaune, 2,1 sur Excellent, 3 minimum demandé). **Contour sombre fin** autour du symbole : 3,3 à 10,8
+  sur toutes. Vérifié en noir et blanc : les 10 pastilles restent toutes différentes. Police du symbole gardée en
+  mémoire (SysFont était recréée à chaque pastille dessinée).
+- **Contrastes des textes** : `design.contraste()` (norme WCAG) ; les 17 plateaux passent (texte 15:1, texte
+  discret 5,7:1, or 8,6:1).
+- **4K** : l'échelle des textes était plafonnée à 1,65 : en 3840×2160, panneau de 430 px et boutons écrits en
+  18 px = minuscules. Plafond porté à 3,4 ; panneau, marges, pendules et textes des boutons grandissent au-delà
+  d'environ 1700×1050. **En dessous (1366×768, 1024×640…) les captures sont identiques au pixel près** ;
+  1920×1080 : presque rien ne change.
+- `tests/captures_ecrans.py` : `SICKCHESS_SORTIE` pour photographier dans un autre dossier (captures 4K et
+  1366×768 regardées).
+- Tests : `tests/test_lisibilite.py`. Recette : R-09G, R-09H.
+
+À vérifier par Julien :
+- [ ] t100 (voir A_FAIRE), R-09G, R-09H.

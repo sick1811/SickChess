@@ -288,6 +288,7 @@ class ChessTimer:
         texte_inactif = t.get("texte_discret", TEXTE_INACTIF)
 
         clignote = (pygame.time.get_ticks() // PERIODE_CLIGNOTEMENT) % 2 == 0
+        g = ui.grand_ecran(screen)                # 24/10 (p33) : 4K
         for couleur, nom in ((chess.BLACK, "NOIRS"), (chess.WHITE, "BLANCS")):
             rect = pygame.Rect(*zones[couleur])
             if rect.height < 20 or rect.width < 80:
@@ -304,7 +305,7 @@ class ChessTimer:
                                else (40, 38, 36), centre, rayon)
             pygame.draw.circle(screen, bordure, centre, rayon, 1)
 
-            taille_nom = max(11, min(15, rect.height // 4))
+            taille_nom = max(11, min(int(15 * g), rect.height // 4))
             largeur_nom = ui.mesurer(nom, taille_nom, gras=True)[0]
             ui.texte(screen, nom, centre[0] + rayon + 8,
                      rect.centery - taille_nom // 2 - 1, taille_nom,
@@ -313,7 +314,7 @@ class ChessTimer:
             # Le chrono prend toute la place restante, sans jamais toucher le nom.
             x_texte = centre[0] + rayon + 12 + largeur_nom
             place = max(40, rect.right - 12 - x_texte)
-            taille_chiffres = max(16, min(38, int(rect.height * 0.55)))
+            taille_chiffres = max(16, min(int(38 * g), int(rect.height * 0.55)))
 
             # SickChess - BUG "la fin de partie n'est pas finie a 00:00" :
             # on testait self.active, qui passe a False des que la partie se

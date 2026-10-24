@@ -457,32 +457,46 @@ def dessiner_pastille(surface, centre, rayon, cle, police=None):
     pygame.draw.circle(surface, (255, 255, 255), (cx, cy), rayon)
     pygame.draw.circle(surface, coul, (cx, cy), rayon - max(1, rayon // 8))
 
-    blanc = (255, 255, 255)
+    # 24/10 (p33, lisibilite) : le symbole blanc a un contour sombre. Sur les
+    # pastilles claires (Imprecision jaune, Excellent vert clair) le blanc seul
+    # avait un contraste de 1,6 a 2,3 (il faut 3) : le symbole se lit
+    # maintenant sur toutes les couleurs, et sans les couleurs.
+    _dessiner_glyphe(surface, glyphe, cx, cy, rayon, CONTOUR_GLYPHE, police, contour=True)
+    _dessiner_glyphe(surface, glyphe, cx, cy, rayon, (255, 255, 255), police)
+
+
+CONTOUR_GLYPHE = (28, 26, 24)
+
+
+def _dessiner_glyphe(surface, glyphe, cx, cy, rayon, blanc, police=None, contour=False):
+    """Le symbole d'une pastille (trace au trait, ou texte) ; contour=True le
+    trace un peu plus epais, en dessous, pour faire le contour sombre."""
+    plus = max(1, rayon // 9) if contour else 0
     if glyphe == "coche":
-        e = max(2, rayon // 4)
+        e = max(2, rayon // 4) + 2 * plus
         pygame.draw.lines(surface, blanc, False, [
             (cx - rayon * 0.45, cy),
             (cx - rayon * 0.10, cy + rayon * 0.38),
             (cx + rayon * 0.50, cy - rayon * 0.40),
         ], e)
     elif glyphe == "rond":
-        pygame.draw.circle(surface, blanc, (cx, cy), max(3, int(rayon * 0.42)),
-                           max(2, rayon // 5))
+        pygame.draw.circle(surface, blanc, (cx, cy), max(3, int(rayon * 0.42)) + plus,
+                           max(2, rayon // 5) + 2 * plus)
     elif glyphe == "livre":
         # Un petit livre ouvert : deux pages et la reliure au milieu.
         largeur = rayon * 0.62
         hauteur = rayon * 0.46
         pygame.draw.line(surface, blanc, (cx, cy - hauteur),
-                         (cx, cy + hauteur), max(2, rayon // 6))
+                         (cx, cy + hauteur), max(2, rayon // 6) + 2 * plus)
         for sens in (-1, 1):
             pygame.draw.lines(surface, blanc, False, [
                 (cx + sens * largeur, cy - hauteur * 0.78),
                 (cx + sens * largeur, cy + hauteur * 0.62),
                 (cx, cy + hauteur),
-            ], max(2, rayon // 7))
+            ], max(2, rayon // 7) + 2 * plus)
             pygame.draw.line(surface, blanc,
                              (cx + sens * largeur, cy - hauteur * 0.78),
-                             (cx, cy - hauteur * 0.35), max(2, rayon // 7))
+                             (cx, cy - hauteur * 0.35), max(2, rayon // 7) + 2 * plus)
     elif glyphe == "etoile":
         # Etoile a cinq branches, tracee au trait : aucune police speciale.
         points = []
@@ -491,12 +505,28 @@ def dessiner_pastille(surface, centre, rayon, cle, police=None):
             r = rayon * (0.62 if i % 2 == 0 else 0.27)
             points.append((cx + r * math.cos(angle), cy - r * math.sin(angle)))
         pygame.draw.polygon(surface, blanc, points)
+        if plus:
+            pygame.draw.polygon(surface, blanc, points, 2 * plus + 1)
     else:
         if police is None:
-            police = pygame.font.SysFont("Arial", max(10, int(rayon * 1.25)), bold=True)
+            police = _police_glyphe(max(10, int(rayon * 1.25)))
         rendu = police.render(glyphe, True, blanc)
-        surface.blit(rendu, (cx - rendu.get_width() // 2,
-                             cy - rendu.get_height() // 2))
+        x, y = cx - rendu.get_width() // 2, cy - rendu.get_height() // 2
+        if plus:
+            for dx, dy in ((-plus, 0), (plus, 0), (0, -plus), (0, plus)):
+                surface.blit(rendu, (x + dx, y + dy))
+        else:
+            surface.blit(rendu, (x, y))
+
+
+_POLICES_GLYPHE = {}
+
+
+def _police_glyphe(taille):
+    """Gardee en memoire : SysFont est lent (jamais a chaque image)."""
+    if taille not in _POLICES_GLYPHE:
+        _POLICES_GLYPHE[taille] = pygame.font.SysFont("Arial", taille, bold=True)
+    return _POLICES_GLYPHE[taille]
 
 
 def dessiner_pastille_sur_case(surface, rect_case, cle, police=None,

@@ -83,7 +83,7 @@ Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/
        sur le PC de Julien ; table de calibrage dans le code, test qui la vérifie).
 6. [x] **p27 – Résumé du coach immédiat** (**fait le 24/10, séance (31)**) (carte de fin : ouverture, plus gros moment, précision
        provisoire, comparaison avec les 10 dernières parties).
-7. [ ] **p33 – Lisibilité pour tous** (pastilles reconnaissables sans couleur, contrastes,
+7. [x] **p33 – Lisibilité pour tous** (**fait le 24/10, séance (32)**) (pastilles reconnaissables sans couleur, contrastes,
        1366×768 et 4K ; relecteur-interface).
 → 24/10 : nouvelles demandes de Julien (page « À faire », statut « veux ») : p35 Analyse libre (**faite le
   24/10, séance (23)**), p36 invitation d'un ami affichée dans le jeu
@@ -103,6 +103,9 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t100 (32) : la revue sur ton écran : les symboles des pastilles (surtout Imprécision jaune, Excellent vert
+      clair) ont un fin contour sombre : plus lisibles ? toujours jolis ? Si tu as un écran 2560×1440 ou une télé
+      4K : plein écran (F11), tout est-il à la bonne taille ?
 - [ ] t99 (31) : finis une partie contre l'ordinateur : sur la carte de fin, trois lignes du coach (ouverture, ton
       plus gros moment avec le coup qu'il fallait jouer, précision « provisoire » puis comparée à tes 10 dernières
       parties). Utile ? Lisible ? Rien ne chevauche les boutons ?

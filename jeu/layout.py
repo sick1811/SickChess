@@ -19,6 +19,10 @@ PANNEAU_MIN = 290
 PANNEAU_MAX = 430
 LARGEUR_MINI = 900
 HAUTEUR_MINI = 560
+# 24/10 (p33) : au-dela de 1,65 (plus grand qu'environ 1700x1050 : 1440p, 4K),
+# tout grandit encore, proportionnellement. En dessous, rien ne change.
+ECHELLE_NORMALE_MAX = 1.65
+ECHELLE_MAX = 3.4
 
 
 def _borne(valeur, mini, maxi):
@@ -34,22 +38,25 @@ class Disposition:
     def recalculer(self, largeur, hauteur):
         self.largeur = max(LARGEUR_MINI, int(largeur))
         self.hauteur = max(HAUTEUR_MINI, int(hauteur))
-        self.echelle = max(0.86, min(1.65, min(self.largeur / 1024.0,
-                                               self.hauteur / 640.0)))
+        self.echelle = max(0.86, min(ECHELLE_MAX, min(self.largeur / 1024.0,
+                                                      self.hauteur / 640.0)))
+        # Grand ecran : les bornes en pixels grandissent avec l'echelle.
+        self.grand = max(1.0, self.echelle / ECHELLE_NORMALE_MAX)
+        g, marge = self.grand, int(MARGE * self.grand)
 
-        largeur_panneau = _borne(self.largeur * 0.32, PANNEAU_MIN, PANNEAU_MAX)
+        largeur_panneau = _borne(self.largeur * 0.32, PANNEAU_MIN * g, PANNEAU_MAX * g)
 
-        hauteur_dispo = self.hauteur - 2 * MARGE
-        largeur_dispo = self.largeur - largeur_panneau - 3 * MARGE
+        hauteur_dispo = self.hauteur - 2 * marge
+        largeur_dispo = self.largeur - largeur_panneau - 3 * marge
         cote = max(240, min(hauteur_dispo, largeur_dispo))
 
         self.taille_case = int(cote // 8)
         self.cote_plateau = self.taille_case * 8
-        self.plateau_x = MARGE + (largeur_dispo - self.cote_plateau) // 2
-        self.plateau_y = MARGE + (hauteur_dispo - self.cote_plateau) // 2
+        self.plateau_x = marge + (largeur_dispo - self.cote_plateau) // 2
+        self.plateau_y = marge + (hauteur_dispo - self.cote_plateau) // 2
 
-        self.panneau_x = self.largeur - largeur_panneau - MARGE
-        self.panneau_y = MARGE
+        self.panneau_x = self.largeur - largeur_panneau - marge
+        self.panneau_y = marge
         self.panneau_l = largeur_panneau
         self.panneau_h = hauteur_dispo
 
@@ -67,16 +74,16 @@ class Disposition:
         Les horloges, les prises et les boutons prennent une hauteur bornee ;
         la liste des coups (ou le chat) recoit tout le reste.
         """
-        ech = self.echelle
+        ech, g = self.echelle, self.grand
         marge = int(14 * ech)
         x = self.panneau_x + marge
         interieur = self.panneau_l - 2 * marge
 
-        h_horloge = _borne(56 * ech, 44, 74)
-        h_captures = _borne(40 * ech, 30, 56)
-        h_infos = _borne(44 * ech, 34, 60)
-        h_boutons = _borne(44 * ech, 36, 58)
-        espace = _borne(8 * ech, 6, 14)
+        h_horloge = _borne(56 * ech, 44, 74 * g)
+        h_captures = _borne(40 * ech, 30, 56 * g)
+        h_infos = _borne(44 * ech, 34, 60 * g)
+        h_boutons = _borne(44 * ech, 36, 58 * g)
+        espace = _borne(8 * ech, 6, 14 * g)
 
         fixes = 2 * h_horloge + 2 * h_captures + h_infos + h_boutons + 7 * espace
         reste = self.panneau_h - fixes - 2 * espace

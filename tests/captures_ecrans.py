@@ -17,7 +17,7 @@ os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
 import chess
 import pygame
 
-SORTIE = os.path.join(RACINE, "tests", "ecrans")
+SORTIE = os.environ.get("SICKCHESS_SORTIE") or os.path.join(RACINE, "tests", "ecrans")
 os.makedirs(SORTIE, exist_ok=True)
 TAILLE = tuple(int(v) for v in os.environ.get("SICKCHESS_TAILLE", "1280x720").split("x"))
 
