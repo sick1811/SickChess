@@ -158,6 +158,18 @@ def assombrir(couleur, part=0.12):
     return melanger(couleur, (0, 0, 0), part)
 
 
+def contraste(couleur_a, couleur_b):
+    """Rapport de contraste WCAG (1 a 21) entre deux couleurs. 24/10 (p33) :
+    4,5 au moins pour un texte, 3 pour un symbole (tests/test_lisibilite.py)."""
+    def lum(c):
+        def canal(v):
+            v /= 255.0
+            return v / 12.92 if v <= 0.03928 else ((v + 0.055) / 1.055) ** 2.4
+        return 0.2126 * canal(c[0]) + 0.7152 * canal(c[1]) + 0.0722 * canal(c[2])
+    clair, sombre = sorted((lum(couleur_a), lum(couleur_b)), reverse=True)
+    return (clair + 0.05) / (sombre + 0.05)
+
+
 def avec_alpha(couleur, alpha):
     return tuple(couleur[:3]) + (max(0, min(255, int(alpha))),)
 
@@ -325,7 +337,7 @@ def echelle(surface_ou_taille, reference=1280.0):
         largeur = surface_ou_taille.get_size()[0]
     except AttributeError:
         largeur = float(surface_ou_taille)
-    return max(0.8, min(1.6, largeur / reference))
+    return max(0.8, min(3.2, largeur / reference))          # 24/10 (p33) : 4K
 
 
 def mesure(cle, ech=1.0):

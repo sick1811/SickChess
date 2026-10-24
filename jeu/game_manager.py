@@ -754,6 +754,10 @@ class GameManager:
         self._fichier_analyse = None
         if chemin_pgn:
             self._fichier_analyse = os.path.splitext(chemin_pgn)[0] + ".analyse.json"
+        try:
+            self.board.end_screen.preparer_le_coach(chemin_pgn)     # 24/10 (p27)
+        except Exception as e:
+            print("[COACH] %s" % e)
         # La revue de partie : l'analyse faite PENDANT la partie est reprise
         # telle quelle (rien a recalculer) ; sinon elle demarre maintenant.
         direct = getattr(self, "analyse_en_direct", None)

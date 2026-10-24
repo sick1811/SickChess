@@ -34,6 +34,8 @@ SERIES = [
     ("test_endurance.py", False),
     ("test_verifier_version.py", False),
     ("test_petit_pc.py", False),
+    ("test_resume_coach.py", False),
+    ("test_lisibilite.py", False),
     ("test_cache_analyse.py", False),
     ("test_statistiques.py", False),
     ("test_entrainement.py", False),

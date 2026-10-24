@@ -261,130 +261,137 @@
    "ordre": 10600
   },
   {
+   "id": "R-06J",
+   "section": "Fin de partie et revue",
+   "texte": "Finir une partie contre l'ordinateur : lire le résumé du coach sur la carte de fin",
+   "detail": "Trois lignes tout de suite : l'ouverture (« Ouverture : C60 - Partie espagnole (4 coups de théorie) »), ton plus gros moment (ta pire faute et le coup qu'il fallait jouer, ou ton plus beau coup), ta précision « provisoire » qui devient définitive, comparée à tes 10 dernières parties (« ta meilleure… », « au-dessus de ta moyenne… »). Rien ne chevauche les boutons.",
+   "ordre": 10601
+  },
+  {
    "id": "R-061",
    "section": "Fin de partie et revue",
    "texte": "Carte de fin → Rejouer, puis → Menu",
    "detail": "Rejouer relance avec les mêmes réglages ; Menu revient au menu.",
-   "ordre": 10601
+   "ordre": 10602
   },
   {
    "id": "R-062",
    "section": "Fin de partie et revue",
    "texte": "Carte de fin → Revue de la partie",
    "detail": "La revue s'ouvre sur la position de départ.",
-   "ordre": 10602
+   "ordre": 10603
   },
   {
    "id": "R-063",
    "section": "Fin de partie et revue",
    "texte": "Revue : flèches gauche/droite, Début/Fin, molette, clic sur un coup, clic sur la courbe",
    "detail": "On se déplace dans la partie, l'échiquier suit, son à chaque coup en avant.",
-   "ordre": 10603
+   "ordre": 10604
   },
   {
    "id": "R-064",
    "section": "Fin de partie et revue",
    "texte": "Revue : pastilles des coups",
    "detail": "Une pastille par coup (rond d'attente avant) ; elle ne change plus une fois affichée.",
-   "ordre": 10604
+   "ordre": 10605
   },
   {
    "id": "R-065",
    "section": "Fin de partie et revue",
    "texte": "Revue : un coup marqué Erreur ou Gaffe",
    "detail": "Flèche verte vers le coup qu'il fallait jouer ; « Il fallait jouer … » dans le détail.",
-   "ordre": 10605
+   "ordre": 10606
   },
   {
    "id": "R-06A",
    "section": "Fin de partie et revue",
    "texte": "Revue : un coup marqué Gaffe / Erreur / Imprécision (ex. laisser une pièce en prise)",
    "detail": "Sous la pastille, une phrase explique la faute (« Ce coup laisse ton cavalier sans défense », « Tu avais un mat en un coup »…) sans jamais écrire le coup.",
-   "ordre": 10606
+   "ordre": 10607
   },
   {
    "id": "R-066",
    "section": "Fin de partie et revue",
    "texte": "Revue : un bon sacrifice",
    "detail": "Garde une bonne pastille (Brillant, Meilleur, Excellent…).",
-   "ordre": 10607
+   "ordre": 10608
   },
   {
    "id": "R-067",
    "section": "Fin de partie et revue",
    "texte": "Revue : jouer un autre coup sur l'échiquier, puis le coup de l'autre camp",
    "detail": "Variante : TU joues les deux camps, Stockfish ne joue JAMAIS ; flèches bleues de ses meilleurs coups, évaluation et barre suivent ; flèche gauche annule un coup, Échap ramène à la partie.",
-   "ordre": 10608
+   "ordre": 10609
   },
   {
    "id": "R-06B",
    "section": "Fin de partie et revue",
    "texte": "Revue : regarder n'importe quelle position ; touche B",
    "detail": "Flèche bleue = meilleur coup de Stockfish ici (plus claire : les coups aussi bons) ; « Meilleur ici : … » et la suite prévue dans le détail ; B cache / remet les flèches.",
-   "ordre": 10609
+   "ordre": 10610
   },
   {
    "id": "R-06C",
    "section": "Fin de partie et revue",
    "texte": "Revue : la feuille de coups",
    "detail": "L'évaluation après chaque coup à droite, en couleur quand le coup a coûté (orange, rouge).",
-   "ordre": 10610
+   "ordre": 10611
   },
   {
    "id": "R-06D",
    "section": "Fin de partie et revue",
    "texte": "Revue : Exporter (ou touche E) une fois l'analyse terminée ; coller sur lichess.org/paste ou chess.com/analysis",
    "detail": "PGN copié et enregistré dans exports/ ; lichess / chess.com relisent les évaluations et les pastilles. Précision : identique à la méthode lichess (chess.com a sa propre formule, secrète : écart de quelques points normal).",
-   "ordre": 10611
+   "ordre": 10612
   },
   {
    "id": "R-06E",
    "section": "Fin de partie et revue",
    "texte": "Revue d'une partie importée de chess.com (ex. contre dragondu5)",
    "detail": "Mêmes moments forts que chess.com : 7.Qe2 gaffe, 10.h3 erreur, 15.Qb3 erreur, 7...Bxa1 Très bien.",
-   "ordre": 10612
+   "ordre": 10613
   },
   {
    "id": "R-06F",
    "section": "Fin de partie et revue",
    "texte": "Revue juste après une partie, pendant que l'analyse calcule (Options : Calcul fixe, Forte)",
    "detail": "En haut : « Analyse fine… 40 % · environ 3 min » ; le temps restant baisse régulièrement ; à la fin « Analyse terminée (profondeur X à Y) ».",
-   "ordre": 10613
+   "ordre": 10614
   },
   {
    "id": "R-06H",
    "section": "Fin de partie et revue",
    "texte": "Mes parties → Importer une longue partie (60 coups et plus), ouvrir la revue (Calcul fixe, Forte)",
    "detail": "Courbe, flèches et la plupart des pastilles en 1 à 2 minutes ; quelques coups gardent un rond creux (« en vérification ») puis reçoivent leur pastille ; une pastille posée ne change plus ; revue complète en environ 5 minutes pour 70 coups.",
-   "ordre": 10614
+   "ordre": 10615
   },
   {
    "id": "R-06I",
    "section": "Fin de partie et revue",
    "texte": "Importer une partie qui commence à une autre position (PGN avec [FEN \"…\"]) dont le 1er coup est une gaffe, puis sa revue",
    "detail": "Le 1er coup n'est pas « Théorique » : il reçoit sa vraie pastille (Gaffe). Une partie normale garde ses coups « Théorique » au début.",
-   "ordre": 10615
+   "ordre": 10616
   },
   {
    "id": "R-06G",
    "section": "Fin de partie et revue",
    "texte": "Changer Options → Partie → Façon d'analyser, puis rouvrir la revue d'une partie déjà analysée",
    "detail": "La revue s'affiche tout de suite, sans tout refaire (une analyse assez forte est gardée, quel que soit le mode).",
-   "ordre": 10616
+   "ordre": 10617
   },
   {
    "id": "R-068",
    "section": "Fin de partie et revue",
    "texte": "Revue : touche F",
    "detail": "L'échiquier se retourne.",
-   "ordre": 10617
+   "ordre": 10618
   },
   {
    "id": "R-069",
    "section": "Fin de partie et revue",
    "texte": "Ressortir de la revue, la rouvrir",
    "detail": "Tout s'affiche tout de suite, sans nouvelle analyse.",
-   "ordre": 10618
+   "ordre": 10619
   },
   {
    "id": "R-070",
@@ -695,18 +702,32 @@
    "ordre": 11207
   },
   {
+   "id": "R-09G",
+   "section": "Options",
+   "texte": "Plein écran (F11) sur un grand écran (2560×1440 ou 4K) ; puis fenêtre réduite au minimum",
+   "detail": "En 4K, panneau, boutons, pendules et textes grandissent avec l'écran (rien de minuscule) ; en petite fenêtre et en 1366×768 rien ne déborde.",
+   "ordre": 11208
+  },
+  {
+   "id": "R-09H",
+   "section": "Options",
+   "texte": "Revue : regarder les pastilles (ou une capture en noir et blanc)",
+   "detail": "Chaque pastille se reconnaît à son symbole, même sans les couleurs (!!, !, étoile, livre, coche, rond, ?!, ?, X, ??) ; le symbole se lit aussi sur le jaune et le vert clair (contour sombre).",
+   "ordre": 11209
+  },
+  {
    "id": "R-094",
    "section": "Options",
    "texte": "Valeurs par défaut",
    "detail": "Tout revient aux réglages d'origine (plateau Tournoi, accent Or).",
-   "ordre": 11208
+   "ordre": 11210
   },
   {
    "id": "R-09F",
    "section": "Options",
    "texte": "Options → Affichage → « Puissance du PC » : lire la ligne « Ce PC : … » ; essayer Petit PC puis une revue ; revenir à Automatique",
    "detail": "La ligne dit tes cœurs, ta mémoire et « PC normal » (ton i7) ; en Petit PC, la revue n'ouvre qu'un seul stockfish.exe (Gestionnaire des tâches) et reste fluide ; un choix de puissance d'analyse fait à la main est gardé.",
-   "ordre": 11209
+   "ordre": 11211
   },
   {
    "id": "R-100",

@@ -103,6 +103,8 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
 
 - [ ] **R-060** – Finir une partie contre l'ordinateur  
   → Carte de fin : résultat, raison, Elo « 1200 -> 1215 (+15) », précision des deux joueurs presque tout de suite.
+- [ ] **R-06J** – Finir une partie contre l'ordinateur : lire le résumé du coach sur la carte de fin  
+  → Trois lignes tout de suite : l'ouverture (« Ouverture : C60 - Partie espagnole (4 coups de théorie) »), ton plus gros moment (ta pire faute et le coup qu'il fallait jouer, ou ton plus beau coup), ta précision « provisoire » qui devient définitive, comparée à tes 10 dernières parties (« ta meilleure… », « au-dessus de ta moyenne… »). Rien ne chevauche les boutons.
 - [ ] **R-061** – Carte de fin → Rejouer, puis → Menu  
   → Rejouer relance avec les mêmes réglages ; Menu revient au menu.
 - [ ] **R-062** – Carte de fin → Revue de la partie  
@@ -245,6 +247,10 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
   → Tous les écrans suivent, rien ne déborde.
 - [ ] **R-09C** – Options → Affichage → Langue → English, puis Enregistrer ; parcourir menu, partie, revue, problèmes, aide F1  
   → Tout est en anglais (boutons, explications, noms d'ouvertures), rien ne déborde ; revenir à Français remet tout.
+- [ ] **R-09G** – Plein écran (F11) sur un grand écran (2560×1440 ou 4K) ; puis fenêtre réduite au minimum  
+  → En 4K, panneau, boutons, pendules et textes grandissent avec l'écran (rien de minuscule) ; en petite fenêtre et en 1366×768 rien ne déborde.
+- [ ] **R-09H** – Revue : regarder les pastilles (ou une capture en noir et blanc)  
+  → Chaque pastille se reconnaît à son symbole, même sans les couleurs (!!, !, étoile, livre, coche, rond, ?!, ?, X, ??) ; le symbole se lit aussi sur le jaune et le vert clair (contour sombre).
 - [ ] **R-094** – Valeurs par défaut  
   → Tout revient aux réglages d'origine (plateau Tournoi, accent Or).
 - [ ] **R-09F** – Options → Affichage → « Puissance du PC » : lire la ligne « Ce PC : … » ; essayer Petit PC puis une revue ; revenir à Automatique  

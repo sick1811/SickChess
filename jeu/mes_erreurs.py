@@ -152,11 +152,17 @@ def description(puzzle):
 def coup_presque_aussi_bon(fen_avant, coup, puzzle, chemin_stockfish=None):
     """Un autre coup que celui du moteur, mais qui ne perd presque rien ?
 
-    On demande a Stockfish (profondeur 14) l'evaluation apres le coup propose et
-    on la compare a celle du meilleur coup. Sans moteur : non."""
+    On demande a Stockfish (profondeur 14) l'evaluation apres le coup propose ET
+    apres le meilleur coup, et on compare les deux. Sans moteur : non.
+    24/10 : la reference etait l'evaluation enregistree par l'analyse de la partie ;
+    sur un PC occupe elle etait moins profonde et un bon coup pouvait etre refuse
+    (controle « un autre coup qui defend f7 », rouge une fois sur trois sous charge).
+    Les deux coups sont maintenant juges par le meme calcul."""
     s = (puzzle or {}).get("source") or {}
     reference = s.get("eval_meilleur")
-    if reference is None:
+    coups = (puzzle or {}).get("coups") or []
+    meilleur = coups[1] if len(coups) > 1 else None
+    if reference is None and meilleur is None:
         return False
     try:
         import moteurs
@@ -164,25 +170,38 @@ def coup_presque_aussi_bon(fen_avant, coup, puzzle, chemin_stockfish=None):
         if moteur is None:
             return False
         plateau = chess.Board(fen_avant)
-        joueur_blanc = plateau.turn == chess.WHITE
-        plateau.push(coup)
-        # 24/10 : 1,5 s ne suffisait pas quand le PC etait occupe (analyse en tache de
-        # fond, suite de tests) : la profondeur 14 n'etait pas atteinte et un bon coup
-        # pouvait etre refuse. 5 s de garde-fou ; sur un PC libre, 14 est atteint bien avant.
-        details = moteur.analyser_position(plateau.fen(), 14, 5000)
+
+        def apres(c):
+            """Evaluation (pions) pour le joueur apres le coup c, ou None."""
+            p = plateau.copy()
+            p.push(c)
+            details = moteur.analyser_position(p.fen(), 14, 5000)
+            if not details:
+                return None
+            import analyse_partie
+            v = analyse_partie._en_pions(details.get("evaluation"), details.get("mat"))
+            # v est du point de vue de l'adversaire (au trait) : on retourne.
+            return None if v is None else -v
+
+        pour_le_joueur = apres(coup)
+        if pour_le_joueur is None:
+            return False
+        joue_meilleur = None
+        if meilleur:
+            try:
+                m = chess.Move.from_uci(meilleur)
+                if m in plateau.legal_moves:
+                    joue_meilleur = apres(m)
+            except ValueError:
+                joue_meilleur = None
+        if joue_meilleur is None:
+            if reference is None:
+                return False
+            joue_meilleur = reference if plateau.turn == chess.WHITE else -reference
     except Exception as souci:
         print("[MES ERREURS] verification impossible : %s" % souci)
         return False
-    if not details:
-        return False
-    import analyse_partie
-    valeur = analyse_partie._en_pions(details.get("evaluation"), details.get("mat"))
-    if valeur is None:
-        return False
-    # valeur est du point de vue du joueur au trait (l'adversaire) : on retourne.
-    pour_le_joueur = -valeur
-    reference_joueur = reference if joueur_blanc else -reference
-    return pour_le_joueur >= reference_joueur - TOLERANCE_PIONS
+    return pour_le_joueur >= joue_meilleur - TOLERANCE_PIONS
 
 
 class SessionErreurs:

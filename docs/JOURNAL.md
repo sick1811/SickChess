@@ -1176,3 +1176,46 @@ Fait :
 
 À vérifier par Julien :
 - [ ] t98 (voir A_FAIRE), R-09F.
+
+## 24/10/2026 (31) – Travail p27 : résumé du coach sur la carte de fin (Claude Code dans le cloud)
+Demande de Julien : « p27 ».
+Fait :
+- **`jeu/resume_coach.py`** : dès la fin de la partie, la carte de fin montre trois lignes à lire tout de suite :
+  **l'ouverture** (« Ouverture : C60 - Partie espagnole (4 coups de théorie) ») ; **ton plus gros moment** (ta
+  pire faute et le coup qu'il fallait jouer, « 23. Fxh7 ?? (gaffe), mieux : Cf3 » ; sans faute : ton plus beau
+  coup, ou « Aucune faute : bravo ! ») ; **ta précision**, « provisoire » tant que l'analyse tourne, puis comparée
+  à tes **10 dernières parties analysées** (« ta meilleure de tes 10 dernières parties », « au-dessus / sous /
+  comme ta moyenne (78 %) »).
+- Les précisions passées sont lues une fois, dans un fil (la carte ne bloque pas) ; lignes recalculées 3 fois par
+  seconde au plus. Contre l'ordinateur et en ligne (ton camp) ; partie à deux : ouverture et plus gros moment.
+- Carte un peu plus haute (390 au lieu de 300, 460 de large) ; la ligne « toi X % – ordinateur Y % » reste,
+  plus discrète, dessous.
+- Tests : `tests/test_resume_coach.py` (36 contrôles). Anglais traduit. Recette : R-06J.
+
+À vérifier par Julien :
+- [ ] t99 (voir A_FAIRE), R-06J.
+
+## 24/10/2026 (32) – Travail p33 : lisibilité pour tous (Claude Code dans le cloud)
+Demande de Julien : « p33 ».
+Fait :
+- **Pastilles sans la couleur (daltoniens)** : elles avaient déjà un symbole chacune (!!, !, étoile, livre, coche,
+  rond, ?!, ?, X, ??). Mesuré : le symbole blanc était peu lisible sur les pastilles claires (contraste 1,6 sur
+  Imprécision jaune, 2,1 sur Excellent, 3 minimum demandé). **Contour sombre fin** autour du symbole : 3,3 à 10,8
+  sur toutes. Vérifié en noir et blanc : les 10 pastilles restent toutes différentes. Police du symbole gardée en
+  mémoire (SysFont était recréée à chaque pastille dessinée).
+- **Contrastes des textes** : `design.contraste()` (norme WCAG) ; les 17 plateaux passent (texte 15:1, texte
+  discret 5,7:1, or 8,6:1).
+- **4K** : l'échelle des textes était plafonnée à 1,65 : en 3840×2160, panneau de 430 px et boutons écrits en
+  18 px = minuscules. Plafond porté à 3,4 ; panneau, marges, pendules et textes des boutons grandissent au-delà
+  d'environ 1700×1050. **En dessous (1366×768, 1024×640…) les captures sont identiques au pixel près** ;
+  1920×1080 : presque rien ne change.
+- `tests/captures_ecrans.py` : `SICKCHESS_SORTIE` pour photographier dans un autre dossier (captures 4K et
+  1366×768 regardées).
+- Tests : `tests/test_lisibilite.py`. Recette : R-09G, R-09H.
+
+À vérifier par Julien :
+- [ ] t100 (voir A_FAIRE), R-09G, R-09H.
+- En passant (séance 32) : « Mes erreurs », contrôle « un autre coup qui défend f7 » encore rouge pendant la suite
+  complète. Vraie cause trouvée : le coup du joueur était comparé à l'évaluation **enregistrée** du meilleur coup,
+  moins profonde quand le PC est chargé. Les deux coups sont maintenant jugés par le même calcul (profondeur 14).
+  Reproduit sous charge (rouge 2 fois sur 3) → vert 7 fois sur 7 après correction.

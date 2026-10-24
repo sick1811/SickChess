@@ -355,6 +355,10 @@ def images_au_repos():
 
 # ---------------------------------------------------------------- echelle
 
+# 24/10 (p33) : 1,65 au plus, c'etait un texte deux fois trop petit en 4K
+# (3840x2160 = 3,4 fois la fenetre de base). Jusqu'a 1,65 rien ne change.
+ECHELLE_MAX = 3.4
+
 def echelle(cible):
     """Facteur de taille deduit de la fenetre. 1.0 = 1024x640 (taille par defaut).
 
@@ -372,7 +376,17 @@ def echelle(cible):
         facteur *= float(apparence.reglage("echelle_interface", 1.0))
     except Exception:
         pass
-    return max(0.86, min(1.65, facteur))
+    return max(0.86, min(ECHELLE_MAX, facteur))
+
+
+def grand_ecran(cible):
+    """24/10 (p33) : 1.0 jusqu'a environ 1700x1050 (rien ne change), puis
+    jusqu'a ~2 en 4K. Pour les tailles ecrites en pixels (boutons, pendules)."""
+    if hasattr(cible, "get_size"):
+        largeur, hauteur = cible.get_size()
+    else:
+        largeur, hauteur = cible
+    return max(1.0, min(ECHELLE_MAX, min(largeur / 1024.0, hauteur / 640.0)) / 1.65)
 
 
 def t(base, ech=1.0):
@@ -467,6 +481,10 @@ def texte_centre_dans(surface, chaine, rect, taille=17, couleur=(235, 232, 226),
     """Texte centre dans un rectangle, garanti de ne pas en sortir."""
     rect = pygame.Rect(rect)
     chaine = _tr(str(chaine))
+    g = grand_ecran(surface)        # 24/10 (p33) : en 4K, a la taille du bouton
+    if g > 1.0:
+        taille = max(taille, min(int(taille * g), int(rect.height * 0.6)))
+        marge = int(marge * g)
     largeur = max(10, rect.width - 2 * marge)
     if ajuster:
         taille = taille_qui_tient(chaine, taille, max(9, taille * 0.55),
