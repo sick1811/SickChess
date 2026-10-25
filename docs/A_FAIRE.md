@@ -217,8 +217,9 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 - [ ] t106 (39) : installer la n° 7 : Windows demande une fois l'accord (pare-feu) ; « Oui » ; relancer : plus de
       demande ; jouer en ligne avec un ami sur un Wi-Fi public (R-118).
       **Sur ton PC (25/10)** : deux règles « SickChess » existaient déjà (créées avant, sans description) : avec elles,
-      Windows ne demande rien. Pour le vrai essai : Terminal (administrateur) → `netsh advfirewall firewall delete rule
-      name=SickChess`, puis double-clic sur l'installeur, puis lancer le jeu ; Claude Code vérifie ensuite les règles.
+      Windows ne demande rien. **Fait le 25/10** (installation normale de la n° 7 sur le PC de Julien) : une demande
+      Windows, « Oui », les 2 règles refaites par l'installeur (entrée + sortie, profil Tous, autoriser), aucune
+      règle de blocage ; au lancement « [PARE-FEU] ok », plus aucune demande. Reste : jouer en ligne sur un Wi-Fi public.
 - [ ] t105 (39) : après la n° 7, ton ami (n° 4 ou 5) : le jeu se met à jour seul au menu, sans aller sur GitHub.
       À partir de la n° 8 : un ami en retard de plusieurs versions les reçoit toutes, un seul redémarrage (R-117).
 - [ ] t104 (38) : **analyse de fond (p25)** : importe une partie (ou joues-en une à deux), reste au menu

@@ -1559,5 +1559,9 @@ Fait :
   l'a installé ensuite. La branche `main-phsero` ne sert plus (pas supprimée).
 
 À vérifier par Julien :
-- [ ] t106 / R-118 : le pare-feu pour de vrai (deux anciennes règles « SickChess » à retirer d'abord, voir À faire).
+- [x] t106 / R-118 (pare-feu) fait le 25/10 : installation normale de la n° 7 → une demande Windows, « Oui » ;
+  les 2 règles « SickChess » refaites par l'installeur (nouveaux identifiants ; entrée + sortie, profil Tous,
+  autoriser ; aucune règle de blocage) ; au lancement du jeu « [PARE-FEU] ok », aucune nouvelle demande.
+  Pas besoin de retirer les anciennes règles : l'installeur normal les retire et les refait lui-même.
+- [ ] t106 (suite) : jouer en ligne avec un ami sur un Wi-Fi public.
 - [ ] t105, t107, t108, t109, t104, t103 ; R-117 (à la n° 8), R-119.
