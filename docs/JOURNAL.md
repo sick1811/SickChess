@@ -1686,6 +1686,11 @@ Fait :
   ordre identique d'un lancement à l'autre, « ici » ne sort jamais du groupe, reprise de l'ancien fichier, écran en
   3 tailles) ; `test_entrainement.py` adapté.
 - Recette : R-097 et R-098 modifiés, R-164 à R-169 ajoutés (167 tests). VERSION 0.5.0 (nouveauté).
+- Vérification avant version : rien de bloquant (licences « à revoir » : seulement pour Steam), 1479 contrôles
+  verts, banc vert. **Version amis n° 9 (0.5.0) publiée** : https://github.com/sick1811/SickChess-amis/releases/tag/v0.5.0-n9
+  (programme 18,6 Mo, jeu 8,0 Mo ; moteur, problèmes, finales inchangés ; installeur 664 Mo). Installation silencieuse
+  dans %TEMP%\SickChessEssai : jeu ouvert 22 s, journal sans erreur, 4 180 151 problèmes, « [MAJ] installee : n° 9 »,
+  `jeu/arbre_ouvertures.py` présent ; verifier_en_ligne.py : tout OK ; désinstallé.
 
 À vérifier par Julien :
 - [ ] t118 à t123 dans `docs/A_FAIRE.md` (« À tester par Julien ») et dans la page « À faire ».
