@@ -1,6 +1,6 @@
 # Recette complète – SickChess
 
-Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10/2026.
+Tous les tests à faire à la main pour vérifier le jeu entier. Version : 25/10/2026.
 
 **Règles**
 - Fichier fabriqué par `python outils/recette.py` : modifier `outils/recette.py`, pas ce fichier.
@@ -23,6 +23,8 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
   → Accueil : ton nom, ton niveau (4 choix), puis « Trois choses à savoir » ; ensuite le menu ; il ne revient plus. (Remettre profil.json.)
 - [ ] **R-005** – Quitter par le bouton Quitter puis par la croix de la fenêtre  
   → Le jeu se ferme tout de suite (moins d'une seconde, même pendant une revue ou quand l'ordinateur réfléchit), sans message d'erreur ; journal_du_jeu.txt finit par « Fin normale ».
+- [ ] **R-007** – Au menu principal, appuyer sur Échap ; essayer Non, puis Échap, puis un clic à côté ; enfin Échap puis Oui (ou Entrée)  
+  → Une fenêtre « Quitter SickChess ? » avec Oui / Non s'ouvre ; Non, Échap ou un clic à côté la ferment et on reste au menu ; Oui ou Entrée ferment le jeu (journal « Fin normale ») ; le bouton Quitter du menu ferme toujours directement, sans question ; en anglais la fenêtre est traduite.
 
 ## Partie contre l'ordinateur
 
@@ -157,7 +159,7 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
 - [ ] **R-06E** – Revue d'une partie importée de chess.com (ex. contre dragondu5)  
   → Mêmes moments forts que chess.com : 7.Qe2 gaffe, 10.h3 erreur, 15.Qb3 erreur, 7...Bxa1 Très bien.
 - [ ] **R-06F** – Revue juste après une partie, pendant que l'analyse calcule (Options : Calcul fixe, Forte)  
-  → En haut : « Analyse fine… 40 % · environ 3 min » ; le temps restant baisse régulièrement ; à la fin « Analyse terminée (profondeur X à Y) ».
+  → En haut : « Analyse fine… 40 % · environ N min » ; le temps annoncé est juste : il baisse régulièrement, ne remonte pas, et la revue finit à peu près quand il l'avait dit (écart de moins d'une minute) ; à la fin « Analyse terminée (profondeur X à Y) ».
 - [ ] **R-06H** – Mes parties → Importer une longue partie (60 coups et plus), ouvrir la revue (Calcul fixe, Forte)  
   → Courbe, flèches et la plupart des pastilles en 1 à 2 minutes ; quelques coups gardent un rond creux (« en vérification ») puis reçoivent leur pastille ; une pastille posée ne change plus ; revue complète en environ 5 minutes pour 70 coups.
 - [ ] **R-06I** – Importer une partie qui commence à une autre position (PGN avec [FEN "…"]) dont le 1er coup est une gaffe, puis sa revue  
@@ -168,6 +170,12 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
   → L'échiquier se retourne.
 - [ ] **R-069** – Ressortir de la revue, la rouvrir  
   → Tout s'affiche tout de suite, sans nouvelle analyse.
+- [ ] **R-06K** – Revue : regarder la feuille de coups, les pastilles sur l'échiquier et le résumé de fin  
+  → Pastilles plus grosses et bien lisibles : signe sombre sur les couleurs claires (jaune, vert clair), contour net, Gaffe en rouge franc, Manque en rose ; les mêmes pastilles sur l'échiquier et dans le résumé ; rien ne chevauche le texte des coups.
+- [ ] **R-06L** – Options : Calcul fixe, Forte. Revue d'une partie d'environ 17 coups jamais analysée ; pendant l'analyse, cliquer sur un coup au milieu  
+  → Revue complète en 1 min 30 à 3 min ; le clic sur un coup ne ralentit pas la fin de l'analyse (pas d'attente d'une dizaine de secondes de plus) ; toutes les pastilles arrivent.
+- [ ] **R-06M** – Lancer le jeu, puis tout de suite la revue d'une partie jamais analysée qui commence par une ouverture connue  
+  → Les premiers coups ont la pastille « Théorique » dès cette première revue (pas seulement quand on la rouvre).
 
 ## Mes parties et profil
 
@@ -325,6 +333,8 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
   → Le bandeau disparaît ; « INVITATIONS REÇUES » liste l'invitation (« il y a N min ») avec Rejoindre, pendant 10 minutes.
 - [ ] **R-10E** – Sans ami : Jouer en ligne → « Test : invitation », puis Retour au menu  
   → « Ami de test t'invite à jouer » apparaît dans le menu (Rejoindre mène à un salon qui n'existe pas : message clair).
+- [ ] **R-10F** – Menu → Jouer en ligne : lire la phrase sous le titre, en français puis en English (Options → Langue)  
+  → La phrase « Joue contre un ami Steam. Crée une partie et invite-le, ou entre le code qu'il t'a donné. » est entière (2 ou 3 lignes), rien n'est coupé ni ne touche le bouton « Créer une partie » ; pareil en anglais.
 
 ## Version amis et mises à jour
 

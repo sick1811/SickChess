@@ -1602,3 +1602,43 @@ Fait :
 À vérifier par Julien :
 - [ ] t110 (Freestyle, tous les modes) et t111 (chute au temps) dans « À tester par Julien ».
 
+
+
+## 25/10/2026 (43) – Chef d'orchestre : Échap au menu, pastilles lisibles, revue plus rapide et temps juste (Claude Code)
+Fait :
+- **Organisation de Claude Code** (rien ne change dans le jeu) : CLAUDE.md complété (en-tête, partie
+  Architecture), 13 agents dans `.claude/agents/` (dont correcteur, enquêteur de bug, bâtisseur, traducteur,
+  documentaliste, trieur de tâches, gardien du dépôt, recetteur, arbitre des échecs, relecteur des textes) et la
+  skill `chef-orchestre` (répartir les tâches entre agents ; un fichier = un seul agent à la fois).
+- **Temps restant de la revue juste** : avant, la revue annonçait par exemple 26 s alors qu'il en fallait 70 ;
+  maintenant l'écart reste sous 25 % dès 20 % de l'analyse (surveillé par `test_temps_revue`).
+- **Salon en ligne** : la phrase d'accueil « Joue contre un ami Steam. Crée une partie… » s'affiche en entier, en
+  français et en anglais.
+- **t56 : pas un bug** – une partie en ligne jouée contre soi-même sur un seul PC compte deux fois (une par
+  fenêtre) ; surveillé par `test_stats_a_deux`.
+- 3 séries de tests ajoutées au lancement complet (`test_textes_affiches`, `test_temps_revue`, `test_stats_a_deux`).
+- **Échap au menu principal** : ne ferme plus le jeu d'un coup ; une fenêtre « Quitter SickChess ? » Oui / Non
+  (décision de Julien). Non, Échap ou un clic à côté : on reste. Le bouton Quitter ferme toujours directement.
+- **Pastilles de la feuille de coups** (t100) : plus grosses (56 % → 84 % de la hauteur de ligne) et contrastées
+  (signe sur couleur : contraste 1,6 → au moins 4,5 sur le jaune) ; Gaffe en rouge franc, Manque en rose. Validées
+  par Julien sur captures.
+- **Livre d'ouvertures** : il n'est utilisé qu'une fois chargé. Avant, une revue lancée juste après l'ouverture du
+  jeu creusait 1...e5 pendant 33 s pour rien et perdait la pastille « Théorique ».
+- **Revue plus rapide après un clic sur un coup** : plus de vérification profonde avant la passe des coups voisins ;
+  après un clic, 7 → 5 positions vérifiées, revue complète 87,9 s → 75,5 s. Le testeur a simulé 240 revues : toutes
+  finies ; l'arbitre : précision 114 / 114, aucune pastille changée.
+- **Mesure de la lenteur (t71)** : en Forte, une partie de 17 coups prend 1 min 30 (partie calme) à 3 min (partie
+  tactique). 3 moteurs × 4 fils reste la meilleure répartition. Les « 7 min » vues par Julien viennent très
+  probablement du réglage « Maximale » du dossier de développement (Maximale : 298 s sur l'Opéra). Gains de la
+  séance : ~12 s (livre d'ouvertures) + ~11 s (clic sur un coup). Piste pas faite (risque moyen) : réutiliser la
+  passe des 3 coups dans la passe profonde (~10 % de plus). Décision : ne pas réduire la marge du verdict.
+- Recette automatique : tout vert sauf R-149 (« plus aucun stockfish d'analyse libre ») et le processeur de
+  R-143 / R-149 à la 1re passe, à cause d'un stockfish.exe d'une autre session Claude (le jeu, lui, avait bien fermé
+  ses moteurs). À refaire quand rien d'autre ne tourne ; piste : ne compter que les moteurs lancés par le jeu.
+- Recette : R-007 (Échap au menu), R-06F (temps annoncé juste), R-06K (pastilles), R-06L (revue ~17 coups),
+  R-06M (« Théorique » dès la 1re revue), R-10F (phrase du salon) ; 161 tests au total.
+
+À vérifier par Julien :
+- [ ] Les 6 tests « (43) » de `docs/A_FAIRE.md`, section « À tester par Julien » (Échap, Quitter, pastilles,
+  durée de la revue avec la version installée, « Théorique », phrase du salon).
+- [ ] t68 (« Enregistrer » qui n'a pas réagi une fois) : toujours pas reproduit, reste ouvert.

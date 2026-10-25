@@ -1,5 +1,5 @@
 {
- "version": "24/10/2026",
+ "version": "25/10/2026",
  "tests": [
   {
    "id": "R-001",
@@ -42,6 +42,13 @@
    "texte": "Quitter par le bouton Quitter puis par la croix de la fenêtre",
    "detail": "Le jeu se ferme tout de suite (moins d'une seconde, même pendant une revue ou quand l'ordinateur réfléchit), sans message d'erreur ; journal_du_jeu.txt finit par « Fin normale ».",
    "ordre": 10005
+  },
+  {
+   "id": "R-007",
+   "section": "Lancement et fenêtre",
+   "texte": "Au menu principal, appuyer sur Échap ; essayer Non, puis Échap, puis un clic à côté ; enfin Échap puis Oui (ou Entrée)",
+   "detail": "Une fenêtre « Quitter SickChess ? » avec Oui / Non s'ouvre ; Non, Échap ou un clic à côté la ferment et on reste au menu ; Oui ou Entrée ferment le jeu (journal « Fin normale ») ; le bouton Quitter du menu ferme toujours directement, sans question ; en anglais la fenêtre est traduite.",
+   "ordre": 10006
   },
   {
    "id": "R-010",
@@ -439,7 +446,7 @@
    "id": "R-06F",
    "section": "Fin de partie et revue",
    "texte": "Revue juste après une partie, pendant que l'analyse calcule (Options : Calcul fixe, Forte)",
-   "detail": "En haut : « Analyse fine… 40 % · environ 3 min » ; le temps restant baisse régulièrement ; à la fin « Analyse terminée (profondeur X à Y) ».",
+   "detail": "En haut : « Analyse fine… 40 % · environ N min » ; le temps annoncé est juste : il baisse régulièrement, ne remonte pas, et la revue finit à peu près quand il l'avait dit (écart de moins d'une minute) ; à la fin « Analyse terminée (profondeur X à Y) ».",
    "ordre": 10714
   },
   {
@@ -476,6 +483,27 @@
    "texte": "Ressortir de la revue, la rouvrir",
    "detail": "Tout s'affiche tout de suite, sans nouvelle analyse.",
    "ordre": 10719
+  },
+  {
+   "id": "R-06K",
+   "section": "Fin de partie et revue",
+   "texte": "Revue : regarder la feuille de coups, les pastilles sur l'échiquier et le résumé de fin",
+   "detail": "Pastilles plus grosses et bien lisibles : signe sombre sur les couleurs claires (jaune, vert clair), contour net, Gaffe en rouge franc, Manque en rose ; les mêmes pastilles sur l'échiquier et dans le résumé ; rien ne chevauche le texte des coups.",
+   "ordre": 10720
+  },
+  {
+   "id": "R-06L",
+   "section": "Fin de partie et revue",
+   "texte": "Options : Calcul fixe, Forte. Revue d'une partie d'environ 17 coups jamais analysée ; pendant l'analyse, cliquer sur un coup au milieu",
+   "detail": "Revue complète en 1 min 30 à 3 min ; le clic sur un coup ne ralentit pas la fin de l'analyse (pas d'attente d'une dizaine de secondes de plus) ; toutes les pastilles arrivent.",
+   "ordre": 10721
+  },
+  {
+   "id": "R-06M",
+   "section": "Fin de partie et revue",
+   "texte": "Lancer le jeu, puis tout de suite la revue d'une partie jamais analysée qui commence par une ouverture connue",
+   "detail": "Les premiers coups ont la pastille « Théorique » dès cette première revue (pas seulement quand on la rouvre).",
+   "ordre": 10722
   },
   {
    "id": "R-070",
@@ -952,6 +980,13 @@
    "texte": "Sans ami : Jouer en ligne → « Test : invitation », puis Retour au menu",
    "detail": "« Ami de test t'invite à jouer » apparaît dans le menu (Rejoindre mène à un salon qui n'existe pas : message clair).",
    "ordre": 11416
+  },
+  {
+   "id": "R-10F",
+   "section": "En ligne (Steam)",
+   "texte": "Menu → Jouer en ligne : lire la phrase sous le titre, en français puis en English (Options → Langue)",
+   "detail": "La phrase « Joue contre un ami Steam. Crée une partie et invite-le, ou entre le code qu'il t'a donné. » est entière (2 ou 3 lignes), rien n'est coupé ni ne touche le bouton « Créer une partie » ; pareil en anglais.",
+   "ordre": 11417
   },
   {
    "id": "R-110",

@@ -3,7 +3,7 @@
 Fichier partagé entre Cowork et Claude Code. **À relire au début de chaque séance,
 à mettre à jour à la fin.** La page « SickChess – À faire »
 (https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5) en est la version à cocher pour Julien.
-Mis à jour le 25/10/2026.
+Mis à jour le 25/10/2026 (fin de séance (43)).
 
 ## Retours de Julien à traiter (priorité)
 - [ ] **25/10 – mise à jour chez l'ami de Julien** (version n° 4 ou 5) : « vérifie ta connexion / site
@@ -53,13 +53,20 @@ Mis à jour le 25/10/2026.
       - [x] t52 (séance 36) : contre la montre / survie : après une faute, le bon coup est joué sous tes yeux
             (« Raté ! Il fallait Qxh2#… ») pendant 2,2 s.
       - [x] t98 (séance 36) : « → » remplacé par « : » (la police n'a pas ce signe).
-      - [ ] t71 / t99 : revue lente (17 coups : 7 min) et temps annoncé faux ; précision définitive ~2 min 30.
-      - [ ] t100 : petites pastilles « ?! » / « ! » peu lisibles dans la feuille de coups.
-      - [ ] t56 : une partie à deux compte dans « Tes ouvertures » (voulu ?) ; t68 : Enregistrer pas réagi une fois.
+      - [x] t71 / t99 : revue lente (17 coups : 7 min) et temps annoncé faux ; précision définitive ~2 min 30.
+            (25/10, JOURNAL (43)) Temps annoncé : **fait** (écart < 25 % dès 20 % de l'analyse). Lenteur : **mesurée**
+            (Forte, 17 coups = 1 min 30 à 3 min ; les 7 min venaient très probablement du réglage « Maximale » du
+            dossier de dev) ; ~12 s + ~11 s gagnés. Reste : retest de Julien avec la version installée (test (43) n° 4).
+      - [x] t100 : petites pastilles « ?! » / « ! » peu lisibles dans la feuille de coups. (25/10, JOURNAL (43) :
+            plus grosses et contrastées, validées par Julien sur captures.)
+      - [x] t56 : une partie à deux compte dans « Tes ouvertures » (voulu ?) → **pas un bug** (25/10, JOURNAL (43)) :
+            en ligne contre soi-même sur un seul PC, la partie compte deux fois ; surveillé par `test_stats_a_deux`.
+      - [ ] t68 : Enregistrer pas réagi une fois (pas reproduit, reste ouvert).
       - [x] Accents manquants (séance 36) : « Aucun coup joué », « … l'adversaire réfléchit », « %d problèmes
             joués », « Crée une partie » → corrigés, surveillés par `tests/test_textes_affiches.py`.
-      - [ ] Texte coupé : « Joue contre un ami Steam. Cree une partie et invite-le, ou entre… » (Jouer en ligne).
-      - [ ] Au menu principal, Échap ferme le jeu sans demander (deux fois par accident pendant les tests).
+      - [x] Texte coupé : « Joue contre un ami Steam. Cree une partie et invite-le, ou entre… » (Jouer en ligne).
+            (25/10, JOURNAL (43) : phrase entière en français et en anglais.)
+      - [x] (25/10, JOURNAL (43), fait) Au menu principal, Échap ferme le jeu sans demander (deux fois par accident pendant les tests).
             **Décision de Julien (25/10)** : Échap ouvre « Quitter SickChess ? Oui / Non » (Non ou Échap = on reste).
       - **Autres décisions de Julien (25/10)** :
         - t71 revue lente : **accélérer sans baisser** « Forte » par défaut (mesure avant / après) ; si on
@@ -83,7 +90,7 @@ Mis à jour le 25/10/2026.
       par défaut (journal (13)). À valider : t67, t68 ; mesure t69 par Claude Code.
 
 ## Recette complète (stabilité)
-- `docs/RECETTE.md` : 71 tests à la main sur tout le jeu (R-001 à R-131), source dans
+- `docs/RECETTE.md` : 161 tests à la main sur tout le jeu (version du 25/10/2026), source dans
   `outils/recette.py`. Recopiés dans la page, groupe « Recette complète »
   (Fonctionne / Ne fonctionne pas + commentaire, bouton « Nouvelle passe »).
 - Tenue à jour à chaque séance ; passe complète avant chaque version amis / Steam.
@@ -207,6 +214,24 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+Séance du 25/10 (43) – pour chaque point : **Fonctionne / Ne fonctionne pas + commentaire**.
+Les points 3 à 6 ne seront dans la version installée qu'après la prochaine version amis (n° 8) ; le point 4
+(durée de la revue) peut se faire dès maintenant avec la n° 7.
+- [ ] t112 (43) : **Échap au menu** : au menu principal, appuie sur Échap → une fenêtre « Quitter SickChess ? »
+      avec Oui / Non. Essaie Non, puis Échap, puis un clic à côté : la fenêtre se ferme et tu restes au menu.
+      Enfin Échap puis Oui (ou Entrée) : le jeu se ferme.
+- [ ] t113 (43) : **bouton Quitter du menu** : un clic ferme le jeu tout de suite, sans question.
+- [ ] t114 (43) : **pastilles plus lisibles** : ouvre une revue ; dans la feuille de coups, sur l'échiquier et dans le
+      résumé de fin, les pastilles sont plus grosses, le signe se lit bien même sur le jaune et le vert clair, Gaffe
+      en rouge franc, Manque en rose ; rien ne chevauche le texte des coups.
+- [ ] t115 (43) : **retest de la durée de la revue (t71)** avec la **VERSION INSTALLÉE** (pas le dossier de dev, qui est
+      réglé en « Maximale ») : Options → Partie : Calcul fixe + Forte ; ouvre la revue d'une partie d'environ
+      17 coups jamais analysée et chronomètre. On doit voir : le temps restant baisse sans remonter, la revue finit
+      en 1 min 30 à 3 min, et un clic sur un coup au milieu ne retarde pas la fin. **Note le temps réel.**
+- [ ] t116 (43) : **« Théorique » dès la 1re revue** : lance le jeu et ouvre tout de suite la revue d'une partie jamais
+      analysée qui commence par une ouverture connue : les premiers coups ont la pastille « Théorique ».
+- [ ] t117 (43) : **phrase du salon en ligne** : Menu → Jouer en ligne : la phrase sous le titre (« Joue contre un ami
+      Steam. Crée une partie… ») est entière, rien de coupé ; pareil en anglais (Options → Langue → English).
 - [ ] t110 (42) : **Freestyle** (Fonctionne / Ne fonctionne pas + commentaire) :
       a) Partie contre l'ordinateur → panneau VARIANTE : Normal / Freestyle ; Freestyle → Au hasard : pièces
          mélangées, « Freestyle n° … » au-dessus des coups ; b) roquer en posant le roi SUR sa tour, puis en le
