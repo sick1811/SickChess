@@ -231,10 +231,22 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 25/10
 
 ## Entraînement aux ouvertures
 
-- [ ] **R-097** – Menu → Entraînement aux ouvertures : choisir Blancs ou Noirs puis une ouverture  
+- [ ] **R-097** – Menu → Entraînement aux ouvertures : choisir un coup dans l'arbre (ex. 1.e4 › 1...e5 › 2.Nf3 › 2...Nc6 › 3.Bb5), Blancs ou Noirs, puis « S'entraîner ici »  
   → Le jeu joue les coups adverses de la théorie ; à toi de trouver les tiens ; un coup faux = rouge, on réessaie.
 - [ ] **R-098** – « Montrer le coup (H) », finir la ligne, « Ligne suivante »  
-  → Flèche du bon coup ; à la fin : score et nom exact de la variante ; la suivante est une autre variante ; le % s'affiche sur l'ouverture dans la liste.
+  → Flèche du bon coup ; à la fin : score et nom exact de la variante ; la suivante reste dans le même groupe (« Ligne 2 / N ») ; retour à l'arbre : « réussies / total » augmente si la ligne était sans faute.
+- [ ] **R-164** – Écran Ouvertures : regarder l'arbre au départ, puis déplier 1.e4 (clic sur +, ou flèche →)  
+  → Les premiers coups dans un ordre fixe (1.e4, 1.d4, 1.c4…), le même à chaque lancement ; chaque ligne : coup, nom (« Famille › Variante »), code ECO, « réussies / total ».
+- [ ] **R-165** – Avancer coup par coup avec ↑ ↓ → ← (et + / −), la molette, puis cliquer sur un morceau du fil d'Ariane en haut  
+  → L'échiquier à droite montre la position du coup choisi ; le fil « Début › 1.e4 › 1...e5 › … » suit ; un clic dessus remonte à ce coup.
+- [ ] **R-166** – Chercher une suite de coups sans nom (ex. sous 3...a6 : « 5...b5 6.Bb3 »)  
+  → Les coups de passage sont regroupés sur une seule ligne, pas de niveau vide.
+- [ ] **R-167** – Choisir 3...a6 (Défense Morphy), « S'entraîner ici », faire 5 lignes dont une avec une faute  
+  → Toutes les lignes sont des suites de 3...a6 (jamais une autre ouverture) ; la plus jouée d'abord ; la ligne ratée revient à la fin du tour.
+- [ ] **R-168** – Cocher « Au hasard dans ce groupe » puis « S'entraîner ici »  
+  → Les lignes arrivent dans le désordre, mais toujours sous le coup choisi.
+- [ ] **R-169** – Options → Notation française, revenir dans Ouvertures ; puis tester en 1366×768, 1920×1080 et 4K si possible  
+  → Coups en français (2.Cf3 Cc6 3.Fb5) dans l'arbre et le fil d'Ariane ; aucun texte coupé ; ta progression d'avant est toujours là (ancien fichier gardé en entrainement.json.bak).
 
 ## Analyse libre
 

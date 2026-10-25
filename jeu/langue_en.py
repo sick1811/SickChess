@@ -278,6 +278,14 @@ EN = {
     "Ligne terminée : %d coup%s trouvé%s du premier coup sur %d.": "Line done: {0} move{1} found on the first try out of {3}.",
     "Montrer le coup (H)": "Show the move (H)", "Ligne suivante": "Next line",
     "Changer d'ouverture": "Change opening", "Aucune ligne pour cette ouverture.": "No line for this opening.",
+    # 25/10 : l'arbre des ouvertures
+    "Flèches ou clic pour avancer coup par coup, + / − pour déplier, Entrée pour t'entraîner.":
+        "Arrows or click to go move by move, + / − to expand, Enter to train.",
+    "Début": "Start", "Toutes les ouvertures": "All openings", "S'entraîner ici": "Train here",
+    "Changer de groupe": "Change group", "Au hasard dans ce groupe": "Random within this group",
+    "ECO %s   ·   %d lignes": "ECO %s   ·   %d lines",
+    "Réussies sans faute : %d / %d": "Done without a mistake: %d / %d",
+    "Ligne %d / %d   ·   tour %d   ·   à revoir %d": "Line %d / %d   ·   round %d   ·   to review %d",
 
     # --- signaler
     "Signaler un problème ou proposer une idée": "Report a bug or suggest an idea",

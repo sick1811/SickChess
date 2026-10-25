@@ -1652,3 +1652,40 @@ Fait :
 - [ ] Les 6 tests « (43) » de `docs/A_FAIRE.md`, section « À tester par Julien » (Échap, Quitter, pastilles,
   durée de la revue avec la version installée, « Théorique », phrase du salon).
 - [ ] t68 (« Enregistrer » qui n'a pas réagi une fois) : toujours pas reproduit, reste ouvert.
+
+## 25/10/2026 (44) – Entraînement aux ouvertures rangé en arbre, coup par coup (Claude Code)
+État des lieux (avant) : l'écran montrait ~80 « familles » en vrac (grille de boutons, mises en avant puis par
+nombre) ; chaque ligne était tirée AU HASARD dans la famille ; la progression était gardée par famille seulement.
+Les noms viennent des 3 810 lignes lichess (`ouvertures/*.tsv`, traduites par `ouvertures_fr.py`). Le livre
+(`ouvertures.py`) sert aussi au nom de l'ouverture en partie, à la pastille « Théorique » de la revue, au résumé du
+coach, aux en-têtes PGN et aux statistiques : **aucun de ces fichiers n'a été touché**.
+Fait :
+- **Nouveau `jeu/arbre_ouvertures.py`** : un nœud = un demi-coup (1.e4 → 1...e5 → 2.Nf3 …), construit une fois à
+  partir du livre lichess (25 ms), gardé en mémoire. Chaque ligne lichess se range sous le coup qui la fait naître ;
+  le nœud porte le nom (« Partie espagnole › Défense Morphy »), le code ECO et le nombre de lignes en dessous.
+  Tri fixe : le plus de lignes d'abord (le fichier lichess ne donne pas le nombre de parties jouées), puis
+  l'alphabet. 8 653 nœuds, 3 810 nommés (= toutes les lignes), 2 459 lignes à réciter (les « feuilles »).
+- **Écran Ouvertures refait** (Onyx & Or) : l'arbre à gauche qui se déplie (flèches, + / −, clic, double-clic,
+  molette), les coups sans nom regroupés sur une ligne (« 5...b5 6.Bb3 »), notation choisie dans Options ; le fil
+  d'Ariane en haut, cliquable ; à droite l'échiquier du coup choisi, nom, ECO, « réussies sans faute / total »,
+  Blancs / Noirs, **« S'entraîner ici »** et la case « Au hasard dans ce groupe » (non cochée par défaut).
+- **S'entraîner ici** : seulement les lignes sous le coup choisi, dans l'ordre de l'arbre (déjà réussies en dernier),
+  les lignes ratées repassent à la fin du tour ; « Changer de groupe » / Échap ramène à l'arbre, au même coup.
+- **Progression ligne par ligne** (`entrainement.json` format 2) ; l'ancien fichier par famille est repris tel quel
+  (et copié en `entrainement.json.bak`). L'ancien tirage au hasard par famille est retiré.
+- Vitesse de l'écran (même PC, ancienne version mesurée dans une copie à part) : 1024×640 1,52 → 0,50 ms/image ;
+  1366×768 1,90 → 0,79 ; 1920×1080 2,28 → 1,29 ; 4K 7,55 → 4,56 (l'arbre et l'échiquier sont dessinés une fois puis
+  gardés tant que rien ne change).
+  Banc d'essai (section vitesse) : écran « Ouvertures » 0,63 ms/image (≈ 1,8 avant).
+- Suite complète : 1476 contrôles verts (`test_anglais` corrigé : il appelait l'ancienne liste de familles).
+- Captures et banc lancés dans le vrai dossier du jeu : `entrainement.json` de Julien converti au format 2, contenu
+  vérifié identique (2 ouvertures), ancien fichier gardé en `entrainement.json.bak` (ajouté au `.gitignore`).
+- Textes anglais ajoutés (`langue_en.py`) ; captures `tests/ecrans/09_ouvertures_arbre_*` (1366, 1920, 3840) et
+  `10_ouvertures_ligne_3840` regardées : rien de coupé, en français comme en anglais.
+- Tests : nouvelle série `tests/test_arbre_ouvertures.py` (Espagnole / Morphy, aucune ligne perdue ni en double,
+  ordre identique d'un lancement à l'autre, « ici » ne sort jamais du groupe, reprise de l'ancien fichier, écran en
+  3 tailles) ; `test_entrainement.py` adapté.
+- Recette : R-097 et R-098 modifiés, R-164 à R-169 ajoutés (167 tests). VERSION 0.5.0 (nouveauté).
+
+À vérifier par Julien :
+- [ ] t118 à t123 dans `docs/A_FAIRE.md` (« À tester par Julien ») et dans la page « À faire ».

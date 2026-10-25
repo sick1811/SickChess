@@ -109,5 +109,24 @@ libre.ouvrir_l_editeur(); libre.edition.choisir_outil("Q")
 libre.draw(); photo(gm.screen, "08_editeur_position")
 libre.analyse.arreter()
 
+# 9. entrainement aux ouvertures, l'arbre coup par coup (25/10), en 3 tailles
+import arbre_ouvertures
+from ecran_entrainement import EcranEntrainement
+for l, h in ((1366, 768), (1920, 1080), (3840, 2160)):
+    ecran = pygame.display.set_mode((l, h))
+    ouv = EcranEntrainement(ecran, gm.config)
+    ouv.choisir(arbre_ouvertures.noeud("e4 e5 Nf3 Nc6 Bb5 a6 Ba4 Nf6 O-O Be7"))
+    ouv.draw(); photo(ecran, "09_ouvertures_arbre_%d" % l)
+ouv.commencer()
+ouv.adverse_a = 1
+for _ in range(6):
+    if ouv.adverse_a:
+        ouv.adverse_a = 1
+        ouv.update()
+    elif ouv.entr.a_moi_de_jouer():
+        ouv.plateau.make_move(chess.Move.from_uci(ouv.entr.coup_attendu_uci()))
+ouv.plateau.animation.clear()          # la photo, pas une piece en vol
+ouv.draw(); photo(ecran, "10_ouvertures_ligne_3840")
+
 print("captures dans", SORTIE)
 pygame.quit()

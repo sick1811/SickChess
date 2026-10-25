@@ -417,9 +417,9 @@ class EcranOptions:
         if a_ecrire.get("langue") != self.avant.get("langue"):
             try:                       # les noms d'ouvertures changent de langue
                 import ouvertures
-                import entrainement
+                import arbre_ouvertures
                 ouvertures.recharger()
-                entrainement._FAMILLES.clear()
+                arbre_ouvertures.oublier()
             except Exception as e:
                 print("[OPTIONS] langue : %s" % e)
         apparence.preferences(recharger=True)

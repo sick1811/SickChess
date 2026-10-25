@@ -2,94 +2,28 @@
 #
 # Repris de V8_TURBO_3000 (entrainement.py), nettoye : tu choisis une
 # ouverture et ta couleur, le jeu joue les coups adverses de la theorie, et
-# c'est a toi de trouver les tiens. Chaque nouvelle ligne est tiree au hasard
-# dans la famille : c'est ainsi que les DEVIATIONS courantes arrivent
-# (Najdorf, puis Dragon, puis Scheveningue...). Un coup faux ne fait pas
-# avancer : on reessaie, ou on demande a voir le coup.
+# c'est a toi de trouver les tiens. Un coup faux ne fait pas avancer : on
+# reessaie, ou on demande a voir le coup.
 #
 # Les donnees : les 3 810 lignes du livre lichess (ouvertures.py), deja
 # traduites. Le livre donne les coups et les noms, pas les idees : on entraine
 # la memoire des coups. La progression par ouverture est gardee dans
 # entrainement.json (hors GitHub).
+#
+# 25/10 (arbre des ouvertures) : l'ecran ne tire plus au hasard dans une
+# famille. Il montre l'arbre coup par coup (arbre_ouvertures.py) ;
+# « S'entrainer ici » recite les lignes SOUS le noeud choisi, dans l'ordre de
+# l'arbre, puis les lignes ratees repassent (Seance). La progression est
+# gardee ligne par ligne (format 2) ; l'ancien fichier est converti (.bak).
 
 import copy
 import json
 import os
-import random
+import shutil
 
 import chess
 
-import ouvertures
-
-FAMILLES_MISES_EN_AVANT = [
-    "Défense sicilienne", "Partie espagnole", "Partie italienne",
-    "Défense française", "Défense Caro-Kann", "Gambit dame refusé",
-    "Gambit dame accepté", "Défense slave", "Défense est-indienne",
-    "Défense nimzo-indienne", "Ouverture anglaise", "Défense scandinave",
-    "Partie écossaise", "Défense Pirc", "Défense hollandaise",
-    "Partie viennoise", "Défense Alekhine", "Défense Grünfeld",
-    "Défense Benoni", "Défense russe", "Gambit du roi accepté", "Ouverture catalane",
-]
-COUPS_MINIMUM = 6          # demi-coups
-COUPS_MAXIMUM = 20
 FICHIER = "entrainement.json"
-
-
-def famille_de(nom):
-    return nom.split(",")[0].split(":")[0].strip()
-
-
-def lignes_de(famille, minimum=COUPS_MINIMUM, maximum=COUPS_MAXIMUM):
-    """Les lignes de theorie de la famille [(coups SAN, eco, nom)], sans les
-    lignes qui ne sont que le debut d'une autre."""
-    famille = str(famille or "").strip()
-    trouvees = []
-    for cle, (eco, nom) in ouvertures.livre().items():
-        if famille_de(nom) != famille:
-            continue
-        coups = cle.split()
-        if minimum <= len(coups) <= maximum:
-            trouvees.append((coups, eco, nom))
-    trouvees.sort(key=lambda l: -len(l[0]))
-    gardees = []
-    for coups, eco, nom in trouvees:
-        prefixe = " ".join(coups) + " "
-        if any(" ".join(c).startswith(prefixe) for c, _e, _n in gardees):
-            continue
-        gardees.append((coups, eco, nom))
-    gardees.sort(key=lambda l: (l[1], l[2]))
-    return gardees
-
-
-_FAMILLES = []
-
-
-def familles(minimum=4):
-    """[(famille, nombre de lignes)] : les mises en avant d'abord."""
-    if _FAMILLES:
-        return list(_FAMILLES)
-    comptes = {}
-    for _cle, (_eco, nom) in ouvertures.livre().items():
-        f = famille_de(nom)
-        comptes[f] = comptes.get(f, 0) + 1
-    utiles = {}
-    for nom, combien in comptes.items():
-        if combien >= minimum:
-            n = len(lignes_de(nom))
-            if n:
-                utiles[nom] = n
-    en_avant = [(n, utiles[n]) for n in FAMILLES_MISES_EN_AVANT if n in utiles]
-    reste = sorted(((n, c) for n, c in utiles.items() if n not in FAMILLES_MISES_EN_AVANT),
-                   key=lambda x: (-x[1], x[0]))
-    _FAMILLES.extend(en_avant + reste)
-    return list(_FAMILLES)
-
-
-def tirer_une_ligne(famille, hasard=None, sauf=None):
-    lignes = lignes_de(famille)
-    if sauf and len(lignes) > 1:
-        lignes = [l for l in lignes if l[0] != sauf] or lignes
-    return (hasard or random).choice(lignes) if lignes else None
 
 
 class Entrainement:
@@ -166,6 +100,16 @@ class Entrainement:
 
 
 # --- progression gardee
+#
+# Format 2 (25/10) :
+#   {"version": 2,
+#    "lignes":   {"blancs|e4 e5 Nf3 Nc6 Bb5 a6": {essais, reussie, meilleure, derniere}},
+#    "familles": {"Partie espagnole|blancs": {lignes, parfaites, moyenne}}}
+# "familles" est l'ancien contenu du fichier, repris tel quel : rien de perdu.
+VERSION_PROGRESSION = 2
+PARFAIT = 99.9
+
+
 def _chemin():
     try:
         from asset_manager import dossier_ecriture
@@ -174,49 +118,183 @@ def _chemin():
         return os.path.join(os.getcwd(), FICHIER)
 
 
+def _camp(couleur):
+    return "blancs" if couleur == chess.WHITE else "noirs"
+
+
+def convertir(d):
+    """Un contenu lu (ancien ou nouveau) -> format 2. Rien n'est jete."""
+    if not isinstance(d, dict):
+        return {"version": VERSION_PROGRESSION, "lignes": {}, "familles": {}}
+    if d.get("version") == VERSION_PROGRESSION:
+        d.setdefault("lignes", {})
+        d.setdefault("familles", {})
+        return d
+    anciennes = {cle: v for cle, v in d.items() if isinstance(v, dict) and "|" in cle}
+    return {"version": VERSION_PROGRESSION, "lignes": {}, "familles": anciennes}
+
+
+def _ecrire(chemin, d):
+    try:
+        with open(chemin, "w", encoding="utf-8") as f:
+            json.dump(d, f, ensure_ascii=False, indent=1)
+    except OSError as e:
+        print("[ENTRAINEMENT] progression non enregistree : %s" % e)
+
+
 # 23/10 (banc d'essai) : l'ecran Ouvertures demandait la progression 24 fois
 # par image. On lit le fichier une fois, puis on garde une copie en memoire,
 # mise a jour a chaque enregistrement (par chemin : les tests en changent).
 _EN_MEMOIRE = {}
+# 25/10 : les lignes reussies par chemin et par camp (l'arbre les lit a chaque image)
+_REUSSIES = {}
 
 
-def charger_progression():
+def _memoire():
     chemin = _chemin()
     if chemin not in _EN_MEMOIRE:
         try:
             with open(chemin, "r", encoding="utf-8") as f:
-                d = json.load(f)
-            _EN_MEMOIRE[chemin] = d if isinstance(d, dict) else {}
+                lu = json.load(f)
         except (OSError, ValueError):
-            _EN_MEMOIRE[chemin] = {}
-    return copy.deepcopy(_EN_MEMOIRE[chemin])
+            lu = None
+        neuf = convertir(lu)
+        if isinstance(lu, dict) and lu.get("version") != VERSION_PROGRESSION:
+            try:                        # l'ancien fichier est garde a cote
+                shutil.copyfile(chemin, chemin + ".bak")
+            except OSError as e:
+                print("[ENTRAINEMENT] copie .bak impossible : %s" % e)
+            _ecrire(chemin, neuf)
+            print("[ENTRAINEMENT] progression convertie au format %d" % VERSION_PROGRESSION)
+        _EN_MEMOIRE[chemin] = neuf
+    return _EN_MEMOIRE[chemin]
 
 
-def noter_une_ligne(famille, couleur, note):
-    """Ajoute le resultat d'une ligne finie ; renvoie l'entree de la famille."""
-    d = charger_progression()
-    cle = "%s|%s" % (famille, "blancs" if couleur == chess.WHITE else "noirs")
-    e = d.setdefault(cle, {"lignes": 0, "parfaites": 0, "moyenne": 0.0})
+def charger_progression():
+    return copy.deepcopy(_memoire())
+
+
+def noter_une_ligne(famille, couleur, note, cle_ligne=None):
+    """Ajoute le resultat d'une ligne finie ; renvoie l'entree de la famille.
+    cle_ligne ('e4 e5 Nf3 ...') : la ligne de l'arbre, notee a part."""
+    d = copy.deepcopy(_memoire())
+    cle = "%s|%s" % (famille, _camp(couleur))
+    e = d["familles"].setdefault(cle, {"lignes": 0, "parfaites": 0, "moyenne": 0.0})
     e["moyenne"] = (e["moyenne"] * e["lignes"] + note) / (e["lignes"] + 1)
     e["lignes"] += 1
-    if note >= 99.9:
+    if note >= PARFAIT:
         e["parfaites"] += 1
         try:
             import succes
             succes.debloquer("ouverture_parfaite")
         except Exception as e3:
             print("[SUCCES] %s" % e3)
-    _EN_MEMOIRE[_chemin()] = copy.deepcopy(d)
-    try:
-        with open(_chemin(), "w", encoding="utf-8") as f:
-            json.dump(d, f, ensure_ascii=False, indent=1)
-    except OSError as e2:
-        print("[ENTRAINEMENT] progression non enregistree : %s" % e2)
-    return e
+    if cle_ligne:
+        lg = d["lignes"].setdefault("%s|%s" % (_camp(couleur), cle_ligne), {
+            "essais": 0, "reussie": False, "meilleure": 0.0, "derniere": 0.0})
+        lg["essais"] += 1
+        lg["derniere"] = round(float(note), 1)
+        lg["meilleure"] = max(lg["meilleure"], lg["derniere"])
+        lg["reussie"] = bool(lg["reussie"] or note >= PARFAIT)
+    chemin = _chemin()
+    _EN_MEMOIRE[chemin] = d
+    _REUSSIES.pop(chemin, None)
+    _ecrire(chemin, d)
+    return dict(e)
 
 
 def progression(famille, couleur):
-    cle = "%s|%s" % (famille, "blancs" if couleur == chess.WHITE else "noirs")
-    charger_progression()                   # remplit la memoire si besoin
-    e = _EN_MEMOIRE[_chemin()].get(cle)
+    e = _memoire()["familles"].get("%s|%s" % (famille, _camp(couleur)))
     return dict(e) if e is not None else None
+
+
+def ligne(cle_ligne, couleur):
+    """Ce qu'on sait d'une ligne de l'arbre, ou None si jamais jouee."""
+    e = _memoire()["lignes"].get("%s|%s" % (_camp(couleur), cle_ligne))
+    return dict(e) if e is not None else None
+
+
+def lignes_reussies(couleur):
+    """frozenset des cles de lignes reussies sans faute (gardees en memoire)."""
+    par_camp = _REUSSIES.setdefault(_chemin(), {})
+    camp = _camp(couleur)
+    if camp not in par_camp:
+        debut = camp + "|"
+        par_camp[camp] = frozenset(c[len(debut):] for c, v in _memoire()["lignes"].items()
+                                   if c.startswith(debut) and v.get("reussie"))
+    return par_camp[camp]
+
+
+def reussies_sous(noeud, couleur):
+    """Combien de lignes reussies sous ce noeud de l'arbre."""
+    reussies = lignes_reussies(couleur)
+    cle = noeud.cle()
+    if not reussies or not cle:
+        return len(reussies)
+    debut = cle + " "
+    return sum(1 for c in reussies if c == cle or c.startswith(debut))
+
+
+# --- s'entrainer sous un noeud de l'arbre
+class Seance:
+    """Les lignes sous un noeud, dans l'ordre de l'arbre (la plus jouee
+    d'abord), celles deja reussies en dernier ; une ligne ratee repasse une
+    fois le tour fini. 'hasard' (random.Random) : le groupe est melange."""
+
+    def __init__(self, noeud, couleur=chess.WHITE, hasard=None):
+        self.noeud = noeud
+        self.couleur = couleur
+        self.hasard = hasard
+        self.a_revoir = []
+        self.courante = None
+        self.tour = 0
+        self.numero = self.taille_tour = 0
+        self.file = []
+        self._remplir()
+
+    def _remplir(self):
+        feuilles = self.noeud.feuilles()
+        faites = lignes_reussies(self.couleur)
+        a_faire = [f for f in feuilles if f.cle() not in faites]
+        deja = [f for f in feuilles if f.cle() in faites]
+        if self.hasard is not None:
+            self.hasard.shuffle(a_faire)
+            self.hasard.shuffle(deja)
+        self.file = a_faire + deja
+        self._nouveau_tour()
+
+    def _nouveau_tour(self):
+        self.tour += 1
+        self.numero = 0                   # la ligne en cours dans ce tour
+        self.taille_tour = len(self.file)
+
+    def total(self):
+        return self.noeud.nb_lignes
+
+    def suivante(self):
+        """La prochaine ligne (un noeud feuille de l'arbre)."""
+        if not self.file and self.a_revoir:
+            self.file, self.a_revoir = self.a_revoir, []
+            self._nouveau_tour()
+        if not self.file:
+            self._remplir()               # tout le groupe est passe : on recommence
+        self.courante = self.file.pop(0) if self.file else None
+        if self.courante is not None:
+            self.numero += 1
+        return self.courante
+
+    def resultat(self, note):
+        """La ligne courante est finie : ratee, elle repasse a la fin du tour."""
+        if self.courante is not None and note < PARFAIT \
+                and self.courante not in self.a_revoir:
+            self.a_revoir.append(self.courante)
+
+    def entrainement(self):
+        """L'Entrainement de la ligne courante, ou None."""
+        n = self.courante
+        if n is None:
+            return None
+        nommant = n.nommant()
+        return Entrainement((n.coups(), n.code_eco(),
+                             nommant.nom_lichess if nommant is not None else ""), self.couleur)
+

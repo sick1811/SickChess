@@ -49,6 +49,7 @@ SERIES = [
     ("test_cache_analyse.py", False),
     ("test_statistiques.py", False),
     ("test_entrainement.py", False),
+    ("test_arbre_ouvertures.py", False),
     ("test_premier_lancement.py", False),
     ("test_sons_musique.py", False),
     ("test_effets.py", False),

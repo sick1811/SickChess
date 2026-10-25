@@ -108,7 +108,7 @@ if os.path.exists(os.path.join("puzzles", "tranches.tsv")):   # pas de base : ec
     pb.commencer("classe"); pb.attente_jusqu_a = 0; pb.update(); pb.draw(); photo("problemes")
 from ecran_entrainement import EcranEntrainement
 en = EcranEntrainement(ecran, {}); en.draw(); photo("ouvertures")
-en.commencer(en.familles[0][0]); en.draw()
+en.commencer(); en.draw()
 from ecran_analyse_libre import EcranAnalyseLibre      # 24/10 (p35)
 
 

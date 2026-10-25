@@ -37,18 +37,14 @@ def verifier(condition, message):
         echecs.append(message)
 
 
-print("1. Les ouvertures proposees")
-f = entrainement.familles()
-noms = [n for n, _ in f]
-verifier(len(f) >= 30, "%d ouvertures jouables" % len(f))
-verifier(noms[0] == "Défense sicilienne" and "Partie espagnole" in noms[:3],
-         "les grandes ouvertures en tete : %s" % noms[:4])
-verifier(all(entrainement.lignes_de(n) for n in noms[:40]), "chacune a au moins une ligne")
-lignes = entrainement.lignes_de("Défense sicilienne")
-verifier(len(lignes) > 20, "sicilienne : %d lignes differentes (les deviations)" % len(lignes))
-cles = [" ".join(c) for c, _e, _n in lignes]
-verifier(not any(a != b and b.startswith(a + " ") for a in cles for b in cles),
-         "aucune ligne n'est le simple debut d'une autre")
+print("1. Les ouvertures proposees (25/10 : en arbre, voir test_arbre_ouvertures.py)")
+import arbre_ouvertures
+r = arbre_ouvertures.racine()
+verifier(len(r.enfants) >= 15 and r.nb_lignes > 2000,
+         "%d premiers coups, %d lignes a reciter" % (len(r.enfants), r.nb_lignes))
+sic = arbre_ouvertures.noeud("e4 c5")
+verifier(sic.famille() == "Défense sicilienne" and sic.nb_lignes > 20,
+         "sicilienne : %d lignes differentes (les deviations)" % sic.nb_lignes)
 
 print("2. Reciter une ligne")
 ligne = (["e4", "c5", "Nf3", "d6", "d4", "cxd4"], "B50", "Défense sicilienne")
@@ -78,8 +74,8 @@ from ecran_entrainement import EcranEntrainement
 ecr = EcranEntrainement(ecran, {})
 ecr.draw()
 pygame.image.save(ecran, "tests/capture_ouvertures_choix.png")
-verifier(ecr.btns_familles and ecr.btns_familles[0].rect.bottom < ecr.btn_retour_choix.rect.top,
-         "la grille des ouvertures tient au-dessus du bouton Retour")
+verifier(ecr.rect_arbre.bottom <= 640 and ecr.btn_retour_choix.rect.bottom <= 640,
+         "l'arbre des ouvertures et le bouton Retour tiennent dans 640 px")
 ecr.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=ecr.btn_noirs.rect.center))
 verifier(ecr.couleur == chess.BLACK, "choix des Noirs")
 random.seed(3)
@@ -126,7 +122,7 @@ verifier(ouvertures_fr.traduire("King's Gambit Declined: Keene's Defense") == "G
 print("4 ter. « Ligne suivante » en plein ecran, 3 fois de suite (defaut Cowork 24/10, non reproduit)")
 ecran_grand = pygame.display.set_mode((1920, 1080))
 grand = EcranEntrainement(ecran_grand, {})
-grand.commencer(grand.familles[0][0])
+grand.commencer()
 for essai in range(3):
     n = 0
     while not grand.entr.termine() and n < 60:
@@ -171,7 +167,7 @@ entrainement.noter_une_ligne("Partie italienne", chess.BLACK, 50.0)
 verifier(entrainement.progression("Partie italienne", chess.BLACK)["lignes"] == avant + 1,
          "une ligne notee se voit tout de suite")
 with builtins.open(entrainement._chemin(), encoding="utf-8") as f:
-    verifier(json.load(f)["Partie italienne|noirs"]["lignes"] == avant + 1,
+    verifier(json.load(f)["familles"]["Partie italienne|noirs"]["lignes"] == avant + 1,
              "et elle est bien ecrite sur le disque")
 p = entrainement.progression("Partie italienne", chess.BLACK)
 p["lignes"] = 999

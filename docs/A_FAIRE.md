@@ -3,7 +3,7 @@
 Fichier partagé entre Cowork et Claude Code. **À relire au début de chaque séance,
 à mettre à jour à la fin.** La page « SickChess – À faire »
 (https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5) en est la version à cocher pour Julien.
-Mis à jour le 25/10/2026 (fin de séance (43)).
+Mis à jour le 25/10/2026 (fin de séance (44) – arbre des ouvertures).
 
 ## Retours de Julien à traiter (priorité)
 - [ ] **25/10 – mise à jour chez l'ami de Julien** (version n° 4 ou 5) : « vérifie ta connexion / site
@@ -214,6 +214,25 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+Séance du 25/10 (44) · arbre des ouvertures – **Fonctionne / Ne fonctionne pas + commentaire** (version amis n° 9, 0.5.0).
+- [ ] t118 (44) : **l'arbre** : Menu → Entraînement aux ouvertures. À gauche les premiers coups (1.e4, 1.d4, 1.c4…)
+      toujours dans le même ordre ; clic sur « + » (ou flèche →) déplie coup par coup : 1.e4 › 1...e5 › 2.Nf3 ›
+      2...Nc6 › 3.Bb5 « Partie espagnole » › 3...a6 « Partie espagnole › Défense Morphy ». Chaque ligne montre le
+      code ECO et « réussies / total ». Des coups sans nom sont regroupés sur une ligne (ex. « 5...b5 6.Bb3 »).
+- [ ] t119 (44) : **naviguer** : flèches ↑ ↓ → ←, + / −, molette, clic ; l'échiquier à droite montre la position du coup
+      choisi ; le fil d'Ariane en haut (« Début › 1.e4 › … ») suit, et un clic sur un de ses morceaux y remonte.
+- [ ] t120 (44) : **S'entraîner ici** : choisis 3...a6, Blancs, « S'entraîner ici » (ou Entrée) : toutes les lignes sont
+      des suites de 3...a6, la plus jouée d'abord (« Ligne 1 / N »). Fais une faute sur une ligne : elle revient à la
+      fin du tour (« à revoir 1 »). « Changer de groupe » ou Échap : retour à l'arbre, au même coup, et le compteur
+      « réussies / total » a augmenté pour les lignes sans faute.
+- [ ] t121 (44) : **au hasard dans ce groupe** : coche la case puis « S'entraîner ici » : ordre mélangé, mais jamais une
+      ligne d'une autre ouverture.
+- [ ] t122 (44) : **notation, langue, tailles** : Options → notation française : « 2.Cf3 Cc6 3.Fb5 » dans l'arbre et le
+      fil d'Ariane ; en anglais : textes et noms anglais ; en plein écran (et en 4K si tu peux) rien n'est coupé.
+- [ ] t123 (44) : **ta progression d'avant** : ton ancien % par ouverture n'est pas perdu (gardé dans le fichier) ;
+      un fichier `entrainement.json.bak` (l'ancien) apparaît dans le dossier du jeu. Le nom d'ouverture pendant une
+      partie, la pastille « Théorique » de la revue et le résumé du coach sont inchangés.
+
 Séance du 25/10 (43) – pour chaque point : **Fonctionne / Ne fonctionne pas + commentaire**.
 Les points 3 à 6 ne seront dans la version installée qu'après la prochaine version amis (n° 8) ; le point 4
 (durée de la revue) peut se faire dès maintenant avec la n° 7.
