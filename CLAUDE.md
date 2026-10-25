@@ -132,6 +132,13 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
 - Le lien entre les deux = **ce fichier + `docs/A_FAIRE.md` + `docs/JOURNAL.md`** :
   toujours les tenir à jour en fin de séance.
 
+## Documentation des bibliothèques (Context7)
+- Serveur MCP **Context7** déclaré dans `.mcp.json` (https://github.com/upstash/context7) : il donne
+  la documentation à jour de Pygame, python-chess, PyInstaller, Steamworks, Inno Setup, etc.
+- Avant d'utiliser une fonction de bibliothèque dont on n'est pas sûr (nom, paramètres, version),
+  la chercher avec Context7 (`resolve-library-id` puis `query-docs` / `get-library-docs`) au lieu
+  de deviner. Pas de clé nécessaire (limite gratuite suffisante).
+
 ## Performance (le jeu doit rester léger)
 - Rien ne se lit sur le disque dans un `draw()` ; textes et fonds fixes gardés en cache ;
   ne pas tout redessiner 60 fois par seconde quand rien ne bouge (skill `performance-pygame`).
