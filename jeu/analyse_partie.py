@@ -375,6 +375,9 @@ class AnalyseurPartie:
         self._verrou_choix = threading.Lock()
         self._ouvriers = 0
         self._priorite = None
+        # 25/10 : _prochaine n'a rien rendu parce qu'une voisine est en cours
+        # sur un autre moteur : il faut attendre, pas quitter la revue.
+        self._attendre = False
         self._cache = {}
         # SickChess 17/10 (remarque de Julien : "les analyses ne sont pas bien
         # enregistrees, une nouvelle evaluation commence a chaque revue") :
@@ -610,20 +613,49 @@ class AnalyseurPartie:
         n = len(self.fens)
         p = self._priorite
         occupe = self._en_travail
+        self._attendre = False
         if p is not None:
             # Le coup regarde a besoin des positions p et p+1 ; p+2 donne le
             # meilleur coup de la position suivante. 18/10 (16) : les quatre
             # voisines passent d'abord l'analyse rapide (pour savoir s'il faut
             # verifier), puis la verification.
+            # 25/10 (t71) : la passe des 3 coups va jusqu'a p-2 et p+3, les
+            # voisines de p-1 et p+2 : sans elles, leur verdict restait
+            # incertain et elles etaient verifiees pour rien.
             for niveau in range(1, self.niveau_final + 1):
-                for k in (p + 1, p, p + 2, p - 1):
+                autour = (p + 1, p, p + 2, p - 1, p + 3, p - 2) \
+                    if niveau < self.niveau_final else (p + 1, p, p + 2, p - 1)
+                for k in autour:
                     if 0 <= k < n and self.niveau[k] < niveau and k not in occupe:
-                        return k, niveau
+                        choix = self._voisine_d_abord(k, niveau)
+                        if choix is not None:
+                            return choix
         for niveau in range(1, self.niveau_final + 1):
             for k in range(min(n, len(self.niveau))):
                 if self.niveau[k] < niveau and k not in occupe:
-                    return k, niveau
+                    choix = self._voisine_d_abord(k, niveau)
+                    if choix is not None:
+                        return choix
         return None
+
+    def _voisine_d_abord(self, k, niveau):
+        """25/10 (t71, revue lente) : la verification de k attend la passe des
+        3 coups de ses deux voisines (sans elles, _coup_sur ne sait pas et la
+        position etait verifiee « par accident » : 9 positions au lieu de 6,
+        111 s au lieu de 90 s). On fait d'abord la voisine si elle est libre ;
+        sinon (un autre moteur la fait) on passe a une autre position."""
+        if niveau < self.niveau_final or not self.lignes_spec:
+            return k, niveau
+        # 25/10 : bornee par les positions construites (ajouter_coups agrandit
+        # niveau avant finie et fens, sans le verrou).
+        n = min(len(self.fens), len(self.finie), len(self.niveau))
+        for j in (k - 1, k + 1):
+            if 0 <= j < n and self.niveau[j] < 2 and not self.finie[j]:
+                if j in self._en_travail:
+                    self._attendre = True
+                    return None
+                return j, 2
+        return k, niveau
 
     def _moteur(self, indice=0, combien=1):
         if self._moteur_fourni is not None:
@@ -653,10 +685,13 @@ class AnalyseurPartie:
             while not self._stop:
                 with self._verrou_choix:
                     suivant = self._prochaine()
+                    attendre = self._attendre
                     if suivant is not None:
                         self._en_travail.add(suivant[0])
                 if suivant is None:
-                    if self.suivi or (self._en_travail and indice == 0):
+                    # 25/10 : un renfort attend aussi la voisine prise par un
+                    # autre moteur (avant, il quittait : le moteur 0 finissait seul).
+                    if self.suivi or attendre or (self._en_travail and indice == 0):
                         time.sleep(0.15)      # on attend le coup suivant
                         continue
                     break

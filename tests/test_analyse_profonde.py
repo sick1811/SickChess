@@ -83,6 +83,105 @@ b._analyser(b._moteur_fourni, 0, 3)
 b._analyser(b._moteur_fourni, 1, 3)
 verifier(b.detail(0)["pret"], "a 30 : pastille posee (%s)" % b.detail(0)["note"])
 
+print("4. Un saut au coup p ne fait pas verifier de position en plus (25/10, t71)")
+
+
+class Calme:
+    """Partie calme (meme evaluation partout) : note chaque passe profonde
+    (25 millions de noeuds) et si les deux voisines avaient leur passe des
+    trois coups a ce moment-la."""
+    def __init__(self):
+        self.a = None
+        self.profondes = []
+        self.trop_tot = []
+
+    def analyser_position(self, fen, profondeur, temps, lignes=1, noeuds=0):
+        a = self.a
+        k = a.fens.index(fen)
+        if noeuds == a.noeuds:
+            self.profondes.append(k)
+            if any(0 <= j < len(a.fens) and a.niveau[j] < 2 and not a.finie[j]
+                   for j in (k - 1, k + 1)):
+                self.trop_tot.append(k)
+        plateau = chess.Board(fen)
+        signe = 1 if plateau.turn == chess.WHITE else -1    # +0,2 pour les Blancs
+        coups = [c.uci() for c in list(plateau.legal_moves)[:3]]
+        lignes_moteur = [{"coup": u, "cp": signe * 20 - 2 * n, "mat": None,
+                          "profondeur": 22, "suite": []}
+                         for n, u in enumerate(coups[:lignes])]
+        return {"coup": coups[0], "evaluation": signe * 0.2, "mat": None,
+                "profondeur": 22, "lignes": lignes_moteur, "second_mat": None,
+                "second_evaluation": signe * 0.2 - 0.02 if lignes > 1 else None}
+
+
+# Coups tranquilles hors theorie, sans prise ni position repetee.
+PARTIE_CALME = ["h2h3", "h7h6", "a2a3", "a7a6", "g2g3", "g7g6", "b2b3", "b7b6",
+                "f1g2", "f8g7", "c1b2", "c8b7", "g1f3", "g8f6", "b1c3", "b8c6",
+                "e1g1", "e8g8", "d2d3", "d7d6", "e2e3", "e7e6", "d1e2", "d8e7",
+                "f1e1", "f8e8", "a1d1", "a8d8"]
+
+
+def revue_calme(saut=None):
+    m = Calme()
+    a = A.AnalyseurPartie(None, PARTIE_CALME, None, "calcul_forte", moteur=m)
+    m.a = a
+    verifier(len(set(a.fens)) == len(a.fens), "partie calme : %d positions toutes "
+             "differentes" % len(a.fens))
+    if saut is not None:
+        a.prioriser(saut)
+    a._travailler()
+    verifier(a.terminee(), "revue terminee (saut : %s)" % saut)
+    return m, a
+
+
+m_sans, a_sans = revue_calme()
+m_saut, a_saut = revue_calme(saut=15)
+verifier(not m_saut.trop_tot, "apres un saut au coup 15 : aucune position verifiee "
+         "avant la passe des 3 coups de ses voisines (%s)" % m_saut.trop_tot)
+verifier(sorted(m_saut.profondes) == sorted(m_sans.profondes),
+         "meme nombre de positions verifiees qu'une revue sans saut (%d / %d)"
+         % (len(m_saut.profondes), len(m_sans.profondes)))
+verifier([a_saut.detail(i)["note"] for i in range(len(PARTIE_CALME))]
+         == [a_sans.detail(i)["note"] for i in range(len(PARTIE_CALME))],
+         "memes pastilles avec ou sans saut")
+
+print("5. Un moteur de renfort attend la voisine prise par un autre moteur (25/10)")
+import threading
+import time
+m5 = Calme()
+a5 = A.AnalyseurPartie(None, PARTIE_CALME[:6], None, "calcul_forte", moteur=m5)
+m5.a = a5
+# Tout est fait sauf la position 3 (passe des 3 coups faite, a verifier) et
+# sa voisine 4, que « l'autre moteur » est en train de passer aux 3 coups.
+a5.niveau = [a5.niveau_final] * len(a5.fens)
+a5.niveau[3], a5.niveau[4] = 2, 1
+a5._en_travail.add(4)
+a5._ouvriers = 2
+renfort = threading.Thread(target=a5._travailler, args=(1,), daemon=True)
+renfort.start()
+time.sleep(0.4)
+verifier(renfort.is_alive(), "le renfort attend au lieu de quitter la revue")
+with a5._verrou_choix:                 # l'autre moteur a fini la position 4
+    a5.niveau[4] = 2
+    a5._en_travail.discard(4)
+renfort.join(5)
+verifier(not renfort.is_alive() and a5.niveau[3] == a5.niveau_final,
+         "puis il fait la position 3 et s'arrete (niveau %d)" % a5.niveau[3])
+a5._stop = True
+
+print("6. Analyse en direct : coup ajoute a moitie (25/10)")
+a6 = A.AnalyseurPartie(None, ["h2h3", "h7h6"], None, "calcul_forte", moteur=Calme(),
+                       suivi=True)
+a6.niveau = [3, 3, 2]
+a6.niveau.append(0)                    # ajouter_coups : la case niveau d'abord
+try:
+    choix6 = a6._prochaine()
+    a6.finie.append(False)
+    choix6 = a6._prochaine()
+except IndexError as e:
+    choix6 = "plante : %s" % e
+verifier(choix6 == (2, 3), "la position pas encore construite est ignoree (%s)" % (choix6,))
+
 print()
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))
 sys.exit(1 if echecs else 0)
