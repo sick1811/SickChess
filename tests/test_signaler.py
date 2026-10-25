@@ -158,6 +158,29 @@ try:
 finally:
     ui.coller = vrai_coller
 verifier(court.contenu == "ABCD-1234", "champ court (code d'un salon) : Ctrl+V remplace toujours")
+print("4 bis. Coller (defauts Cowork 24/10 : Ctrl+V remplacait tout, le « à » disparaissait)")
+import ui
+e2 = EcranSignaler(ecran, "0.1.0")
+e2.champ.activer(True)
+e2.champ.contenu = "Rapport de plantage : erreur X. "
+vrai_coller = ui.coller
+ui.coller = lambda: "Test à é ç - ignorer"
+try:
+    e2.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_v,
+                                       mod=pygame.KMOD_CTRL, unicode="v"))
+finally:
+    ui.coller = vrai_coller
+verifier(e2.champ.contenu == "Rapport de plantage : erreur X. Test à é ç - ignorer",
+         "Ctrl+V ajoute au texte deja ecrit : « %s »" % e2.champ.contenu)
+if os.name == "nt":
+    ancien = ui._windows_lire()                 # on rendra le presse-papiers de Julien
+    try:
+        verifier(ui.copier("Test Cowork 24/10 à é ç œ - ignorer")
+                 and ui.coller() == "Test Cowork 24/10 à é ç œ - ignorer",
+                 "presse-papiers Windows : copier puis coller garde les accents (« %s »)" % ui.coller())
+    finally:
+        if ancien:
+            ui._windows_ecrire(ancien)
 
 print("5. Le menu")
 from menu_principal import MainMenu

@@ -245,6 +245,25 @@ def trouver_iscc():
     return None
 
 
+def dossier_d_essai(contenus, racine, dist, base=None):
+    """25/10 : le dossier du jeu tel qu'un ami l'a : programme (SickChess.exe) +
+    jeu (le code, a cote de l'exe) + moteur. L'essai du .exe se faisait sur le
+    programme SEUL : « No module named 'game_manager' », et la n° 6 bloquee a tort.
+    Renvoie le dossier, ou dist si l'exe n'est pas la."""
+    if not dist or not os.path.isfile(os.path.join(dist, "SickChess.exe")):
+        return dist
+    dossier = os.path.join(base or os.path.join(DOSSIER_BUILD, "essai"), "SickChess")
+    shutil.rmtree(dossier, ignore_errors=True)
+    shutil.copytree(dist, dossier)
+    for nom in ("jeu", "moteur"):
+        fichiers = (contenus or {}).get(nom) or fichiers_du_paquet(racine, PAQUETS[nom])
+        for absolu, relatif in fichiers:
+            cible = os.path.join(dossier, relatif)
+            os.makedirs(os.path.dirname(cible), exist_ok=True)
+            shutil.copy2(absolu, cible)
+    return dossier
+
+
 def _installeur(manifeste, contenus, racine, dist, sortie, depot):
     """SickChess_Installation.exe : installeur Windows COMPLET pour un NOUVEL ami
     (24/10, choix de Julien : programme, jeu, Stockfish, problemes ET tables de
@@ -371,9 +390,8 @@ def publier(notes, racine=RACINE, dossier_publier=DOSSIER_PUBLIER, dist=None,
         "paquets": paquets,
     }
     chemin_manifeste = os.path.join(sortie, "maj.json")
-    for chemin in (chemin_manifeste, os.path.join(dossier_publier, "maj.json")):
-        with open(chemin, "w", encoding="utf-8") as f:
-            json.dump(manifeste, f, indent=2, ensure_ascii=False)
+    with open(chemin_manifeste, "w", encoding="utf-8") as f:
+        json.dump(manifeste, f, indent=2, ensure_ascii=False)
     a_envoyer.append(chemin_manifeste)
 
     # -- le jeu a donner a un nouvel ami (programme + jeu)
@@ -390,13 +408,19 @@ def publier(notes, racine=RACINE, dossier_publier=DOSSIER_PUBLIER, dist=None,
         # 24/10 (p32) : le .exe doit demarrer chez un ami (dossier neuf) AVANT
         # d'etre envoye : sinon, rien ne part.
         import verifier_version
-        dossier_exe = dist or os.path.join(DOSSIER_BUILD, "dist", "SickChess")
+        dossier_exe = dossier_d_essai(contenus, racine,
+                                      dist or os.path.join(DOSSIER_BUILD, "dist", "SickChess"))
         etat, phrase = verifier_version.controle_exe(dossier_exe)
         dire("  essai du .exe : %s - %s" % (etat, phrase))
         if etat == verifier_version.BLOQUANT:
             raise SystemExit("Le .exe ne demarre pas correctement : rien n'est envoye.")
-    if envoyer:
-        _envoyer_sur_github(depot, etiquette, manifeste, a_envoyer, sortie)
+    if envoyer and not _envoyer_sur_github(depot, etiquette, manifeste, a_envoyer, sortie):
+        return manifeste
+    # 25/10 : la copie locale (« derniere version publiee ») n'est ecrite qu'APRES
+    # l'envoi. Avant, elle l'etait avant l'essai du .exe : la n° 6 bloquee par l'essai
+    # passait pour publiee (« Rien n'a change depuis la version n°6 »).
+    with open(os.path.join(dossier_publier, "maj.json"), "w", encoding="utf-8") as f:
+        json.dump(manifeste, f, indent=2, ensure_ascii=False)
     return manifeste
 
 
@@ -450,12 +474,12 @@ def _envoyer_sur_github(depot, etiquette, manifeste, fichiers, sortie):
         dire("  3. Glisse TOUS les fichiers du dossier qui va s'ouvrir, puis Publish.")
         if sys.platform == "win32":
             os.startfile(sortie)
-        return
+        return True
     if subprocess.run(["gh", "repo", "view", depot], capture_output=True).returncode != 0:
         reponse = input("Le depot %s n'existe pas. Le creer (public) ? [o/n] " % depot)
         if reponse.strip().lower() not in ("o", "oui", "y"):
             dire("Rien n'est envoye. Les fichiers restent dans %s" % sortie)
-            return
+            return False
         subprocess.run(["gh", "repo", "create", depot, "--public", "--description",
                         "Versions de SickChess pour les amis (mises a jour du jeu)"],
                        check=True)
@@ -471,6 +495,7 @@ def _envoyer_sur_github(depot, etiquette, manifeste, fichiers, sortie):
          "download/SickChess_Installation.exe" % depot)
     dire("  (ou le zip : https://github.com/%s/releases/latest/download/SickChess_amis.zip)"
          % depot)
+    return True
 
 
 def installeur_seul(racine=RACINE, dossier_publier=DOSSIER_PUBLIER, envoyer=True):

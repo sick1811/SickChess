@@ -206,6 +206,24 @@ d["record_survie"] = 1
 verifier(mp.record("survie") == 4242, "modifier ce qu'on a recu ne change pas la memoire")
 del mp.open
 
+
+print("Probleme du jour rouvert le meme jour (defaut Cowork 24/10 : le jeu se fermait)")
+d = mp.charger()
+d.setdefault("jour", {})[mp.aujourd_hui()] = True          # deja reussi aujourd'hui
+mp.enregistrer(d)
+neuf = EcranProblemes(ecran, {})                           # ecran tout neuf, comme sur le PC
+try:
+    neuf.commencer("jour")
+    neuf.draw()
+    neuf.update()
+    neuf.draw()
+    plante = None
+except Exception as e:                                     # AttributeError: ... 'solution'
+    plante = "%s: %s" % (type(e).__name__, e)
+verifier(plante is None, "rouvrir le probleme du jour deja fait ne plante pas (%s)" % plante)
+verifier("déjà fait le problème du jour" in neuf.message,
+         "message : « %s »" % neuf.message)
+
 print()
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))
 pygame.quit()

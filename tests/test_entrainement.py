@@ -118,10 +118,33 @@ import re as _re
 restes = sorted({ouvertures_fr.traduire(nom) for _eco, nom in ouvertures.livre().values()
                  if _re.search(r"\b(King's|Queen's|roi's|dame's)", ouvertures_fr.traduire(nom))})
 verifier(not restes, "plus de King's / Queen's dans les noms traduits (%d : %s)" % (len(restes), restes[:3]))
-verifier(ouvertures_fr.traduire("King's Knight Opening") == "Ouverture du cavalier roi",
+verifier(ouvertures_fr.traduire("King's Knight Opening") == "Partie du cavalier roi",
          "King's Knight Opening : %s" % ouvertures_fr.traduire("King's Knight Opening"))
 verifier(ouvertures_fr.traduire("King's Gambit Declined: Keene's Defense") == "Gambit du roi refusé, Défense Keene",
          "le « 's » anglais d'un nom propre disparait : %s" % ouvertures_fr.traduire("King's Gambit Declined: Keene's Defense"))
+
+print("4 ter. « Ligne suivante » en plein ecran, 3 fois de suite (defaut Cowork 24/10, non reproduit)")
+ecran_grand = pygame.display.set_mode((1920, 1080))
+grand = EcranEntrainement(ecran_grand, {})
+grand.commencer(grand.familles[0][0])
+for essai in range(3):
+    n = 0
+    while not grand.entr.termine() and n < 60:
+        n += 1
+        if grand.adverse_a:
+            grand.adverse_a = 1
+            grand.update()
+        elif grand.entr.a_moi_de_jouer():
+            grand.plateau.make_move(chess.Move.from_uci(grand.entr.coup_attendu_uci()))
+            grand.update()
+    grand.draw()
+    avant = list(grand.entr.coups)
+    centre = grand.btn_suivante.rect.center
+    for type_ in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP):
+        grand.handle_event(pygame.event.Event(type_, button=1, pos=centre))
+    verifier(grand.entr.coups != avant and not grand.entr.termine(),
+             "1920x1080, ligne finie, clic %d sur « Ligne suivante » : une autre ligne" % (essai + 1))
+ecran = pygame.display.set_mode((1024, 640))
 
 print("5. Le menu")
 from menu_principal import MainMenu

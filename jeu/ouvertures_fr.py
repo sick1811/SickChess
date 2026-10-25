@@ -42,7 +42,6 @@ import unicodedata
 FAMILLES = {
     # 24/10 (Cowork, t57 : « Ouverture King's du cavalier ») : les familles en
     # King's / Queen's / nom propre + 's qui restaient a moitie en anglais.
-    "King's Knight Opening": "Ouverture du cavalier roi",
     "King's Pawn Opening": "Ouverture du pion roi",
     "Anderssen's Opening": "Ouverture Anderssen",
     "Pseudo Queen's Indian Defense": "Défense pseudo-ouest-indienne",
@@ -276,6 +275,48 @@ EXPRESSIONS = {
 }
 
 # --------------------------------------------------------------- mots isoles
+
+# 25/10 (defaut Cowork : « Ouverture King's du cavalier ») : les possessifs des
+# PIECES ne se traduisent pas mot a mot (King's Knight = le cavalier ROI, pas
+# « King's du cavalier ») ; on donne les expressions entieres du livre.
+EXPRESSIONS.update({
+    "King's Knight's Gambit": "Gambit du cavalier roi",
+    "King's Knight Opening": "Partie du cavalier roi",
+    "King's Knight Variation": "Variante du cavalier roi",
+    "Queen's Knight Defense": "Défense du cavalier dame",
+    "Queen's Knight Variation": "Variante du cavalier dame",
+    "Queen's Knight": "Cavalier dame",
+    "King's Bishop Variation": "Variante du fou roi",
+    "Modern Bishop's Opening": "Ouverture du fou moderne",
+    "Bishop's Opening": "Ouverture du fou",
+    "Bishop's Gambit": "Gambit du fou",
+    "King's Pawn Opening": "Ouverture du pion roi",
+    "King's Pawn Line": "Ligne du pion roi",
+    "Queen's Pawn": "Pion dame",
+    "King's English Variation": "Variante anglaise du roi",
+    "King's English": "Anglaise du roi",
+    "King's Gambit Reversed": "Gambit du roi inversé",
+    "King's Head Opening": "Ouverture de la tête du roi",
+    "King's Indian Attack": "Attaque est-indienne",
+    "King's Indian Formation": "Formation est-indienne",
+    "King's Indian System": "Système est-indien",
+    "King's Indian Variation": "Variante est-indienne",
+    "Pseudo Queen's Indian Defense": "Défense pseudo-ouest-indienne",
+    "Anti-Queen's Indian System": "Système anti-ouest-indien",
+    "Queen's Indian Defense": "Défense ouest-indienne",
+    "Queen's Indian Formation": "Formation ouest-indienne",
+    "Queen's Indian Variation": "Variante ouest-indienne",
+    "Queen's Indian Accelerated": "Ouest-indienne accélérée",
+    "Queen's Gambit Invitation": "Invitation au gambit dame",
+    "Knight's Tour Variation": "Variante du tour du cavalier",
+    "Beginner's Trap": "Piège du débutant",
+    "Lion's Jaw": "Mâchoire du lion",
+    "Fool's Mate": "Mat le plus rapide",
+})
+
+# Les noms propres au possessif (« Petrov's », « Keene's ») : on garde le nom,
+# sans le « 's » (« Défense Keene »). Les pieces sont traitees au-dessus.
+_POSSESSIF = re.compile(r"\b([A-Z][A-Za-z.\-]*)'s\b")
 
 MOTS = {
     "with": "avec",
@@ -537,6 +578,9 @@ def _traduire_morceau(texte):
         motif_exact = r"\b%s\b" % re.escape(anglais)
         if re.search(motif_exact, reste):
             reste = re.sub(motif_exact, EXPRESSIONS[anglais].replace("\\", "\\\\"), reste)
+    # 1 bis. 25/10 : le « 's » d'un nom propre tombe (« Keene's Defense » ->
+    # « Keene Defense » -> « Defense Keene »).
+    reste = _POSSESSIF.sub(r"\1", reste)
     # 2. LA REGLE DE L'ORDRE FRANCAIS : "Najdorf Variation" -> "Variante
     #    Najdorf". Elle passe avant le mot a mot, qui ne sait pas inverser.
     inverse = _inverser(reste)

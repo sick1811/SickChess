@@ -35,6 +35,12 @@ Mis à jour le 24/10/2026.
       - [ ] t71 / t99 : revue lente (17 coups : 7 min) et temps annoncé faux ; précision définitive ~2 min 30.
       - [ ] t100 : petites pastilles « ?! » / « ! » peu lisibles dans la feuille de coups.
       - [ ] t56 : une partie à deux compte dans « Tes ouvertures » (voulu ?) ; t68 : Enregistrer pas réagi une fois.
+      - [ ] Accents manquants : « Aucun coup joue » (panneau de partie), « Jouer d'avance pendant que l'adversaire
+            reflechit » (Options → Partie), « %d problèmes joues » (écran Problèmes), « Cree une partie » (en ligne).
+      - [ ] Texte coupé : « Joue contre un ami Steam. Cree une partie et invite-le, ou entre… » (Jouer en ligne).
+      - [ ] Au menu principal, Échap ferme le jeu sans demander (deux fois par accident pendant les tests).
+      - [ ] Ne pas mettre dans Git : `_sauvegarde_cowork_2026-10-24/` (sauvegarde des données de Julien faite par
+            Cowork, à garder ou supprimer par Julien) et `rapports/` (ajouté au .gitignore le 25/10).
 - [x] Analyses gardées (fichier `.analyse.json` à côté du PGN), pastilles stables, analyse
       pendant la partie, revue au coup 1, sacrifices non punis – faits et validés le 17/10.
 - [x] Sons des pièces : chocs de bois enregistrés (Kenney CC0) – validés.
@@ -171,7 +177,7 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
-- [ ] t105 (39) : regarde ton salon Discord : 3 messages de test (rouge, vert, bleu) de Claude, à supprimer.
+- [ ] t107 (39) : regarde ton salon Discord : 3 messages de test (rouge, vert, bleu) de Claude, à supprimer.
       Après la prochaine version : Menu → Signaler → un bug puis une idée : ils arrivent en rouge / vert.
 - [ ] t104 (38) : **analyse de fond (p25)** : importe une partie (ou joues-en une à deux), reste au menu
       quelques minutes, puis Mes parties : « Revue prête » ; sa revue s'ouvre avec toutes les pastilles.
@@ -187,7 +193,7 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
       redescend de plusieurs Go ; rouvre la même revue : pastilles et précision sont toujours là.
 → 24/10 : chaque test de la page porte une étiquette « Qui » (Cowork / Claude Code PC / Toi) ;
   répartition et consignes pour Cowork : `docs/TESTS_COWORK.md`. Filtre « Seulement pour moi » dans la page.
-- [ ] t101 (28) : **quitter et lancer vite** : pendant que l'ordinateur réfléchit (niveau Maximum, longue cadence),
+- [x] (✓ Cowork 24/10) t101 (28) : **quitter et lancer vite** : pendant que l'ordinateur réfléchit (niveau Maximum, longue cadence),
       clique Quitter la partie → le menu revient aussitôt ; dans le Gestionnaire des tâches, stockfish.exe redescend
       à 0 % ; relance une partie contre l'ordinateur → elle démarre tout de suite. Même chose pendant une revue, puis
       bouton Quitter du jeu (et la croix) : le jeu se ferme en moins d'une seconde, sans « ne répond pas ».
@@ -204,21 +210,21 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 - [ ] t97 (29) : double-clic sur CONSTRUIRE_VERSION_AMIS.bat : la vérification passe d'abord (OK / A REVOIR /
       BLOQUANT) ; la version ne se fabrique que sans BLOQUANT ; le .exe est essayé avant l'envoi. Clair ?
 - [ ] Claude Code (PC) : `python outils/endurance.py` (2 h, la nuit) → docs/ENDURANCE.md ; dire à Julien le verdict.
-- [ ] t96 (27) : dans un terminal, dossier du jeu : `python SickChess.py --plantage-test` (le jeu se ferme), puis
+- [x] (✓ Cowork 24/10) t96 (27) : dans un terminal, dossier du jeu : `python SickChess.py --plantage-test` (le jeu se ferme), puis
       relance le jeu : carte « La dernière fois, SickChess s'est fermé… » ; « Envoyer le rapport » ouvre Signaler
       déjà rempli ; envoie (ou Non merci) : la carte ne revient plus.
-- [ ] t95 (26) : importe (Mes parties → Importer) une partie qui commence à une autre position (PGN avec
+- [x] (✓ Cowork 24/10) t95 (26) : importe (Mes parties → Importer) une partie qui commence à une autre position (PGN avec
       [FEN "…"]) dont le 1er coup est une gaffe : sa revue le note Gaffe, pas « Théorique » (R-06I).
 - [ ] Claude Code (PC) : `python outils/recette_auto.py` et `python outils/banc_essai.py --sections precision`
       (relance programmée à 4 h 20), puis version amis.
-- [ ] t92 (25, Steam ouvert) : Problèmes → « Classements Steam » : les trois classements et les trois vues se
+- [x] (✓ Cowork 24/10) t92 (25, Steam ouvert) : Problèmes → « Classements Steam » : les trois classements et les trois vues se
       chargent ; ta ligne « Toi » en or (après un premier score). Lisible ? Rapide ?
-- [ ] t93 (25) : fais un contre la montre puis rouvre les classements : ton score y est (Actualiser si besoin) ;
+- [x] (✓ Cowork 24/10) t93 (25) : fais un contre la montre puis rouvre les classements : ton score y est (Actualiser si besoin) ;
       même chose avec une survie et un problème classé.
 - [ ] t94 (25) : Steam fermé : l'écran le dit et montre tes scores ; joue un contre la montre ; relance le jeu
       Steam ouvert : ton record apparaît dans le classement sans rien refaire.
 - [ ] Regarder `docs/steam_succes/apercu.png` : les icônes des succès te plaisent ? (à refaire avec Cowork sinon)
-- [ ] t88 (24, sans ami) : Jouer en ligne → « Test : invitation », puis Retour : dans le menu, « Ami de test
+- [x] (✓ Cowork 24/10) t88 (24, sans ami) : Jouer en ligne → « Test : invitation », puis Retour : dans le menu, « Ami de test
       t'invite à jouer » avec un petit son ; « Plus tard » le range ; Jouer en ligne le montre dans
       « INVITATIONS REÇUES ».
 - [ ] t89 (24, avec un ami) : SickChess ouvert au menu, ton ami t'invite depuis son salon : bandeau en haut ;
@@ -226,15 +232,15 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 - [ ] t90 (24, avec un ami) : même chose pendant les Problèmes (ou une revue) : l'écran se ferme, salon de l'ami.
 - [ ] t91 (24, avec un ami) : même chose pendant une partie contre l'ordinateur : « Rejoindre <ami> ? »,
       pendule arrêtée ; Rester continue ; Rejoindre → salon, et ensuite « Reprendre la partie » dans le menu.
-- [ ] t82 (23) : Menu → Analyse libre : en quelques secondes, 3 lignes de Stockfish, « profondeur » qui monte,
+- [x] (✓ Cowork 24/10) t82 (23) : Menu → Analyse libre : en quelques secondes, 3 lignes de Stockfish, « profondeur » qui monte,
       flèche bleue ; joue des coups des deux camps : Stockfish suit chaque coup aussitôt ; le jeu reste fluide.
-- [ ] t83 (23) : clique sur une des 3 lignes (son premier coup est joué) ; Espace : « Relancer » en or et le
+- [x] (✓ Cowork 24/10) t83 (23) : clique sur une des 3 lignes (son premier coup est joué) ; Espace : « Relancer » en or et le
       processeur redescend (Gestionnaire des tâches) ; Espace : ça repart.
-- [ ] t84 (23) : copie un FEN sur lichess (Partager) puis Ctrl+V ; copie une partie PGN puis Ctrl+V ; C copie
+- [x] (✓ Cowork 24/10) t84 (23) : copie un FEN sur lichess (Partager) puis Ctrl+V ; copie une partie PGN puis Ctrl+V ; C copie
       le FEN et lichess.org/analysis affiche la même position.
 - [ ] t85 (23) : Éditer (E) : vide le plateau, pose rois / tours / pions, essaie une position impossible
       (message), coche un roque, « Analyser ». L'éditeur est-il facile à utiliser ?
-- [ ] t86 (23) : revue d'une partie → un coup → « Analyser (A) » : même position ; Retour : la revue revient
+- [x] (✓ Cowork 24/10) t86 (23) : revue d'une partie → un coup → « Analyser (A) » : même position ; Retour : la revue revient
       au même coup. Les 4 boutons du bas de la revue tiennent bien sur ton écran ?
 - [x] t87 (23) : avec le dossier syzygy/ : colle `8/8/8/4k3/8/8/4P3/4K3 w - - 0 1` → « Tables de finale :
       nulle » (24/10 : vérifié par Cowork ; c'est bien nulle, l'ancien texte « les Blancs gagnent » était faux) ; laisse 2 min sur une position : « analyse terminée », plus de stockfish.exe
@@ -260,7 +266,7 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 - [ ] t64-t66 : revue – Stockfish ne joue plus, flèches bleues/vertes, export et comparaison chess.com.
 - [ ] t67 : temps réel d'une revue complète (Calcul fixe, **Forte**, par défaut depuis le 18/10 (14)) ;
       la mesure prévoit environ 9 min pour 40 coups. « environ X min » juste ?
-- [ ] t68 : Options → Partie → Façon d'analyser / Puissance ; « Forte » est sélectionné ; partie déjà
+- [x] (✓ Cowork 24/10) t68 : Options → Partie → Façon d'analyser / Puissance ; « Forte » est sélectionné ; partie déjà
       analysée pas refaite.
 - [x] t69 : mesure faite le 18/10 (`docs/MESURE_STOCKFISH.md`) ; décision de Julien : Forte et 3 × 4.
 - [ ] t71 (16) : revue d'une longue partie importée (Forte) : ≈ 5 min pour 70 coups ? Ronds creux qui se
@@ -269,7 +275,7 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
       noter la mémoire du PC (Gestionnaire des tâches → Performance → Mémoire).
 - [x] Commit Git de la séance du 18/10 (13) par Claude Code (fusionné sur GitHub, PR n° 1).
 - [ ] Problèmes → « Mes erreurs » : tes gaffes deviennent des problèmes (parties dont la revue a été ouverte).
-- [ ] Revue : jouer une variante sur l'échiquier, Stockfish répond ; Échap pour revenir.
+- [x] (✓ Cowork 24/10) Revue : jouer une variante sur l'échiquier, Stockfish répond ; Échap pour revenir.
 - [ ] Commit Git des séances du 17/10 (3) et (4) par Claude Code.
 - [ ] Problèmes : nouveaux sons de réussite / d'erreur (marimba).
 - [ ] Commit Git de la séance du 17/10 (3) par Claude Code (sons des problèmes, A_FAIRE, JOURNAL).
@@ -280,7 +286,7 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
       télécharge moteur + problèmes + finales, puis le jeu redémarre ?
 - [ ] Petite modif + nouveau .bat : le bouton s'allume « Mise à jour disponible ! »,
       ne télécharge que le paquet « jeu », profil et réglages gardés ?
-- [ ] Multijoueur sur un seul PC : lancer le jeu deux fois, « Test : héberger » /
+- [x] (✓ Cowork 24/10) Multijoueur sur un seul PC : lancer le jeu deux fois, « Test : héberger » /
       « Test : rejoindre ». (Pas encore fait : pas d'adversaire humain.)
 - [ ] Multijoueur Steam avec un ami (deux PC) ; l'overlay Maj+Tab s'ouvre-t-il ?
 

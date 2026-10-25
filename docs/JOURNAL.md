@@ -1297,6 +1297,26 @@ Causes et corrections :
 - Version testée : celle du PC (sans le travail « quitter / lancer vite » de la séance 28).
 - À décider par Julien : 4 Stockfish gardent ~5,5 Go de mémoire même au menu (libérer quand on n'analyse pas ?).
 
+## 24/10/2026 (30) – [récupéré du PC le 25/10] Cowork fait les tests « Cowork » de la page sur le PC de Julien
+Fait (Cowork, jeu piloté souris + clavier sur le vrai PC, Steam ouvert) :
+- Données de Julien sauvegardées avant (`_sauvegarde_cowork_2026-10-24/`) et remises à l'identique après
+  (empreintes vérifiées : config, profil, puzzles_score, mes_erreurs, succes, entrainement, modes_problemes ;
+  parties/ identique). Les 12 fichiers de parties créés par les tests sont rangés dans
+  `_sauvegarde_cowork_2026-10-24/parties_ajoutees_par_cowork/` (Cowork ne peut pas supprimer).
+- 36 tests : résultat écrit dans chaque commentaire de la page. Bons (cochés) : m04, r02, t01, t12, t50, t55,
+  t56, t63, t64, t68, t82, t83, t84, t86, t88, t92, t93, t95, t96, t101.
+  Avec défaut : r01, t51, t52, t54, t57, t62, t65, t71, t85, t98. Pour l'avis de Julien : t60, t99, t100.
+  Pas faits : t61 (bandeau de succès non vu), t87 et t98 (compter les stockfish.exe : le Gestionnaire des
+  tâches ne répond pas aux clics de Cowork), t94 (il faut fermer Steam).
+- **2 plantages trouvés** (Problème du jour rouvert ; éditeur de l'analyse libre) et une quinzaine de petits
+  défauts : liste dans `docs/A_FAIRE.md`, section « Défauts trouvés par Cowork ».
+- Reste sur Steam : le classement Contre la montre de Julien est passé à 1 (son ancien record 0).
+- `rapports/` : deux rapports écrits par les tests (dont la trace du plantage du Problème du jour).
+
+À vérifier par Julien :
+- [ ] t60, t99, t100 : ton avis (joli ? utile ? lisible ?).
+- [ ] t94 (Steam fermé puis ouvert), t61 (bandeau de succès), t53, t58, q01, t66, t13, t59, t89–t91.
+
 ## 24/10/2026 (30) – Tests faits par Cowork sur le PC de Julien ; deux plantages corrigés (Claude Code, cloud)
 Cowork a pris la main sur le PC de Julien et passé les tests « Cowork » de la page « À faire » (étiquette
 « Qui », `docs/TESTS_COWORK.md`) : 19 validés (m04, r02, t01, t12, t50, t55, t56, t63, t64, t68, t82–t84, t86,
@@ -1324,17 +1344,7 @@ Question de Julien : « pourquoi tu ne changes pas le numéro de version 0.1.0 c
 - Le n° amis (compteur des mises à jour) ne change pas de rôle. La n° 5 en ligne est en 0.1.0 et n'a **pas**
   le travail des séances 28 à 30 : **à publier en n° 6 (0.2.0)** par Claude Code sur le PC.
 
-## 25/10/2026 (34) – Fusion de main-phsero (0.2.0) ; « Mes erreurs » enfin stable (Claude Code, cloud)
-- `main-phsero` (deux plantages corrigés par Cowork, version **0.2.0**) fusionnée dans main (avance rapide, sans
-  conflit). Suite complète : 1056 contrôles verts, un seul rouge : `test_mes_erreurs.py`.
-- **Vraie cause du contrôle instable « un autre coup qui défend f7 »** (3e fois) : ni la charge ni la profondeur.
-  Stockfish sur plusieurs cœurs ne donne pas deux fois la même évaluation : 3...De7 / 3...g6 s'écartent de 0,10 à
-  0,39 pion selon le calcul, et la marge fixe était de 0,30 pion → un bon coup refusé ~1 fois sur 4.
-  Correction : **la même règle que la revue** : un coup qui perd moins de 5 points de chances de gagner (« Bon » ou
-  mieux) est accepté. Contrôle ajouté avec un faux moteur (toujours le même résultat) : écart 0,39 accepté,
-  vrai mauvais coup et mat en 1 refusés. Sous charge : vert 8 fois sur 8.
-
-## 24/10/2026 (35) – Au menu, les Stockfish d'analyse rendent leur mémoire (Claude Code, cloud)
+## 24/10/2026 (32) – Au menu, les Stockfish d'analyse rendent leur mémoire (Claude Code, cloud)
 Constat du test d'endurance : au menu, 4 Stockfish gardaient ~5,5 Go jusqu'à la fermeture du jeu. Julien : **oui**.
 - `moteurs.liberer_au_repos()` : ferme tous les Stockfish sauf l'adversaire (« jeu », léger, garde le lancement
   immédiat d'une partie) ; ne coupe **jamais** un moteur en pleine recherche (son verrou est tenu jusqu'à
@@ -1350,6 +1360,37 @@ Constat du test d'endurance : au menu, 4 Stockfish gardaient ~5,5 Go jusqu'à la
 À vérifier par Julien :
 - [ ] t102 / R-126 : 2 min au menu après une revue → stockfish.exe d'analyse fermés, mémoire rendue ; la revue
   rouverte a toujours ses pastilles.
+
+## 25/10/2026 (34) – Fusion de main-phsero (0.2.0) ; « Mes erreurs » enfin stable (Claude Code, cloud)
+- `main-phsero` (deux plantages corrigés par Cowork, version **0.2.0**) fusionnée dans main (avance rapide, sans
+  conflit). Suite complète : 1056 contrôles verts, un seul rouge : `test_mes_erreurs.py`.
+- **Vraie cause du contrôle instable « un autre coup qui défend f7 »** (3e fois) : ni la charge ni la profondeur.
+  Stockfish sur plusieurs cœurs ne donne pas deux fois la même évaluation : 3...De7 / 3...g6 s'écartent de 0,10 à
+  0,39 pion selon le calcul, et la marge fixe était de 0,30 pion → un bon coup refusé ~1 fois sur 4.
+  Correction : **la même règle que la revue** : un coup qui perd moins de 5 points de chances de gagner (« Bon » ou
+  mieux) est accepté. Contrôle ajouté avec un faux moteur (toujours le même résultat) : écart 0,39 accepté,
+  vrai mauvais coup et mat en 1 refusés. Sous charge : vert 8 fois sur 8.
+- 25/10 : la vérification du `.bat` (verifier_version) bloquait sur PC sur `test_precision_moteur.py` puis aussi
+  `test_revue.py`, verts quand on les lance seuls (37/37). Elle ne montrait que le nom de la série : impossible de savoir
+  quel coup. Elle montre maintenant les contrôles en ECHEC et garde tout dans `tests/verification_tests.txt`.
+- 25/10 : n° 6 bloquée à la toute fin par l'essai du `.exe` (« No module named 'game_manager' »). Faux problème : l'essai
+  copiait le programme SEUL dans un dossier neuf, sans le paquet « jeu » (le code est livré à côté de l'exe). Chez un ami
+  les deux sont toujours ensemble. `publier_maj.dossier_d_essai` assemble maintenant programme + jeu + moteur comme
+  chez un ami avant l'essai (test : `test_verifier_version.py`, partie 7b). Vérification de la n° 6 : 1074 contrôles
+  verts, banc d'essai vert.
+- 25/10 : ensuite, « Rien n'a change depuis la version n°6 » alors que GitHub n'avait que la n° 5 : la copie locale
+  `publier/maj.json` était écrite AVANT l'essai du `.exe` et l'envoi. Elle ne l'est plus qu'après un envoi réussi
+  (test : `test_mise_a_jour.py`, partie 4b). Sur le PC : supprimer `publier\maj.json` (copie de la n° 6 jamais envoyée).
+- 25/10 : **version amis n° 6 publiée (0.2.0)** par Julien depuis son PC (`publier_maj.py`, après vérification verte :
+  1074 contrôles, banc vert ; essai du .exe OK). Vérifié en ligne depuis le cloud : `maj.json` = n° 6 / 0.2.0, nouveaux
+  paquets programme (19,5 Mo), jeu (8,4 Mo), moteur (76,6 Mo) ; problèmes et finales repris de la n° 1 ; installeur
+  complet 696 Mo derrière le lien « latest ». https://github.com/sick1811/SickChess-amis/releases/tag/v0.2.0-n6
+- 25/10 : les changements mis de côté sur le PC (`git stash` avant la mise à jour 0.2.0, branche de sauvegarde
+  `sauvegarde/avant-0.2.0`) comparés à la n° 6 : le code = les mêmes deux corrections de plantage (rien à reprendre) ;
+  repris : les 13 tests cochés « ✓ Cowork », 4 défauts Cowork absents de la liste (accents, texte coupé « Jouer en
+  ligne », Échap au menu, dossiers à garder hors de Git), le compte rendu détaillé de Cowork dans ce journal, et ses
+  deux tests plus complets (éditeur à la vraie souris sur 8 tailles d'écran dont 4K ; Problème du jour rouvert).
+  `.gitignore` : `rapports/` et `_sauvegarde_cowork_*/` (plus d'« À REVOIR Git » à la vérification).
 
 ## 25/10/2026 (36) – Défauts trouvés par Cowork corrigés (Claude Code, cloud)
 Demande de Julien : « mets à jour À faire et corrige ». Fusion de `main` (Mes erreurs stable, séance 34) dans
@@ -1416,3 +1457,12 @@ Julien a donné l'adresse du webhook de son salon : « les bugs en rouge, les id
   jamais de faux message dans le vrai salon (le test du plantage clique vraiment « Envoyer »).
 - Essai réel : 3 messages de test (rouge, vert, bleu) envoyés, acceptés par Discord (réponse 2xx).
 - Tests : `test_signaler.py` (couleurs, titres, version, envoi, garde-fou). Recette R-095 précisée, R-127 nouveau.
+
+## 25/10/2026 (40) – Fusion de main (n° 6 publiée) dans main-phsero (Claude Code, cloud)
+Deux sessions avaient corrigé en parallèle les mêmes défauts de Cowork (main : séances « défauts Cowork 1-3 » ;
+main-phsero : séance 36 ci-dessus). Fusion : clic dans la feuille de la revue (même correction, une seule gardée) ;
+collage : la version main-phsero (Ctrl+V ajoute dans un message mais remplace dans un champ court comme le code d'un
+salon ; UTF-16 en plus de UTF-8 / cp1252) + l'écriture Windows du presse-papiers venue de main ; les deux séries de
+tests gardées (noms d'ouvertures + « Ligne suivante » 3 fois en 1920×1080). Traduction « King's Knight Opening » :
+celle de main (« Partie du cavalier roi »). `test_nulles.py` (venu de main) utilise le Stockfish trouvé. Suite complète :
+1158 contrôles, tout vert.
