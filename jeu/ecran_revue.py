@@ -892,7 +892,8 @@ class EcranRevue:
         x0 = zone.x + int(8 * ech)
         larg_num = ui.mesurer("999.", taille, mono=True)[0] + int(4 * ech)
         colonne = max(40, (zone.width - larg_num - int(16 * ech)) // 2)
-        rayon = max(5, int(self.hauteur_ligne * 0.28))
+        # 25/10 (t100, pastilles peu lisibles) : 84 % de la ligne au lieu de 56 %.
+        rayon = max(7, int(self.hauteur_ligne * 0.42))
         y = zone.y + int(5 * ech)
         fin = min(self._total_lignes(), self.premiere_ligne + self.lignes_visibles)
         for ligne in range(self.premiere_ligne, fin):
@@ -914,7 +915,8 @@ class EcranRevue:
                 infos = self.analyseur.detail(index)
                 if infos["pret"] and infos["note"]:
                     annotations.dessiner_pastille(ecran, centre, rayon, infos["note"],
-                                                  ui.police(max(9, rayon + 2), True))
+                                                  ui.police(max(9, int(rayon * 1.3)), True),
+                                                  fond=t["accent"] if courant else t["fond"])
                 else:
                     annotations.dessiner_pastille_en_attente(ecran, centre, rayon - 1)
                 # 17/10 : l'evaluation apres le coup, a droite de la case,
@@ -935,7 +937,7 @@ class EcranRevue:
                                   - ui.police(petite, mono=True).get_height()) // 2,
                              petite, couleur_ev, mono=True, ancre="droite")
                 ui.texte(ecran, notation.afficher(self.sans[index]),
-                         centre[0] + rayon + int(5 * ech), y, taille,
+                         centre[0] + rayon + max(4, int(6 * ech)), y, taille,
                          t["fond"] if courant else t["texte"], gras=courant,
                          largeur_max=rect.right - larg_ev - centre[0] - rayon - int(6 * ech))
                 self.rects_coups.append((rect, index))

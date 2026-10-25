@@ -24,6 +24,8 @@ import math
 import chess
 import pygame
 
+import design
+
 VALEUR_PIECE = {chess.PAWN: 1, chess.KNIGHT: 3, chess.BISHOP: 3,
                 chess.ROOK: 5, chess.QUEEN: 9, chess.KING: 0}
 
@@ -50,9 +52,11 @@ PASTILLES = {
     "bon":        ("Bon",            (168, 173, 148), "rond"),
     "imprecision": ("Imprécision",   (247, 198, 49), "?!"),
     "erreur":     ("Erreur",         (229, 143, 42), "?"),
-    "manque":     ("Manque",         (214, 84, 92), "X"),
-    "gaffe":      ("Gaffe",          (202, 52, 49), "??"),
+    "manque":     ("Manque",         (236, 96, 118), "X"),
+    "gaffe":      ("Gaffe",          (214, 40, 40), "??"),
 }
+# 25/10 (t100, pastilles peu lisibles) : Gaffe d'un rouge plus franc, Manque
+# plus rose et plus clair (signe sombre a 5,8 de contraste) : on ne les confond plus.
 
 # L'ordre que tu m'as donne.
 # V7.2 (03/09) - MEILLEUR PASSE DEVANT EXCELLENT.
@@ -442,11 +446,13 @@ def dessiner_pastille_en_attente(surface, centre, rayon):
                     (int(centre[0]), int(centre[1])), rayon, max(1, rayon // 4))
 
 
-def dessiner_pastille(surface, centre, rayon, cle, police=None):
+def dessiner_pastille(surface, centre, rayon, cle, police=None, fond=None):
     """Pastille ronde coloree, comme celle qui apparait sur la case d'arrivee.
 
     Le glyphe est trace au trait pour la coche et le rond : aucune police
     speciale n'est necessaire, donc rien ne peut manquer sur un autre PC.
+    fond : la couleur derriere la pastille ; le contour prend alors la teinte
+    (claire ou sombre) qui s'en detache le mieux. Sans fond : contour blanc.
     """
     if cle not in PASTILLES:
         return
@@ -454,18 +460,33 @@ def dessiner_pastille(surface, centre, rayon, cle, police=None):
     cx, cy = int(centre[0]), int(centre[1])
     rayon = max(7, int(rayon))
 
-    pygame.draw.circle(surface, (255, 255, 255), (cx, cy), rayon)
-    pygame.draw.circle(surface, coul, (cx, cy), rayon - max(1, rayon // 8))
+    # 25/10 (t100) : contour de 2 px au moins (1 px avant, il disparaissait).
+    contour = (255, 255, 255) if fond is None else couleur_contour(fond)
+    pygame.draw.circle(surface, contour, (cx, cy), rayon)
+    pygame.draw.circle(surface, coul, (cx, cy), rayon - max(2, rayon // 6))
 
-    # 24/10 (p33, lisibilite) : le symbole blanc a un contour sombre. Sur les
-    # pastilles claires (Imprecision jaune, Excellent vert clair) le blanc seul
-    # avait un contraste de 1,6 a 2,3 (il faut 3) : le symbole se lit
-    # maintenant sur toutes les couleurs, et sans les couleurs.
-    _dessiner_glyphe(surface, glyphe, cx, cy, rayon, CONTOUR_GLYPHE, police, contour=True)
-    _dessiner_glyphe(surface, glyphe, cx, cy, rayon, (255, 255, 255), police)
+    # 24/10 (p33, lisibilite) : le symbole a un contour sombre.
+    # 25/10 (t100) : il ne suffisait pas (blanc sur jaune : 1,6) et, en petit, le
+    # contour empatait le signe. Le symbole est maintenant onyx sur les couleurs
+    # claires, blanc sur le rouge, sans contour : 4,5 de contraste au moins
+    # partout (tests/test_pastilles.py).
+    _dessiner_glyphe(surface, glyphe, cx, cy, rayon, couleur_signe(cle), police)
 
 
 CONTOUR_GLYPHE = (28, 26, 24)
+SIGNE_SOMBRE = (20, 18, 16)        # l'onyx de design.py, a peine chaud
+CONTOUR_CLAIR = design.ARDOISE[100]  # le texte principal, blanc chaud
+
+
+def couleur_signe(cle):
+    """Blanc ou onyx : celui qui se lit le mieux sur la couleur de la pastille."""
+    coul = couleur(cle)
+    return max(((255, 255, 255), SIGNE_SOMBRE), key=lambda s: design.contraste(s, coul))
+
+
+def couleur_contour(fond):
+    """Le contour de la pastille : clair sur fond sombre, sombre sur l'accent."""
+    return max((CONTOUR_CLAIR, CONTOUR_GLYPHE), key=lambda c: design.contraste(c, fond))
 
 
 def _dessiner_glyphe(surface, glyphe, cx, cy, rayon, blanc, police=None, contour=False):
