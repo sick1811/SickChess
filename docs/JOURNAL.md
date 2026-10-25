@@ -1597,7 +1597,12 @@ Fait :
 
 - Suite complète : 1421 contrôles verts, sauf `test_analyse_de_fond.py` (« les deux revues sont prêtes (240 s) »,
   6 échecs) – **rouge aussi sur le code d'avant cette séance** (vérifié dans une copie propre à d68fef8) : défaut
-  déjà là, pas lié au Freestyle. Version amis NON publiée tant qu'il reste rouge.
+  déjà là, pas lié au Freestyle. **Cause trouvée** : pendant ces essais, une autre session faisait tourner un banc
+  (`comparer.py`, 3 Stockfish) à 100 % du processeur ; l'analyse de fond (1 cœur, priorité basse – c'est voulu) ne
+  finissait pas en 240 s (Stockfish à 350 000 positions/s au lieu de ~1,2 million). PC au repos : vert en 167 s.
+  Pas de défaut dans le jeu. À retenir : ne pas lancer la suite complète pendant un banc d'une autre session.
+- Suite complète refaite PC au repos (avec le commit t71 de l'autre session) : 1426 contrôles, tout vert.
+  VERSION 0.4.0 (nouveauté : Freestyle).
 
 À vérifier par Julien :
 - [ ] t110 (Freestyle, tous les modes) et t111 (chute au temps) dans « À tester par Julien ».

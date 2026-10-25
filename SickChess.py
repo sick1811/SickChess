@@ -9,7 +9,7 @@ import os
 import sys
 import traceback
 
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 
 # 17/10 (recette R-002) : en plein ecran, SDL reduisait la fenetre des qu'une
 # autre fenetre prenait la main (notification, Alt+Tab rate...), et le jeu
