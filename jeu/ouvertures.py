@@ -34,6 +34,7 @@
 
 import json
 import os
+import threading
 
 # Chaque entree : (code ECO, nom, coups en notation algebrique courte)
 # Ecrites a la main. Le fichier officiel de lichess, s'il est depose, prend le
@@ -169,6 +170,9 @@ PROFONDEUR_MAX = 36
 _LIVRE = None
 _SOURCE = "interne"
 _FRANCAIS = None
+# 25/10 (t71) : un seul fil charge le livre ; les autres attendent la table
+# COMPLETE au lieu de lire une table vide en cours de remplissage.
+_VERROU = threading.Lock()
 
 
 def _en_francais():
@@ -270,14 +274,22 @@ def _sans_numeros(pgn):
 def livre():
     """Le livre, charge une seule fois. {suite en SAN: (eco, nom)}."""
     global _LIVRE, _SOURCE
-    if _LIVRE is not None:
+    table = _LIVRE
+    if table is not None:
+        return table
+    with _VERROU:
+        if _LIVRE is None:                # un autre fil a pu finir entre-temps
+            _LIVRE, _SOURCE = _charger()
         return _LIVRE
+
+
+def _charger():
+    """Lit et traduit le livre. Renvoie (table complete, source)."""
     officiel = _lire_le_fichier_officiel()
     if officiel:
         source, lignes = "lichess (%d ouvertures)" % len(officiel), officiel
     else:
         source, lignes = "interne (%d ouvertures)" % len(_THEORIE), _THEORIE
-    _SOURCE = source
     # V7.2 (03/09) - TA DEMANDE : "trouve toutes les variantes d'ouverture
     # connues, toutes". La base de lichess les a toutes (3 810 avec leur code
     # ECO), mais elle est en anglais. On la traduit, sinon le logiciel passerait
@@ -290,18 +302,19 @@ def livre():
             from ouvertures_fr import traduire
         except Exception as souci:
             print("[OUVERTURES] traduction indisponible : %s" % souci)
-    _LIVRE = {}
+    # 25/10 (t71) : remplie a part, publiee dans _LIVRE une fois complete.
+    table = {}
     for eco, nom, coups in lignes:
         if traduire is not None:
             nom = traduire(nom) or nom
         cle = coups.strip()
         if cle:
             # La ligne la plus PRECISE gagne : "Najdorf" plutot que "Sicilienne".
-            ancien = _LIVRE.get(cle)
+            ancien = table.get(cle)
             if ancien is None or len(nom) > len(ancien[1]):
-                _LIVRE[cle] = (eco, nom)
+                table[cle] = (eco, nom)
     print("[OUVERTURES] livre %s" % source)
-    return _LIVRE
+    return table, source
 
 
 def source():
@@ -313,9 +326,10 @@ def source():
 def recharger():
     """Oublie le livre : il sera relu au prochain appel (sert aux tests)."""
     global _LIVRE, _SOURCE, _FRANCAIS
-    _LIVRE = None
-    _SOURCE = "interne"
-    _FRANCAIS = None
+    with _VERROU:                         # 25/10 (t71) : pas au milieu d'un chargement
+        _LIVRE = None
+        _SOURCE = "interne"
+        _FRANCAIS = None
     try:
         import ouvertures_fr
         ouvertures_fr.oublier()

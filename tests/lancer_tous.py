@@ -43,6 +43,7 @@ SERIES = [
     ("test_stats_a_deux.py", False),
     ("test_menu_echap.py", False),
     ("test_pastilles.py", False),
+    ("test_livre_fils.py", False),
     ("test_cache_analyse.py", False),
     ("test_statistiques.py", False),
     ("test_entrainement.py", False),
