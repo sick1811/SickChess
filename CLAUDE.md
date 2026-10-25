@@ -138,7 +138,8 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
 - Toute optimisation : banc avant / après sur la même machine, gain noté dans le journal.
 
 ## Skills du projet (`.claude/skills/`)
-`seance-sickchess` (déroulé d'une séance) · `compiler-exe` (PyInstaller) ·
+`seance-sickchess` (déroulé d'une séance) · `chef-orchestre` (répartir beaucoup de tâches
+entre agents et sessions) · `compiler-exe` (PyInstaller) ·
 `verifier-echecs` (règles et analyse justes) · `captures-steam` (images de la page Steam) ·
 `banc-essai` (mesures et décisions de Julien) · `performance-pygame` (processeur, carte
 graphique, Stockfish) · `menage-code` (code et fichiers inutiles, sans rien casser) · `version-amis` (installeur,
@@ -148,4 +149,9 @@ Agents (`.claude/agents/`) : `testeur` (cherche les bugs), `relecteur-interface`
 justes, erreurs avec FEN), `relecteur-textes` (accents, anglais, textes coupés, aide F1),
 `recetteur` (recette auto + liste « À tester par Julien »), `gardien-depot` (avant un commit :
 rien de personnel, tests verts, journal à jour), `trieur-taches` (ordre de travail et tâches
-parallèles sans fichier commun). Tous lisent et rendent un rapport ; aucun ne modifie le code.
+parallèles sans fichier commun) : ils lisent et rendent un rapport. Ceux qui modifient
+(seulement les fichiers qu'on leur confie, jamais de commit) : `correcteur` (un défaut :
+test rouge → correction → vert), `enqueteur-bug` (bugs « une fois sur 10 » : cause + test),
+`batisseur` (nouvelle fonction), `traducteur` (textes et anglais), `documentaliste`
+(journal, A_FAIRE, recette). **Beaucoup de tâches à la fois : skill `chef-orchestre`**
+(qui fait quoi, un fichier = un seul agent, contrôle avant commit).
