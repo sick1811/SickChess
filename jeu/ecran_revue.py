@@ -495,6 +495,14 @@ class EcranRevue:
             d = self.disposition
             sur_le_plateau = pygame.Rect(d.plateau_x, d.plateau_y, d.cote_plateau,
                                          d.cote_plateau).collidepoint(event.pos)
+            # 24/10 (defaut Cowork) : une piece restee choisie envoyait TOUS les
+            # clics a l'echiquier, meme sur la feuille de coups (« cliquer un
+            # coup ne fait rien »). Un clic hors de l'echiquier lache la piece
+            # et suit son chemin normal (feuille, courbe, boutons).
+            if not sur_le_plateau and p.selected_square is not None \
+                    and not p.dragging and not p.promotion.est_actif() \
+                    and event.type == pygame.MOUSEBUTTONDOWN:
+                p.annuler_selection()
             if sur_le_plateau or p.dragging or p.selected_square is not None \
                     or p.promotion.est_actif():
                 p.handle_event(event)

@@ -209,6 +209,30 @@ verifier(gm._revue_d_une_partie_enregistree({"chemin": "absent.pgn"}) is None,
 gm.cleanup_game()
 gm.cleanup()
 
+print("Clic sur un coup de la feuille avec une piece choisie sur l'echiquier (defaut Cowork 24/10)")
+# Sur le PC de Julien, cliquer un coup ne faisait rien : une piece restee
+# choisie sur l'echiquier envoyait TOUS les clics a l'echiquier.
+pygame.init()                       # gm.cleanup() vient de fermer pygame
+import ui
+ui.vider_cache()
+for taille in ((1024, 640), (1920, 1080)):
+    ecran = pygame.display.set_mode(taille)
+    af = AnalyseurPartie(None, PARTIE, moteur=MoteurFactice())
+    af._travailler()
+    rf = EcranRevue(ecran, af, {}, ("Toi", "Ordinateur"), "0-1")
+    rf.aller_a(2, son=False)
+    rf.draw()
+    piece = next(c for c in rf.plateau.board.piece_map()
+                 if rf.plateau.board.color_at(c) == rf.plateau.board.turn)
+    rf.plateau.selected_square = piece                     # une piece choisie
+    rect, index = rf.rects_coups[min(5, len(rf.rects_coups) - 1)]
+    rf.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=rect.center))
+    rf.handle_event(pygame.event.Event(pygame.MOUSEBUTTONUP, button=1, pos=rect.center))
+    verifier(rf.index == index + 1 and rf.plateau.selected_square is None,
+             "%dx%d : le clic sur le coup %d y va (index %d) et lache la piece choisie"
+             % (taille[0], taille[1], index + 1, rf.index))
+    af.arreter()
+
 print()
 if echecs:
     print("%d ECHEC(S)" % len(echecs))

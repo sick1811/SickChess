@@ -111,6 +111,29 @@ ancienne = ecr.entr.coups
 ecr.handle_event(pygame.event.Event(pygame.MOUSEBUTTONDOWN, button=1, pos=ecr.btn_suivante.rect.center))
 verifier(ecr.entr.coups != ancienne and not ecr.entr.termine(), "ligne suivante : une autre variante")
 
+print("4 bis. « Ligne suivante » en plein ecran, 3 fois de suite (defaut Cowork 24/10, non reproduit)")
+ecran_grand = pygame.display.set_mode((1920, 1080))
+grand = EcranEntrainement(ecran_grand, {})
+grand.commencer(grand.familles[0][0])
+for essai in range(3):
+    n = 0
+    while not grand.entr.termine() and n < 60:
+        n += 1
+        if grand.adverse_a:
+            grand.adverse_a = 1
+            grand.update()
+        elif grand.entr.a_moi_de_jouer():
+            grand.plateau.make_move(chess.Move.from_uci(grand.entr.coup_attendu_uci()))
+            grand.update()
+    grand.draw()
+    avant = list(grand.entr.coups)
+    centre = grand.btn_suivante.rect.center
+    for type_ in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP):
+        grand.handle_event(pygame.event.Event(type_, button=1, pos=centre))
+    verifier(grand.entr.coups != avant and not grand.entr.termine(),
+             "1920x1080, ligne finie, clic %d sur « Ligne suivante » : une autre ligne" % (essai + 1))
+ecran = pygame.display.set_mode((1024, 640))
+
 print("5. Le menu")
 from menu_principal import MainMenu
 m = MainMenu(ecran)
