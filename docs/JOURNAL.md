@@ -1392,7 +1392,6 @@ Constat du test d'endurance : au menu, 4 Stockfish gardaient ~5,5 Go jusqu'à la
   deux tests plus complets (éditeur à la vraie souris sur 8 tailles d'écran dont 4K ; Problème du jour rouvert).
   `.gitignore` : `rapports/` et `_sauvegarde_cowork_*/` (plus d'« À REVOIR Git » à la vérification).
 
-
 ## 25/10/2026 (35) – Cowork : la répétition qui « ne compte pas » (retour de Julien)
 Retour : l'ami de Julien, seul contre l'ordinateur (version amis n° 4 ou 5) : « répétition 2 fois » en jaune
 au-dessus des coups, il joue le dernier coup, le message s'efface et la nulle ne compte pas.
@@ -1411,6 +1410,62 @@ Fait :
 - [ ] Claude Code (PC) : relire, tous les tests avec le vrai Stockfish, essai contre l'ordinateur avec
   pré-mouvement, commit, puis version amis n° 7.
 - [ ] Julien : demander à son ami le FEN / la partie pour confirmer que c'était bien ce cas.
+
+
+## 25/10/2026 (36) – Défauts trouvés par Cowork corrigés (Claude Code, cloud)
+Demande de Julien : « mets à jour À faire et corrige ». Fusion de `main` (Mes erreurs stable, séance 34) dans
+`main-phsero`. Chaque défaut reproduit d'abord par un test :
+- **Revue (t65)** : « aussi bon : Nf3, Nf3 » → un coup une seule fois, le mieux noté d'abord
+  (`meilleurs_depuis_lignes`). Clic sur un coup de la feuille : une pièce sélectionnée sur l'échiquier
+  « mangeait » le clic → elle est désélectionnée ET le coup s'affiche. Le cas exact de Cowork (5 clics sans effet)
+  n'est pas reproduit ici (14 clics sur 14 marchent, 1280×720 et 1920×1080) : à revérifier.
+- **Explication d'une gaffe coupée (t51)** : le cadre n'avait de place pour AUCUNE ligne ; il grandit (tant que la
+  feuille garde 5 lignes) et la « Suite prévue » s'efface quand il y a une explication → 3 lignes.
+- **Problèmes (t52, r01)** : messages et description de « Mes erreurs » sur plusieurs lignes au lieu d'être rognés ;
+  contre la montre / survie : après une faute, le bon coup est joué (animé) et nommé, 2,2 s avant la suite.
+- **Mes erreurs (r01)** : une partie importée sans ton nom (Morphy 1858) ne donne plus d'erreurs « à toi ».
+- **Ouvertures (t57)** : King's / Queen's / « Keene's » traduits (0 nom à moitié anglais sur 3 175) ; « Ligne
+  suivante » non reproduit (marche dans les tests, aussi en 1920×1080).
+- **Signaler (t54)** : Ctrl+V ajoute au message (un champ court, comme le code d'un salon, est toujours remplacé) ;
+  presse-papiers Windows (cp1252 / UTF-16) décodé sans perdre les accents.
+- **Anglais (t62)** : « 55 %10olved » (« %% » lu comme « % s ») ; « Ordinateur (400) - Toi », reprise au menu ;
+  `ui.mesurer` mesure le texte traduit (« BLA… » sur la pendule) ; aide F1 de la revue à jour (A = analyse libre).
+- **Options (t98)** : « → » (absent de la police) remplacé par « : ».
+- Suite complète : 1093 contrôles, tout vert. Version toujours 0.2.0 (pas encore publiée).
+- Tests ajoutés : test_variantes, test_modes_analyse, test_entrainement, test_signaler, test_mes_erreurs,
+  test_anglais, test_modes_problemes.
+
+À vérifier par Julien (à confier à Cowork) :
+- [ ] t103 : la liste des corrections ci-dessus, sur le PC.
+
+
+## 25/10/2026 (37) – Relecture complète de la page « À faire » ; mise à jour vue en 3 min (Claude Code, cloud)
+Julien : « tu as lu les À faire ? ». Relecture des 266 lignes (avant : seulement « Tester sur ton PC »). Points rouges
+de la recette jamais traités :
+- **R-114** « fonctionne pas en version 4 » : l'ami resté au menu ne voyait la nouvelle version qu'au bout de
+  20 minutes (`REVERIFIER_TOUTES_LES`). Passé à **3 minutes** (au menu seulement, un petit fichier). Cause la plus
+  probable, pas prouvée : à revérifier à la prochaine publication. Test : `test_maj_auto.py`.
+- **R-095 / R-096** : Signaler doit écrire dans le salon Discord de Julien. Le code d'envoi existe
+  (`signalement.py`, clé `signalement_webhook`) ; **il manque l'adresse du webhook** (le lien discord.gg est une
+  invitation, pas une adresse d'envoi). Demandé à Julien.
+- Les bugs et idées postés sur Discord : Claude n'y a pas accès ; Julien les recopiera.
+
+
+## 25/10/2026 (38) – p25 : analyse des parties en tâche de fond (Claude Code, cloud)
+Travail choisi par Julien (« Je veux ») : « les parties importées ou pas encore analysées se calculent pendant
+que tu es dans le menu ou que tu fais des problèmes ; pastille « Revue prête » dans Mes parties ».
+- `jeu/analyse_de_fond.py` : au menu et pendant les Problèmes (aussi Mes parties, Signaler, Options), la plus
+  récente partie sans `.analyse.json` est analysée, puis la suivante. **Un seul** Stockfish à lui (hors de
+  `moteurs.py` : la libération au repos ne le touche pas), priorité basse, 1/4 des cœurs (1 sur un petit PC),
+  256 Mo ; même puissance que la revue (le fichier écrit est celui que la revue relit).
+- **Pause** (Stockfish fermé, travail gardé en mémoire) dès qu'une partie, une revue, l'analyse libre, les
+  ouvertures ou le jeu en ligne commencent. La revue d'une partie à moitié faite **reprend** ce travail
+  (`AnalyseurPartie.reprendre_de`, seulement d'une analyse au moins aussi forte).
+- Mes parties : étiquette « Revue prête » (relue toutes les 3 s, hors du dessin). Réglage `analyse_de_fond`
+  (vrai par défaut). Recette R-079 ; test t104.
+- Test : `tests/test_analyse_de_fond.py` (vrai Stockfish) : 2 parties analysées toutes seules, pause en 0,01 s
+  avec 15 positions gardées, reprises par la revue, étiquette dans Mes parties. Suite complète : 1111 contrôles
+  verts + ce test (rouge une fois : il comptait trop tôt, corrigé). Version 0.2.0 (pas encore publiée).
 
 
 ## 25/10/2026 (39) – Cowork : mises à jour une par une, sans rien demander à l'ami
@@ -1442,3 +1497,27 @@ Fait :
 À vérifier :
 - [ ] Claude Code (PC) : relire, tous les tests, essai du pare-feu sur Windows, commit, version amis n° 7.
 - [ ] Julien : t105, t106.
+
+
+## 25/10/2026 (39) – « Signaler » arrive dans le salon Discord, en couleurs (Claude Code, cloud)
+Julien a donné l'adresse du webhook de son salon : « les bugs en rouge, les idées en vert, les crashs en bleu ».
+- `signalement.message_discord` : un cadre Discord (embed) **Bug** rouge, **Idée** verte, **Plantage** bleu, avec
+  le message et « SickChess 0.2.0 » ; le rapport complet reste en pièce jointe. Le rapport de plantage (carte au
+  lancement suivant → Signaler) part en type « plantage » (bleu) avec son journal.
+- **L'adresse n'est pas dans le code** (le système de sécurité a refusé de l'écrire dans Git, à raison) : elle va
+  dans `signalement.json` (déjà hors Git), lu dans le dossier de données ou celui du jeu, et ajouté au paquet
+  « jeu » de `publier_maj.py`. À créer sur le PC par Claude Code.
+- `SICKCHESS_SANS_ENVOI` : posé par `lancer_tous.py`, les tests et les robots (endurance, recette automatique) :
+  jamais de faux message dans le vrai salon (le test du plantage clique vraiment « Envoyer »).
+- Essai réel : 3 messages de test (rouge, vert, bleu) envoyés, acceptés par Discord (réponse 2xx).
+- Tests : `test_signaler.py` (couleurs, titres, version, envoi, garde-fou). Recette R-095 précisée, R-127 nouveau.
+
+
+## 25/10/2026 (40) – Fusion de main (n° 6 publiée) dans main-phsero (Claude Code, cloud)
+Deux sessions avaient corrigé en parallèle les mêmes défauts de Cowork (main : séances « défauts Cowork 1-3 » ;
+main-phsero : séance 36 ci-dessus). Fusion : clic dans la feuille de la revue (même correction, une seule gardée) ;
+collage : la version main-phsero (Ctrl+V ajoute dans un message mais remplace dans un champ court comme le code d'un
+salon ; UTF-16 en plus de UTF-8 / cp1252) + l'écriture Windows du presse-papiers venue de main ; les deux séries de
+tests gardées (noms d'ouvertures + « Ligne suivante » 3 fois en 1920×1080). Traduction « King's Knight Opening » :
+celle de main (« Partie du cavalier roi »). `test_nulles.py` (venu de main) utilise le Stockfish trouvé. Suite complète :
+1158 contrôles, tout vert.

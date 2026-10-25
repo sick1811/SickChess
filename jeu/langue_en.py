@@ -175,6 +175,8 @@ EN = {
     "Pas d'indice pendant un défi.": "No hints during a challenge.",
     "Voici la solution.": "Here is the solution.",
     "Raté ! Problème suivant...": "Missed! Next puzzle...",
+    "Revue prête": "Review ready",
+    "Raté ! Il fallait %s. Problème suivant...": "Missed! The move was %s. Next puzzle...",
     "Problème suivant": "Next puzzle", "Passer ce problème": "Skip this puzzle",
     "Indice (H)": "Hint (H)", "Solution": "Solution", "Rejouer le défi": "Play again",
     "ce problème %+d": "this puzzle %+d", "séance %+d": "session %+d", "gain x%.1f": "gain x%.1f",
@@ -381,6 +383,8 @@ EN = {
     "Aller au premier ou au dernier coup": "Go to the first or last move",
     "Clic sur un coup": "Click a move", "Aller directement a ce coup": "Jump to that move",
     "Relancer ou interrompre l'analyse Stockfish": "Restart or stop the Stockfish analysis",
+    # 24/10 (Cowork, t62) : restes en francais.
+    "À deux sur ce PC": "Two players on this PC",
     "Revenir à l'écran de fin": "Back to the end screen", "Échap": "Esc", "Entrée": "Enter",
     "REVUE (après la partie)": "REVIEW (after the game)",
     "Gauche / Droite": "Left / Right", "Coup précédent ou suivant (aussi la molette)": "Previous or next move (also the wheel)",
@@ -562,8 +566,8 @@ EN = {
     "Envoyer le rapport": "Send the report", "Non merci": "No thanks",
     # --- mode petit PC (24/10, travail p31)
     "Puissance du PC": "Computer power", "Automatique": "Automatic", "Petit PC": "Small PC",
-    "PC normal": "Normal PC", "Ce PC : %d cœurs, %s → petit PC": "This PC: %d cores, %s → small PC",
-    "Ce PC : %d cœurs, %s → PC normal": "This PC: %d cores, %s → normal PC",
+    "PC normal": "Normal PC", "Ce PC : %d cœurs, %s : petit PC": "This PC: %d cores, %s: small PC",
+    "Ce PC : %d cœurs, %s : PC normal": "This PC: %d cores, %s: normal PC",
     "Analyse, mémoire de Stockfish et effets adaptés au PC": "Analysis, Stockfish memory and effects adapted to the PC",
     # --- resume du coach sur la carte de fin (24/10, travail p27)
     "Ouverture : sortie du livre dès le premier coup": "Opening: out of the book from the first move",

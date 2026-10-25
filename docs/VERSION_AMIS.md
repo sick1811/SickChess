@@ -47,7 +47,7 @@ Envoie-lui une fois ce lien (il donne toujours la dernière version) :
 ## Mise à jour automatique (23/10)
 Dès qu'une nouvelle version est publiée, le jeu de l'ami, **quand il est dans le menu**,
 la télécharge tout seul (« Mise à jour : 42 % »), puis redémarre dessus. Jamais en pleine
-partie. S'il reste ouvert, il revérifie toutes les 3 minutes (25/10 ; avant : 20). Pour couper :
+partie. S'il reste ouvert au menu, il revérifie toutes les 3 minutes (20 avant le 25/10). Pour couper :
 `"maj_auto": false` dans son config.json.
 → Chaque fois que tu publies (`CONSTRUIRE_VERSION_AMIS.bat`), tous tes amis l'ont dans
 l'heure, sans rien faire.

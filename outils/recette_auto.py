@@ -12,6 +12,8 @@ captures v_*.png dans le meme dossier. Dossier temporaire pour le profil, les
 parties et la sauvegarde : tes donnees ne sont pas touchees.
 24/10/2026 (travail p35 a p37). Code de sortie 0 si tout est vert.
 """
+import os as _os_envoi
+_os_envoi.environ["SICKCHESS_SANS_ENVOI"] = "1"   # 25/10 : jamais de faux message dans le vrai salon Discord
 import os, sys, time, json, tempfile
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.chdir(RACINE); sys.path.insert(0, os.path.join(RACINE, "jeu"))

@@ -40,6 +40,13 @@ import unicodedata
 # c'est elle qui doit etre juste.
 
 FAMILLES = {
+    # 24/10 (Cowork, t57 : « Ouverture King's du cavalier ») : les familles en
+    # King's / Queen's / nom propre + 's qui restaient a moitie en anglais.
+    "King's Pawn Opening": "Ouverture du pion roi",
+    "Anderssen's Opening": "Ouverture Anderssen",
+    "Pseudo Queen's Indian Defense": "Défense pseudo-ouest-indienne",
+    "Queen's Indian Accelerated": "Défense ouest-indienne accélérée",
+    "Queen's Pawn": "Pion dame",
     "Sicilian Defense": "Défense sicilienne",
     "Ruy Lopez": "Partie espagnole",
     "French Defense": "Défense française",
@@ -183,6 +190,30 @@ FAMILLES = {
 # toujours la plus longue d'abord.
 
 EXPRESSIONS = {
+    # 24/10 (t57) : King's / Queen's dans les variantes.
+    "King's Indian Variation": "Variante est-indienne",
+    "Queen's Indian Variation": "Variante ouest-indienne",
+    "King's Indian Formation": "Formation est-indienne",
+    "Queen's Indian Formation": "Formation ouest-indienne",
+    "Anti-Queen's Indian System": "Système anti-ouest-indien",
+    "King's Indian System": "Système est-indien",
+    "King's Indian Attack": "Attaque est-indienne",
+    "Queen's Indian Defense": "Défense ouest-indienne",
+    "King's Pawn Line": "Ligne du pion roi",
+    "King's Knight Variation": "Variante du cavalier roi",
+    "Queen's Knight Variation": "Variante du cavalier dame",
+    "Queen's Knight Defense": "Défense du cavalier dame",
+    "Queen's Knight": "Cavalier dame",
+    "King's Bishop Variation": "Variante du fou roi",
+    "King's English Variation": "Variante anglaise du roi",
+    "King's English": "Anglaise du roi",
+    "King's Gambit Reversed": "Gambit du roi inversé",
+    "Queen's Gambit Invitation": "Invitation au gambit dame",
+    "King's Knight's Gambit": "Gambit du cavalier roi",
+    "Bishop's Gambit": "Gambit du fou",
+    "Modern Bishop's Opening": "Ouverture moderne du fou",
+    "King David's Opening": "Ouverture du roi David",
+    "Fool's Mate": "Mat du sot",
     "Exchange Variation": "Variante d'échange",
     "Advance Variation": "Variante d'avance",
     "Classical Variation": "Variante classique",
@@ -288,6 +319,7 @@ EXPRESSIONS.update({
 _POSSESSIF = re.compile(r"\b([A-Z][A-Za-z.\-]*)'s\b")
 
 MOTS = {
+    "with": "avec",
     "Variation": "Variante",
     "Defense": "Défense",
     "Defence": "Défense",
@@ -604,6 +636,11 @@ def traduire(nom):
 
     famille, _, suite = nom.partition(":")
     famille = famille.strip()
+    if famille not in FAMILLES and "," in famille:
+        # 24/10 : « Queen's Indian Defense, with e3 » (sans « : ») : la famille
+        # est avant la premiere virgule, le reste est la variante.
+        famille, _, debut = famille.partition(",")
+        famille, suite = famille.strip(), debut + ("," + suite if suite else "")
     traduite = FAMILLES.get(famille)
     if traduite is None:
         # Pas dans la table : on traduit quand meme le vocabulaire de structure
@@ -611,11 +648,16 @@ def traduire(nom):
         traduite = _traduire_morceau(famille)
 
     morceaux = [traduite]
+    # 24/10 : « Truc's » apres un mot francais de structure (Défense Keene's,
+    # Ligne Kramnik's) : le nom propre seul, sans le « 's » anglais.
     for bout in suite.split(","):
         bout = _traduire_morceau(bout)
         if bout:
             morceaux.append(bout)
     sortie = ", ".join(m for m in morceaux if m)
+    sortie = re.sub(r"\b(Défense|Attaque|Ligne|Système|Gambit|Ouverture|Variante|Piège|Contre-gambit)"
+                    r" ([A-Z][\w.-]*)'s\b", r"\1 \2", sortie)
+    sortie = re.sub(r"\b([A-Z][\w-]+)'s (Défense|Variante|Gambit)\b", r"\2 \1", sortie)
     _CACHE[nom] = sortie
     return sortie
 

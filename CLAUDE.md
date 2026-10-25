@@ -1,3 +1,7 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # SickChess – consignes pour Claude
 
 Jeu d'échecs PC (Windows) en **Python + Pygame**, moteur **Stockfish**, vendu à petit
@@ -32,6 +36,32 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
   `steam_api64.dll`, `profil.json`, `parties/`, `puzzles_score.json`.
 - Ne jamais écraser `profil.json`, `parties/`, `puzzles_score.json` : ce sont les données
   de Julien. Les tests travaillent dans des dossiers temporaires.
+
+## Architecture (ce qu'il faut savoir avant de toucher au code)
+- **Pas de paquet** : `SickChess.py` ajoute `jeu/` au chemin Python, puis les modules
+  s'importent à plat (`import ui`, `from game_manager import GameManager`). Les tests font
+  de même (`sys.path.insert(0, "jeu")`, `SDL_VIDEODRIVER=dummy`).
+- **`game_manager.GameManager`** tient la fenêtre et la boucle : `run()` (menu) →
+  `preparer_partie()` (crée `board.ChessBoard` + un mode : `mode_stockfish`, `mode_hotseat`,
+  `mode_en_ligne`) → `boucle_de_partie()`. Chaque écran (`ecran_*.py`, `menu_*.py`) est une
+  classe `handle_event` / `update` / `draw`, ouverte par une méthode `ouvrir_…()` qui fait
+  tourner sa propre petite boucle puis rend la main.
+- **Plateau** : `board.py` (état, coups, fin de partie `_verifier_fin`, pré-mouvement)
+  délègue à `board_render`, `board_input`, `board_animation`, `board_highlights`, `timer`…
+  Règles : python-chess (`rules.py`, `regles_nulle.py`).
+- **Stockfish** : ne jamais lancer un moteur à la main, passer par `moteurs.py` (un moteur
+  par rôle : « jeu », « analyse », renforts ; priorité basse pour l'analyse). `engine.py`
+  garde un verrou pendant toute une recherche : arrêter / quitter ne doit pas le prendre
+  (`interrompre()`). Analyse d'une partie : `analyse_partie.py`, pastilles `annotations.py`.
+- **Textes affichés** : écrits en français dans le code ; `ui.texte` les passe par
+  `langue.traduire`, qui cherche la phrase dans `langue_en.EN` (les `%s` / `%d` sont des
+  modèles). Un texte modifié = sa clé dans `langue_en.py` modifiée aussi.
+  Dessin : `ui.py` (cache des textes, `ui.Cadence` 30/60 images/s), mise en page `layout.py`.
+- **Données du joueur** : toujours via `asset_manager.dossier_ecriture()` ; les tests le
+  remplacent par un dossier temporaire (`asset_manager.dossier_ecriture = lambda: TEMP`).
+- **Tests** : scripts simples (pas de pytest) avec `verifier(condition, message)`, sortie
+  1 si un échec. Nouvelle série = l'ajouter à `SERIES` dans `tests/lancer_tous.py`
+  (`True` = utilise Stockfish, sautée par `--rapide`). Vérif. de style : `ruff check jeu tests`.
 
 ## Commandes
 - Lancer le jeu : `python SickChess.py` (ou double-clic `LANCER.bat`).

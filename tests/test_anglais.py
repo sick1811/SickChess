@@ -3,6 +3,8 @@
 # Dessine tous les ecrans en anglais et liste les textes restes en francais.
 # Dossier temporaire : tes donnees ne sont pas touchees.
 
+import os as _os_envoi
+_os_envoi.environ["SICKCHESS_SANS_ENVOI"] = "1"   # 25/10 : jamais de faux message dans le vrai salon Discord
 import os
 import re
 import sys
@@ -51,6 +53,19 @@ verifier(langue.traduire("Mode classé  -  ton classement : 1300") == "Rated mod
 verifier(langue.traduire("OPTIONS") == "OPTIONS" and langue.traduire("QUITTER") == "QUIT", "majuscules du menu")
 verifier(ouvertures.nom_de_l_ouverture(["e4", "c5"]).startswith("Sicilian"),
          "ouvertures en anglais : %s" % ouvertures.nom_de_l_ouverture(["e4", "c5"]))
+
+verifier(langue.traduire("111 problèmes joues, 55 % réussis, meilleure série 7 - enregistré")
+         == "111 puzzles played, 55 % solved, best streak 7 - saved",
+         "« %% » suivi d'un mot (Cowork, t62 : « 55 %%10olved ») : %r" % langue.traduire(
+             "111 problèmes joues, 55 % réussis, meilleure série 7 - enregistré"))
+verifier(langue.traduire("Ordinateur (400) - Toi") == "Computer (400) - You",
+         "haut de la revue : %r" % langue.traduire("Ordinateur (400) - Toi"))
+verifier(langue.traduire("Contre l'ordinateur (3000 Elo)  -  coup 2  -  24/10/2026 13:02").startswith("Against the computer (3000 Elo)  -  move 2"),
+         "reprise au menu en anglais")
+
+import ui
+verifier(ui.mesurer("NOIRS", 15, True) == ui.mesurer("BLACK", 15, True),
+         "on mesure le texte traduit (pendule : « BLA… » coupe)")
 
 print("2. Tous les ecrans")
 from menu_principal import MainMenu

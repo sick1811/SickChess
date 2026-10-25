@@ -146,6 +146,7 @@ def chemin_stockfish():
 
 if chemin_stockfish():
     print("3. Contre l'ordinateur (vrai Stockfish), 5 fois")
+    gm.stockfish_path = chemin_stockfish()    # 25/10 : celui trouve (cloud : SICKCHESS_STOCKFISH)
     vus = 0
     for _ in range(5):
         b = jouer(partie("stockfish", PAT[0]), [PAT[1]], attendre_ia=True)

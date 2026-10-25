@@ -100,6 +100,32 @@ r.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE, mod=0, un
 verifier(r.variante is None and r.index == 5 and p.board.fen() == a.fens[5],
          "retour a la position de la partie")
 
+print("4 bis. Clic sur un coup de la feuille (Cowork, t65 : « ne fait rien » sur le PC)")
+r.aller_a(0, son=False)
+r.draw()
+bons = 0
+for rect, index in list(r.rects_coups):
+    for genre in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP):
+        r.handle_event(pygame.event.Event(genre, button=1, pos=rect.center))
+    bons += r.index == index + 1
+    r.draw()
+verifier(r.rects_coups and bons == len(r.rects_coups),
+         "chaque coup clique dans la feuille s'affiche (%d / %d)" % (bons, len(r.rects_coups)))
+d = r.disposition
+case_g1 = (d.plateau_x + 6 * d.taille_case + d.taille_case // 2, d.plateau_y + 7 * d.taille_case + d.taille_case // 2)
+if p.flipped:
+    case_g1 = (d.plateau_x + d.taille_case + d.taille_case // 2, d.plateau_y + d.taille_case // 2)
+r.aller_a(2, son=False)
+r.draw()
+for genre in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP):
+    r.handle_event(pygame.event.Event(genre, button=1, pos=case_g1))
+rect, index = r.rects_coups[5]
+for genre in (pygame.MOUSEBUTTONDOWN, pygame.MOUSEBUTTONUP):
+    r.handle_event(pygame.event.Event(genre, button=1, pos=rect.center))
+verifier(r.index == index + 1 and p.selected_square is None,
+         "une piece selectionnee : le 1er clic sur un coup marche quand meme (%d, voulu %d)" % (r.index, index + 1))
+r.aller_a(0, son=False)
+
 print("5. Exporter la revue (PGN annote)")
 import tempfile
 import chess.pgn

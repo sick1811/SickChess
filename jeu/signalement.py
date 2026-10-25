@@ -18,7 +18,18 @@ import uuid
 
 LIGNES_DU_JOURNAL = 120
 DOSSIER = "rapports"
-TYPES = {"probleme": "Problème", "idee": "Idée"}
+TYPES = {"probleme": "Problème", "idee": "Idée", "plantage": "Plantage"}
+
+# 25/10 (Julien, recette R-095 / R-096) : les messages arrivent dans le salon
+# Discord de SickChess. Couleurs choisies par Julien : les bugs en rouge, les
+# idees en vert, les plantages en bleu.
+COULEURS = {"probleme": 0xE53935, "idee": 0x43A047, "plantage": 0x1E88E5}
+TITRES = {"probleme": "Bug", "idee": "Idée", "plantage": "Plantage"}
+# L'adresse du salon (webhook) n'est PAS dans le code (il part sur GitHub) :
+# elle est dans signalement.json, a cote du jeu (hors Git), livre avec la
+# version amis. Les tests et les robots (endurance, recette automatique)
+# mettent cette variable : jamais de faux message dans le vrai salon.
+SANS_ENVOI = "SICKCHESS_SANS_ENVOI"
 
 
 def _racine():
@@ -52,7 +63,7 @@ def construire(type_, message, version="", journal=None, maintenant=None):
         (message or "").strip() or "(vide)",
         "",
     ]
-    if type_ == "probleme":
+    if type_ in ("probleme", "plantage"):
         entete += ["--- Fin du journal du jeu ---",
                    journal if journal is not None else fin_du_journal()]
     return "\n".join(entete)
@@ -74,11 +85,19 @@ def enregistrer(texte, type_="probleme", dossier=None, maintenant=None):
         return None
 
 
+def _dossier_du_jeu():
+    """Le dossier du jeu (la ou la version amis installe signalement.json)."""
+    return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
 def adresse_d_envoi():
     """L'adresse du salon Discord (webhook), ou '' si rien n'est regle."""
-    for nom in ("signalement.json", "config.json"):
+    if os.environ.get(SANS_ENVOI):
+        return ""
+    for dossier, nom in ((_racine(), "signalement.json"), (_dossier_du_jeu(), "signalement.json"),
+                         (_racine(), "config.json")):
         try:
-            with open(os.path.join(_racine(), nom), "r", encoding="utf-8") as f:
+            with open(os.path.join(dossier, nom), "r", encoding="utf-8") as f:
                 url = (json.load(f) or {}).get("signalement_webhook", "")
             if isinstance(url, str) and url.startswith("https://"):
                 return url
@@ -87,18 +106,28 @@ def adresse_d_envoi():
     return ""
 
 
-def envoyer(url, type_, message, texte_complet, delai=10, ouvrir=None):
+def message_discord(type_, message, version=""):
+    """Le message du salon : un cadre de la couleur du type (bug rouge, idee
+    verte, plantage bleu), le texte du joueur et la version."""
+    texte = (message or "").strip() or "(vide)"
+    if len(texte) > 4000:
+        texte = texte[:3997] + "..."
+    cadre = {"title": TITRES.get(type_, "Message"), "description": texte,
+             "color": COULEURS.get(type_, 0x9E9E9E)}
+    if version:
+        cadre["footer"] = {"text": "SickChess %s" % version}
+    return {"embeds": [cadre]}
+
+
+def envoyer(url, type_, message, texte_complet, delai=10, ouvrir=None, version=""):
     """Envoie au webhook Discord (message + rapport en piece jointe).
     Renvoie (ok, explication)."""
     import urllib.request
-    resume = "**%s** : %s" % (TYPES.get(type_, "Message"), (message or "").strip())
-    if len(resume) > 1900:
-        resume = resume[:1897] + "..."
     frontiere = "----sickchess%s" % uuid.uuid4().hex
     corps = []
     corps.append("--%s\r\nContent-Disposition: form-data; name=\"payload_json\"\r\n"
                  "Content-Type: application/json\r\n\r\n%s\r\n"
-                 % (frontiere, json.dumps({"content": resume})))
+                 % (frontiere, json.dumps(message_discord(type_, message, version))))
     corps.append("--%s\r\nContent-Disposition: form-data; name=\"files[0]\"; "
                  "filename=\"rapport.txt\"\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n"
                  % frontiere)

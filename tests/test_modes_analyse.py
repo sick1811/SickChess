@@ -261,6 +261,15 @@ finally:
     moteurs.moteur_d_analyse_n = ancien_n
     os.cpu_count = ancien_cpu
 
+print("7 bis. Meilleurs coups : pas de doublon, le mieux note d'abord (Cowork, t65)")
+depart = chess.Board().fen()
+melange = [["e2e4", 0.33, None, []], ["g1f3", 0.35, None, []], ["g1f3", 0.35, None, []]]
+coups = A.meilleurs_depuis_lignes(depart, melange, 3)
+verifier([c["san"] for c in coups] == ["Nf3", "e4"], "un coup une seule fois, le mieux note d'abord : %s" % [c["san"] for c in coups])
+noirs = chess.Board("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1").fen()
+coups = A.meilleurs_depuis_lignes(noirs, [["e7e5", -0.30, None, []], ["c7c5", -0.40, None, []]], 3)
+verifier(coups and coups[0]["san"] == "c5", "aux Noirs : le meilleur pour les Noirs d'abord (%s)" % [c["san"] for c in coups])
+
 print("8. Stockfish pour de vrai : go nodes")
 chemin = os.environ.get("SICKCHESS_STOCKFISH")
 if not chemin:

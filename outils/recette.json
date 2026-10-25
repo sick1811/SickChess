@@ -408,53 +408,60 @@
    "ordre": 10701
   },
   {
+   "id": "R-079",
+   "section": "Mes parties et profil",
+   "texte": "Importer une partie (ou en jouer une à deux), revenir au menu et attendre quelques minutes, puis Mes parties",
+   "detail": "La partie affiche « Revue prête » ; sa revue s'ouvre avec toutes les pastilles tout de suite. Pendant une partie contre l'ordinateur, aucun stockfish.exe de plus (l'analyse de fond est en pause) ; Options → réglage « analyse_de_fond » à faux dans config.json : plus rien ne se calcule au menu.",
+   "ordre": 10702
+  },
+  {
    "id": "R-072",
    "section": "Mes parties et profil",
    "texte": "Revoir une partie de la liste",
    "detail": "La revue s'ouvre au début ; si elle a déjà été analysée, pas de nouvelle analyse.",
-   "ordre": 10702
+   "ordre": 10703
   },
   {
    "id": "R-075",
    "section": "Mes parties et profil",
    "texte": "Copier un PGN (lichess / chess.com) puis Mes parties → Importer (PGN)",
    "detail": "La revue de la partie s'ouvre ; elle apparaît dans la liste avec la pastille PGN (ou V/N/D si ton nom y est) ; l'Elo ne bouge pas.",
-   "ordre": 10703
+   "ordre": 10704
   },
   {
    "id": "R-076",
    "section": "Mes parties et profil",
    "texte": "Copier un lien de partie lichess puis Importer ; glisser un fichier .pgn sur la fenêtre",
    "detail": "La partie est téléchargée / importée et la revue s'ouvre.",
-   "ordre": 10704
+   "ordre": 10705
   },
   {
    "id": "R-077",
    "section": "Mes parties et profil",
    "texte": "Mes parties → Statistiques",
    "detail": "Parties et score (Blancs / Noirs), précision moyenne et tendance, tes ouvertures avec leur score, tes fautes par phase, courbe de précision.",
-   "ordre": 10705
+   "ordre": 10706
   },
   {
    "id": "R-078",
    "section": "Mes parties et profil",
    "texte": "Battre l'ordinateur, puis Mes parties → Statistiques → Succès",
    "detail": "Bandeau « Succès débloqué : Premier sang » en haut de l'écran ; la liste montre les 14 succès, ceux obtenus en couleur avec la date.",
-   "ordre": 10706
+   "ordre": 10707
   },
   {
    "id": "R-073",
    "section": "Mes parties et profil",
    "texte": "Bouton Ouvrir le dossier",
    "detail": "L'explorateur Windows s'ouvre sur le dossier parties.",
-   "ordre": 10707
+   "ordre": 10708
   },
   {
    "id": "R-074",
    "section": "Mes parties et profil",
    "texte": "Partie à deux puis Mes parties",
    "detail": "La partie apparaît avec la pastille « 2J » et ne change pas l'Elo.",
-   "ordre": 10708
+   "ordre": 10709
   },
   {
    "id": "R-080",
@@ -502,7 +509,7 @@
    "id": "R-087",
    "section": "Problèmes",
    "texte": "Problèmes → Contre la montre",
-   "detail": "3:00 qui descend ; les problèmes deviennent plus durs ; une faute = solution puis problème suivant ; à 0:00 « Temps écoulé ! », score et record ; « Rejouer le défi ».",
+   "detail": "3:00 qui descend ; les problèmes deviennent plus durs ; une faute = le bon coup joué sous tes yeux (« Raté ! Il fallait … ») pendant 2 s, puis problème suivant ; à 0:00 « Temps écoulé ! », score et record ; « Rejouer le défi ».",
    "ordre": 10806
   },
   {
@@ -634,16 +641,30 @@
   {
    "id": "R-095",
    "section": "Signaler un problème",
-   "texte": "Menu → Signaler un problème / une idée : écrire un message, Envoyer",
-   "detail": "Sans adresse d'envoi réglée : « Message enregistré dans le dossier rapports et copié », le dossier rapports s'ouvre avec le fichier.",
+   "texte": "Menu → Signaler un problème / une idée : écrire un message, Envoyer (une fois « Un problème », une fois « Une idée »)",
+   "detail": "« Merci ! Ton message est bien parti. » ; dans le salon Discord de SickChess : le bug dans un cadre rouge, l'idée dans un cadre vert, avec la version et le rapport en pièce jointe. Sans signalement.json : « Message enregistré dans le dossier rapports et copié ».",
    "ordre": 11100
+  },
+  {
+   "id": "R-099",
+   "section": "Signaler un problème",
+   "texte": "Signaler : écrire « Bonjour, » puis coller (Ctrl+V) un texte copié ailleurs avec des accents (« à côté »)",
+   "detail": "Le texte collé s'ajoute à la suite de « Bonjour, » (rien n'est effacé) et garde ses accents.",
+   "ordre": 11101
+  },
+  {
+   "id": "R-127",
+   "section": "Signaler un problème",
+   "texte": "python SickChess.py --plantage-test, relancer le jeu, « Envoyer le rapport » puis Envoyer",
+   "detail": "Le plantage arrive dans le salon Discord dans un cadre bleu, avec le journal du plantage en pièce jointe.",
+   "ordre": 11102
   },
   {
    "id": "R-096",
    "section": "Signaler un problème",
    "texte": "Ouvrir le fichier du rapport",
    "detail": "Ton message, la version, le système et (pour un problème) la fin du journal du jeu.",
-   "ordre": 11101
+   "ordre": 11103
   },
   {
    "id": "R-090",
@@ -866,7 +887,7 @@
    "id": "R-114",
    "section": "Version amis et mises à jour",
    "texte": "Publier une nouvelle version, l'ami ouvre le jeu et reste dans le menu",
-   "detail": "Le bouton affiche « Mise à jour : X % », puis « Nouvelle version prête », le jeu redémarre tout seul sur la nouvelle version ; profil et parties gardés ; jamais de redémarrage en pleine partie.",
+   "detail": "Au plus 3 minutes après la publication, le bouton affiche « Mise à jour : X % », puis « Nouvelle version prête », le jeu redémarre tout seul sur la nouvelle version ; profil et parties gardés ; jamais de redémarrage en pleine partie.",
    "ordre": 11404
   },
   {

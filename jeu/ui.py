@@ -192,6 +192,30 @@ def copier(texte):
         return False
 
 
+def decoder_presse_papiers(donnees):
+    """24/10 (Cowork, t54 : le « à » disparaissait en collant) : sous Windows,
+    le presse-papiers « texte » arrive dans l'ancien encodage de Windows
+    (cp1252), pas en UTF-8 ; decoder en UTF-8 en ignorant les erreurs jetait
+    toutes les lettres accentuees. On essaie UTF-8, puis UTF-16 (octets nuls
+    un sur deux), puis cp1252, puis latin-1 (qui ne rate jamais)."""
+    if not isinstance(donnees, (bytes, bytearray)):
+        return str(donnees or "")
+    donnees = bytes(donnees)
+    if len(donnees) >= 4 and donnees[1::2].count(0) > len(donnees) // 4:
+        brut = donnees[:len(donnees) // 2 * 2]
+        try:
+            return brut.decode("utf-16-le").replace("\x00", "")
+        except UnicodeDecodeError:
+            pass
+    donnees = donnees.rstrip(b"\x00")
+    for encodage in ("utf-8", "cp1252", "latin-1"):
+        try:
+            return donnees.decode(encodage)
+        except UnicodeDecodeError:
+            continue
+    return donnees.decode("latin-1", "replace")
+
+
 def coller():
     """Lit le presse-papiers. Chaine vide si on n'y arrive pas.
 
@@ -208,7 +232,9 @@ def coller():
         pygame.scrap.init()
         donnees = pygame.scrap.get(pygame.SCRAP_TEXT)
         if donnees:
-            return _decoder(donnees).replace("\x00", "").strip()
+            if isinstance(donnees, bytes):
+                donnees = decoder_presse_papiers(donnees)
+            return donnees.replace("\x00", "").strip()
     except Exception:
         pass
     import subprocess
@@ -488,7 +514,9 @@ def t(base, ech=1.0):
 # ---------------------------------------------------------------- mesure
 
 def mesurer(chaine, taille, gras=False, mono=False):
-    return _taille_de(police(taille, gras, mono), str(chaine))
+    # 24/10 (Cowork, t62 : « BLA… » sur la pendule) : on mesure le texte tel
+    # qu'il sera affiche (traduit), pas le francais.
+    return _taille_de(police(taille, gras, mono), _tr(str(chaine)))
 
 
 def rogner(chaine, taille, largeur_max, gras=False, mono=False, suffixe="..."):
@@ -919,10 +947,13 @@ def couper_en_lignes_riches(chaine, taille, largeur_max, gras=False):
 class ChampTexte:
     """Zone de saisie : accepte les accents et les emoji Windows (touche Win + .)."""
 
-    def __init__(self, longueur_max=140):
+    def __init__(self, longueur_max=140, coller_remplace=True):
         self.contenu = ""
         self.longueur_max = int(longueur_max)
         self.actif = False
+        # 24/10 (Cowork, t54) : Ctrl+V REMPLACE dans un champ court (code d'un
+        # salon, lien) ; il AJOUTE au texte deja ecrit dans un long message.
+        self.coller_remplace = bool(coller_remplace)
 
     def activer(self, actif=True):
         self.actif = bool(actif)
@@ -955,9 +986,7 @@ class ChampTexte:
             # la main une adresse recue par message - et sur certains PC la
             # saisie clavier ne parvenait meme pas au champ.
             if event.key == pygame.K_v and (event.mod & getattr(pygame, "KMOD_CTRL", 0)):
-                # 25/10 (defaut Cowork) : Ctrl+V AJOUTE, comme partout ailleurs ;
-                # il remplacait tout le texte deja ecrit.
-                self.coller_le_presse_papiers(remplacer=False)
+                self.coller_le_presse_papiers(remplacer=self.coller_remplace)
                 return None
             if event.key == pygame.K_BACKSPACE:
                 self.contenu = self.contenu[:-1]

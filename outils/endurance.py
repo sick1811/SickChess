@@ -23,6 +23,8 @@ un passage d'au moins une heure, docs/ENDURANCE.md. SORTIE = tests/endurance/.
 Code de sortie : 0 si tout est vert, 1 sinon. Le banc d'essai le lance (section
 « endurance », hors --rapide).
 """
+import os as _os_envoi
+_os_envoi.environ["SICKCHESS_SANS_ENVOI"] = "1"   # 25/10 : jamais de faux message dans le vrai salon Discord
 import collections
 import gc
 import json

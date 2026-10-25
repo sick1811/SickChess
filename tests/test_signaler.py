@@ -3,6 +3,8 @@
 # Tout se passe dans un dossier temporaire ; l'envoi est simule (aucun
 # message ne part vraiment).
 
+import os as _os_envoi
+_os_envoi.environ["SICKCHESS_SANS_ENVOI"] = "1"   # 25/10 : jamais de faux message dans le vrai salon Discord
 import json
 import os
 import sys
@@ -53,10 +55,16 @@ verifier(chemin and os.path.exists(chemin) and chemin.startswith(os.path.join(TE
          "rapport range dans rapports/")
 
 print("2. L'adresse d'envoi")
-verifier(signalement.adresse_d_envoi() == "", "rien de regle : pas d'envoi direct")
-with open(os.path.join(TEMP, "signalement.json"), "w", encoding="utf-8") as f:
-    json.dump({"signalement_webhook": "https://discord.com/api/webhooks/1/abc"}, f)
-verifier(signalement.adresse_d_envoi().startswith("https://discord.com"), "adresse lue dans signalement.json")
+signalement._dossier_du_jeu = lambda: os.path.join(TEMP, "jeu_vide")    # pas celui de Julien
+del os.environ["SICKCHESS_SANS_ENVOI"]
+try:
+    verifier(signalement.adresse_d_envoi() == "", "rien de regle : pas d'envoi direct")
+    with open(os.path.join(TEMP, "signalement.json"), "w", encoding="utf-8") as f:
+        json.dump({"signalement_webhook": "https://discord.com/api/webhooks/1/abc"}, f)
+    verifier(signalement.adresse_d_envoi().startswith("https://discord.com"), "adresse lue dans signalement.json")
+finally:
+    os.environ["SICKCHESS_SANS_ENVOI"] = "1"
+verifier(signalement.adresse_d_envoi() == "", "tests et robots : jamais d'envoi dans le vrai salon")
 
 print("3. L'envoi (simule)")
 envoyes = []
@@ -79,6 +87,19 @@ verifier(ok and "Merci" in msg, "envoi reussi : %s" % msg)
 corps = envoyes[0].data.decode("utf-8")
 verifier("Le son coupe" in corps and "rapport.txt" in corps and "ligne 299" in corps,
          "message + journal en piece jointe")
+
+print("3 bis. Couleurs dans le salon (Julien : bugs rouges, idees vertes, plantages bleus)")
+for type_, couleur, titre in (("probleme", 0xE53935, "Bug"), ("idee", 0x43A047, "Idée"),
+                              ("plantage", 0x1E88E5, "Plantage")):
+    cadre = signalement.message_discord(type_, "texte", "0.2.0")["embeds"][0]
+    verifier(cadre["color"] == couleur and cadre["title"] == titre and cadre["description"] == "texte"
+             and "0.2.0" in cadre["footer"]["text"], "%s : cadre %s, couleur %06X" % (type_, titre, couleur))
+envoyes.clear()
+signalement.envoyer("https://discord.com/api/webhooks/1/abc", "idee", "Un mode aveugle", "x",
+                    ouvrir=faux_envoi, version="0.2.0")
+verifier('"color": %d' % 0x43A047 in envoyes[0].data.decode("utf-8"), "l'envoi porte bien la couleur")
+verifier("journal" in signalement.construire("plantage", "KeyError", "0.2.0", journal="fin du journal").lower(),
+         "un plantage embarque le journal")
 
 
 def coupe(requete, timeout=10):
@@ -112,6 +133,32 @@ verifier(e.btn_annuler.libelle == "Fermer", "bouton Fermer")
 verifier(e.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE, mod=0, unicode="")) == "retour",
          "Echap ferme")
 
+print("4 bis. Coller (Ctrl+V) : ajoute au texte, garde les accents (Cowork, t54)")
+import ui
+verifier(ui.decoder_presse_papiers("Voilà à côté".encode("cp1252")) == "Voilà à côté",
+         "presse-papiers Windows (cp1252) : les accents restent")
+verifier(ui.decoder_presse_papiers("Voilà à côté".encode("utf-8")) == "Voilà à côté", "UTF-8 : pareil")
+verifier(ui.decoder_presse_papiers("Voilà à côté".encode("utf-16-le") + b"\x00\x00") == "Voilà à côté",
+         "UTF-16 : pareil")
+e2 = EcranSignaler(ecran, "0.1.0")
+for car in "Début. ":
+    e2.handle_event(pygame.event.Event(pygame.TEXTINPUT, text=car))
+vrai_coller = ui.coller
+ui.coller = lambda: "Le son coupe à la fin"
+try:
+    e2.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_v, mod=pygame.KMOD_CTRL, unicode=""))
+finally:
+    ui.coller = vrai_coller
+verifier(e2.champ.contenu.startswith("Début.") and e2.champ.contenu.endswith("Le son coupe à la fin"),
+         "Ctrl+V ajoute au texte deja ecrit : %r" % e2.champ.contenu)
+court = ui.ChampTexte().activer(True)
+court.contenu = "ancien"
+ui.coller = lambda: "ABCD-1234"
+try:
+    court.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_v, mod=pygame.KMOD_CTRL, unicode=""))
+finally:
+    ui.coller = vrai_coller
+verifier(court.contenu == "ABCD-1234", "champ court (code d'un salon) : Ctrl+V remplace toujours")
 print("4 bis. Coller (defauts Cowork 24/10 : Ctrl+V remplacait tout, le « à » disparaissait)")
 import ui
 e2 = EcranSignaler(ecran, "0.1.0")

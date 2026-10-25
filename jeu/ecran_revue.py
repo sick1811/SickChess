@@ -449,7 +449,13 @@ class EcranRevue:
         y += h_titre + espace
         self.zone_precision = pygame.Rect(x, y, l, int(104 * ech))
         y += self.zone_precision.height + espace
-        self.zone_detail = pygame.Rect(x, y, l, int(118 * ech))  # 17/10 : + meilleurs coups
+        # 24/10 (Cowork, t51 : explication d'une gaffe coupee) : le cadre du coup
+        # grandit (jusqu'a 2 lignes de plus) tant que la feuille garde 6 lignes.
+        h_detail = int(118 * ech)  # 17/10 : + meilleurs coups
+        ligne_coup = ui.police(ui.t(14, ech), mono=True).get_height() + int(5 * ech)
+        reste = bas - (y + h_detail + espace + int(58 * ech) + espace) - int(10 * ech)
+        h_detail += max(0, min(int(46 * ech), reste - 5 * ligne_coup))
+        self.zone_detail = pygame.Rect(x, y, l, h_detail)
         y += self.zone_detail.height + espace
         self.zone_courbe = pygame.Rect(x, y, l, int(58 * ech))
         y += self.zone_courbe.height + espace
@@ -495,19 +501,15 @@ class EcranRevue:
             d = self.disposition
             sur_le_plateau = pygame.Rect(d.plateau_x, d.plateau_y, d.cote_plateau,
                                          d.cote_plateau).collidepoint(event.pos)
-            # 24/10 (defaut Cowork) : une piece restee choisie envoyait TOUS les
-            # clics a l'echiquier, meme sur la feuille de coups (« cliquer un
-            # coup ne fait rien »). Un clic hors de l'echiquier lache la piece
-            # et suit son chemin normal (feuille, courbe, boutons).
-            if not sur_le_plateau and p.selected_square is not None \
-                    and not p.dragging and not p.promotion.est_actif() \
-                    and event.type == pygame.MOUSEBUTTONDOWN:
-                p.annuler_selection()
-            if sur_le_plateau or p.dragging or p.selected_square is not None \
-                    or p.promotion.est_actif():
+            if sur_le_plateau or p.dragging or p.promotion.est_actif():
                 p.handle_event(event)
                 if event.type != pygame.MOUSEMOTION:
                     return None
+            elif p.selected_square is not None and event.type == pygame.MOUSEBUTTONDOWN:
+                # 24/10 (Cowork, t65) : une piece selectionnee « mangeait » le
+                # clic sur la feuille des coups (rien ne se passait). On la
+                # deselectionne ET le clic fait son travail.
+                p.annuler_selection()
         if self.variante is not None and event.type == pygame.KEYDOWN \
                 and event.key in (pygame.K_ESCAPE, pygame.K_LEFT, pygame.K_BACKSPACE):
             if p.selected_square is not None or p.dragging:
@@ -793,19 +795,24 @@ class EcranRevue:
         ui.texte(ecran, phrase, x, y, ui.t(13, ech), couleur, gras=True,
                  largeur_max=l, ajuster=True)
         y += ui.police(ui.t(13, ech), True).get_height() + int(3 * ech)
-        # La ligne des meilleurs coups reste toujours en bas du cadre.
-        h_meilleurs = 2 * ui.police(petite).get_height() + int(4 * ech)
-        bas_meilleurs = zone.bottom - h_meilleurs - int(6 * ech)
         # 17/10 (travail p03) : la faute expliquee avec des mots.
+        explication = None
         if infos["pret"] and infos["note"] in NOTES_A_CORRIGER:
             explication = self._explication(self.index - 1)
-            if explication and bas_meilleurs - y > ui.police(ui.t(12, ech)).get_height():
-                ui.paragraphe(ecran, explication,
-                              pygame.Rect(x, y, l, bas_meilleurs - y),
-                              ui.t(12, ech), t["texte"])
-        self._ligne_meilleurs(ecran, t, ech, x, max(y, bas_meilleurs), l)
+        # La ligne des meilleurs coups reste toujours en bas du cadre. 24/10
+        # (Cowork, t51) : avec une explication, on enleve la « Suite prevue »
+        # pour lui laisser une ligne de plus (elle etait coupee).
+        lignes_meilleurs = 1 if explication else 2
+        h_meilleurs = lignes_meilleurs * ui.police(petite).get_height() + int(4 * ech)
+        bas_meilleurs = zone.bottom - h_meilleurs - int(6 * ech)
+        if explication and bas_meilleurs - y > ui.police(ui.t(12, ech)).get_height():
+            ui.paragraphe(ecran, explication,
+                          pygame.Rect(x, y, l, bas_meilleurs - y),
+                          ui.t(12, ech), t["texte"], interligne=1.15)
+        self._ligne_meilleurs(ecran, t, ech, x, max(y, bas_meilleurs), l,
+                              avec_suite=not explication)
 
-    def _ligne_meilleurs(self, ecran, t, ech, x, y, l):
+    def _ligne_meilleurs(self, ecran, t, ech, x, y, l, avec_suite=True):
         """« Meilleur ici : Nf3 (+0.35)  ·  aussi bon : d4 (+0.30) » et la suite
         prevue par Stockfish. Renvoie le y suivant."""
         petite = ui.t(12, ech)
@@ -826,7 +833,7 @@ class EcranRevue:
         ui.texte(ecran, texte, x, y, petite, BLEU_MEILLEUR[:3], gras=True,
                  largeur_max=l, ajuster=True)
         y += h + int(2 * ech)
-        if premier["suite_san"]:
+        if premier["suite_san"] and avec_suite:
             suite = " ".join(notation.afficher(c) for c in premier["suite_san"])
             ui.texte(ecran, "Suite prévue : " + suite, x, y, petite,
                      t["texte_discret"], largeur_max=l)

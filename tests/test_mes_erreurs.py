@@ -163,6 +163,14 @@ verifier(not mes_erreurs.coup_presque_aussi_bon(fen_avant, chess.Move.from_uci("
 moteurs.moteur_d_analyse = ancien
 
 print()
+print("5. Partie importee ou tu ne joues pas (Cowork, r01 : Morphy 1858)")
+verifier(mes_erreurs._camps_du_joueur({"importee": True, "camp": ""}) == set(),
+         "importee sans ton nom : aucune de « tes » erreurs")
+verifier(mes_erreurs._camps_du_joueur({"importee": True, "camp": "noir"}) == {chess.BLACK},
+         "importee avec ton nom aux Noirs : tes coups des Noirs")
+verifier(mes_erreurs._camps_du_joueur({"camp": ""}) == {chess.WHITE, chess.BLACK},
+         "partie a deux sur ce PC : les deux camps (comme avant)")
+
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))
 pygame.quit()
 sys.exit(1 if echecs else 0)

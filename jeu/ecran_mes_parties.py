@@ -32,6 +32,11 @@ class EcranMesParties:
         self.theme_plateau = theme_plateau
         self.profil = get_profil()
         self.parties = historique_parties.lister()
+        # 25/10 (p25) : « Revue prête » (analyse enregistree, souvent par
+        # l'analyse de fond) ; relu toutes les 3 s hors du dessin.
+        self.revues_pretes = set()
+        self._revues_lues_le = 0.0
+        self.maj_revues_pretes()
         self.message = ""
         self.premiere_ligne = 0
         self.lignes_visibles = 1
@@ -137,6 +142,7 @@ class EcranMesParties:
                                      " Ou glisse un fichier .pgn sur la fenêtre.")
             return None
         self.parties = historique_parties.lister()
+        self.maj_revues_pretes()
         self.message = "Partie importée."
         for index, partie in enumerate(self.parties):
             if partie["chemin"] == chemin:
@@ -404,6 +410,16 @@ class EcranMesParties:
             l_bouton = int(92 * ech)
             x_texte = pastille.right + int(12 * ech)
             place = rect.right - l_bouton - int(20 * ech) - x_texte
+            if partie.get("chemin") in self.revues_pretes:
+                # 25/10 (p25) : la revue s'ouvrira tout de suite.
+                etiquette = "Revue prête"
+                l_etiquette = ui.mesurer(etiquette, ui.t(12, ech), gras=True)[0] + int(14 * ech)
+                r_etiquette = pygame.Rect(rect.right - l_bouton - int(18 * ech) - l_etiquette,
+                                          rect.centery - int(11 * ech), l_etiquette, int(22 * ech))
+                ui.cadre(ecran, r_etiquette, None, t["accent"], 1, 8)
+                ui.texte_centre_dans(ecran, etiquette, r_etiquette, ui.t(12, ech),
+                                     t["accent"], gras=True, marge=4)
+                place -= l_etiquette + int(8 * ech)
             h1 = ui.police(ui.t(15, ech), True).get_height()
             y_texte = rect.y + (rect.height - h1 - ui.police(ui.t(12, ech)).get_height()
                                 - int(2 * ech)) // 2
@@ -436,10 +452,22 @@ class EcranMesParties:
 
     # ------------------------------------------------------------- boucle
 
+    def maj_revues_pretes(self, maintenant=None, forcer=True):
+        """Les parties dont l'analyse est enregistree (pastille « Revue prête »)."""
+        import time
+        import analyse_de_fond
+        maintenant = time.time() if maintenant is None else maintenant
+        if not forcer and maintenant - self._revues_lues_le < 3.0:
+            return
+        self._revues_lues_le = maintenant
+        self.revues_pretes = {p["chemin"] for p in self.parties
+                              if analyse_de_fond.revue_prete(p.get("chemin", ""))}
+
     def run(self, clock, evenement_fenetre=None, apres_dessin=None):
         """Boucle autonome. evenement_fenetre(event) -> True si F11/F1/taille."""
         cadence = ui.Cadence()       # 23/10 : 30 images/s au repos
         while True:
+            self.maj_revues_pretes(forcer=False)
             evenements = ui.evenements()
             for event in evenements:
                 if evenement_fenetre is not None and evenement_fenetre(event):

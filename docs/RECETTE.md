@@ -148,6 +148,8 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
   → Profil (nom, Elo, victoires/nulles/défaites, courbe) et liste des parties, la plus récente en haut.
 - [ ] **R-071** – Changer de nom, valider avec Entrée  
   → Le nouveau nom s'affiche ici et dans les nouvelles parties.
+- [ ] **R-079** – Importer une partie (ou en jouer une à deux), revenir au menu et attendre quelques minutes, puis Mes parties  
+  → La partie affiche « Revue prête » ; sa revue s'ouvre avec toutes les pastilles tout de suite. Pendant une partie contre l'ordinateur, aucun stockfish.exe de plus (l'analyse de fond est en pause) ; Options → réglage « analyse_de_fond » à faux dans config.json : plus rien ne se calcule au menu.
 - [ ] **R-072** – Revoir une partie de la liste  
   → La revue s'ouvre au début ; si elle a déjà été analysée, pas de nouvelle analyse.
 - [ ] **R-075** – Copier un PGN (lichess / chess.com) puis Mes parties → Importer (PGN)  
@@ -178,7 +180,7 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
 - [ ] **R-085** – Problème avec promotion (thème Promotion)  
   → Le choix de la pièce s'affiche et la bonne pièce est acceptée.
 - [ ] **R-087** – Problèmes → Contre la montre  
-  → 3:00 qui descend ; les problèmes deviennent plus durs ; une faute = solution puis problème suivant ; à 0:00 « Temps écoulé ! », score et record ; « Rejouer le défi ».
+  → 3:00 qui descend ; les problèmes deviennent plus durs ; une faute = le bon coup joué sous tes yeux (« Raté ! Il fallait … ») pendant 2 s, puis problème suivant ; à 0:00 « Temps écoulé ! », score et record ; « Rejouer le défi ».
 - [ ] **R-088** – Problèmes → Survie  
   → Vies 3/3 ; chaque faute en retire une ; à 0 : « Trois fautes : fini ! » et le record.
 - [ ] **R-089** – Problèmes → Problème du jour, puis le rouvrir  
@@ -224,8 +226,12 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
 
 ## Signaler un problème
 
-- [ ] **R-095** – Menu → Signaler un problème / une idée : écrire un message, Envoyer  
-  → Sans adresse d'envoi réglée : « Message enregistré dans le dossier rapports et copié », le dossier rapports s'ouvre avec le fichier.
+- [ ] **R-095** – Menu → Signaler un problème / une idée : écrire un message, Envoyer (une fois « Un problème », une fois « Une idée »)  
+  → « Merci ! Ton message est bien parti. » ; dans le salon Discord de SickChess : le bug dans un cadre rouge, l'idée dans un cadre vert, avec la version et le rapport en pièce jointe. Sans signalement.json : « Message enregistré dans le dossier rapports et copié ».
+- [ ] **R-099** – Signaler : écrire « Bonjour, » puis coller (Ctrl+V) un texte copié ailleurs avec des accents (« à côté »)  
+  → Le texte collé s'ajoute à la suite de « Bonjour, » (rien n'est effacé) et garde ses accents.
+- [ ] **R-127** – python SickChess.py --plantage-test, relancer le jeu, « Envoyer le rapport » puis Envoyer  
+  → Le plantage arrive dans le salon Discord dans un cadre bleu, avec le journal du plantage en pièce jointe.
 - [ ] **R-096** – Ouvrir le fichier du rapport  
   → Ton message, la version, le système et (pour un problème) la fin du journal du jeu.
 
@@ -300,7 +306,7 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
 - [ ] **R-113** – Chez un ami : double-clic sur SickChess_Installation.exe  
   → Aucune demande d'administrateur ; installation dans ses programmes, icône sur le Bureau ; le jeu démarre et on peut jouer contre l'ordinateur tout de suite. (Si Windows prévient « éditeur inconnu » : Informations complémentaires → Exécuter quand même.)
 - [ ] **R-114** – Publier une nouvelle version, l'ami ouvre le jeu et reste dans le menu  
-  → Le bouton affiche « Mise à jour : X % », puis « Nouvelle version prête », le jeu redémarre tout seul sur la nouvelle version ; profil et parties gardés ; jamais de redémarrage en pleine partie.
+  → Au plus 3 minutes après la publication, le bouton affiche « Mise à jour : X % », puis « Nouvelle version prête », le jeu redémarre tout seul sur la nouvelle version ; profil et parties gardés ; jamais de redémarrage en pleine partie.
 - [ ] **R-115** – Double-clic sur CONSTRUIRE_VERSION_AMIS.bat  
   → D'abord « Vérification avant une version pour les amis » : une ligne OK / A REVOIR / BLOQUANT par point (mode test, numéro Steam, licences, version, Git, tests, banc d'essai) ; s'il y a un BLOQUANT, rien n'est fabriqué ; sinon la version se fabrique, et le .exe est essayé dans un dossier neuf avant l'envoi.
 - [ ] **R-116** – Mise à jour qui échoue : cliquer Mise à jour avec Internet coupé, puis Internet rétabli pendant qu'une version se publie  

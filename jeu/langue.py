@@ -18,8 +18,8 @@ _etat = {"langue": None}
 _memo = {}
 _modeles = []
 _manquants = set()
-# 25/10 (defaut Cowork « 55 %10olved ») : « %% » d'abord, sinon le second % de
-# « %% solved » etait pris pour « % s » et recevait la valeur suivante.
+# 24/10 (Cowork, t62 : « 55 %10olved ») : « %% » d'abord, sinon « %% s(olved) »
+# etait pris pour un « % s » a remplir.
 _SPEC = re.compile(r"%%|%(?:[-+ 0#]*\d*(?:\.\d+)?[sdfi])")
 
 
@@ -59,7 +59,7 @@ def _table():
                 motif = ""
                 pos = 0
                 for m in _SPEC.finditer(fr):
-                    if m.group() == "%%":
+                    if m.group(0) == "%%":
                         continue
                     motif += re.escape(fr[pos:m.start()].replace("%%", "%")) + "(.*?)"
                     pos = m.end()
@@ -80,13 +80,14 @@ def _remplir(en, groupes):
             pass
     sortie, i, pos = "", 0, 0
     for m in _SPEC.finditer(en):
-        if m.group() == "%%":
-            continue
         sortie += en[pos:m.start()]
-        sortie += groupes[i] if i < len(groupes) else ""
-        i += 1
+        if m.group(0) == "%%":
+            sortie += "%"
+        else:
+            sortie += groupes[i] if i < len(groupes) else ""
+            i += 1
         pos = m.end()
-    return (sortie + en[pos:]).replace("%%", "%")
+    return sortie + en[pos:]
 
 
 def traduire(texte):
@@ -112,7 +113,7 @@ def traduire(texte):
     if resultat is None:
         # Textes composes (« 1-0   Analyse... », themes « Mat, Mat en 1 ») :
         # on traduit chaque morceau.
-        for sep in ("   ", "  -  ", " · ", ", "):
+        for sep in ("   ", "  -  ", " · ", ", ", " - "):     # 24/10 : « Ordinateur (400) - Toi »
             if sep in texte:
                 morceaux = texte.split(sep)
                 traduits = [traduire(m) for m in morceaux]

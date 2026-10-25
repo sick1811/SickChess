@@ -25,20 +25,34 @@ Mis à jour le 25/10/2026.
       partie 1 bis. Plan du jour dans la page « À faire », groupe « Aujourd'hui · 25/10 » (j01 à j08) :
       Julien précise le cas (j01), Cowork reproduit sur le PC (j02), Claude Code corrige avec un test qui joue
       chaque cas 20 fois (j03, `tests/test_nulles.py` déjà commencé, pas encore dans Git).
+- [ ] **25/10 – Recette, points rouges** :
+      - [x] R-095 / R-096 « Signaler » arrive dans le salon Discord (séance 39) : bugs en **rouge**, idées en
+            **vert**, plantages en **bleu** (choix de Julien), version + rapport en pièce jointe ; 3 messages de
+            test envoyés et acceptés par Discord le 25/10. **L'adresse (webhook) n'est PAS dans Git** : sur le PC,
+            Claude Code crée `signalement.json` à la racine du jeu (`{"signalement_webhook": "<adresse>"}`, adresse
+            donnée par Julien dans la discussion cloud du 25/10) ; il part dans le paquet « jeu » de la version amis.
+      - [x] R-114 « ne fonctionne pas en version 4 » (l'ami au menu ne reçoit pas la nouvelle version) : le jeu ne
+            revérifiait que toutes les 20 min → 3 min (séance 37). À revérifier à la publication de la n° 7.
+      - [ ] Bugs et idées postés dans le salon Discord : Claude n'a pas accès à Discord → Julien les recopie.
 - [ ] **24/10 – Défauts trouvés par Cowork sur le PC de Julien** (page « À faire », commentaires « Vérifié par Cowork ») :
       - [x] PLANTAGE t85 : éditeur de l'analyse libre en 1920×1080 (cases en nombres à virgule) → corrigé (séance 30).
       - [x] PLANTAGE t52 : rouvrir le Problème du jour déjà fait → corrigé (séance 30).
-      - [ ] Textes coupés : t51 (« Ta pièce va sur une case où elle se fait prendre :… »), t52 (« Rec… » record
-            illisible), r01 (« tu as joué… », « Indice : 0 points… »), t62 (« BLA… », aide F1).
-      - [ ] t65 : cliquer un coup dans la feuille de la revue ne fait rien ; « aussi bon : Nf3, Nf3 » en double
-            (et « aussi bon » mieux noté que « meilleur »).
-      - [ ] t57 : « Ligne suivante » ne réagit pas ; nom « Ouverture King's du cavalier » mi-anglais.
-      - [ ] t54 : coller (Ctrl+V) dans Signaler remplace tout le texte et perd les accents (« à »).
-      - [ ] r01 : une partie importée où Julien ne joue pas (Morphy) donne des « Mes erreurs ».
-      - [ ] t62 : anglais : « 55 %10olved » cassé, restes en français (menu, haut de la revue), aide F1 : A = analyse libre.
-      - [ ] t52 : contre la montre, après une faute la solution ne se voit pas (le suivant arrive aussitôt).
+      - [x] Textes coupés (séance 36) : t51 explication des gaffes (cadre plus haut, 3 lignes), t52 / r01 messages
+            et « tu as joué… » sur plusieurs lignes, t62 « BLA… » (mesure du texte traduit), aide F1 de la revue.
+      - [x] t65 (séance 36) : « Nf3, Nf3 » en double et ordre des meilleurs coups ; clic sur un coup de la feuille :
+            une pièce sélectionnée « mangeait » le clic → corrigé. ⚠ Le cas exact de Cowork n'est pas reproduit :
+            à revérifier sur le PC.
+      - [x] t57 (séance 36) : noms d'ouvertures (King's / Queen's / « Keene's » → français). « Ligne suivante » :
+            **non reproduit** (marche en 1920×1080 et dans les tests) → à revérifier par Cowork.
+      - [x] t54 (séance 36) : Ctrl+V ajoute au message (remplace toujours dans un champ court : code de salon) ;
+            accents gardés (presse-papiers Windows en cp1252).
+      - [x] r01 (séance 36) : une partie importée sans ton nom ne donne plus de « Mes erreurs ».
+      - [x] t62 (séance 36) : « 55 %10olved » corrigé (« %% » mal lu), restes en français (reprise, haut de la revue).
+      - [x] t52 (séance 36) : contre la montre / survie : après une faute, le bon coup est joué sous tes yeux
+            (« Raté ! Il fallait Qxh2#… ») pendant 2,2 s.
+      - [x] t98 (séance 36) : « → » remplacé par « : » (la police n'a pas ce signe).
       - [ ] t71 / t99 : revue lente (17 coups : 7 min) et temps annoncé faux ; précision définitive ~2 min 30.
-      - [ ] t98 : la flèche « → » s'affiche en carré (police) ; t100 : petites pastilles « ?! » / « ! » peu lisibles.
+      - [ ] t100 : petites pastilles « ?! » / « ! » peu lisibles dans la feuille de coups.
       - [ ] t56 : une partie à deux compte dans « Tes ouvertures » (voulu ?) ; t68 : Enregistrer pas réagi une fois.
       - [ ] Accents manquants : « Aucun coup joue » (panneau de partie), « Jouer d'avance pendant que l'adversaire
             reflechit » (Options → Partie), « %d problèmes joues » (écran Problèmes), « Cree une partie » (en ligne).
@@ -182,10 +196,21 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
-- [ ] t105 (39) : après la n° 7, ton ami (n° 4 ou 5) : le jeu se met à jour seul au menu, sans aller sur GitHub.
-      À partir de la n° 8 : un ami en retard de plusieurs versions les reçoit toutes, un seul redémarrage (R-117).
+- [ ] t107 (39) : regarde ton salon Discord : 3 messages de test (rouge, vert, bleu) de Claude, à supprimer.
+      Après la prochaine version : Menu → Signaler → un bug puis une idée : ils arrivent en rouge / vert.
 - [ ] t106 (39) : installer la n° 7 : Windows demande une fois l'accord (pare-feu) ; « Oui » ; relancer : plus de
       demande ; jouer en ligne avec un ami sur un Wi-Fi public (R-118).
+- [ ] t105 (39) : après la n° 7, ton ami (n° 4 ou 5) : le jeu se met à jour seul au menu, sans aller sur GitHub.
+      À partir de la n° 8 : un ami en retard de plusieurs versions les reçoit toutes, un seul redémarrage (R-117).
+- [ ] t104 (38) : **analyse de fond (p25)** : importe une partie (ou joues-en une à deux), reste au menu
+      quelques minutes, puis Mes parties : « Revue prête » ; sa revue s'ouvre avec toutes les pastilles.
+      Pendant une partie contre l'ordinateur : pas de stockfish.exe en plus. Le jeu reste fluide au menu ?
+- [ ] t103 (36) : **corrections des défauts trouvés par Cowork** (à confier à Cowork sur ton PC) :
+      revue : clic sur un coup de la feuille (même après avoir cliqué une pièce), plus de « Nf3, Nf3 », explication
+      d'une gaffe en entier ; Problèmes : messages et record lisibles, Mes erreurs sans les parties de Morphy,
+      contre la montre : le bon coup montré après une faute ; Ouvertures : noms en français, « Ligne suivante » ;
+      Signaler : Ctrl+V ajoute au texte avec les accents ; anglais : plus de « %10olved », pendule « BLACK » entière,
+      aide F1 de la revue à jour ; Options : « Ce PC : 12 cœurs, 16 Go : PC normal ».
 - [ ] t102 (32) : fais une revue, reviens au menu et ne touche à rien 3 minutes, Gestionnaire des tâches ouvert :
       au bout de 2 min les stockfish.exe d'analyse disparaissent (il en reste 1, l'adversaire), la mémoire
       redescend de plusieurs Go ; rouvre la même revue : pastilles et précision sont toujours là.

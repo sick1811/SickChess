@@ -128,9 +128,17 @@ verifier(ecr.session.mode == "chrono" and ecr.puzzle is not None, "contre la mon
 classement_avant = puzzles.charger_le_score()["classement"]
 avancer(ecr)
 verifier(not ecr.demander_un_indice(), "pas d'indice pendant un defi")
+attendu_uci = puzzles.coup_attendu(ecr.puzzle, ecr.avance)
+debut_faute = pygame.time.get_ticks()
 ecr.plateau.make_move(mauvais_coup(ecr))
 verifier(ecr.fini and ecr.enchainer_a > 0 and ecr.session.rates() == 1,
          "une faute : probleme termine, le suivant arrive tout seul")
+coup_bon = chess.Move.from_uci(attendu_uci)
+verifier(ecr.plateau.board.piece_at(coup_bon.to_square) is not None
+         and ecr.plateau.board.fen() == ecr.positions[ecr.index_solution]
+         and "Il fallait" in ecr.message,
+         "une faute : le bon coup est joue sous tes yeux (%s)" % ecr.message)
+verifier(ecr.enchainer_a - debut_faute >= 2000, "et on a 2 s pour le voir (%d ms)" % (ecr.enchainer_a - debut_faute))
 ancien = ecr.puzzle["id"]
 ecr.enchainer_a = 1
 ecr.update()
