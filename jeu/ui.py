@@ -82,11 +82,89 @@ def evenement_fenetre(event):
     return None
 
 
+def _windows_ecrire(texte):
+    """25/10 (defaut Cowork : les accents disparaissaient au collage) : le
+    presse-papiers Unicode de Windows (CF_UNICODETEXT). pygame 2.6 ne connait
+    que CF_TEXT (Windows-1252), ou « à » devient un octet que la lecture en
+    UTF-8 jetait. True si ca a marche."""
+    if os.name != "nt":
+        return False
+    try:
+        import ctypes
+        from ctypes import wintypes
+        k, u = ctypes.windll.kernel32, ctypes.windll.user32
+        k.GlobalAlloc.restype = ctypes.c_void_p
+        k.GlobalAlloc.argtypes = [wintypes.UINT, ctypes.c_size_t]
+        k.GlobalLock.restype = ctypes.c_void_p
+        k.GlobalLock.argtypes = [ctypes.c_void_p]
+        k.GlobalUnlock.argtypes = [ctypes.c_void_p]
+        u.SetClipboardData.restype = ctypes.c_void_p
+        u.SetClipboardData.argtypes = [wintypes.UINT, ctypes.c_void_p]
+        u.OpenClipboard.argtypes = [ctypes.c_void_p]
+        donnees = texte.replace("\r\n", "\n").replace("\n", "\r\n").encode("utf-16-le") + b"\0\0"
+        memoire = k.GlobalAlloc(0x0042, len(donnees))           # GMEM_MOVEABLE | ZEROINIT
+        if not memoire:
+            return False
+        ctypes.memmove(k.GlobalLock(memoire), donnees, len(donnees))
+        k.GlobalUnlock(memoire)
+        if not u.OpenClipboard(None):
+            return False
+        try:
+            u.EmptyClipboard()
+            return bool(u.SetClipboardData(13, memoire))       # CF_UNICODETEXT
+        finally:
+            u.CloseClipboard()
+    except Exception:
+        return False
+
+
+def _windows_lire():
+    """Le texte Unicode du presse-papiers de Windows, ou None."""
+    if os.name != "nt":
+        return None
+    try:
+        import ctypes
+        k, u = ctypes.windll.kernel32, ctypes.windll.user32
+        u.GetClipboardData.restype = ctypes.c_void_p
+        k.GlobalLock.restype = ctypes.c_void_p
+        k.GlobalLock.argtypes = [ctypes.c_void_p]
+        k.GlobalUnlock.argtypes = [ctypes.c_void_p]
+        u.OpenClipboard.argtypes = [ctypes.c_void_p]
+        if not u.OpenClipboard(None):
+            return None
+        try:
+            memoire = u.GetClipboardData(13)                   # CF_UNICODETEXT
+            if not memoire:
+                return None
+            pointeur = k.GlobalLock(memoire)
+            try:
+                return ctypes.wstring_at(pointeur) if pointeur else None
+            finally:
+                k.GlobalUnlock(memoire)
+        finally:
+            u.CloseClipboard()
+    except Exception:
+        return None
+
+
+def _decoder(donnees):
+    """Octets du presse-papiers -> texte : UTF-8, sinon Windows-1252 (jamais
+    de lettre perdue comme avec decode('utf-8', 'ignore'))."""
+    if not isinstance(donnees, bytes):
+        return donnees
+    try:
+        return donnees.decode("utf-8")
+    except UnicodeDecodeError:
+        return donnees.decode("cp1252", "replace")
+
+
 def copier(texte):
     """Met du texte dans le presse-papiers. True si ca a marche."""
     texte = str(texte or "")
     if not texte:
         return False
+    if _windows_ecrire(texte):
+        return True
     try:
         pygame.scrap.init()
         pygame.scrap.put(pygame.SCRAP_TEXT, texte.encode("utf-8"))
@@ -111,13 +189,14 @@ def coller():
     echoue on renvoie "" et l'ecran propose de taper le lien a la main - jamais
     de plantage pour un presse-papiers.
     """
+    texte = _windows_lire()
+    if texte:
+        return texte.replace("\x00", "").strip()
     try:
         pygame.scrap.init()
         donnees = pygame.scrap.get(pygame.SCRAP_TEXT)
         if donnees:
-            if isinstance(donnees, bytes):
-                donnees = donnees.decode("utf-8", "ignore")
-            return donnees.replace("\x00", "").strip()
+            return _decoder(donnees).replace("\x00", "").strip()
     except Exception:
         pass
     import subprocess
@@ -130,7 +209,7 @@ def coller():
     for commande in essais:
         try:
             sortie = subprocess.run(commande, capture_output=True, timeout=2.0)
-            texte = (sortie.stdout or b"").decode("utf-8", "ignore").strip()
+            texte = _decoder(sortie.stdout or b"").strip()
             if texte:
                 return texte
         except Exception:
@@ -864,7 +943,9 @@ class ChampTexte:
             # la main une adresse recue par message - et sur certains PC la
             # saisie clavier ne parvenait meme pas au champ.
             if event.key == pygame.K_v and (event.mod & getattr(pygame, "KMOD_CTRL", 0)):
-                self.coller_le_presse_papiers()
+                # 25/10 (defaut Cowork) : Ctrl+V AJOUTE, comme partout ailleurs ;
+                # il remplacait tout le texte deja ecrit.
+                self.coller_le_presse_papiers(remplacer=False)
                 return None
             if event.key == pygame.K_BACKSPACE:
                 self.contenu = self.contenu[:-1]
@@ -882,8 +963,10 @@ class ChampTexte:
         return None
 
     def ajouter(self, texte_ajoute):
-        if len(self.contenu) + len(texte_ajoute) <= self.longueur_max:
-            self.contenu += texte_ajoute
+        # 25/10 : ce qui depasse est coupe (avant, tout le texte etait refuse).
+        place = self.longueur_max - len(self.contenu)
+        if place > 0:
+            self.contenu += texte_ajoute[:place]
 
     def coller_le_presse_papiers(self, remplacer=True):
         """Met le presse-papiers dans le champ. Renvoie ce qui a ete colle.
