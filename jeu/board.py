@@ -187,13 +187,28 @@ class ChessBoard:
         else:
             self.highlights.set_case_echec(None)
 
-        # Le coup prepare d'avance part des que c'est notre tour.
-        self.jouer_premouvement()
+        # 25/10 - TA REMARQUE (ton ami contre l'ordinateur) : « repetition 2 fois
+        # en jaune, puis le dernier coup, le message s'efface et la nulle ne
+        # compte pas ». Le coup prepare d'avance partait AVANT qu'on regarde si
+        # la partie etait finie : quand l'ordinateur ramenait la position une
+        # 3e fois, ton pre-mouvement etait joue aussitot, la position changeait
+        # et la repetition passait a la trappe. On regarde d'abord si la partie
+        # est finie, et seulement ensuite on joue le coup prepare.
+        if self._verifier_fin():
+            return
 
-        if not self.game_over:
-            fini, raison = ChessRules.check_game_over(self.board)
-            if fini:
-                self.terminer_partie(raison)
+        # Le coup prepare d'avance part des que c'est notre tour.
+        if self.jouer_premouvement():
+            self._verifier_fin()
+
+    def _verifier_fin(self):
+        """Termine la partie si une regle l'arrete (mat, pat, nulles). True si finie."""
+        if self.game_over:
+            return True
+        fini, raison = ChessRules.check_game_over(self.board)
+        if fini:
+            self.terminer_partie(raison)
+        return fini
 
     def draw(self):
         self.renderer.draw()

@@ -120,6 +120,9 @@ class EcranMiseAJour:
                         t["accent"])
             y += 42
             noms = ", ".join(mise_a_jour.NOMS_LISIBLES.get(n, n) for n in m.a_telecharger)
+            if len(getattr(m, "etapes", [])) > 1:
+                # 25/10 : plusieurs versions a la suite, un seul redemarrage.
+                noms = "mises à jour %s, l'une après l'autre (%s)" % (m.etape(), noms)
             ui.paragraphe(ecran, "À télécharger : %s  –  %s"
                           % (mise_a_jour.taille_lisible(m.octets_total), noms),
                           (x, y, l, 44), 15, t["texte_discret"])

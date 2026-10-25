@@ -38,7 +38,7 @@ Si seul l'installeur a changé (pas le jeu) : `py outils/publier_maj.py --instal
 refait l'installeur de la dernière version et le remplace dans sa release.
 
 ## Vérifier avant d'annoncer (à faire à chaque nouvel installeur)
-1. Installer en silence dans un dossier d'essai :
+1. Installer en silence dans un dossier d'essai (et `set SICKCHESS_SANS_PARE_FEU=1` avant de lancer le jeu d'essai) :
    `publier\<etiquette>\SickChess_Installation.exe /VERYSILENT /CURRENTUSER /DIR="%TEMP%\SickChessEssai" /TASKS=""`
 2. Lancer `"%TEMP%\SickChessEssai\SickChess.exe"` 20 s puis le fermer : `journal_du_jeu.txt` du
    dossier d'essai sans erreur, menu atteint.
@@ -47,6 +47,15 @@ refait l'installeur de la dernière version et le remplace dans sa release.
    Vérifier aussi que `puzzles/` et `syzygy/` sont dans le dossier d'essai et que le menu
    propose « Problèmes » (pas « base absente »).
 4. Désinstaller l'essai : `"%TEMP%\SickChessEssai\unins000.exe" /VERYSILENT`.
+
+## Mises à jour une par une et pare-feu (25/10, règles de Julien)
+- Chaque `maj.json` porte la liste `versions` : un ami à la n° 3 reçoit 4, 5 puis 6 et ne
+  redémarre qu'une fois. **Ne jamais supprimer une ancienne release** de `SickChess-amis`.
+- Essais automatiques du `.exe` ou de l'installeur : mettre `SICKCHESS_SANS_PARE_FEU=1`
+  (sinon le jeu demande l'accord de Windows pour le pare-feu). L'installation en
+  `/VERYSILENT` ne demande rien.
+- Vérifier une fois à la main (R-118) : installation normale → une demande Windows → règles
+  « SickChess » entrée et sortie, profil « Tous » (`netsh advfirewall firewall show rule name=SickChess`).
 
 ## Ne jamais
 - Chercher à cacher le programme aux antivirus (obfuscation, packers, exe qui se déguise,

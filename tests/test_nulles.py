@@ -88,6 +88,36 @@ verifier(b.game_over and "RÉPÉTITION" in (b.game_over_reason or ""),
          "position de depart vue 3 fois, pas a la suite : nulle (%s)" % b.game_over_reason)
 gm.cleanup_game()
 
+print("1 bis. Un coup prepare d'avance attend (cas de l'ami de Julien, 25/10)")
+# L'adversaire ramene la position une 3e fois alors qu'un pre-mouvement attend :
+# avant le 25/10, le pre-mouvement partait avant qu'on regarde la fin de partie,
+# la repetition passait a la trappe et l'avertissement jaune s'effacait.
+b = jouer(partie(), ALLER_RETOUR[:7])
+b.premove = chess.Move.from_uci("b1c3")
+jouer(b, ALLER_RETOUR[7:])
+verifier(b.game_over and "RÉPÉTITION" in (b.game_over_reason or ""),
+         "3e retour joue par l'adversaire, pre-mouvement en attente : nulle (%s)" % b.game_over_reason)
+verifier(len(b.board.move_stack) == 8, "le pre-mouvement n'est pas joue apres la nulle (%d coups)"
+         % len(b.board.move_stack))
+gm.cleanup_game()
+# Meme chose pour la regle des 50 coups : le 100e demi-coup vient de l'adversaire.
+b = partie(fen="4k3/8/8/8/8/8/8/R3K3 b - - 99 80")
+b.premove = chess.Move.from_uci("a1a2")
+jouer(b, ["e8d8"])
+verifier(b.game_over and "50 COUPS" in (b.game_over_reason or ""),
+         "50 coups atteints par l'adversaire, pre-mouvement en attente : nulle (%s)" % b.game_over_reason)
+gm.cleanup_game()
+for essai in range(20):
+    b = jouer(partie(), ALLER_RETOUR[:7])
+    b.premove = chess.Move.from_uci("b1c3")
+    jouer(b, ALLER_RETOUR[7:])
+    if not (b.game_over and "RÉPÉTITION" in (b.game_over_reason or "")):
+        break
+    gm.cleanup_game()
+else:
+    essai = 20
+verifier(essai == 20, "repetition avec pre-mouvement : nulle %d fois sur 20" % essai)
+
 print("2. Apres « Reprendre » (la partie sauvegardee est rejouee)")
 b = jouer(partie(), ALLER_RETOUR[:4])
 donnees = {"mode": "hotseat", "coups": [m.uci() for m in b.board.move_stack],

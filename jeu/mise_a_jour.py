@@ -26,6 +26,20 @@
 #                       remplacer un .exe qui tourne), recopie les fichiers,
 #                       efface maj_temp et relance le jeu.
 #
+# UNE PAR UNE (25/10, regle de Julien) : un ami reste a la n° 3 recoit la n° 4,
+# puis la n° 5, puis la n° 6, chacune a son tour (ses paquets telecharges et poses
+# dans l'ordre), et le jeu ne redemarre qu'UNE fois, a la fin ; un ami a la n° 5
+# ne recoit que la n° 6. Le maj.json de la derniere version porte la liste "versions" (numero +
+# adresse du maj.json de chaque version, publiee par outils/publier_maj.py) : le
+# jeu prend TOUTES les versions plus recentes que la sienne. Sans cette liste
+# (versions publiees avant le 25/10), il prend la derniere, comme avant.
+# Les versions publiees ne doivent donc JAMAIS etre effacees de GitHub.
+#
+# SANS RIEN DEMANDER AU JOUEUR (25/10) : chaque lecture reseau est reessayee
+# (3 essais), et si le DNS du PC ne trouve pas GitHub (box, reseau public), le jeu
+# demande l'adresse a un DNS securise (Cloudflare, Google, en HTTPS) ; la
+# connexion reste verifiee par le certificat de GitHub, rien n'est contourne.
+#
 # TES DONNEES NE SONT JAMAIS TOUCHEES : config.json, profil.json, parties/,
 # scores des problemes, sauvegardes... sont exclus de la copie (FICHIERS_A_TOI).
 
@@ -40,6 +54,7 @@ import sys
 import threading
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 import zipfile
 
@@ -59,10 +74,14 @@ NOMS_LISIBLES = {
 # Fichiers et dossiers du joueur : une mise a jour ne les ecrase jamais.
 FICHIERS_A_TOI = ["config.json", "profil.json", "puzzles_score.json",
                   "statistiques.json", "sauvegarde*.json", "partie_en_cours.json",
-                  "journal_du_jeu.txt", "diagnostic_son.txt", FICHIER_INSTALLE]
+                  "journal_du_jeu.txt", "diagnostic_son.txt", "pare_feu.json",
+                  FICHIER_INSTALLE]
 DOSSIERS_A_TOI = ["parties", DOSSIER_TEMP]
 
 DELAI_RESEAU = 20
+# Attente avant chaque essai (secondes) : 3 essais, puis on abandonne pour cette
+# fois (le menu reessaie tout seul quelques minutes plus tard).
+ATTENTES_ESSAIS = (0, 3, 8)
 TAILLE_BLOC = 256 * 1024
 
 
@@ -149,9 +168,101 @@ def cause_lisible(souci):
     return str(souci) or souci.__class__.__name__
 
 
-def _ouvrir(url, timeout=DELAI_RESEAU):
+# ---------------------------------------------------------------- DNS de secours
+# 25/10 : un ami avait « adresse du site introuvable » alors que GitHub marchait :
+# c'est le DNS de son reseau (box, Wi-Fi public, ecole) qui ne repondait pas. Pour
+# les seuls sites de la mise a jour, quand le DNS du PC echoue, on demande
+# l'adresse a un DNS public en HTTPS. Le certificat du site reste verifie.
+HOTES_SECOURS = ("github.com", "githubusercontent.com")
+SERVEURS_DNS_SECOURS = ("https://1.1.1.1/dns-query?name=%s&type=A",
+                        "https://8.8.8.8/resolve?name=%s&type=A")
+_getaddrinfo_systeme = socket.getaddrinfo
+_DNS_CACHE = {}
+
+
+def hote_de_secours(hote):
+    hote = str(hote or "").lower().rstrip(".")
+    return any(hote == h or hote.endswith("." + h) for h in HOTES_SECOURS)
+
+
+def resoudre_par_https(hote, serveurs=SERVEURS_DNS_SECOURS, timeout=8):
+    """Adresses IPv4 de hote, demandees a un DNS public en HTTPS ([] si rien)."""
+    if hote in _DNS_CACHE:
+        return _DNS_CACHE[hote]
+    for modele in serveurs:
+        try:
+            requete = urllib.request.Request(modele % hote, headers={
+                "Accept": "application/dns-json", "User-Agent": "SickChess-maj"})
+            with urllib.request.urlopen(requete, timeout=timeout) as reponse:
+                donnees = json.loads(reponse.read(65536).decode("utf-8"))
+            ips = [r["data"] for r in donnees.get("Answer", [])
+                   if r.get("type") == 1 and r.get("data")]
+            if ips:
+                _DNS_CACHE[hote] = ips
+                print("[MAJ] DNS du PC sans reponse pour %s : adresse obtenue par "
+                      "DNS securise (%s)" % (hote, ", ".join(ips[:3])))
+                return ips
+        except Exception as souci:
+            print("[MAJ] DNS securise %s : %s" % (modele.split("/")[2], souci))
+    return []
+
+
+def _getaddrinfo_avec_secours(hote, port, *args, **kwargs):
+    try:
+        return _getaddrinfo_systeme(hote, port, *args, **kwargs)
+    except socket.gaierror:
+        if not hote_de_secours(hote):
+            raise
+        ips = resoudre_par_https(str(hote).lower().rstrip("."))
+        if not ips:
+            raise
+        resultat = []
+        for ip in ips:
+            try:
+                resultat.extend(_getaddrinfo_systeme(ip, port, *args, **kwargs))
+            except socket.gaierror:
+                pass
+        if not resultat:
+            raise
+        return resultat
+
+
+def activer_dns_de_secours():
+    """Branche le DNS de secours (une fois). Ne change rien pour les autres sites."""
+    if socket.getaddrinfo is not _getaddrinfo_avec_secours:
+        socket.getaddrinfo = _getaddrinfo_avec_secours
+
+
+activer_dns_de_secours()
+
+
+def _reessayable(souci):
+    if isinstance(souci, urllib.error.HTTPError):
+        return souci.code >= 500 or souci.code == 429
+    return isinstance(souci, (urllib.error.URLError, OSError))
+
+
+def _ouvrir_une_fois(url, timeout):
     requete = urllib.request.Request(url, headers={"User-Agent": "SickChess-maj"})
     return urllib.request.urlopen(requete, timeout=timeout)
+
+
+def _ouvrir(url, timeout=DELAI_RESEAU):
+    """Ouvre url ; reessaie seul (reseau qui flanche) avant d'abandonner."""
+    souci = None
+    for numero, attente in enumerate(ATTENTES_ESSAIS, 1):
+        if attente:
+            time.sleep(attente)
+        try:
+            return _ouvrir_une_fois(url, timeout)
+        except Exception as e:
+            souci = e
+            hote = urllib.parse.urlparse(url).hostname
+            print("[MAJ] essai %d/%d rate (%s) : %s: %s" % (
+                numero, len(ATTENTES_ESSAIS), hote, e.__class__.__name__, e))
+            if not _reessayable(e):
+                break
+    raise souci
 
 
 def lire_manifeste(url):
@@ -169,6 +280,24 @@ def lire_manifeste(url):
             if cle not in paquet:
                 raise ValueError("paquet %s incomplet (%s manque)" % (nom, cle))
     return donnees
+
+
+def versions_manquantes(dernier, numero_installe):
+    """Les versions a installer, dans l'ordre : [(numero, adresse du maj.json)].
+    Vide si la liste "versions" manque ou si le numero installe est inconnu."""
+    try:
+        numero_installe = int(numero_installe)
+    except (TypeError, ValueError):
+        return []
+    liste = []
+    for v in (dernier or {}).get("versions") or []:
+        try:
+            n = int(v["numero"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if n > numero_installe and v.get("manifeste"):
+            liste.append((n, str(v["manifeste"])))
+    return sorted(set(liste))
 
 
 def paquets_a_telecharger(manifeste, installe):
@@ -213,6 +342,8 @@ class MiseAJour:
         self.etat = "rien"
         self.erreur = ""
         self.manifeste = None
+        self.dernier = None          # maj.json de la toute derniere version
+        self.etapes = []             # [(maj.json d'une version, [paquets])], dans l'ordre
         self.a_telecharger = []
         self.octets_total = 0
         self.octets_recus = 0
@@ -232,9 +363,26 @@ class MiseAJour:
         m = self.manifeste or {}
         return "%s (n°%s)" % (m.get("version", "?"), m.get("numero", "?"))
 
+    def numeros(self):
+        return [m.get("numero") for m, _ in self.etapes]
+
+    def etape(self):
+        """« n° 6 », ou « n° 4 à 6 » quand plusieurs versions arrivent ensemble."""
+        numeros = self.numeros() or [(self.manifeste or {}).get("numero", "?")]
+        if len(numeros) > 1:
+            return "n° %s à %s" % (numeros[0], numeros[-1])
+        return "n° %s" % numeros[0]
+
     def notes(self):
-        notes = (self.manifeste or {}).get("notes") or []
-        return [str(n) for n in notes][:12] if isinstance(notes, list) else [str(notes)]
+        lignes = []
+        plusieurs = len(self.etapes) > 1
+        for manifeste, _ in (self.etapes or [(self.manifeste or {}, [])]):
+            notes = manifeste.get("notes") or []
+            notes = [str(n) for n in notes] if isinstance(notes, list) else [str(notes)]
+            if plusieurs:
+                notes = ["n° %s : %s" % (manifeste.get("numero"), n) for n in notes]
+            lignes.extend(notes)
+        return lignes[-12:]
 
     def progression(self):
         if not self.octets_total:
@@ -260,12 +408,44 @@ class MiseAJour:
 
     def _verifier(self):
         try:
-            self.manifeste = lire_manifeste(self.url)
+            self.dernier = lire_manifeste(self.url)
             self.installe = lire_installe(self.dossier)
-            self.a_telecharger = paquets_a_telecharger(self.manifeste, self.installe)
-            self.octets_total = sum(int(self.manifeste["paquets"][n]["taille"])
-                                    for n in self.a_telecharger)
-            self.etat = "disponible" if self.a_telecharger else "a_jour"
+            # Une par une : toutes les versions plus recentes que celle installee,
+            # dans l'ordre (la derniere est deja lue).
+            manquantes = versions_manquantes(self.dernier,
+                                             (self.installe or {}).get("numero"))
+            manifestes = []
+            for numero, adresse in manquantes:
+                if numero == self.dernier.get("numero"):
+                    manifestes.append(self.dernier)
+                    continue
+                version = lire_manifeste(adresse)
+                if int(version.get("numero", -1)) != numero:
+                    raise ValueError("la version n° %d annoncée ne correspond pas "
+                                     "à son fichier" % numero)
+                manifestes.append(version)
+            if not manifestes or manifestes[-1].get("numero") != self.dernier.get("numero"):
+                manifestes.append(self.dernier)      # sans liste : la derniere seule
+            # Ce qu'il faut pour chaque version, a partir de ce qu'aura le jeu
+            # apres la precedente.
+            etat = dict((self.installe or {}).get("paquets", {}))
+            self.etapes = []
+            for manifeste in manifestes:
+                noms = paquets_a_telecharger(manifeste, {"paquets": etat})
+                for nom in noms:
+                    etat[nom] = manifeste["paquets"][nom]["empreinte"]
+                if noms:
+                    self.etapes.append((manifeste, noms))
+            self.manifeste = self.dernier
+            self.a_telecharger = []
+            for _, noms in self.etapes:
+                self.a_telecharger += [n for n in noms if n not in self.a_telecharger]
+            self.octets_total = sum(int(m["paquets"][n]["taille"])
+                                    for m, noms in self.etapes for n in noms)
+            print("[MAJ] installee : n° %s ; derniere : n° %s ; a installer : %s"
+                  % ((self.installe or {}).get("numero"), self.dernier.get("numero"),
+                     self.numeros() or "rien"))
+            self.etat = "disponible" if self.etapes else "a_jour"
         except Exception as souci:
             self._echec("Impossible de vérifier les mises à jour", souci)
 
@@ -294,23 +474,27 @@ class MiseAJour:
             shutil.rmtree(temp, ignore_errors=True)
             extrait = os.path.join(temp, "extrait")
             os.makedirs(extrait, exist_ok=True)
-            for nom in self.a_telecharger:
-                paquet = self.manifeste["paquets"][nom]
-                self.paquet_en_cours = NOMS_LISIBLES.get(nom, nom)
-                chemin = os.path.join(temp, nom + ".zip")
-                self._telecharger_un(paquet["url"], chemin)
-                if self._annuler:
-                    raise InterruptedError("annule")
-                if _sha256(chemin) != paquet["sha256"]:
-                    raise ValueError("le fichier %s est abîmé (somme de contrôle "
-                                     "fausse). Réessaie." % nom)
-                _extraire(chemin, extrait)
-                os.remove(chemin)
-            # Ce que le jeu aura APRES l'installation.
+            paquets = dict((self.installe or {}).get("paquets", {}))
+            # Chaque version a son tour : ses paquets sont poses par-dessus ceux de
+            # la precedente (la n° 5 remplace ce que la n° 4 avait change).
+            for manifeste, noms in self.etapes:
+                for nom in noms:
+                    paquet = manifeste["paquets"][nom]
+                    self.paquet_en_cours = "n° %s – %s" % (
+                        manifeste.get("numero"), NOMS_LISIBLES.get(nom, nom))
+                    chemin = os.path.join(temp, nom + ".zip")
+                    self._telecharger_un(paquet["url"], chemin)
+                    if self._annuler:
+                        raise InterruptedError("annule")
+                    if _sha256(chemin) != paquet["sha256"]:
+                        raise ValueError("le fichier %s est abîmé (somme de contrôle "
+                                         "fausse). Réessaie." % nom)
+                    _extraire(chemin, extrait)
+                    os.remove(chemin)
+                    paquets[nom] = paquet["empreinte"]
+                print("[MAJ] version n° %s prete (%s)" % (manifeste.get("numero"), ", ".join(noms)))
+            # Ce que le jeu aura APRES l'installation (un seul redemarrage).
             installe = dict(self.installe or {})
-            paquets = dict(installe.get("paquets", {}))
-            for nom in self.a_telecharger:
-                paquets[nom] = self.manifeste["paquets"][nom]["empreinte"]
             installe.update({"paquets": paquets, "numero": self.manifeste.get("numero"),
                              "version": self.manifeste.get("version"),
                              "source": self.url, "installe_le": time.strftime("%Y-%m-%d %H:%M")})
@@ -413,8 +597,9 @@ def verifier_en_arriere_plan():
 # nouvelle modification »). Dans le menu, une nouvelle version publiee est
 # telechargee toute seule, puis installee (le jeu redemarre) - jamais pendant une
 # partie, puisque seul le menu appelle ceci. Reglage "maj_auto" de config.json
-# (vrai par defaut). Le jeu reverifie toutes les 20 minutes s'il reste ouvert.
-REVERIFIER_TOUTES_LES = 20 * 60
+# (vrai par defaut). 25/10 : le jeu reverifie toutes les 3 minutes s'il reste
+# ouvert (avant : 20 min), et apres un echec aussi : il insiste tout seul.
+REVERIFIER_TOUTES_LES = 3 * 60
 ATTENTE_AVANT_REDEMARRAGE = 3.0
 
 
@@ -426,10 +611,12 @@ def pas_automatique(maj, config, maintenant, etat_auto):
     if maj is None or not (config or {}).get("maj_auto", True):
         return None, None
     etat = maj.etat
+    etape = maj.etape() if hasattr(maj, "etape") else ""
+    nom = ("Mise à jour %s" % etape) if etape else "Mise à jour"
     if etat == "disponible":
-        return "telecharger", "Mise à jour : téléchargement…"
+        return "telecharger", "%s : téléchargement…" % nom
     if etat == "telechargement":
-        return None, "Mise à jour : %d %%" % int(100 * maj.progression())
+        return None, "%s : %d %%" % (nom, int(100 * maj.progression()))
     if etat == "pret":
         depuis = etat_auto.setdefault("pret_depuis", maintenant)
         if maintenant - depuis >= ATTENTE_AVANT_REDEMARRAGE:

@@ -19,6 +19,7 @@ SERIES = [
     ("test_multijoueur.py", False),
     ("test_mise_a_jour.py", False),
     ("test_maj_auto.py", False),
+    ("test_maj_une_par_une.py", False),
     ("test_pause.py", False),
     ("test_explication_revue.py", False),
     ("test_modes_problemes.py", False),
@@ -55,6 +56,7 @@ SERIES = [
     ("test_mes_erreurs.py", True),
     ("test_variantes.py", True),
     ("test_analyse_libre_moteur.py", True),
+    ("test_moteur_decale.py", True),
     ("test_precision_moteur.py", True),
 ]
 

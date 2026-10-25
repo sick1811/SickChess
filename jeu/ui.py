@@ -82,6 +82,18 @@ def evenement_fenetre(event):
     return None
 
 
+def _ouvrir_presse_papiers(u):
+    """25/10 : juste apres une copie, Windows et d'autres programmes (historique
+    du presse-papiers...) viennent le lire et le tiennent un instant : un seul
+    essai echouait ~1 fois sur 25. On reessaie 20 fois, 10 ms d'ecart."""
+    import time
+    for _ in range(20):
+        if u.OpenClipboard(None):
+            return True
+        time.sleep(0.01)
+    return False
+
+
 def _windows_ecrire(texte):
     """25/10 (defaut Cowork : les accents disparaissaient au collage) : le
     presse-papiers Unicode de Windows (CF_UNICODETEXT). pygame 2.6 ne connait
@@ -107,7 +119,7 @@ def _windows_ecrire(texte):
             return False
         ctypes.memmove(k.GlobalLock(memoire), donnees, len(donnees))
         k.GlobalUnlock(memoire)
-        if not u.OpenClipboard(None):
+        if not _ouvrir_presse_papiers(u):
             return False
         try:
             u.EmptyClipboard()
@@ -130,7 +142,7 @@ def _windows_lire():
         k.GlobalLock.argtypes = [ctypes.c_void_p]
         k.GlobalUnlock.argtypes = [ctypes.c_void_p]
         u.OpenClipboard.argtypes = [ctypes.c_void_p]
-        if not u.OpenClipboard(None):
+        if not _ouvrir_presse_papiers(u):
             return None
         try:
             memoire = u.GetClipboardData(13)                   # CF_UNICODETEXT

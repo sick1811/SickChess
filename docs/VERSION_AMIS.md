@@ -47,10 +47,41 @@ Envoie-lui une fois ce lien (il donne toujours la dernière version) :
 ## Mise à jour automatique (23/10)
 Dès qu'une nouvelle version est publiée, le jeu de l'ami, **quand il est dans le menu**,
 la télécharge tout seul (« Mise à jour : 42 % »), puis redémarre dessus. Jamais en pleine
-partie. S'il reste ouvert, il revérifie toutes les 20 minutes. Pour couper :
+partie. S'il reste ouvert, il revérifie toutes les 3 minutes (25/10 ; avant : 20). Pour couper :
 `"maj_auto": false` dans son config.json.
 → Chaque fois que tu publies (`CONSTRUIRE_VERSION_AMIS.bat`), tous tes amis l'ont dans
 l'heure, sans rien faire.
+
+## Les mises à jour s'installent une par une (25/10, règle de Julien)
+- Un ami resté à la **n° 3** reçoit la **n° 4, puis la n° 5, puis la n° 6** : les paquets de
+  chaque version sont téléchargés et posés dans l'ordre, et le jeu **ne redémarre qu'une fois**,
+  à la fin. Un ami à la **n° 5** ne reçoit que la **n° 6**.
+- Le bouton du menu affiche « Mise à jour n° 4 à 6 : 42 % » ; l'écran « Mise à jour » montre
+  les notes de chaque version.
+- Comment : chaque `maj.json` contient la liste `versions` (numéro + adresse du `maj.json` de
+  chaque version), écrite par `publier_maj.py`. La n° 7 retrouve seule les n° 1 à 6 en ligne.
+- **Ne jamais effacer une ancienne version (release) sur GitHub** : un ami en retard en a besoin.
+- Les jeux à la n° 6 ou avant ont encore l'ancien programme : leur première mise à jour les
+  amène directement à la dernière version (n° 7 ou plus) ; ensuite, c'est une par une.
+
+## Sans rien demander à l'ami (25/10)
+- **Le jeu insiste tout seul** : chaque téléchargement est réessayé 3 fois ; au menu, le jeu
+  revérifie toutes les **3 minutes**, aussi après un échec.
+- **DNS de secours** : si le réseau de l'ami (box, Wi-Fi public, école) ne trouve pas GitHub,
+  le jeu demande l'adresse à un DNS public sécurisé (Cloudflare, Google, en HTTPS). Le
+  certificat de GitHub reste vérifié : rien n'est contourné. Seulement pour les sites de la
+  mise à jour.
+- **Pare-feu de Windows, réseau privé ET public** : à l'installation (et au premier lancement
+  si ce n'est pas fait), Windows demande **une fois** « Autoriser cette application à apporter
+  des modifications ? ». Avec « Oui », SickChess.exe est autorisé en entrée et en sortie sur
+  tous les réseaux (mises à jour et parties en ligne par Steam), et les anciennes règles de
+  blocage du jeu (créées quand on a cliqué « Annuler » sur le message du pare-feu) sont
+  retirées. Personne ne peut changer le pare-feu sans cet accord : c'est la règle de Windows.
+  « Non » : le jeu marche quand même et redemandera à la version suivante. Code :
+  `jeu/pare_feu.py` et la fin de `outils/installeur_amis.iss`. Pour les essais automatiques :
+  `SICKCHESS_SANS_PARE_FEU=1`.
+- Un antivirus qui bloque le jeu, lui, ne se règle pas de l'extérieur (et on ne cherche pas à
+  le contourner) : signature de l'exe ou signalement de faux positif à Microsoft (voir plus bas).
 
 ## Pour un nouvel ami : le zip (ancienne façon, toujours valable)
 Lien :
@@ -85,6 +116,8 @@ tables de finales se téléchargent (~700 Mo, une fois). Mode d'emploi : `LISEZ-
 - `jeu/ecran_mise_a_jour.py` – l'écran du bouton.
 - `outils/publier_maj.py` + `outils/sickchess_amis.spec` – fabrication et publication.
 - `tests/test_mise_a_jour.py` – tout le circuit avec un faux serveur (36 contrôles).
+- `tests/test_maj_une_par_une.py` – une par une, réessais, DNS de secours, pare-feu (37 contrôles).
+- `jeu/pare_feu.py` – l'autorisation dans le pare-feu de Windows.
 
 ## Le numéro de version (24/10/2026)
 Deux numéros, comme les vraies applications :

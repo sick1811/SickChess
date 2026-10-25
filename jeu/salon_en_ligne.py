@@ -407,8 +407,8 @@ class SalonEnLigne:
         colonne = min(460, largeur - 40)
         x = (largeur - colonne) // 2
         y = 100
-        ui.paragraphe(ecran, "Joue contre un ami Steam. Cree une partie et "
-                      "invite-le, ou entre le code qu'il t'a donne.",
+        ui.paragraphe(ecran, "Joue contre un ami Steam. Crée une partie et "
+                      "invite-le, ou entre le code qu'il t'a donné.",
                       (x, y, colonne, 50), 16, t["texte_discret"])
         y += 60
         actif = self.steam.actif

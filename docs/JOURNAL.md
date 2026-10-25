@@ -1391,3 +1391,54 @@ Constat du test d'endurance : au menu, 4 Stockfish gardaient ~5,5 Go jusqu'à la
   ligne », Échap au menu, dossiers à garder hors de Git), le compte rendu détaillé de Cowork dans ce journal, et ses
   deux tests plus complets (éditeur à la vraie souris sur 8 tailles d'écran dont 4K ; Problème du jour rouvert).
   `.gitignore` : `rapports/` et `_sauvegarde_cowork_*/` (plus d'« À REVOIR Git » à la vérification).
+
+
+## 25/10/2026 (35) – Cowork : la répétition qui « ne compte pas » (retour de Julien)
+Retour : l'ami de Julien, seul contre l'ordinateur (version amis n° 4 ou 5) : « répétition 2 fois » en jaune
+au-dessus des coups, il joue le dernier coup, le message s'efface et la nulle ne compte pas.
+Fait :
+- Reproduit sans Stockfish : quand un **pré-mouvement** attend et que l'adversaire ramène la position une 3e fois,
+  `ChessBoard.update()` jouait le pré-mouvement (`jouer_premouvement`) AVANT `ChessRules.check_game_over` : la
+  position changeait aussitôt, la 3e répétition n'était jamais vue, l'avertissement s'effaçait. Même chose pour
+  les 50 coups atteints par le coup adverse. Les règles elles-mêmes (rules.py, regles_nulle.py) sont justes.
+- Correction : `update()` appelle `_verifier_fin()` d'abord, puis le pré-mouvement, puis `_verifier_fin()` encore.
+- Tests : `tests/test_nulles.py` partie « 1 bis » (répétition + pré-mouvement, 50 coups + pré-mouvement,
+  20 essais) : rouge avant, vert après. Suite rapide sur la machine de Cowork : 943 contrôles verts, seul
+  `test_petit_pc.py` rouge (mémoire illisible sur cette machine Linux, sans rapport).
+- Pas de commit (Cowork) : fichiers modifiés `jeu/board.py`, `tests/test_nulles.py`.
+
+À vérifier :
+- [ ] Claude Code (PC) : relire, tous les tests avec le vrai Stockfish, essai contre l'ordinateur avec
+  pré-mouvement, commit, puis version amis n° 7.
+- [ ] Julien : demander à son ami le FEN / la partie pour confirmer que c'était bien ce cas.
+
+
+## 25/10/2026 (39) – Cowork : mises à jour une par une, sans rien demander à l'ami
+Règles de Julien : un ami ne va JAMAIS sur GitHub, le jeu se met à jour et s'installe seul ; il doit marcher
+sur un réseau privé comme public (mises à jour et Steam) ; un ami à la n° 3 reçoit la 4, la 5 puis la 6, à la
+suite, avec un seul redémarrage ; un ami à la n° 5 ne reçoit que la 6.
+Fait :
+- `outils/publier_maj.py` : chaque maj.json porte la liste `versions` (numéro + adresse du maj.json de chaque
+  version). La n° 7 retrouve les n° 1 à 6 en ligne (git ls-remote), les suivantes reprennent la liste.
+- `jeu/mise_a_jour.py` : le jeu lit toutes les versions plus récentes que la sienne, télécharge les paquets de
+  chacune dans l'ordre (posés les uns après les autres), un seul redémarrage ; bouton « Mise à jour n° 4 à 6 » ;
+  notes de chaque version. Sans liste (n° 1 à 6) : la dernière, comme avant.
+- Réseau : 3 essais par fichier (sauf 404) ; DNS de secours en HTTPS (Cloudflare, Google) pour github.com et
+  githubusercontent.com seulement, certificat toujours vérifié (essayé pour de vrai : adresses trouvées) ;
+  revérification au menu toutes les 3 min, aussi après un échec (avant : 20 min).
+- `jeu/pare_feu.py` (appelé par SickChess.py) + fin de `outils/installeur_amis.iss` : règles « SickChess »
+  entrée et sortie pour SickChess.exe, tous profils (privé, public, domaine), anciennes règles du jeu retirées
+  (dont les blocages Windows). Windows demande une fois l'accord (obligatoire) ; refusé : redemandé à la
+  version suivante. `SICKCHESS_SANS_PARE_FEU=1` pour les essais automatiques.
+- Tests : `tests/test_maj_une_par_une.py` (39 contrôles, faux site local), `test_maj_auto.py` (3 min) ;
+  test_mise_a_jour vert. Suite rapide sur la machine de Cowork : 980 contrôles verts ; rouges sans rapport
+  (stockfish.exe ne tourne pas sous Linux : test_sortie_rapide, test_nulles ; mémoire : test_petit_pc).
+- Recette : R-117 (une par une), R-118 (pare-feu), R-119 (DNS en panne). Docs : VERSION_AMIS.md, skill version-amis.
+- Limite honnête : les jeux à la n° 6 ou avant ont l'ancien programme ; leur prochaine mise à jour les amène
+  directement à la dernière version, puis c'est une par une. Un ami dont la mise à jour échoue AUJOURD'HUI ne
+  recevra la correction que si sa mise à jour passe une fois (son journal dira pourquoi elle échoue).
+- Pas de commit (Cowork).
+
+À vérifier :
+- [ ] Claude Code (PC) : relire, tous les tests, essai du pare-feu sur Windows, commit, version amis n° 7.
+- [ ] Julien : t105, t106.

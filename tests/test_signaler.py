@@ -26,6 +26,7 @@ import ui
 TEMP = tempfile.mkdtemp(prefix="sickchess_signaler_")
 signalement._racine = lambda: TEMP
 signalement.ouvrir_le_dossier = lambda chemin: True
+VRAI_COPIER = ui.copier      # garde pour le controle du vrai presse-papiers (4 bis)
 ui.copier = lambda texte: True
 with open(os.path.join(TEMP, "journal_du_jeu.txt"), "w", encoding="utf-8") as f:
     f.write("".join("ligne %d\n" % i for i in range(300)))
@@ -127,11 +128,18 @@ verifier(e2.champ.contenu == "Rapport de plantage : erreur X. Test à é ç - ig
          "Ctrl+V ajoute au texte deja ecrit : « %s »" % e2.champ.contenu)
 if os.name == "nt":
     ancien = ui._windows_lire()                 # on rendra le presse-papiers de Julien
+    faux_copier, ui.copier = ui.copier, VRAI_COPIER   # 25/10 : le faux ne copiait rien
     try:
         verifier(ui.copier("Test Cowork 24/10 à é ç œ - ignorer")
                  and ui.coller() == "Test Cowork 24/10 à é ç œ - ignorer",
                  "presse-papiers Windows : copier puis coller garde les accents (« %s »)" % ui.coller())
+        # 25/10 : un presse-papiers tenu un instant par un autre programme faisait
+        # rater ~1 copie sur 25 (contrôle ci-dessus rouge une fois sur deux).
+        rates = sum(1 for i in range(50)
+                    if not (ui.copier("Essai %d à é" % i) and ui.coller() == "Essai %d à é" % i))
+        verifier(rates == 0, "50 copier-coller à la suite : aucun raté (%d raté(s))" % rates)
     finally:
+        ui.copier = faux_copier
         if ancien:
             ui._windows_ecrire(ancien)
 

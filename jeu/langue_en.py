@@ -61,7 +61,7 @@ EN = {
     "Au hasard": "Random", "Blancs": "White", "Noirs": "Black",
 
     # --- en partie
-    "COUPS JOUÉS": "MOVES", "Aucun coup joue": "No moves yet",
+    "COUPS JOUÉS": "MOVES", "Aucun coup joué": "No moves yet",
     "Deux joueurs sur ce PC": "Two players on this PC",
     "Ordinateur  %d Elo": "Computer  %d Elo",
     "Sans limite de temps": "No time limit", "Sans pendule": "No clock",
@@ -146,7 +146,7 @@ EN = {
     "Mode classé  -  ton classement : %d": "Rated mode  -  your rating: %d",
     "Mode libre  -  départ à %d": "Free mode  -  start at %d",
     "Ton vrai niveau en tactique. Les résultats sont enregistrés.": "Your true tactics level. Results are saved.",
-    "%d problèmes joues, %.0f %% réussis, meilleure série %d - enregistré":
+    "%d problèmes joués, %.0f %% réussis, meilleure série %d - enregistré":
         "%d puzzles played, %.0f %% solved, best streak %d - saved",
     "Niveau de départ : %d": "Starting level: %d",
     "Thèmes : tous (clique pour filtrer)": "Themes: all (click to filter)",
@@ -315,7 +315,7 @@ EN = {
     "Couleur d'accent": "Accent colour", "Titres, surlignages et boutons": "Titles, highlights and buttons",
     "Pièces": "Pieces", "Le dessin des pièces": "The piece design",
     "Coordonnées": "Coordinates", "Les lettres et les chiffres sur le bord": "Letters and numbers on the edge",
-    "Dernier coup": "Last move", "Surligner les deux cases du coup joue": "Highlight the two squares of the last move",
+    "Dernier coup": "Last move", "Surligner les deux cases du coup joué": "Highlight the two squares of the last move",
     "Coups possibles": "Legal moves", "Des points sur les cases où la pièce peut aller": "Dots on the squares the piece can reach",
     "Flèche du cavalier": "Knight arrow", "Au clic droit : en L ou droite": "On right-click: L-shaped or straight",
     "En L": "L-shaped", "Droite": "Straight", "Oui": "Yes", "Non": "No",
@@ -325,7 +325,7 @@ EN = {
     "Vif": "Quick", "Immédiat": "Instant",
     "Notation des coups": "Move notation", "Les lettres des pièces dans la liste des coups": "Piece letters in the move list",
     "Anglaise (Nf3)": "English (Nf3)", "Française (Cf3)": "French (Cf3)",
-    "Pré-mouvement": "Premove", "Jouer d'avance pendant que l'adversaire reflechit": "Move ahead while the opponent thinks",
+    "Pré-mouvement": "Premove", "Jouer d'avance pendant que l'adversaire réfléchit": "Move ahead while the opponent thinks",
     "Profondeur de l'analyse": "Analysis depth", "Revue et précision : plus profond = plus juste, plus long": "Review and accuracy: deeper = more accurate, slower",
     "Variante (tu joues les deux camps)": "Variation (you play both sides)", "Stockfish cherche le meilleur coup...": "Stockfish is looking for the best move...",
     "Stockfish calcule...": "Stockfish is calculating...", "Flèche gauche : annuler un coup  -  Échap : revenir à la partie": "Left arrow: take back  -  Esc: back to the game",
@@ -358,8 +358,8 @@ EN = {
     "RACCOURCIS": "SHORTCUTS", "PENDANT LA PARTIE": "DURING THE GAME", "PRÉMOUVEMENT": "PREMOVE",
     "PARTIE EN RESEAU": "ONLINE GAME", "MENU PRINCIPAL": "MAIN MENU", "FENÊTRE": "WINDOW",
     "REPLAY (après la partie)": "REVIEW (after the game)", "F1 ou un clic pour fermer": "F1 or a click to close",
-    "Clic gauche": "Left click", "Glisser-deposer": "Drag and drop", "Clic droit": "Right click",
-    "Maj + clic droit": "Shift + right click", "Clic droit sur une pièce prise": "Right-click while dragging",
+    "Clic gauche": "Left click", "Glisser-déposer": "Drag and drop", "Clic droit": "Right click",
+    "Maj + clic droit": "Shift + right click", "Clic droit sur une pièce prise": "Right-click mid-drag",
     "Sélectionner une pièce, puis sa case d'arrivée": "Select a piece, then its target square",
     "Déplacer une pièce directement": "Move a piece directly",
     "Annuler le déplacement en cours": "Cancel the current move",
@@ -382,6 +382,15 @@ EN = {
     "Clic sur un coup": "Click a move", "Aller directement a ce coup": "Jump to that move",
     "Relancer ou interrompre l'analyse Stockfish": "Restart or stop the Stockfish analysis",
     "Revenir à l'écran de fin": "Back to the end screen", "Échap": "Esc", "Entrée": "Enter",
+    "REVUE (après la partie)": "REVIEW (after the game)",
+    "Gauche / Droite": "Left / Right", "Coup précédent ou suivant (aussi la molette)": "Previous or next move (also the wheel)",
+    "Haut / Bas": "Up / Down", "Premier ou dernier coup (aussi Début / Fin)": "First or last move (also Home / End)",
+    "Montrer ou cacher les flèches des meilleurs coups": "Show or hide the best-move arrows",
+    "Exporter la partie annotée (fichier PGN, aussi copié)": "Export the annotated game (PGN file, also copied)",
+    "Ouvrir l'analyse libre sur la position affichée": "Open free analysis on the shown position",
+    "Aller à ce coup (feuille ou courbe)": "Jump to that move (move list or graph)",
+    "Coup sur le plateau": "Move on the board",
+    "Essayer une variante (Échap : retour à la partie)": "Try a variation (Esc: back to the game)",
 
     # --- en ligne
     "Partie en ligne": "Online game", "Créer une partie": "Create a game", "Inviter": "Invite",
@@ -409,7 +418,7 @@ EN = {
     "Inviter avec Steam (Maj+Tab)": "Invite with Steam (Shift+Tab)",
     "Fenêtre Steam ouverte. Si rien ne s'affiche, utilise la liste d'amis ci-contre.":
         "Steam window opened. If nothing shows up, use the friends list here.",
-    "Joue contre un ami Steam. Cree une partie et invite-le, ou entre le code qu'il t'a donne.":
+    "Joue contre un ami Steam. Crée une partie et invite-le, ou entre le code qu'il t'a donné.":
         "Play a Steam friend. Create a game and invite them, or enter the code they gave you.",
     "Test : heberger": "Test: host", "Test : héberger": "Test: host", "Test : rejoindre": "Test: join",
     "Test sans Steam : deux fenetres du jeu sur ce PC": "Test without Steam: two game windows on this PC",
@@ -575,4 +584,15 @@ EN = {
     "Précision : %d %%, au-dessus de ta moyenne (%d %%)": "Accuracy: %d %%, above your average (%d %%)",
     "Précision : %d %%, sous ta moyenne (%d %%)": "Accuracy: %d %%, below your average (%d %%)",
     "Précision : %d %%, comme ta moyenne (%d %%)": "Accuracy: %d %%, same as your average (%d %%)",
+
+    # --- erreurs Steam (25/10, defauts Cowork : restaient en francais)
+    "Steam n'est pas lancé.": "Steam is not running.",
+    "Ouvre Steam, connecte-toi, puis reviens ici.": "Open Steam, sign in, then come back here.",
+    "Steam doit être mis à jour.": "Steam needs an update.",
+    "Steam refuse la connexion.": "Steam refused the connection.",
+
+    # --- reprise au menu et haut de la revue (25/10, defauts Cowork)
+    "Contre l'ordinateur (%s Elo)": "Against the computer (%s Elo)",
+    "Ordinateur (%s)": "Computer (%s)",
+    "Contre l'ordinateur": "Against the computer",
 }

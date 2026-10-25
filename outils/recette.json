@@ -884,6 +884,27 @@
    "ordre": 11406
   },
   {
+   "id": "R-117",
+   "section": "Version amis et mises à jour",
+   "texte": "Un PC d'essai à la n° 7 ; publier la n° 8 puis la n° 9 ; ouvrir le jeu et rester au menu",
+   "detail": "Le bouton affiche « Mise à jour n° 8 à 9 : X % » ; « Ce qui change » montre les notes de la n° 8 puis de la n° 9 ; les deux versions se téléchargent l'une après l'autre ; le jeu ne redémarre qu'une fois et affiche la n° 9 ; profil et parties gardés.",
+   "ordre": 11407
+  },
+  {
+   "id": "R-118",
+   "section": "Version amis et mises à jour",
+   "texte": "Première installation (ou première mise à jour) de la n° 7 sur un PC qui n'a jamais eu SickChess, réseau Wi-Fi « Public »",
+   "detail": "Windows demande une fois « Autoriser cette application à apporter des modifications ? » ; Oui : pare-feu Windows → règles « SickChess » (entrée et sortie, tous les profils) ; relancer : plus aucune demande ; Non : le jeu marche, il redemandera à la version suivante.",
+   "ordre": 11408
+  },
+  {
+   "id": "R-119",
+   "section": "Version amis et mises à jour",
+   "texte": "Sur un réseau dont le DNS ne marche pas (Paramètres réseau → DNS manuel 10.255.255.1), laisser le jeu au menu",
+   "detail": "La mise à jour passe quand même ; journal_du_jeu.txt : « [MAJ] DNS du PC sans reponse pour github.com : adresse obtenue par DNS securise » ; remettre le DNS automatique ensuite.",
+   "ordre": 11409
+  },
+  {
    "id": "R-120",
    "section": "Solidité",
    "texte": "Renommer moteur/stockfish.exe puis lancer une partie contre l'ordinateur",

@@ -306,7 +306,9 @@ class ChessTimer:
             pygame.draw.circle(screen, bordure, centre, rayon, 1)
 
             taille_nom = max(11, min(int(15 * g), rect.height // 4))
-            largeur_nom = ui.mesurer(nom, taille_nom, gras=True)[0]
+            # 25/10 (defaut Cowork « BLA… » en anglais) : on mesure le nom AFFICHE
+            # (« BLACK » est plus large que « NOIRS »), pas le nom francais.
+            largeur_nom = ui.mesurer(ui._tr(nom), taille_nom, gras=True)[0]
             ui.texte(screen, nom, centre[0] + rayon + 8,
                      rect.centery - taille_nom // 2 - 1, taille_nom,
                      texte_inactif, gras=True, largeur_max=largeur_nom + 2)

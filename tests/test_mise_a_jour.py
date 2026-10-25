@@ -219,6 +219,11 @@ print("4b. Envoi rate (essai du .exe, GitHub) : la version n'est PAS notee comme
 # depuis la version n°6 ») : la copie locale de maj.json etait ecrite avant l'envoi.
 ecrire(os.path.join(projet, "jeu", "ui.py"), "VALEUR = 3  # essai rate\n")
 ancien_envoi = publier_maj._envoyer_sur_github
+# 25/10 : sous Windows, publier() lance pour de vrai le .exe d'essai ; ici le
+# « .exe » est un faux fichier (WinError 216). On fait comme s'il demarrait.
+import verifier_version
+ancien_controle = verifier_version.controle_exe
+verifier_version.controle_exe = lambda dossier, *a, **k: (verifier_version.OK, "essai simule")
 for rate, quoi in ((lambda *a: False, "envoi refuse"),
                    (lambda *a: (_ for _ in ()).throw(SystemExit("essai rate")), "envoi qui plante")):
     publier_maj._envoyer_sur_github = rate
@@ -230,6 +235,7 @@ for rate, quoi in ((lambda *a: False, "envoi refuse"),
     with open(os.path.join(publier, "maj.json"), encoding="utf-8") as f:
         verifier(json.load(f)["numero"] == 2, "%s : la derniere version publiee reste la n°2" % quoi)
 publier_maj._envoyer_sur_github = ancien_envoi
+verifier_version.controle_exe = ancien_controle
 ecrire(os.path.join(projet, "jeu", "ui.py"), "VALEUR = 2  # bug corrige\n")
 
 print("5. Rien de change : rien a publier")

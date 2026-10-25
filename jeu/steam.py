@@ -309,7 +309,7 @@ class Steam:
                 return True
             detail = message.value.decode("utf-8", "replace")
             if resultat == 2:
-                return self._echec("Steam n'est pas lance.",
+                return self._echec("Steam n'est pas lancé.",
                                    "Ouvre Steam, connecte-toi, puis reviens ici.")
             if resultat == 3:
                 return self._echec("Steam doit être mis à jour.", detail)

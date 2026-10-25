@@ -305,6 +305,12 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
   → D'abord « Vérification avant une version pour les amis » : une ligne OK / A REVOIR / BLOQUANT par point (mode test, numéro Steam, licences, version, Git, tests, banc d'essai) ; s'il y a un BLOQUANT, rien n'est fabriqué ; sinon la version se fabrique, et le .exe est essayé dans un dossier neuf avant l'envoi.
 - [ ] **R-116** – Mise à jour qui échoue : cliquer Mise à jour avec Internet coupé, puis Internet rétabli pendant qu'une version se publie  
   → Le message dit la vraie cause : « pas d'Internet, ou adresse du site … introuvable » (Internet coupé), « fichier de mise à jour introuvable sur le site (erreur 404) … réessaie dans quelques minutes » (publication en cours) ; plus jamais « pas de connexion » quand Internet marche.
+- [ ] **R-117** – Un PC d'essai à la n° 7 ; publier la n° 8 puis la n° 9 ; ouvrir le jeu et rester au menu  
+  → Le bouton affiche « Mise à jour n° 8 à 9 : X % » ; « Ce qui change » montre les notes de la n° 8 puis de la n° 9 ; les deux versions se téléchargent l'une après l'autre ; le jeu ne redémarre qu'une fois et affiche la n° 9 ; profil et parties gardés.
+- [ ] **R-118** – Première installation (ou première mise à jour) de la n° 7 sur un PC qui n'a jamais eu SickChess, réseau Wi-Fi « Public »  
+  → Windows demande une fois « Autoriser cette application à apporter des modifications ? » ; Oui : pare-feu Windows → règles « SickChess » (entrée et sortie, tous les profils) ; relancer : plus aucune demande ; Non : le jeu marche, il redemandera à la version suivante.
+- [ ] **R-119** – Sur un réseau dont le DNS ne marche pas (Paramètres réseau → DNS manuel 10.255.255.1), laisser le jeu au menu  
+  → La mise à jour passe quand même ; journal_du_jeu.txt : « [MAJ] DNS du PC sans reponse pour github.com : adresse obtenue par DNS securise » ; remettre le DNS automatique ensuite.
 
 ## Solidité
 

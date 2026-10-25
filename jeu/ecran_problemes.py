@@ -756,7 +756,7 @@ class EcranProblemes:
             bouton.maj_survol(souris)
             bouton.dessiner(ecran, t, rayon=10)
 
-        sous = ("%d problèmes joues, %.0f %% réussis, meilleure série %d - enregistré"
+        sous = ("%d problèmes joués, %.0f %% réussis, meilleure série %d - enregistré"
                 % (joues, puzzles.pourcentage(score), int(score.get("meilleure_serie", 0)))
                 if joues else "Ton vrai niveau en tactique. Les résultats sont enregistrés.")
         ui.texte(ecran, sous, largeur // 2, self.btn_classe.rect.bottom + int(5 * ech),

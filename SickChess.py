@@ -93,6 +93,13 @@ def main():
         preparer_dossier_utilisateur()
     except Exception:
         pass
+    try:
+        # 25/10 : le jeu s'autorise dans le pare-feu de Windows (Internet et Steam,
+        # reseau prive ET public), une fois, avec l'accord de Windows. Voir pare_feu.py.
+        import pare_feu
+        pare_feu.au_demarrage()
+    except Exception:
+        pass
     manager = None
     try:
         from game_manager import GameManager

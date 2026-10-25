@@ -18,7 +18,9 @@ _etat = {"langue": None}
 _memo = {}
 _modeles = []
 _manquants = set()
-_SPEC = re.compile(r"%(?:[-+ 0#]*\d*(?:\.\d+)?[sdfi])")
+# 25/10 (defaut Cowork « 55 %10olved ») : « %% » d'abord, sinon le second % de
+# « %% solved » etait pris pour « % s » et recevait la valeur suivante.
+_SPEC = re.compile(r"%%|%(?:[-+ 0#]*\d*(?:\.\d+)?[sdfi])")
 
 
 def _langue_du_systeme():
@@ -57,6 +59,8 @@ def _table():
                 motif = ""
                 pos = 0
                 for m in _SPEC.finditer(fr):
+                    if m.group() == "%%":
+                        continue
                     motif += re.escape(fr[pos:m.start()].replace("%%", "%")) + "(.*?)"
                     pos = m.end()
                 motif += re.escape(fr[pos:].replace("%%", "%"))
@@ -76,6 +80,8 @@ def _remplir(en, groupes):
             pass
     sortie, i, pos = "", 0, 0
     for m in _SPEC.finditer(en):
+        if m.group() == "%%":
+            continue
         sortie += en[pos:m.start()]
         sortie += groupes[i] if i < len(groupes) else ""
         i += 1

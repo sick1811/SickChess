@@ -3,9 +3,28 @@
 Fichier partagé entre Cowork et Claude Code. **À relire au début de chaque séance,
 à mettre à jour à la fin.** La page « SickChess – À faire »
 (https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5) en est la version à cocher pour Julien.
-Mis à jour le 24/10/2026.
+Mis à jour le 25/10/2026.
 
 ## Retours de Julien à traiter (priorité)
+- [ ] **25/10 – mise à jour chez l'ami de Julien** (version n° 4 ou 5) : « vérifie ta connexion / site
+      introuvable ». Le site marche (vérifié par Cowork le 25/10 : latest → v0.2.0-n6, maj.json téléchargé). Donc
+      blocage sur le PC de l'ami (antivirus, pare-feu, DNS, VPN). Attendre son journal_du_jeu.txt (ligne [MAJ]).
+      **Règle de Julien (25/10) : l'ami ne doit JAMAIS aller sur GitHub ; le jeu se met à jour et s'installe
+      seul. Pas de bouton « Télécharger à la main ».** Fait par Cowork le 25/10 (pas encore dans Git) :
+      mises à jour une par une avec un seul redémarrage, réessais, DNS de secours, revérification toutes les
+      3 min, autorisation pare-feu (privé + public). Voir JOURNAL 25/10 (39).
+- [ ] **Claude Code (PC) – mises à jour une par une + pare-feu** : relire `jeu/mise_a_jour.py`,
+      `jeu/pare_feu.py`, `SickChess.py`, `jeu/ecran_mise_a_jour.py`, `outils/publier_maj.py`,
+      `outils/installeur_amis.iss`, `tests/test_maj_une_par_une.py` ; tous les tests (vrai Stockfish) ; sur le
+      PC : lancer l'exe d'essai SANS `SICKCHESS_SANS_PARE_FEU` → une demande Windows → `netsh advfirewall
+      firewall show rule name=SickChess` (entrée + sortie, profil Tous) ; commit ; puis version amis n° 7
+      (sa liste `versions` doit contenir les n° 1 à 7). Ne jamais supprimer une ancienne release.
+- [x] (25/10, Cowork, à vérifier par Claude Code + commit) **« la répétition ne compte pas »** (ami de Julien
+      contre l'ordinateur, version n° 4 ou 5) : cause = le pré-mouvement partait avant la vérification de fin de
+      partie (jeu/board.py `update`). Corrigé (`_verifier_fin` avant le pré-mouvement), tests/test_nulles.py
+      partie 1 bis. Plan du jour dans la page « À faire », groupe « Aujourd'hui · 25/10 » (j01 à j08) :
+      Julien précise le cas (j01), Cowork reproduit sur le PC (j02), Claude Code corrige avec un test qui joue
+      chaque cas 20 fois (j03, `tests/test_nulles.py` déjà commencé, pas encore dans Git).
 - [ ] **24/10 – Défauts trouvés par Cowork sur le PC de Julien** (page « À faire », commentaires « Vérifié par Cowork ») :
       - [x] PLANTAGE t85 : éditeur de l'analyse libre en 1920×1080 (cases en nombres à virgule) → corrigé (séance 30).
       - [x] PLANTAGE t52 : rouvrir le Problème du jour déjà fait → corrigé (séance 30).
@@ -163,6 +182,10 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t105 (39) : après la n° 7, ton ami (n° 4 ou 5) : le jeu se met à jour seul au menu, sans aller sur GitHub.
+      À partir de la n° 8 : un ami en retard de plusieurs versions les reçoit toutes, un seul redémarrage (R-117).
+- [ ] t106 (39) : installer la n° 7 : Windows demande une fois l'accord (pare-feu) ; « Oui » ; relancer : plus de
+      demande ; jouer en ligne avec un ami sur un Wi-Fi public (R-118).
 - [ ] t102 (32) : fais une revue, reviens au menu et ne touche à rien 3 minutes, Gestionnaire des tâches ouvert :
       au bout de 2 min les stockfish.exe d'analyse disparaissent (il en reste 1, l'adversaire), la mémoire
       redescend de plusieurs Go ; rouvre la même revue : pastilles et précision sont toujours là.

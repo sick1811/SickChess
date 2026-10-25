@@ -1,7 +1,7 @@
 # tests/test_maj_auto.py - mise a jour automatique du menu (23/10, demande de Julien).
 #     python tests/test_maj_auto.py
 # Verifie mise_a_jour.pas_automatique : telechargement tout seul, redemarrage apres
-# 3 s une seule fois, reverification toutes les 20 min, reglage "maj_auto" a False.
+# 3 s une seule fois, reverification toutes les 3 min (25/10 ; avant 20), reglage "maj_auto" a False.
 
 import os
 import sys
@@ -49,11 +49,15 @@ a, _ = m.pas_automatique(Faux("pret"), {}, 104.0, etat)
 verifier(a is None, "une seule tentative d'installation (pas une par image)")
 etat = {}
 verifier(m.pas_automatique(Faux("a_jour"), {}, 0, etat)[0] is None, "a jour : rien tout de suite")
-verifier(m.pas_automatique(Faux("a_jour"), {}, 10 * 60, etat)[0] is None, "rien avant 20 min")
-verifier(m.pas_automatique(Faux("a_jour"), {}, 20 * 60 + 1, etat)[0] == "verifier",
-         "jeu reste ouvert : reverification apres 20 min")
-verifier(m.pas_automatique(Faux("a_jour"), {}, 20 * 60 + 2, etat)[0] is None,
-         "puis attend de nouveau 20 min")
+verifier(m.pas_automatique(Faux("a_jour"), {}, 2 * 60, etat)[0] is None, "rien avant 3 min")
+verifier(m.pas_automatique(Faux("a_jour"), {}, 3 * 60 + 1, etat)[0] == "verifier",
+         "jeu reste ouvert : reverification apres 3 min")
+verifier(m.pas_automatique(Faux("a_jour"), {}, 3 * 60 + 2, etat)[0] is None,
+         "puis attend de nouveau 3 min")
+etat = {}
+m.pas_automatique(Faux("erreur"), {}, 0, etat)
+verifier(m.pas_automatique(Faux("erreur"), {}, 3 * 60 + 1, etat)[0] == "verifier",
+         "apres un echec reseau : le jeu reessaie tout seul 3 min plus tard")
 verifier(m.pas_automatique(Faux("erreur"), {}, 0, {})[0] is None, "erreur reseau : on ne boucle pas")
 
 print("%d controle(s) en echec" % len(echecs) if echecs else "Tout est bon.")

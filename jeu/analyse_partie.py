@@ -362,6 +362,7 @@ class AnalyseurPartie:
         # 17/10 (Julien : « enormement plus rapide ») : plusieurs moteurs
         # analysent des positions differentes en meme temps.
         self._fils = []
+        self._rates = {}             # 25/10 : recherches revenues sans evaluation
         self._en_travail = set()
         # 24/10 : les moteurs qui cherchent EN CE MOMENT pour cette analyse
         # (arreter() n'interrompt qu'eux, jamais une autre analyse).
@@ -654,6 +655,17 @@ class AnalyseurPartie:
                         time.sleep(0.15)      # on attend le coup suivant
                         continue
                     break
+                if self._moteur_fourni is None and not self._vivant(moteur):
+                    # 25/10 : moteur ferme sous nos pieds (renfort libere par
+                    # l'analyse precedente au moment ou celle-ci demarrait,
+                    # Stockfish qui ne repondait plus) : on en reprend un neuf.
+                    moteur = self._moteur(indice, max(1, self._ouvriers))
+                    if moteur is None:
+                        with self._verrou_choix:
+                            self._en_travail.discard(suivant[0])
+                        if indice == 0:
+                            raise RuntimeError("Stockfish n'a pas redemarre")
+                        return
                 try:
                     self._analyser(moteur, *suivant)
                 finally:
@@ -671,6 +683,13 @@ class AnalyseurPartie:
                 if not self._stop and not self.suivi:
                     self._ecrire_cache()
                     self._liberer_les_renforts()
+
+    @staticmethod
+    def _vivant(moteur):
+        try:
+            return bool(moteur.est_vivant())
+        except Exception:
+            return True                        # moteur de test sans est_vivant
 
     def _liberer_les_renforts(self):
         """23/10 (surveillance) : l'analyse finie, les moteurs de renfort
@@ -726,6 +745,15 @@ class AnalyseurPartie:
             # 24/10 : recherche interrompue par arreter() : resultat incomplet,
             # on ne le garde pas (la position sera refaite si l'analyse reprend).
             return
+        if not details or _en_pions(details.get("evaluation"), details.get("mat")) is None:
+            # 25/10 : recherche revenue SANS evaluation (Stockfish ferme ou relance
+            # pendant la recherche : il renvoie un dernier « bestmove » vide).
+            # Avant, la position etait notee faite sans evaluation : pastille
+            # absente dans la revue. Maintenant elle est refaite (un moteur neuf
+            # si le sien est ferme, voir _travailler), 3 fois au plus.
+            self._rates[k] = self._rates.get(k, 0) + 1
+            if self._rates[k] <= 3:
+                return
         if details:
             signe = 1.0 if self.trait[k] else -1.0
             classees = lignes_du_moteur(self.fens[k], details)

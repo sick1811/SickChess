@@ -534,7 +534,7 @@ class BoardRender:
         if zone.height < 24:
             return
         if not sans:
-            ui.texte(plateau.screen, "Aucun coup joue", zone.x + ui.t(8, ech),
+            ui.texte(plateau.screen, "Aucun coup joué", zone.x + ui.t(8, ech),
                      zone.y + 2, ui.t(13, ech), t["texte_discret"],
                      largeur_max=zone.width - 16)
             return

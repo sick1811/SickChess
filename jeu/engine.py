@@ -270,7 +270,9 @@ class StockfishEngine:
     def est_vivant(self):
         """True si le processus Stockfish tourne toujours."""
         processus = self.process          # quit() peut le vider en meme temps
-        return processus is not None and processus.poll() is None
+        # 25/10 : un moteur en train de se fermer n'est plus vivant (avant, la
+        # revue reessayait sur lui pendant sa seconde de fermeture et abandonnait).
+        return processus is not None and processus.poll() is None             and not getattr(self, "_en_fermeture", False)
 
     def _send_command(self, cmd):
         with self._verrou:
@@ -280,6 +282,8 @@ class StockfishEngine:
         """Ecrit une ligne a Stockfish (sans attendre une recherche en cours)."""
         processus = self.process
         if processus is None or processus.poll() is not None:
+            return False
+        if getattr(self, "_en_fermeture", False) and cmd not in ("stop", "quit"):
             return False
         if self.verbeux:
             print("ENGINE SEND -> " + cmd)
@@ -297,6 +301,27 @@ class StockfishEngine:
         attendre qu'elle finisse. Le fil qui l'a lancee recoit son « bestmove »
         et rend la main. Sans effet si Stockfish ne cherche pas."""
         return self._ecrire("stop")
+
+    def _abandonner_la_recherche(self, attente=5.0):
+        """25/10 (test_precision_moteur rouge sur le PC de Julien) : une recherche
+        trop longue etait abandonnee avec « stop » SANS lire le « bestmove » que
+        Stockfish renvoie quand meme. La recherche suivante le prenait pour le
+        sien : toutes les positions suivantes recevaient le resultat de la
+        precedente (revue fausse, coup de l'ordinateur pour une autre position).
+        On lit donc jusqu'a ce bestmove ; s'il ne vient pas, Stockfish est ferme
+        (il est relance a la demande suivante) plutot que de rester decale.
+        Le verrou doit deja etre pris."""
+        print("ENGINE : timeout - pas de bestmove, recherche abandonnee")
+        self._ecrire("stop")
+        limite = time.time() + attente
+        while time.time() < limite:
+            ligne = self._lire_ligne()
+            if ligne is None:
+                return
+            if ligne.startswith("bestmove"):
+                return
+        print("ENGINE : Stockfish ne repond plus, il est ferme")
+        self.quit()
 
     def send_command(self, cmd):
         """Version publique de _send_command (utilisee par CacheManager)."""
@@ -367,6 +392,14 @@ class StockfishEngine:
     # ------------------------------------------------------------------ niveau
 
     def set_custom_elo(self, elo):
+        """25/10 : sous le verrou du moteur, comme une recherche. Avant, ce reglage
+        attendait « readyok » pendant qu'un autre fil lisait la recherche : deux
+        lecteurs sur le meme Stockfish se volaient les reponses et attendaient
+        pour toujours (revue bloquee sur une position)."""
+        with self._verrou:
+            return self._set_custom_elo(elo)
+
+    def _set_custom_elo(self, elo):
         """Regle la force de jeu. Fonctionne a TOUS les niveaux, meme sous 1320."""
         elo = max(100, min(3200, int(elo)))
         print("ENGINE : configuration elo " + str(elo))
@@ -522,6 +555,14 @@ class StockfishEngine:
         return True
 
     def configurer_pour_analyse(self, threads=None, hash_mb=256, profondeur=None):
+        """25/10 : sous le verrou du moteur, comme une recherche. Avant, ce reglage
+        attendait « readyok » pendant qu'un autre fil lisait la recherche : deux
+        lecteurs sur le meme Stockfish se volaient les reponses et attendaient
+        pour toujours (revue bloquee sur une position)."""
+        with self._verrou:
+            return self._configurer_pour_analyse(threads, hash_mb, profondeur)
+
+    def _configurer_pour_analyse(self, threads=None, hash_mb=256, profondeur=None):
         """Met le moteur a PLEINE PUISSANCE pour analyser une partie.
 
         POURQUOI (ta remarque : "l'evaluation des analyses n'est pas puissante
@@ -708,13 +749,21 @@ class StockfishEngine:
                             "noeuds": calcules,
                             "temps_ms": duree,
                         }
-                self._send_command("stop")
+                self._abandonner_la_recherche()
                 return None
             except Exception as e:
                 print("ENGINE : erreur analyser_position = " + str(e))
                 return None
 
     def nouvelle_partie(self):
+        """25/10 : sous le verrou du moteur, comme une recherche. Avant, ce reglage
+        attendait « readyok » pendant qu'un autre fil lisait la recherche : deux
+        lecteurs sur le meme Stockfish se volaient les reponses et attendaient
+        pour toujours (revue bloquee sur une position)."""
+        with self._verrou:
+            return self._nouvelle_partie()
+
+    def _nouvelle_partie(self):
         """Vide le cache du moteur entre deux parties (evite les coups 'appris')."""
         self._send_command("ucinewgame")
         self._send_command("isready")
@@ -774,8 +823,7 @@ class StockfishEngine:
                             return None
                         return {"coup": best, "evaluation": evaluation,
                                 "mat": mat, "profondeur": profondeur}
-                print("ENGINE : timeout - pas de bestmove")
-                self._send_command("stop")
+                self._abandonner_la_recherche()
                 return None
             except Exception as e:
                 print("ENGINE : erreur get_best_move = " + str(e))
@@ -806,8 +854,7 @@ class StockfishEngine:
                 morceaux = ligne.split()
                 secours = morceaux[1] if len(morceaux) > 1 else "(none)"
                 return self._classement_coherent(lignes), secours
-        print("ENGINE : timeout - pas de bestmove")
-        self._send_command("stop")
+        self._abandonner_la_recherche()
         return None, None
 
     # Ecart de profondeur tolere entre deux lignes du meme classement.
@@ -978,6 +1025,7 @@ class StockfishEngine:
         """Ferme Stockfish. Garantit qu'aucun processus ne survit au jeu."""
         if self.process is None:
             return
+        self._en_fermeture = True
         print("ENGINE : fermeture stockfish")
         try:
             # 24/10 (« le jeu ne repond pas quand on quitte ») : avant, « quit »

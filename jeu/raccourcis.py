@@ -11,7 +11,7 @@ import ui
 RACCOURCIS = [
     ("PENDANT LA PARTIE", None),
     ("Clic gauche", "Sélectionner une pièce, puis sa case d'arrivée"),
-    ("Glisser-deposer", "Déplacer une pièce directement"),
+    ("Glisser-déposer", "Déplacer une pièce directement"),
     ("Clic droit sur une pièce prise", "Annuler le déplacement en cours"),
     ("Clic droit", "Colorier une case ; en glissant, tracer une flèche"),
     ("Maj + clic droit", "Flèche rouge      Ctrl + clic droit : flèche bleue"),
@@ -37,14 +37,16 @@ RACCOURCIS = [
     ("F1", "Afficher ou cacher cette aide"),
     ("Coin de la fenêtre", "Redimensionner : le plateau s'adapte"),
     ("", None),
-    ("REPLAY (après la partie)", None),
-    ("Flèches gauche / droite", "Coup par coup"),
-    ("Flèches haut / bas", "Cinq coups d'un coup"),
-    ("Espace", "Lecture automatique"),
-    ("Debut / Fin", "Aller au premier ou au dernier coup"),
+    ("REVUE (après la partie)", None),
+    # 25/10 : les vraies touches de la revue (ecran_revue.py).
+    ("Gauche / Droite", "Coup précédent ou suivant (aussi la molette)"),
+    ("Haut / Bas", "Premier ou dernier coup (aussi Début / Fin)"),
     ("F", "Retourner le plateau"),
-    ("A", "Relancer ou interrompre l'analyse Stockfish"),
-    ("Clic sur un coup", "Aller directement a ce coup"),
+    ("B", "Montrer ou cacher les flèches des meilleurs coups"),
+    ("E", "Exporter la partie annotée (fichier PGN, aussi copié)"),
+    ("A", "Ouvrir l'analyse libre sur la position affichée"),
+    ("Clic sur un coup", "Aller à ce coup (feuille ou courbe)"),
+    ("Coup sur le plateau", "Essayer une variante (Échap : retour à la partie)"),
     ("Échap", "Revenir à l'écran de fin"),
 ]
 

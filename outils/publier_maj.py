@@ -183,6 +183,56 @@ def manifeste_precedent(depot, dossier_publier):
         return None
 
 
+def url_manifeste_de(depot, etiquette):
+    """Adresse fixe du maj.json d'UNE version (pour les mises a jour une par une)."""
+    return "https://github.com/%s/releases/download/%s/maj.json" % (depot, etiquette)
+
+
+def etiquettes_en_ligne(depot):
+    """Les etiquettes deja publiees (v0.1.0-n4...) lues sur GitHub avec git.
+    Sert une seule fois : quand la version precedente n'a pas encore de liste."""
+    try:
+        sortie = subprocess.run(["git", "ls-remote", "--tags",
+                                 "https://github.com/%s.git" % depot],
+                                capture_output=True, text=True, timeout=60,
+                                env=dict(os.environ, GIT_TERMINAL_PROMPT="0")).stdout
+    except (OSError, subprocess.SubprocessError):
+        return []
+    return sorted({ligne.split("refs/tags/")[-1].replace("^{}", "")
+                   for ligne in sortie.splitlines() if "refs/tags/" in ligne})
+
+
+def liste_des_versions(depot, precedent, numero, etiquette, en_ligne=None):
+    """25/10 (regle de Julien : les mises a jour s'installent UNE PAR UNE) :
+    la liste de toutes les versions publiees, ecrite dans chaque maj.json.
+    Le jeu d'un ami y prend la premiere version plus recente que la sienne."""
+    versions = {}
+    anciennes = (precedent or {}).get("versions") or []
+    if not anciennes and precedent:
+        # Premiere fois : on retrouve les versions deja en ligne (n° 1 a 6).
+        tags = etiquettes_en_ligne(depot) if en_ligne is None else en_ligne
+        anciennes = []
+        for tag in tags:
+            m = re.match(r"^v[\w.]+-n(\d+)$", tag)
+            if m:
+                anciennes.append({"numero": int(m.group(1)), "etiquette": tag})
+        if precedent and precedent.get("etiquette"):
+            anciennes.append({"numero": int(precedent["numero"]),
+                              "etiquette": precedent["etiquette"]})
+    for v in anciennes:
+        try:
+            n = int(v["numero"])
+        except (KeyError, TypeError, ValueError):
+            continue
+        if n < numero and v.get("etiquette"):
+            versions[n] = {"numero": n, "etiquette": v["etiquette"],
+                           "manifeste": v.get("manifeste")
+                           or url_manifeste_de(depot, v["etiquette"])}
+    versions[numero] = {"numero": numero, "etiquette": etiquette,
+                        "manifeste": url_manifeste_de(depot, etiquette)}
+    return [versions[n] for n in sorted(versions)]
+
+
 def zipper(fichiers, destination):
     with zipfile.ZipFile(destination, "w") as archive:
         for absolu, nom in fichiers:
@@ -386,6 +436,7 @@ def publier(notes, racine=RACINE, dossier_publier=DOSSIER_PUBLIER, dist=None,
         "date": time.strftime("%Y-%m-%d"), "etiquette": etiquette,
         "notes": [n.strip() for n in re.split(r"[;|\n]", notes or "") if n.strip()],
         "paquets": paquets,
+        "versions": liste_des_versions(depot, precedent, numero, etiquette),
     }
     chemin_manifeste = os.path.join(sortie, "maj.json")
     with open(chemin_manifeste, "w", encoding="utf-8") as f:
