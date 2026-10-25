@@ -1521,3 +1521,43 @@ salon ; UTF-16 en plus de UTF-8 / cp1252) + l'écriture Windows du presse-papier
 tests gardées (noms d'ouvertures + « Ligne suivante » 3 fois en 1920×1080). Traduction « King's Knight Opening » :
 celle de main (« Partie du cavalier roi »). `test_nulles.py` (venu de main) utilise le Stockfish trouvé. Suite complète :
 1158 contrôles, tout vert.
+
+
+## 25/10/2026 (41) – Version amis n° 7 (0.3.0) publiée : tous les correctifs depuis la n° 6 (Claude Code)
+Fait :
+- Correctifs de Cowork du 25/10 relus sur le PC (répétition / 50 coups avec pré-mouvement, accents et anglais,
+  pendule « BLACK », mises à jour une par une, réessais, DNS de secours, 3 min, pare-feu) : commit `5406d04`.
+  Trouvé à la relecture : aide F1 de la revue laissée vide par Cowork (« TODO ») → remplie avec les vraies touches.
+- **Trois défauts de l'analyse trouvés sur le PC** (test_precision_moteur rouge ou > 10 min une fois sur deux,
+  comme lors de la n° 6) :
+  1. une recherche trop longue était abandonnée sans lire le « bestmove » de Stockfish : la suivante le prenait
+     pour le sien, et TOUTES les positions suivantes recevaient le résultat de la précédente (pastilles fausses,
+     coup de l'ordinateur pour une autre position). `engine._abandonner_la_recherche` lit jusqu'au bestmove, ou
+     ferme Stockfish s'il ne répond plus ;
+  2. le réglage d'un moteur (`configurer_pour_analyse`, aussi `set_custom_elo`, `nouvelle_partie`) attendait
+     « readyok » pendant qu'une recherche lisait le même Stockfish : les deux attendaient pour toujours (revue
+     bloquée sur un coup, 1 fois sur 2 juste après une revue de mat) → sous le verrou du moteur ;
+  3. un moteur fermé pendant une revue (renfort libéré par la revue précédente) : la position était notée faite
+     sans évaluation → moteur neuf, position refaite (3 fois au plus) ; un moteur en fermeture n'est plus « vivant ».
+  Test `tests/test_moteur_decale.py` (rouge avant pour chaque cas, vert après, 8 fois sur 8).
+- Presse-papiers : 20 essais d'ouverture (1 copie sur 25 ratait) ; test_signaler copiait avec un faux presse-papiers.
+  test_mise_a_jour 4b : l'essai du .exe simulé (plantait sous Windows, test écrit dans le cloud).
+- Fusion de `origin/main-phsero` (b33d377, 740211f, fd02be1 : analyse de fond « Revue prête », défauts Cowork,
+  3 min, Signaler → Discord) : commit `2a767ef`, VERSION 0.3.0. Conflits : version Cowork du 25/10 pour la mise à
+  jour, aide F1 complète, traductions sans doublon, journal et À faire gardés dans l'ordre, recette 142 lignes.
+  Attention : ce commit contient aussi le travail en cours d'une autre session (temps restant de la revue,
+  `tests/test_temps_revue.py`, vert mais pas dans lancer_tous) ; vérifié par la vérification avant version.
+- `signalement.json` (adresse du salon Discord, hors Git) créé sur le PC : livré dans le paquet « jeu ».
+- Vérification avant version : tests 1213 verts, banc vert (114 pastilles justes sur 114), aucun BLOQUANT
+  (licences « à revoir » : seulement pour Steam). **n° 7 publiée** : https://github.com/sick1811/SickChess-amis/releases/tag/v0.3.0-n7
+  (programme 18,6 Mo, jeu 8,0 Mo ; moteur de la n° 6, problèmes et finales de la n° 1 ; installeur 664 Mo).
+  En ligne : maj.json = n° 7 / 0.3.0, liste `versions` n° 1 à 7, les 7 maj.json répondent ; aucune release supprimée.
+- Installation silencieuse dans %TEMP%\SickChessEssai : jeu ouvert 20 s, journal sans erreur, 4 180 151 problèmes,
+  « [MAJ] installee : n° 7 ; derniere : n° 7 » (menu atteint), finales et signalement.json présents ; désinstallé.
+  verifier_en_ligne.py (Steam ouvert) : tout ✅.
+- Le crochet post-commit n'était pas installé au début : 5406d04 envoyé à la main (`git push`) ; une autre session
+  l'a installé ensuite. La branche `main-phsero` ne sert plus (pas supprimée).
+
+À vérifier par Julien :
+- [ ] t106 / R-118 : le pare-feu pour de vrai (deux anciennes règles « SickChess » à retirer d'abord, voir À faire).
+- [ ] t105, t107, t108, t109, t104, t103 ; R-117 (à la n° 8), R-119.

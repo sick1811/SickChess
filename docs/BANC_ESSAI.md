@@ -1,6 +1,6 @@
 # Banc d'essai – SickChess
 
-Dernier passage : 2026-10-25 14:18 · Windows 11 · 12 cœurs · Python 3.13.7 · pygame 2.6.1 · rapide
+Dernier passage : 2026-10-25 14:39 · Windows 11 · 12 cœurs · Python 3.13.7 · pygame 2.6.1 · complet
 
 Fabriqué par `python outils/banc_essai.py` (ne pas modifier à la main).
 
@@ -9,21 +9,19 @@ Fabriqué par `python outils/banc_essai.py` (ne pas modifier à la main).
 1021 contrôles OK sur 39 séries (sans Stockfish), en 137 s
 
 
-## 🟠 Vitesse d'affichage
+## 🟢 Vitesse d'affichage
 
-Démarrage 1.22 s · écran le plus lent : Mes parties (7.0 ms/image)
+Démarrage 1.03 s · écran le plus lent : Mes parties (4.2 ms/image)
 
-- **Écran « Mes parties » lent à dessiner** (moyen) – 7.0 ms par image (budget conseillé : 5 ms). Chaque image redessine tout : mettre en cache ce qui ne bouge pas (fond, textes, cases). ·  · Où passe le temps d'une image : · 'blit' of 'pygame.surface.Surface' objects : 61 % (113 appels par image) · pygame.draw.rect : 4 % (36 appels par image) · ecran_mes_parties.py:374 _dessiner_liste : 3 % (1 appels par image) · design.py:146 melanger : 3 % (56 app
 
-## 🟠 Charge du processeur au repos
+## 🟢 Charge du processeur au repos
 
-Menu : 9 % d'un cœur (59 img/s) · Partie : 14 % d'un cœur (53 img/s) · 12 cœurs logiques
+Menu : 4 % d'un cœur (60 img/s) · Partie : 8 % d'un cœur (40 img/s) · 12 cœurs logiques
 
-- **« Partie » occupe le processeur sans rien faire** (moyen) – 14 % d'un cœur à 53 images/s alors que rien ne bouge. Pistes : ne redessiner que si quelque chose change, descendre à 30 images/s au repos, mettre en cache le fond et les textes (skill performance-pygame).
 
 ## 🟢 Mémoire
 
-Jeu au menu : 76.0 Mo
+Jeu au menu : 75.3 Mo
 
 
 ## 🟢 Moteur d'analyse (Stockfish)
@@ -43,12 +41,12 @@ Jeu au menu : 76.0 Mo
 
 ## 🟢 Conflits et santé du projet
 
-0 conflit(s) Git · 0 erreur(s) de syntaxe · dépendances OK · 10 fichier(s) non enregistré(s)
+0 conflit(s) Git · 0 erreur(s) de syntaxe · dépendances OK · 2 fichier(s) non enregistré(s)
 
 
 ## 🟢 Précision des pastilles (banque de positions)
 
-114 coups justes sur 114 (calcul_rapide, 442 s)
+114 coups justes sur 114 (calcul_forte, 534 s)
 
 
 ## ⚪ Endurance (un robot joue 2 heures)
