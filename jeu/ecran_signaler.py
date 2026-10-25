@@ -21,7 +21,8 @@ class EcranSignaler:
         envoye ou range dans rapports/."""
         self.screen = screen
         self.version = version
-        self.type = "probleme"
+        # 25/10 : un rapport de plantage part en bleu dans le salon Discord.
+        self.type = "plantage" if journal is not None else "probleme"
         self.journal = journal
         self.apres_envoi = apres_envoi
         self.champ = ui.ChampTexte(longueur_max=1500, coller_remplace=False).activer(True)
@@ -79,7 +80,7 @@ class EcranSignaler:
                                     "copié : envoie-le à Julien (Discord ou e-mail).")
         else:
             self._resultat = signalement.envoyer(adresse, self.type, self.champ.contenu,
-                                                 texte, ouvrir=ouvrir)
+                                                 texte, ouvrir=ouvrir, version=self.version)
         if self.apres_envoi is not None and (self._resultat[0] or self.chemin):
             self.apres_envoi()           # envoye, ou au moins garde dans rapports/
         return self._resultat
@@ -138,7 +139,7 @@ class EcranSignaler:
         ui.texte(ecran, "Ton message aide à améliorer SickChess. Merci !", largeur // 2,
                  int(ecran.get_height() * 0.08) + ui.t(40, ech), ui.t(14, ech),
                  t["texte_discret"], ancre="centre")
-        self.btn_probleme.selectionne = self.type == "probleme"
+        self.btn_probleme.selectionne = self.type in ("probleme", "plantage")
         self.btn_idee.selectionne = self.type == "idee"
         souris = pygame.mouse.get_pos()
         for b in self.boutons:

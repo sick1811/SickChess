@@ -61,6 +61,7 @@ SERIES = [
 def main():
     rapide = "--rapide" in sys.argv
     env = dict(os.environ, SDL_VIDEODRIVER="dummy", SDL_AUDIODRIVER="dummy",
+               SICKCHESS_SANS_ENVOI="1",     # 25/10 : jamais de faux message dans le salon Discord
                PYTHONIOENCODING="utf-8")
     resultats = []
     for nom, lourd in SERIES:

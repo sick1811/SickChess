@@ -1403,3 +1403,16 @@ que tu es dans le menu ou que tu fais des problèmes ; pastille « Revue prête 
 - Test : `tests/test_analyse_de_fond.py` (vrai Stockfish) : 2 parties analysées toutes seules, pause en 0,01 s
   avec 15 positions gardées, reprises par la revue, étiquette dans Mes parties. Suite complète : 1111 contrôles
   verts + ce test (rouge une fois : il comptait trop tôt, corrigé). Version 0.2.0 (pas encore publiée).
+
+## 25/10/2026 (39) – « Signaler » arrive dans le salon Discord, en couleurs (Claude Code, cloud)
+Julien a donné l'adresse du webhook de son salon : « les bugs en rouge, les idées en vert, les crashs en bleu ».
+- `signalement.message_discord` : un cadre Discord (embed) **Bug** rouge, **Idée** verte, **Plantage** bleu, avec
+  le message et « SickChess 0.2.0 » ; le rapport complet reste en pièce jointe. Le rapport de plantage (carte au
+  lancement suivant → Signaler) part en type « plantage » (bleu) avec son journal.
+- **L'adresse n'est pas dans le code** (le système de sécurité a refusé de l'écrire dans Git, à raison) : elle va
+  dans `signalement.json` (déjà hors Git), lu dans le dossier de données ou celui du jeu, et ajouté au paquet
+  « jeu » de `publier_maj.py`. À créer sur le PC par Claude Code.
+- `SICKCHESS_SANS_ENVOI` : posé par `lancer_tous.py`, les tests et les robots (endurance, recette automatique) :
+  jamais de faux message dans le vrai salon (le test du plantage clique vraiment « Envoyer »).
+- Essai réel : 3 messages de test (rouge, vert, bleu) envoyés, acceptés par Discord (réponse 2xx).
+- Tests : `test_signaler.py` (couleurs, titres, version, envoi, garde-fou). Recette R-095 précisée, R-127 nouveau.

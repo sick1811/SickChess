@@ -7,9 +7,11 @@ Mis à jour le 24/10/2026.
 
 ## Retours de Julien à traiter (priorité)
 - [ ] **25/10 – Recette, points rouges** :
-      - [ ] R-095 / R-096 « Signaler » doit arriver dans le salon Discord de Julien (discord.gg/AvHY2NxTz) :
-            le jeu sait déjà envoyer ; **il faut l'adresse du webhook** (Discord → salon → Modifier → Intégrations →
-            Webhooks → Nouveau → Copier l'URL), clé `signalement_webhook`. En attente de Julien.
+      - [x] R-095 / R-096 « Signaler » arrive dans le salon Discord (séance 39) : bugs en **rouge**, idées en
+            **vert**, plantages en **bleu** (choix de Julien), version + rapport en pièce jointe ; 3 messages de
+            test envoyés et acceptés par Discord le 25/10. **L'adresse (webhook) n'est PAS dans Git** : sur le PC,
+            Claude Code crée `signalement.json` à la racine du jeu (`{"signalement_webhook": "<adresse>"}`, adresse
+            donnée par Julien dans la discussion cloud du 25/10) ; il part dans le paquet « jeu » de la version amis.
       - [x] R-114 « ne fonctionne pas en version 4 » (l'ami au menu ne reçoit pas la nouvelle version) : le jeu ne
             revérifiait que toutes les 20 min → 3 min (séance 37). À revérifier à la publication de la n° 7.
       - [ ] Bugs et idées postés dans le salon Discord : Claude n'a pas accès à Discord → Julien les recopie.
@@ -169,6 +171,8 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t105 (39) : regarde ton salon Discord : 3 messages de test (rouge, vert, bleu) de Claude, à supprimer.
+      Après la prochaine version : Menu → Signaler → un bug puis une idée : ils arrivent en rouge / vert.
 - [ ] t104 (38) : **analyse de fond (p25)** : importe une partie (ou joues-en une à deux), reste au menu
       quelques minutes, puis Mes parties : « Revue prête » ; sa revue s'ouvre avec toutes les pastilles.
       Pendant une partie contre l'ordinateur : pas de stockfish.exe en plus. Le jeu reste fluide au menu ?

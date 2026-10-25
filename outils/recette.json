@@ -641,8 +641,8 @@
   {
    "id": "R-095",
    "section": "Signaler un problème",
-   "texte": "Menu → Signaler un problème / une idée : écrire un message, Envoyer",
-   "detail": "Sans adresse d'envoi réglée : « Message enregistré dans le dossier rapports et copié », le dossier rapports s'ouvre avec le fichier.",
+   "texte": "Menu → Signaler un problème / une idée : écrire un message, Envoyer (une fois « Un problème », une fois « Une idée »)",
+   "detail": "« Merci ! Ton message est bien parti. » ; dans le salon Discord de SickChess : le bug dans un cadre rouge, l'idée dans un cadre vert, avec la version et le rapport en pièce jointe. Sans signalement.json : « Message enregistré dans le dossier rapports et copié ».",
    "ordre": 11100
   },
   {
@@ -653,11 +653,18 @@
    "ordre": 11101
   },
   {
+   "id": "R-127",
+   "section": "Signaler un problème",
+   "texte": "python SickChess.py --plantage-test, relancer le jeu, « Envoyer le rapport » puis Envoyer",
+   "detail": "Le plantage arrive dans le salon Discord dans un cadre bleu, avec le journal du plantage en pièce jointe.",
+   "ordre": 11102
+  },
+  {
    "id": "R-096",
    "section": "Signaler un problème",
    "texte": "Ouvrir le fichier du rapport",
    "detail": "Ton message, la version, le système et (pour un problème) la fin du journal du jeu.",
-   "ordre": 11102
+   "ordre": 11103
   },
   {
    "id": "R-090",

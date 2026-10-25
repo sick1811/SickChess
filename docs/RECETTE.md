@@ -226,10 +226,12 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
 
 ## Signaler un problème
 
-- [ ] **R-095** – Menu → Signaler un problème / une idée : écrire un message, Envoyer  
-  → Sans adresse d'envoi réglée : « Message enregistré dans le dossier rapports et copié », le dossier rapports s'ouvre avec le fichier.
+- [ ] **R-095** – Menu → Signaler un problème / une idée : écrire un message, Envoyer (une fois « Un problème », une fois « Une idée »)  
+  → « Merci ! Ton message est bien parti. » ; dans le salon Discord de SickChess : le bug dans un cadre rouge, l'idée dans un cadre vert, avec la version et le rapport en pièce jointe. Sans signalement.json : « Message enregistré dans le dossier rapports et copié ».
 - [ ] **R-099** – Signaler : écrire « Bonjour, » puis coller (Ctrl+V) un texte copié ailleurs avec des accents (« à côté »)  
   → Le texte collé s'ajoute à la suite de « Bonjour, » (rien n'est effacé) et garde ses accents.
+- [ ] **R-127** – python SickChess.py --plantage-test, relancer le jeu, « Envoyer le rapport » puis Envoyer  
+  → Le plantage arrive dans le salon Discord dans un cadre bleu, avec le journal du plantage en pièce jointe.
 - [ ] **R-096** – Ouvrir le fichier du rapport  
   → Ton message, la version, le système et (pour un problème) la fin du journal du jeu.
 

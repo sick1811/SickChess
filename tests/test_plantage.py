@@ -4,6 +4,8 @@
 # un faux jeu qui plante expres), puis le lancement suivant : carte, « Signaler »
 # deja rempli, envoi, oubli. Dossier temporaire : tes donnees ne sont pas touchees.
 
+import os as _os_envoi
+_os_envoi.environ["SICKCHESS_SANS_ENVOI"] = "1"   # 25/10 : jamais de faux message dans le vrai salon Discord
 import os
 import shutil
 import subprocess

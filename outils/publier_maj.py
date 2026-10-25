@@ -48,7 +48,9 @@ PAQUETS = {
     # defaut et cree config.json chez l'ami au premier passage dans Options.
     "jeu": ["jeu", "assets", "sounds", "music", "polices", "ouvertures", "docs/CREDITS.md",
             "moteur/COPYING-Stockfish.txt", "steam_api64.dll", "steam_appid.txt",
-            "LISEZ-MOI_AMIS.txt"],
+            "LISEZ-MOI_AMIS.txt",
+            # 25/10 : l'adresse du salon Discord de « Signaler » (hors Git).
+            "signalement.json"],
     "moteur": ["moteur"],
     "puzzles": ["puzzles"],
     "syzygy": ["syzygy"],
