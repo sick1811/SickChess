@@ -144,4 +144,8 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
 graphique, Stockfish) · `menage-code` (code et fichiers inutiles, sans rien casser) · `version-amis` (installeur,
 publication, mise à jour automatique, vérification en ligne).
 Agents (`.claude/agents/`) : `testeur` (cherche les bugs), `relecteur-interface` (graphisme),
-`optimiseur` (cherche les lenteurs et chiffre les gains).
+`optimiseur` (cherche les lenteurs et chiffre les gains), `arbitre-echecs` (règles et pastilles
+justes, erreurs avec FEN), `relecteur-textes` (accents, anglais, textes coupés, aide F1),
+`recetteur` (recette auto + liste « À tester par Julien »), `gardien-depot` (avant un commit :
+rien de personnel, tests verts, journal à jour), `trieur-taches` (ordre de travail et tâches
+parallèles sans fichier commun). Tous lisent et rendent un rapport ; aucun ne modifie le code.
