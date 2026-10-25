@@ -404,181 +404,194 @@ class SalonEnLigne:
         self._visibles.append(bouton)
         return bouton
 
+    def _p(self, n):
+        """n pixels a l'echelle de la fenetre (25/10 : le salon etait en pixels
+        fixes - minuscule en 4K, serre en petite fenetre)."""
+        return int(round(n * self.e))
+
     def draw(self):
         ecran = self.screen
         largeur, hauteur = ecran.get_size()
+        self.e = e = ui.echelle(ecran)
+        p = self._p
         t = apparence.theme(self.config.get("theme_plateau"))
         design.degrade_vertical(ecran, ecran.get_rect(),
                                 design.eclaircir(t["fond"], 0.06),
                                 design.assombrir(t["fond"], 0.10))
         self._visibles = []
-        ui.texte(ecran, "Jouer en ligne", largeur // 2, 26, 40, t["texte"],
+        ui.texte(ecran, "Jouer en ligne", largeur // 2, p(26), ui.t(40, e), t["texte"],
                  gras=True, ancre="centre")
 
         if self.etape == "accueil":
             self._dessiner_accueil(t, largeur, hauteur)
         elif self.etape == "attente_steam":
-            ui.texte(ecran, self.info, largeur // 2, hauteur // 2 - 20, 20,
-                     t["texte"], ancre="centre", largeur_max=largeur - 40)
+            ui.texte(ecran, self.info, largeur // 2, hauteur // 2 - p(20), ui.t(20, e),
+                     t["texte"], ancre="centre", largeur_max=largeur - p(40))
             points = "." * (1 + int(time.monotonic() * 2) % 3)
-            ui.texte(ecran, points, largeur // 2, hauteur // 2 + 14, 24,
+            ui.texte(ecran, points, largeur // 2, hauteur // 2 + p(14), ui.t(24, e),
                      t["accent"], ancre="centre")
         else:
             self._dessiner_salon(t, largeur, hauteur)
 
         self._b("retour", "Retour" if self.etape == "accueil" else "Quitter le salon",
-                (20, hauteur - 64, 200, 44))
+                (p(20), hauteur - p(64), p(200), p(44)))
         for bouton in self._visibles:
             bouton.dessiner(ecran, t, rayon=10)
         if self.etape == "accueil":
-            self.champ_code.dessiner(ecran, self._rect_code, t, 18,
+            self.champ_code.dessiner(ecran, self._rect_code, t, ui.t(18, e),
                                      "Code de la partie (ex. 2K7F-9QXA-31BZ)")
 
     def _dessiner_accueil(self, t, largeur, hauteur):
         ecran = self.screen
-        colonne = min(460, largeur - 40)
+        e, p = self.e, self._p
+        colonne = min(p(460), largeur - p(40))
         x = (largeur - colonne) // 2
-        y = 100
+        y = p(100)
         # 25/10 (Cowork, 24/10 : phrase coupée « ou entre... ») : les 50 px ne
         # laissaient qu'une ligne ; jusqu'à 3 lignes, toute la phrase (FR et EN).
         hauteur_phrase = ui.paragraphe(ecran, "Joue contre un ami Steam. Crée une partie et "
                                        "invite-le, ou entre le code qu'il t'a donné.",
-                                       (x, y, colonne, 0), 16, t["texte_discret"],
+                                       (x, y, colonne, 0), ui.t(16, e), t["texte_discret"],
                                        max_lignes=3)
-        y += max(60, hauteur_phrase + 12)
+        y += max(p(60), hauteur_phrase + p(12))
         actif = self.steam.actif
-        self._b("creer", "Créer une partie", (x, y, colonne, 54), actif, taille=20)
-        y += 80
-        self._rect_code = pygame.Rect(x, y, colonne - 110, 46)
-        self._b("coller", "Coller", (x + colonne - 100, y, 100, 46), actif, taille=15)
-        y += 56
-        self._b("rejoindre", "Rejoindre avec ce code", (x, y, colonne, 46),
+        self._b("creer", "Créer une partie", (x, y, colonne, p(54)), actif, taille=20)
+        y += p(80)
+        self._rect_code = pygame.Rect(x, y, colonne - p(110), p(46))
+        self._b("coller", "Coller", (x + colonne - p(100), y, p(100), p(46)), actif, taille=15)
+        y += p(56)
+        self._b("rejoindre", "Rejoindre avec ce code", (x, y, colonne, p(46)),
                 actif and bool(self.champ_code.contenu.strip()))
-        y += 66
+        y += p(66)
         y = self._dessiner_invitations(t, x, y, colonne)
 
         if not actif:
             message = self.steam.erreur or "Steam n'est pas disponible."
-            ui.cadre(ecran, (x, y, colonne, 96), t["panneau"], (200, 90, 80), 2, 10)
-            ui.texte(ecran, message, x + 14, y + 10, 17, (240, 140, 120), gras=True,
-                     largeur_max=colonne - 28, ajuster=True)
-            ui.paragraphe(ecran, self.steam.conseil or "", (x + 14, y + 36,
-                                                             colonne - 150, 52),
-                          14, t["texte_discret"])
-            self._b("reessayer", "Réessayer", (x + colonne - 128, y + 46, 114, 38),
+            ui.cadre(ecran, (x, y, colonne, p(96)), t["panneau"], (200, 90, 80), 2, 10)
+            ui.texte(ecran, message, x + p(14), y + p(10), ui.t(17, e), (240, 140, 120),
+                     gras=True, largeur_max=colonne - p(28), ajuster=True)
+            ui.paragraphe(ecran, self.steam.conseil or "", (x + p(14), y + p(36),
+                                                             colonne - p(150), p(52)),
+                          ui.t(14, e), t["texte_discret"])
+            self._b("reessayer", "Réessayer", (x + colonne - p(128), y + p(46), p(114), p(38)),
                     taille=15)
-            y += 110
+            y += p(110)
         if self.erreur and self.erreur != self.steam.erreur:
-            ui.texte(ecran, self.erreur, largeur // 2, y, 17, (240, 140, 120),
-                     ancre="centre", largeur_max=largeur - 40, ajuster=True)
-            y += 34
+            ui.texte(ecran, self.erreur, largeur // 2, y, ui.t(17, e), (240, 140, 120),
+                     ancre="centre", largeur_max=largeur - p(40), ajuster=True)
+            y += p(34)
         elif self.info:
-            ui.texte(ecran, self.info, largeur // 2, y, 16, t["accent"],
-                     ancre="centre", largeur_max=largeur - 40, ajuster=True)
-            y += 34
+            ui.texte(ecran, self.info, largeur // 2, y, ui.t(16, e), t["accent"],
+                     ancre="centre", largeur_max=largeur - p(40), ajuster=True)
+            y += p(34)
 
         if MODE_TEST:
-            y = max(y, hauteur - 130)
+            y = max(y, hauteur - p(130))
             ui.texte(ecran, "Test sans Steam : deux fenêtres du jeu sur ce PC",
-                     largeur // 2, y, 14, t["texte_discret"], ancre="centre")
-            tiers = (colonne - 20) // 3
-            self._b("test_hote", "Test : héberger", (x, y + 22, tiers, 38), taille=14)
-            self._b("test_invite", "Test : rejoindre", (x + tiers + 10, y + 22, tiers, 38),
-                    taille=14)
+                     largeur // 2, y, ui.t(14, e), t["texte_discret"], ancre="centre")
+            tiers = (colonne - p(20)) // 3
+            self._b("test_hote", "Test : héberger", (x, y + p(22), tiers, p(38)), taille=14)
+            self._b("test_invite", "Test : rejoindre",
+                    (x + tiers + p(10), y + p(22), tiers, p(38)), taille=14)
             # 24/10 (p36) : voir le bandeau d'invitation sans ami (retour au menu).
             self._b("test_invitation", "Test : invitation",
-                    (x + 2 * (tiers + 10), y + 22, colonne - 2 * (tiers + 10), 38), taille=14)
+                    (x + 2 * (tiers + p(10)), y + p(22), colonne - 2 * (tiers + p(10)), p(38)),
+                    taille=14)
 
     def _dessiner_invitations(self, t, x, y, colonne):
         """24/10 (p36) : les invitations recues ces 10 dernieres minutes
         (« Plus tard » sur le bandeau, ou arrivees pendant une partie)."""
         import invitations
+        e, p = self.e, self._p
         recues = invitations.en_attente()[:3]
         if not recues:
             return y
-        ui.texte(self.screen, "INVITATIONS REÇUES", x, y, 13, t["texte_discret"], gras=True)
-        y += 22
+        ui.texte(self.screen, "INVITATIONS REÇUES", x, y, ui.t(13, e), t["texte_discret"],
+                 gras=True)
+        y += p(22)
         for invitation in recues:
-            rect = pygame.Rect(x, y, colonne, 46)
+            rect = pygame.Rect(x, y, colonne, p(46))
             ui.cadre(self.screen, rect, t["panneau"], t["bord"], 1, 10)
-            l_bouton = 120
-            ui.texte(self.screen, "%s t'invite" % invitation["nom"], x + 14, y + 6, 16,
-                     t["texte"], gras=True, largeur_max=colonne - l_bouton - 30)
-            ui.texte(self.screen, invitations.depuis_quand(invitation), x + 14, y + 26, 12,
-                     t["texte_discret"], largeur_max=colonne - l_bouton - 30)
+            l_bouton = p(120)
+            ui.texte(self.screen, "%s t'invite" % invitation["nom"], x + p(14), y + p(6),
+                     ui.t(16, e), t["texte"], gras=True, largeur_max=colonne - l_bouton - p(30))
+            ui.texte(self.screen, invitations.depuis_quand(invitation), x + p(14), y + p(26),
+                     ui.t(12, e), t["texte_discret"], largeur_max=colonne - l_bouton - p(30))
             self._b("invitation:%d" % invitation["salon"], "Rejoindre",
-                    (rect.right - l_bouton - 6, y + 6, l_bouton, 34), self.steam.actif,
+                    (rect.right - l_bouton - p(6), y + p(6), l_bouton, p(34)), self.steam.actif,
                     selectionne=True, taille=15)
-            y += 54
-        return y + 12
+            y += p(54)
+        return y + p(12)
 
     def _dessiner_salon(self, t, largeur, hauteur):
         ecran = self.screen
+        e, p = self.e, self._p
         tr = self.transport
         hote = tr.hote
         avec_amis = hote and bool(self.salon)
-        total = min(980, largeur - 40)
+        total = min(p(980), largeur - p(40))
         x0 = (largeur - total) // 2
         gauche = total if not avec_amis else int(total * 0.52)
-        y = 90
+        y = p(90)
 
         # Etat de la connexion
         couleur_etat = t["accent"] if tr.connecte() else t["texte_discret"]
-        ui.texte(ecran, tr.etat(), x0, y, 19, couleur_etat, gras=True,
-                 largeur_max=gauche - 10, ajuster=True)
-        y += 34
+        ui.texte(ecran, tr.etat(), x0, y, ui.t(19, e), couleur_etat, gras=True,
+                 largeur_max=gauche - p(10), ajuster=True)
+        y += p(34)
 
         if hote:
-            ui.texte(ecran, "CADENCE", x0, y, 13, t["texte_discret"], gras=True)
-            y += 22
+            ui.texte(ecran, "CADENCE", x0, y, ui.t(13, e), t["texte_discret"], gras=True)
+            y += p(22)
             par_ligne = 3
-            l_puce = (gauche - 10 - (par_ligne - 1) * 8) // par_ligne
+            l_puce = (gauche - p(10) - (par_ligne - 1) * p(8)) // par_ligne
             for i, (m, inc) in enumerate(CADENCES):
-                rx = x0 + (i % par_ligne) * (l_puce + 8)
-                ry = y + (i // par_ligne) * 46
+                rx = x0 + (i % par_ligne) * (l_puce + p(8))
+                ry = y + (i // par_ligne) * p(46)
                 self._b("cadence:%d+%d" % (m, inc), libelle_cadence(m, inc),
-                        (rx, ry, l_puce, 38), selectionne=(m, inc) == self.cadence,
+                        (rx, ry, l_puce, p(38)), selectionne=(m, inc) == self.cadence,
                         taille=15)
-            y += 2 * 46 + 10
-            ui.texte(ecran, "TA COULEUR", x0, y, 13, t["texte_discret"], gras=True)
-            y += 22
+            y += 2 * p(46) + p(10)
+            ui.texte(ecran, "TA COULEUR", x0, y, ui.t(13, e), t["texte_discret"], gras=True)
+            y += p(22)
             for i, (cle, libelle) in enumerate(COULEURS):
                 self._b("couleur:" + cle, libelle,
-                        (x0 + i * (l_puce + 8), y, l_puce, 38),
+                        (x0 + i * (l_puce + p(8)), y, l_puce, p(38)),
                         selectionne=cle == self.couleur, taille=15)
-            y += 58
-            ui.texte(ecran, "VARIANTE", x0, y, 13, t["texte_discret"], gras=True)
-            y += 22
+            y += p(58)
+            ui.texte(ecran, "VARIANTE", x0, y, ui.t(13, e), t["texte_discret"], gras=True)
+            y += p(22)
             for i, (cle, libelle) in enumerate(VARIANTES):
                 self._b("variante:" + cle, libelle,
-                        (x0 + i * (l_puce + 8), y, l_puce, 38),
+                        (x0 + i * (l_puce + p(8)), y, l_puce, p(38)),
                         selectionne=cle == ("normal" if self.variante == "normal"
                                             else "freestyle"), taille=15)
             if self.variante != "normal":
                 for i, (cle, libelle) in enumerate(FACONS_960):
                     self._b("facon:" + cle, libelle,
-                            (x0 + i * (l_puce + 8), y + 46, l_puce, 38),
+                            (x0 + i * (l_puce + p(8)), y + p(46), l_puce, p(38)),
                             selectionne=cle == self.variante, taille=15)
-                y += 46
-            y += 58
+                y += p(46)
+            y += p(58)
             self._b("lancer", "Lancer la partie" if tr.connecte()
                     else "En attente de ton ami...",
-                    (x0, y, gauche - 10, 54), tr.connecte(), taille=20)
-            y += 70
+                    (x0, y, gauche - p(10), p(54)), tr.connecte(), taille=20)
+            y += p(70)
             if self.salon:
                 code = module_steam.code_depuis_salon(self.salon)
-                ui.texte(ecran, "Code à donner :", x0, y + 12, 15, t["texte_discret"])
-                ui.texte(ecran, code, x0 + 130, y + 8, 22, t["texte"], gras=True,
-                         mono=True)
-                self._b("copier", "Copier", (x0 + gauche - 110, y, 100, 40), taille=15)
+                r = ui.texte(ecran, "Code à donner :", x0, y + p(12), ui.t(15, e),
+                             t["texte_discret"])
+                ui.texte(ecran, code, max(x0 + p(130), r.right + p(10)), y + p(8),
+                         ui.t(22, e), t["texte"], gras=True, mono=True)
+                self._b("copier", "Copier", (x0 + gauche - p(110), y, p(100), p(40)), taille=15)
             else:
                 ui.texte(ecran, "Mode test : lance une 2e fenêtre et clique "
-                         "\"Test : rejoindre\".", x0, y + 10, 15,
-                         t["texte_discret"], largeur_max=gauche - 10, ajuster=True)
+                         "\"Test : rejoindre\".", x0, y + p(10), ui.t(15, e),
+                         t["texte_discret"], largeur_max=gauche - p(10), ajuster=True)
         else:
             r = self.reglages_hote
             if r is None:
-                ui.texte(ecran, "On attend les réglages de l'hôte...", x0, y, 17,
+                ui.texte(ecran, "On attend les réglages de l'hôte...", x0, y, ui.t(17, e),
                          t["texte_discret"])
             else:
                 couleur = {"blanc": "Noirs", "noir": "Blancs"}.get(
@@ -590,45 +603,47 @@ class SalonEnLigne:
                           "",
                           "%s va lancer la partie." % (tr.nom_adverse or "L'hôte")]
                 for ligne in lignes:
-                    ui.texte(ecran, ligne, x0, y, 19, t["texte"],
-                             largeur_max=total - 10)
-                    y += 32
+                    ui.texte(ecran, ligne, x0, y, ui.t(19, e), t["texte"],
+                             largeur_max=total - p(10))
+                    y += p(32)
 
         if self.info:
-            ui.texte(ecran, self.info, largeur // 2, hauteur - 108, 15,
-                     t["texte_discret"], ancre="centre", largeur_max=largeur - 40,
+            ui.texte(ecran, self.info, largeur // 2, hauteur - p(108), ui.t(15, e),
+                     t["texte_discret"], ancre="centre", largeur_max=largeur - p(40),
                      ajuster=True)
 
         if avec_amis:
-            self._dessiner_amis(t, x0 + gauche + 10, 90, total - gauche - 10,
-                                hauteur - 90 - 130)
+            self._dessiner_amis(t, x0 + gauche + p(10), p(90), total - gauche - p(10),
+                                hauteur - p(90) - p(130))
 
     def _dessiner_amis(self, t, x, y, largeur, hauteur):
         ecran = self.screen
-        self._b("fenetre_steam", "Inviter avec Steam (Maj+Tab)", (x, y, largeur, 40),
+        e, p = self.e, self._p
+        self._b("fenetre_steam", "Inviter avec Steam (Maj+Tab)", (x, y, largeur, p(40)),
                 taille=15)
-        y += 52
-        ui.texte(ecran, "TES AMIS STEAM", x, y, 13, t["texte_discret"], gras=True)
-        y += 22
-        self.zone_amis = pygame.Rect(x, y, largeur, max(0, hauteur - 74))
+        y += p(52)
+        ui.texte(ecran, "TES AMIS STEAM", x, y, ui.t(13, e), t["texte_discret"], gras=True)
+        y += p(22)
+        self.zone_amis = pygame.Rect(x, y, largeur, max(0, hauteur - p(74)))
         ui.cadre(ecran, self.zone_amis, t["panneau"], t.get("bord"), 1, 10)
         if not self.amis:
-            ui.texte(ecran, "Aucun ami trouve.", x + 12, y + 12, 15,
+            ui.texte(ecran, "Aucun ami trouve.", x + p(12), y + p(12), ui.t(15, e),
                      t["texte_discret"])
             return
-        ligne = 44
-        visibles = max(1, (self.zone_amis.height - 8) // ligne)
+        ligne = p(44)
+        visibles = max(1, (self.zone_amis.height - p(8)) // ligne)
         self.defilement_amis = min(self.defilement_amis,
                                    max(0, len(self.amis) - visibles))
         for i, ami in enumerate(self.amis[self.defilement_amis:
                                           self.defilement_amis + visibles]):
-            ry = y + 4 + i * ligne
+            ry = y + p(4) + i * ligne
             pastille = (110, 200, 120) if ami["sur_sickchess"] else \
                 (120, 170, 220) if ami["en_ligne"] else (110, 110, 110)
-            pygame.draw.circle(ecran, pastille, (x + 16, ry + ligne // 2), 5)
-            ui.texte(ecran, ami["nom"], x + 30, ry + 12, 16,
+            pygame.draw.circle(ecran, pastille, (x + p(16), ry + ligne // 2), max(4, p(5)))
+            ui.texte(ecran, ami["nom"], x + p(30), ry + p(12), ui.t(16, e),
                      t["texte"] if ami["en_ligne"] else t["texte_discret"],
-                     largeur_max=largeur - 150)
+                     largeur_max=largeur - p(150))
             deja = ami["id"] in self.invites
             self._b("inviter:%d" % ami["id"], "Invite" if deja else "Inviter",
-                    (x + largeur - 112, ry + 5, 100, ligne - 10), not deja, taille=14)
+                    (x + largeur - p(112), ry + p(5), p(100), ligne - p(10)), not deja,
+                    taille=14)

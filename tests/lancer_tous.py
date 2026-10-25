@@ -40,6 +40,7 @@ SERIES = [
     ("test_petit_pc.py", False),
     ("test_resume_coach.py", False),
     ("test_lisibilite.py", False),
+    ("test_tailles_fenetre.py", False),
     ("test_textes_affiches.py", False),
     ("test_temps_revue.py", False),
     ("test_stats_a_deux.py", False),

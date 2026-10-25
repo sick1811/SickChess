@@ -26,6 +26,7 @@ import annotations
 import apparence
 import notation
 import retournement
+import mise_en_page as mep
 import ui
 from board import ChessBoard
 from ecran_revue import (BLEU_AUSSI_BON, BLEU_MEILLEUR, DispositionRevue,
@@ -329,8 +330,11 @@ class EcranAnalyseLibre:
             p.SQ_SIZE = self.disposition.taille_case
             p.load_piece_images()
         p.disposition = self.disposition
-        ech = self.ech = ui.echelle(self.screen)
         self.panneau = panneau = pygame.Rect(*self.disposition.rect_panneau())
+        # 25/10 (petites fenetres) : l'echelle commune, reduite tant que le
+        # panneau (analyse ET editeur) ne tient pas avec 3 lignes de coups.
+        ech = self.ech = mep.echelle_qui_tient(self._besoin_du_panneau, panneau.height,
+                                               self.disposition.echelle, mini=0.75)
         x = panneau.x + int(14 * ech)
         l = panneau.width - int(28 * ech)
         self.x, self.l = x, l
@@ -379,6 +383,20 @@ class EcranAnalyseLibre:
         rangee([self.btn_annuler, self.btn_valider], bas - h36, h36)
         rangee([self.btn_vider, self.btn_depart], bas - 2 * h36 - espace, h36)
         self._suivre_le_coup()
+
+    @staticmethod
+    def _besoin_du_panneau(ech):
+        """Hauteur demandee par le panneau a l'echelle 'ech' (le plus grand des
+        deux : l'analyse avec 3 lignes de coups, ou l'editeur)."""
+        espace, h36 = int(8 * ech), int(36 * ech)
+        h_titre = ui.police(ui.t(17, ech), True).get_height()             + ui.police(ui.t(12, ech)).get_height() + int(6 * ech)
+        h_lignes = 3 * int(30 * ech) + ui.police(ui.t(12, ech)).get_height() + int(18 * ech)
+        ligne = ui.police(ui.t(14, ech), mono=True).get_height() + int(5 * ech)
+        analyse = (int(24 * ech) + h_titre + h_lignes + 3 * ligne + int(10 * ech)
+                   + int(40 * ech) + 2 * h36 + 5 * espace)
+        editeur = (int(24 * ech) + h_titre + int(2 * 52 * ech + espace) + h36
+                   + int(2 * 26 * ech) + int(40 * ech) + 2 * h36 + 7 * espace)
+        return max(analyse, editeur)
 
     def _ligne_du_coup(self, index):
         noirs = freestyle.plateau(self.fen_depart).turn == chess.BLACK

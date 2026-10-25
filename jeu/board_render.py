@@ -92,7 +92,7 @@ class BoardRender:
         plateau = self.chessboard
         t = self.theme()
         sq = plateau.SQ_SIZE
-        taille = max(9, sq // 6)
+        taille = max(ui.TEXTE_MINI, sq // 6)
 
         rang_bas = 7 if plateau.flipped else 0
         for colonne in range(8):

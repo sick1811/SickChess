@@ -387,8 +387,17 @@ class SettingsScreen:
     _grille = staticmethod(ui.grille)
 
     def _placer(self):
+        """25/10 (petites fenetres, demande de Julien) : avant, un panneau qui ne
+        tenait pas n'etait PAS DESSINE (VARIANTE, RYTHME, meme NIVEAU en grands
+        textes : on ne pouvait plus choisir Freestyle). Maintenant on cherche la
+        plus grande echelle a laquelle tous les panneaux tiennent."""
         self.largeur, self.hauteur = self.screen.get_size()
-        ech = ui.echelle(self.screen)
+        ech = mep.echelle_qui_tient(self._placer_a, 0, ui.echelle(self.screen))
+        self._placer_a(ech)
+
+    def _placer_a(self, ech):
+        """Place tout a l'echelle 'ech'. Renvoie les pixels qui manquent (0 si
+        tout tient) : c'est la mesure utilisee par _placer."""
         self.ech = ech
         # V7.2 : TOUT PASSE PAR LA GRILLE (mise_en_page.py). Voir ce fichier
         # pour les trois defauts mesures : le quart de fenetre vide, les deux
@@ -423,11 +432,11 @@ class SettingsScreen:
         # partent du MEME bord que tout le reste.
         h_case = mep.pas(2.5, ech)
         taille_case_texte = ui.t(15, ech)
+        # 25/10 : la case « Partir d'une position chargee » est cachee (voir
+        # draw) : on ne compte plus sa place, sinon « Retenir » passait seule
+        # sur une ligne et prenait 50 pixels aux panneaux en petite fenetre.
         besoin = (h_case + 12
-                  + ui.mesurer("Retenir ces réglages", taille_case_texte)[0]
-                  + mep.xl(ech) + h_case + 12
-                  + ui.mesurer("Partir d'une position chargée (FEN ou PGN)",
-                               taille_case_texte)[0])
+                  + ui.mesurer("Retenir ces réglages", taille_case_texte)[0])
         self.cases_sur_la_ligne = besoin <= zone_cases.width
         if self.cases_sur_la_ligne:
             y_cases = y_boutons + (h_bouton - h_case) // 2
@@ -480,6 +489,9 @@ class SettingsScreen:
             hauteur_panneau = (h_section + lignes_niveau + int(10 * ech)
                                + int(40 * ech) + int(30 * ech) + h_ligne * 2
                                + h_case_profil + int(16 * ech))
+            hauteur_rythme = h_section + self._grille(
+                self.chips_rythme, 0, 0, interieur, h_chip, ecart, int(120 * ech)) + int(20 * ech)
+            manque_g = hauteur_panneau + mep.m(ech) + hauteur_rythme - (bas - haut)
             self.panneau_niveau = gauche.bloc(hauteur_panneau)
             if self.panneau_niveau is not None:
                 y = self.panneau_niveau.y + int(10 * ech)
@@ -507,7 +519,9 @@ class SettingsScreen:
                 self._grille(self.chips_rythme, x_int_g, y + h_section, interieur,
                              h_chip, ecart, int(120 * ech))
         else:
-            self.panneau_niveau = gauche.bloc(min(gauche.reste(), int(250 * ech)))
+            hauteur_panneau = (int(20 * ech) + h_section + h_ligne * 4 + int(54 * ech))
+            manque_g = hauteur_panneau - (bas - haut)
+            self.panneau_niveau = gauche.bloc(hauteur_panneau)
             self.panneau_rythme = None
             if self.mode == "hotseat" and self.panneau_niveau is not None:
                 y = self.panneau_niveau.y + int(10 * ech) + h_section + h_ligne * 2
@@ -523,7 +537,18 @@ class SettingsScreen:
                                   int(34 * ech), ecart, int(74 * ech))
         hauteur_droite = (h_section + lignes_duree + int(14 * ech) + h_ligne
                           + lignes_inc + int(14 * ech) + h_ligne * 2 + int(16 * ech))
-        self.panneau_temps = droite.bloc(min(hauteur_droite, droite.reste()))
+        hauteur_variante = 0
+        if self.mode in ("stockfish", "hotseat"):
+            h_petite = int(34 * ech)
+            hauteur_variante = (h_section + h_chip + int(10 * ech) + h_petite
+                                + int(10 * ech) + h_petite + int(16 * ech))
+        manque_d = hauteur_droite + (mep.m(ech) + hauteur_variante if hauteur_variante else 0)             - (bas - haut)
+        manque = max(0, manque_g, manque_d)
+        if manque:
+            # Ca ne tient pas a cette echelle : _placer en essaiera une plus
+            # petite. A la plus petite, on place quand meme (pile sans limite).
+            gauche.hauteur = droite.hauteur = None
+        self.panneau_temps = droite.bloc(hauteur_droite)
         if self.panneau_temps is not None:
             y = self.panneau_temps.y + int(10 * ech)
             self.titre_temps = (x_int_d, y)
@@ -541,12 +566,8 @@ class SettingsScreen:
 
         # ---- panneau VARIANTE (Normal / Freestyle)
         self.panneau_variante = None
-        if self.mode in ("stockfish", "hotseat"):
-            h_petite = int(34 * ech)
-            hauteur_variante = (h_section + h_chip + int(10 * ech) + h_petite
-                                + int(10 * ech) + h_petite + int(16 * ech))
-            if droite.reste() >= hauteur_variante:
-                self.panneau_variante = droite.bloc(hauteur_variante)
+        if hauteur_variante:
+            self.panneau_variante = droite.bloc(hauteur_variante)
             if self.panneau_variante is not None:
                 y = self.panneau_variante.y + int(10 * ech)
                 self.titre_variante = (x_int_d, y)
@@ -580,6 +601,7 @@ class SettingsScreen:
         self.interieur_d = interieur_d
         self.h_ligne = h_ligne
         self.h_section = h_section
+        return manque
 
     def _synchroniser_chips(self):
         for chip in self.chips_niveau:

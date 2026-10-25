@@ -25,6 +25,12 @@ import design
 import layout
 import ui
 
+# 26/10 : la disposition suit aussi « Taille des textes » ; on mesure avec la
+# taille par defaut, pas avec le reglage du joueur qui lance les tests.
+_reglage = apparence.reglage
+apparence.reglage = lambda cle, defaut=None: (
+    1.0 if cle == "echelle_interface" else _reglage(cle, defaut))
+
 echecs = []
 
 

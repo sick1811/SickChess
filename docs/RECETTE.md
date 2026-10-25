@@ -15,8 +15,12 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 25/10
   → Le menu s'ouvre en quelques secondes, fond 3D, titre SICKCHESS, icône dorée dans la barre des tâches.
 - [ ] **R-002** – F11 dans le menu puis en partie  
   → Plein écran puis retour en fenêtre, rien ne déborde ni ne se chevauche.
-- [ ] **R-003** – Agrandir / rétrécir la fenêtre à la souris pendant une partie  
-  → L'échiquier et le panneau se recalent, les textes restent lisibles.
+- [ ] **R-003** – Agrandir / rétrécir la fenêtre à la souris pendant une partie, puis pendant une revue  
+  → L'échiquier et le panneau se recalent aussitôt, l'échiquier reste carré et garde la plus grande place, les textes restent lisibles ; en grand écran, échiquier et panneau sont centrés ensemble (pas de grand vide entre les deux) ; la fenêtre ne descend pas sous 900×560.
+- [ ] **R-008** – Réduire la fenêtre au plus petit (900×560), Options → Taille des textes « Très grande », puis ouvrir Jouer contre l'ordinateur et Jouer à deux  
+  → Tous les panneaux sont là : NIVEAU, RYTHME, DURÉE et VARIANTE (Normal / Freestyle / Tournoi) ; rien ne déborde ni ne se chevauche ; les textes rapetissent un peu au lieu de disparaître ; aucun texte minuscule.
+- [ ] **R-009** – Fenêtre plus haute que large (étirer la fenêtre vers le bas et la rétrécir en largeur) : partie, revue, analyse libre  
+  → Le panneau passe SOUS l'échiquier ; tout reste visible et cliquable ; en revenant à une fenêtre large, le panneau repasse à droite.
 - [ ] **R-004** – F1 dans une partie  
   → L'aide des raccourcis s'affiche par-dessus ; F1 ou Échap la ferme.
 - [ ] **R-006** – Premier lancement (dézipper la version amis dans un dossier neuf, ou renommer profil.json)  
@@ -390,6 +394,10 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 25/10
 
 ## Graphisme et textes
 
+- [ ] **R-170** – Revue en petite fenêtre (900×560) avec les 4 tailles de textes (Options → Affichage)  
+  → Les deux pourcentages de précision restent lisibles (en « Très grande », version compacte sur une ligne) ; les boutons ne recouvrent jamais la courbe ni la liste des coups ; au moins 3 lignes de coups visibles ; l'évaluation dans la barre se lit.
+- [ ] **R-171** – Petite fenêtre (900×560), textes « Très grande » : Problèmes, Options, Mes parties, Jouer en ligne, Mise à jour  
+  → Tous les boutons sont dans la fenêtre (Classements Steam et Retour compris) ; le salon en ligne suit la taille de la fenêtre (plus grand en 4K).
 - [ ] **R-130** – Passer sur tous les écrans (menu, réglages, partie, fin, revue, mes parties, problèmes, options, en ligne)  
   → Style Onyx & Or partout, accents corrects, aucun texte coupé ou qui dépasse.
 - [ ] **R-132** – Prendre une pièce ; faire mat ; se faire mater ; ouvrir les écrans  

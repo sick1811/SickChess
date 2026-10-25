@@ -9,10 +9,21 @@
 #
 #   La taille par defaut de la fenetre est 1024x640.
 #
+# 25/10 (petites fenetres, demande de Julien) : LE calcul commun des ecrans
+# avec echiquier (partie, revue, analyse libre, problemes, revoir) :
+#   - une seule echelle : celle des textes (ui.echelle, donc avec le reglage
+#     « Taille des textes »), reduite si le panneau ne tient pas ;
+#   - deux dispositions : « cote » (panneau a droite) et « hauteur » (fenetre
+#     plus haute que large : panneau SOUS l'echiquier) ;
+#   - l'echiquier et le panneau sont centres ensemble (plus de grand vide entre
+#     les deux en 1920x1080).
+#
 # AUCUNE FONCTION SUPPRIMEE : recalculer, rect_plateau, rect_panneau et
 # dans_le_plateau existent toujours, avec les memes noms d'attributs.
 
 import board_geometry as geo
+import mise_en_page as mep
+import ui
 
 MARGE = 18
 PANNEAU_MIN = 290
@@ -32,35 +43,69 @@ def _borne(valeur, mini, maxi):
 class Disposition:
     """Calcule les zones de l'ecran de jeu pour une taille de fenetre donnee."""
 
+    # Hauteur minimum du panneau quand il passe sous l'echiquier (a l'echelle 1).
+    # La revue et l'analyse libre, plus chargees, demandent davantage.
+    PANNEAU_HAUTEUR_MIN = 520
+
     def __init__(self, largeur=1024, hauteur=640):
         self.recalculer(largeur, hauteur)
+
+    def reserve_gauche(self):
+        """Pixels a garder a gauche de l'echiquier (la barre d'avantage de la revue)."""
+        return 0
 
     def recalculer(self, largeur, hauteur):
         self.largeur = max(LARGEUR_MINI, int(largeur))
         self.hauteur = max(HAUTEUR_MINI, int(hauteur))
-        self.echelle = max(0.86, min(ECHELLE_MAX, min(self.largeur / 1024.0,
-                                                      self.hauteur / 640.0)))
+        brute = max(0.86, min(ECHELLE_MAX, min(self.largeur / 1024.0,
+                                               self.hauteur / 640.0)))
         # Grand ecran : les bornes en pixels grandissent avec l'echelle.
-        self.grand = max(1.0, self.echelle / ECHELLE_NORMALE_MAX)
+        self.grand = max(1.0, brute / ECHELLE_NORMALE_MAX)
+        self.echelle = ui.echelle((self.largeur, self.hauteur))
         g, marge = self.grand, int(MARGE * self.grand)
+        self.echelle_fenetre = brute
+        reserve = int(self.reserve_gauche())
 
         # 24/10 (plantage trouve par Cowork en 1920x1080) : des pixels entiers,
         # sinon plateau_x etait 211.0 et les cases calculees au clic des flottants.
         largeur_panneau = int(_borne(self.largeur * 0.32, PANNEAU_MIN * g, PANNEAU_MAX * g))
 
-        hauteur_dispo = self.hauteur - 2 * marge
-        largeur_dispo = self.largeur - largeur_panneau - 3 * marge
-        cote = max(240, min(hauteur_dispo, largeur_dispo))
+        # Les deux dispositions possibles : on garde celle qui donne le plus
+        # grand echiquier (l'echiquier passe toujours en premier).
+        cote_a_droite = min(self.hauteur - 2 * marge,
+                            self.largeur - largeur_panneau - 3 * marge - reserve)
+        h_panneau_min = int(self.PANNEAU_HAUTEUR_MIN * min(brute, ECHELLE_NORMALE_MAX) * g)
+        cote_dessous = min(self.largeur - 2 * marge - reserve,
+                           self.hauteur - h_panneau_min - 3 * marge)
+        self.mode = "hauteur" if cote_dessous > cote_a_droite * 1.05 else "cote"
 
-        self.taille_case = int(cote // 8)
-        self.cote_plateau = self.taille_case * 8
-        self.plateau_x = marge + (largeur_dispo - self.cote_plateau) // 2
-        self.plateau_y = marge + (hauteur_dispo - self.cote_plateau) // 2
-
-        self.panneau_x = self.largeur - largeur_panneau - marge
-        self.panneau_y = marge
-        self.panneau_l = largeur_panneau
-        self.panneau_h = hauteur_dispo
+        if self.mode == "cote":
+            cote = max(240, cote_a_droite)
+            self.taille_case = int(cote // 8)
+            self.cote_plateau = self.taille_case * 8
+            # La place en trop va d'abord au panneau (jusqu'a sa largeur
+            # maximum), puis l'ensemble est centre.
+            libre = self.largeur - 3 * marge - reserve - self.cote_plateau - largeur_panneau
+            plus = max(0, min(libre, int(PANNEAU_MAX * g) - largeur_panneau))
+            largeur_panneau += plus
+            libre -= plus
+            self.plateau_x = marge + max(0, libre) // 2 + reserve
+            self.plateau_y = marge + (self.hauteur - 2 * marge - self.cote_plateau) // 2
+            self.panneau_x = self.plateau_x + self.cote_plateau + marge
+            self.panneau_y = marge
+            self.panneau_l = largeur_panneau
+            self.panneau_h = self.hauteur - 2 * marge
+        else:
+            cote = max(240, cote_dessous)
+            self.taille_case = int(cote // 8)
+            self.cote_plateau = self.taille_case * 8
+            groupe = reserve + self.cote_plateau
+            self.plateau_x = (self.largeur - groupe) // 2 + reserve
+            self.plateau_y = marge
+            self.panneau_x = self.plateau_x - reserve
+            self.panneau_y = self.plateau_y + self.cote_plateau + marge
+            self.panneau_l = groupe
+            self.panneau_h = self.hauteur - self.panneau_y - marge
 
         self._repartir_le_panneau()
 
@@ -70,22 +115,37 @@ class Disposition:
 
     # ------------------------------------------------------------------ panneau
 
+    def _hauteurs(self, ech):
+        g = self.grand
+        return {"horloge": _borne(56 * ech, 44, 74 * g),
+                "captures": _borne(40 * ech, 30, 56 * g),
+                "infos": _borne(44 * ech, 34, 60 * g),
+                "boutons": _borne(44 * ech, 36, 58 * g),
+                "espace": _borne(8 * ech, 6, 14 * g)}
+
+    def _besoin_du_panneau(self, ech):
+        h = self._hauteurs(ech)
+        return (2 * h["horloge"] + 2 * h["captures"] + h["infos"] + h["boutons"]
+                + 9 * h["espace"] + int(90 * ech))
+
     def _repartir_le_panneau(self):
         """Empile les zones du panneau de haut en bas, sans chevauchement.
 
         Les horloges, les prises et les boutons prennent une hauteur bornee ;
         la liste des coups (ou le chat) recoit tout le reste.
         """
-        ech, g = self.echelle, self.grand
+        # 25/10 : si le panneau ne tient pas (petite fenetre, grands textes),
+        # c'est l'echelle qui baisse, pas les zones qui se chevauchent.
+        self.echelle = mep.echelle_qui_tient(self._besoin_du_panneau, self.panneau_h,
+                                             self.echelle, mini=0.75)
+        ech = self.echelle
         marge = int(14 * ech)
         x = self.panneau_x + marge
         interieur = self.panneau_l - 2 * marge
 
-        h_horloge = _borne(56 * ech, 44, 74 * g)
-        h_captures = _borne(40 * ech, 30, 56 * g)
-        h_infos = _borne(44 * ech, 34, 60 * g)
-        h_boutons = _borne(44 * ech, 36, 58 * g)
-        espace = _borne(8 * ech, 6, 14 * g)
+        h = self._hauteurs(ech)
+        h_horloge, h_captures, h_infos = h["horloge"], h["captures"], h["infos"]
+        h_boutons, espace = h["boutons"], h["espace"]
 
         fixes = 2 * h_horloge + 2 * h_captures + h_infos + h_boutons + 7 * espace
         reste = self.panneau_h - fixes - 2 * espace
@@ -129,7 +189,8 @@ class Disposition:
     def zone_sous_le_plateau(self, hauteur=44):
         """Bande libre sous l'echiquier (bulles de chat, messages du mode)."""
         y = self.plateau_y + self.cote_plateau + 6
-        hauteur = min(int(hauteur), max(0, self.hauteur - y - 6))
+        bas = self.panneau_y - 6 if self.mode == "hauteur" else self.hauteur - 6
+        hauteur = min(int(hauteur), max(0, bas - y))
         return (self.plateau_x, y, self.cote_plateau, hauteur)
 
     def dans_le_plateau(self, position):
@@ -138,6 +199,6 @@ class Disposition:
                 and self.plateau_y <= y < self.plateau_y + self.cote_plateau)
 
     def __repr__(self):
-        return ("Disposition(fenetre %dx%d, case %d, plateau en %d,%d)"
+        return ("Disposition(fenetre %dx%d, case %d, plateau en %d,%d, %s)"
                 % (self.largeur, self.hauteur, self.taille_case,
-                   self.plateau_x, self.plateau_y))
+                   self.plateau_x, self.plateau_y, self.mode))

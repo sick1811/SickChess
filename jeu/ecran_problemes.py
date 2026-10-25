@@ -28,6 +28,7 @@ import apparence
 import explication_puzzle
 import puzzles
 import notation
+import mise_en_page as mep
 import ui
 from board import ChessBoard
 from layout import Disposition
@@ -201,10 +202,26 @@ class EcranProblemes:
         self.btn_suivant.placer((x, bas - h_gros, l, h_gros))
         self.bas_texte = bas - h_gros - espace
 
-        # --- choix : une colonne au centre
+        # --- choix : une colonne au centre. 25/10 (petites fenetres) : en
+        # grands textes, les derniers boutons sortaient de la fenetre ; on
+        # cherche la plus grande echelle a laquelle tout tient (marge 12 px).
+        self.ech_choix = mep.echelle_qui_tient(
+            lambda e: self._placer_choix(e, largeur, hauteur), -int(12 * ech), ech)
+        self._placer_choix(self.ech_choix, largeur, hauteur)
+
+    def _placer_choix(self, ech, largeur, hauteur, y_haut=None):
+        """Place la colonne des choix ; renvoie de combien elle depasse le bas."""
         lc = min(int(520 * ech), largeur - 60)
         cx = (largeur - lc) // 2
         y = int(hauteur * 0.20)
+        if y_haut is None:
+            # 25/10 : si la colonne depasse, elle remonte d'abord jusque sous
+            # le sous-titre ; l'echelle ne baisse qu'ensuite.
+            depasse = self._placer_choix(ech, largeur, hauteur, y) + int(12 * ech)
+            sous_titre = int(hauteur * 0.06) + ui.t(50, ech)                 + ui.police(ui.t(15, ech)).get_height() + int(14 * ech)
+            y = max(min(y, sous_titre), y - max(0, depasse))
+        else:
+            y = y_haut
         h_mode = int(56 * ech)
         self.btn_classe.placer((cx, y, lc, h_mode))
         y += h_mode + int(26 * ech)
@@ -235,12 +252,13 @@ class EcranProblemes:
         y += h_defi + int(12 * ech)
         self.btn_erreurs.placer((cx, y, lc, h_mode))
         y += h_mode + int(18 * ech)
-        y_bas = min(y, hauteur - int(50 * ech))
+        y_bas = y
         moitie = (lc - ecart) // 2
         self.btn_classements.placer((cx, y_bas, moitie, int(38 * ech)))
         self.btn_retour_choix.placer((cx + moitie + ecart, y_bas, lc - moitie - ecart,
                                       int(38 * ech)))
         self.colonne_choix = (cx, lc)
+        return y_bas + int(38 * ech) - hauteur
 
     # ================================================================ choix
 
@@ -720,7 +738,7 @@ class EcranProblemes:
     # ---------------------------------------------------------------- choix
 
     def _dessiner_choix(self, t):
-        ecran, ech = self.screen, self.ech
+        ecran, ech = self.screen, self.ech_choix
         largeur, hauteur = ecran.get_size()
         cx, lc = self.colonne_choix
         ui.texte(ecran, "Problèmes", largeur // 2, int(hauteur * 0.06),

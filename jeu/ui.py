@@ -358,6 +358,7 @@ def vider_cache():
     _LARGEURS.clear()
     _RENDUS.clear()
     _ROGNES.clear()
+    _TAILLES_PARAGRAPHE.clear()
 
 
 # 23/10 (banc d'essai) : mesurer et dessiner les textes prenait 40 a 60 % de
@@ -506,9 +507,13 @@ def grand_ecran(cible):
     return max(1.0, min(ECHELLE_MAX, min(largeur / 1024.0, hauteur / 640.0)) / 1.65)
 
 
+# 25/10 (petites fenetres) : en dessous, un texte n'est plus lisible.
+TEXTE_MINI = 11
+
+
 def t(base, ech=1.0):
-    """Taille de texte a l'echelle."""
-    return max(9, int(round(base * ech)))
+    """Taille de texte a l'echelle, jamais sous TEXTE_MINI."""
+    return max(TEXTE_MINI, int(round(base * ech)))
 
 
 # ---------------------------------------------------------------- mesure
@@ -557,7 +562,7 @@ def taille_qui_tient(chaine, taille_max, taille_min, largeur_max,
         if _taille_de(police(taille, gras, mono), str(chaine))[0] <= largeur_max:
             return taille
         taille -= 1
-    return max(int(taille_min), 9)
+    return max(int(taille_min), TEXTE_MINI)
 
 
 # ---------------------------------------------------------------- dessin
@@ -581,7 +586,7 @@ def texte(surface, chaine, x, y, taille=17, couleur=(235, 232, 226), gras=False,
     chaine = _tr(str(chaine))
     if largeur_max:
         if ajuster:
-            taille = taille_qui_tient(chaine, taille, max(9, taille * 0.6),
+            taille = taille_qui_tient(chaine, taille, max(TEXTE_MINI, taille * 0.6),
                                       largeur_max, gras, mono)
         # Meme apres avoir retreci la police, on rogne : c'est la garantie
         # qu'un texte ne depasse JAMAIS de sa zone.
@@ -606,7 +611,7 @@ def texte_centre_dans(surface, chaine, rect, taille=17, couleur=(235, 232, 226),
         marge = int(marge * g)
     largeur = max(10, rect.width - 2 * marge)
     if ajuster:
-        taille = taille_qui_tient(chaine, taille, max(9, taille * 0.55),
+        taille = taille_qui_tient(chaine, taille, max(TEXTE_MINI, taille * 0.55),
                                   largeur, gras, mono)
     chaine = rogner(chaine, taille, largeur, gras, mono)
     rendu = _rendu_de(police(taille, gras, mono), str(chaine), couleur)
@@ -633,11 +638,37 @@ def couper_en_lignes(chaine, taille, largeur_max, gras=False, mono=False):
     return lignes
 
 
+_TAILLES_PARAGRAPHE = {}
+
+
+def _taille_du_paragraphe(chaine, taille, largeur, hauteur, gras, interligne, max_lignes):
+    """La plus grande police (au plus 'taille') qui fait tenir tout le texte."""
+    cle = (chaine, taille, largeur, hauteur, gras, interligne, max_lignes)
+    if cle not in _TAILLES_PARAGRAPHE:
+        if len(_TAILLES_PARAGRAPHE) > 2000:
+            _TAILLES_PARAGRAPHE.clear()
+        essai = int(taille)
+        while essai > TEXTE_MINI:
+            lignes = len(couper_en_lignes(chaine, essai, largeur, gras))
+            place = hauteur // max(1, int(police(essai, gras).get_height() * interligne))
+            if lignes <= min(place, max_lignes or 999):
+                break
+            essai -= 1
+        _TAILLES_PARAGRAPHE[cle] = max(min(int(taille), TEXTE_MINI), essai)
+    return _TAILLES_PARAGRAPHE[cle]
+
+
 def paragraphe(surface, chaine, rect, taille=16, couleur=(180, 176, 170),
                gras=False, interligne=1.3, max_lignes=None):
-    """Texte sur plusieurs lignes, coupe aux espaces, jamais hors du rectangle."""
+    """Texte sur plusieurs lignes, coupe aux espaces, jamais hors du rectangle.
+
+    25/10 (petites fenetres) : si le texte ne tient pas, la police retrecit
+    (jusqu'a TEXTE_MINI) AVANT qu'on coupe la fin avec « ... »."""
     rect = pygame.Rect(rect)
     chaine = _tr(str(chaine))
+    if rect.height:
+        taille = _taille_du_paragraphe(chaine, taille, rect.width, rect.height, gras,
+                                       interligne, max_lignes)
     lignes = couper_en_lignes(chaine, taille, rect.width, gras)
     hauteur_ligne = int(police(taille, gras).get_height() * interligne)
     place = max(1, rect.height // hauteur_ligne) if rect.height else len(lignes)

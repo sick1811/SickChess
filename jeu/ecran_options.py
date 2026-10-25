@@ -579,7 +579,7 @@ class EcranOptions:
                 ecran.blit(voile, (x, y))
 
         if v.get("afficher_coordonnees"):
-            taille = max(8, sq // 6)
+            taille = max(ui.TEXTE_MINI, sq // 6)
             for col in range(8):
                 case = chess.square(col, 0)
                 x, y = geo.case_vers_pixel(case, sq, False)

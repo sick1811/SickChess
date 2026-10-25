@@ -1694,3 +1694,41 @@ Fait :
 
 À vérifier par Julien :
 - [ ] t118 à t123 dans `docs/A_FAIRE.md` (« À tester par Julien ») et dans la page « À faire ».
+
+## 26/10/2026 (45) – Petites fenêtres : tout reste visible, quelle que soit la taille (Claude Code)
+Constat (avant, captures 900×560 / 1280×720 / 1920×1080 et les 4 tailles de textes) : presque tous les écrans
+calculaient déjà leurs tailles à partir de la fenêtre ; les vrais défauts étaient ailleurs :
+1. **Réglages avant partie** : un panneau qui ne tenait pas n'était pas dessiné. En 900×560, RYTHME et **VARIANTE**
+   (Normal / Freestyle) disparaissaient (impossible de choisir Freestyle) ; en « Très grande », même NIVEAU.
+2. **Revue** : pile de hauteurs fixes ; en petite fenêtre + grands textes, les boutons ◀ ▶ recouvraient la courbe et
+   la liste des coups ; compteurs de pastilles et évaluation de la barre à 9 px.
+3. **Deux échelles** : le panneau de partie ignorait « Taille des textes », les écrans posés dessus en tenaient
+   compte. Aussi : grand vide entre échiquier et panneau en 1920, boutons des Problèmes hors de la fenêtre en grands
+   textes, salon en ligne et écran de mise à jour en pixels fixes.
+Décision de Julien : **taille minimale gardée à 900×560**.
+Fait (uniquement l'affichage ; règles, moteur et sons pas touchés) :
+- **Une règle commune** (`mise_en_page.echelle_qui_tient`) : quand la place manque, l'écran rapetisse (jusqu'à 0,7)
+  au lieu de cacher un panneau ou de laisser déborder. Utilisée par la partie, la revue, l'analyse libre, les
+  réglages et les problèmes.
+- **`layout.Disposition` = le calcul central** des écrans avec échiquier : une seule échelle (celle des textes,
+  réduite si le panneau ne tient pas) ; deux dispositions, « côté » (panneau à droite) et **« hauteur »** (fenêtre
+  plus haute que large : panneau sous l'échiquier) ; la barre d'avantage de la revue est réservée dans ce calcul ;
+  échiquier + panneau centrés ensemble (la place en trop va d'abord au panneau).
+- **Revue** : boutons, pourcentages et coup affiché toujours prioritaires ; la courbe s'aplatit pour garder 5
+  lignes de coups ; **version compacte** des précisions (« Toi 97,6 % » sur une ligne) quand même réduite ça ne
+  tient pas.
+- **Réglages** : chaque panneau est mesuré avant d'être placé, plus aucun ne disparaît ; la case cachée « Partir
+  d'une position chargée » ne prend plus de place (elle poussait « Retenir » sur une ligne à elle seule).
+- **Textes** : minimum lisible `ui.TEXTE_MINI = 11` px (ui.t, textes qui rétrécissent, coordonnées de l'échiquier) ;
+  les paragraphes **rétrécissent avant d'être coupés** par « ... ».
+- Problèmes : la colonne des choix remonte sous le sous-titre puis rapetisse ; salon en ligne et mise à jour à
+  l'échelle de la fenêtre.
+- Nouveau contrôle `tests/test_tailles_fenetre.py` (dans `lancer_tous.py`) : 7 tailles (900×560 → 4K, et 900×1200)
+  × 4 tailles de textes ; aucun élément hors de la fenêtre, aucun chevauchement, aucun panneau absent, aucun texte
+  sous 11 px. Avant correction : 306 échecs ; après : tout vert.
+- `test_lisibilite.py` mesure maintenant avec « Taille des textes » Normale (il lisait le réglage Petite de Julien,
+  qui compte désormais aussi pour le panneau de partie). Suite complète : tout vert (1478 + lisibilité).
+- Recette : R-003 modifié, R-008, R-009, R-170, R-171 ajoutés. VERSION 0.5.1 (corrections).
+
+À vérifier par Julien :
+- [ ] t124 à t128 dans `docs/A_FAIRE.md` (« À tester par Julien »).

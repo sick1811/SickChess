@@ -214,6 +214,22 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+Séance du 26/10 (45) · petites fenêtres – **Fonctionne / Ne fonctionne pas + commentaire** (version amis n° 10, 0.5.1).
+- [ ] t124 (45) : **réglages en petite fenêtre** : réduis la fenêtre au plus petit (elle s'arrête à 900×560), Options →
+      Affichage → Taille des textes « Très grande », puis Jouer contre l'ordinateur : NIVEAU, RYTHME, DURÉE et
+      **VARIANTE (Normal / Freestyle)** sont tous visibles et cliquables. Même chose dans Jouer à deux.
+- [ ] t125 (45) : **revue en petite fenêtre** : même fenêtre, ouvre la revue d'une partie avec les 4 tailles de textes :
+      les deux **pourcentages** se lisent (en « Très grande », sur une seule ligne), les boutons ◀ ▶ ne recouvrent plus
+      la courbe ni la liste des coups.
+- [ ] t126 (45) : **redimensionner en cours de partie** : pendant une partie, puis une revue, agrandis / rétrécis la
+      fenêtre à la souris : tout se recale aussitôt, l'échiquier reste carré. En plein écran (F11), l'échiquier et le
+      panneau sont centrés ensemble (plus de grand vide entre les deux).
+- [ ] t127 (45) : **fenêtre en hauteur** : rends la fenêtre plus haute que large : le panneau passe **sous**
+      l'échiquier (partie, revue, analyse libre) ; en la rélargissant, il revient à droite.
+- [ ] t128 (45) : **autres écrans** en petite fenêtre + « Très grande » : Problèmes (« Classements Steam » et
+      « Retour » dans la fenêtre), Options, Mes parties, Jouer en ligne, Mise à jour : rien ne sort de l'écran, aucun
+      texte minuscule.
+
 Séance du 25/10 (44) · arbre des ouvertures – **Fonctionne / Ne fonctionne pas + commentaire** (version amis n° 9, 0.5.0).
 - [ ] t118 (44) : **l'arbre** : Menu → Entraînement aux ouvertures. À gauche les premiers coups (1.e4, 1.d4, 1.c4…)
       toujours dans le même ordre ; clic sur « + » (ou flèche →) déplie coup par coup : 1.e4 › 1...e5 › 2.Nf3 ›

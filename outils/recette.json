@@ -18,37 +18,51 @@
   {
    "id": "R-003",
    "section": "Lancement et fenêtre",
-   "texte": "Agrandir / rétrécir la fenêtre à la souris pendant une partie",
-   "detail": "L'échiquier et le panneau se recalent, les textes restent lisibles.",
+   "texte": "Agrandir / rétrécir la fenêtre à la souris pendant une partie, puis pendant une revue",
+   "detail": "L'échiquier et le panneau se recalent aussitôt, l'échiquier reste carré et garde la plus grande place, les textes restent lisibles ; en grand écran, échiquier et panneau sont centrés ensemble (pas de grand vide entre les deux) ; la fenêtre ne descend pas sous 900×560.",
    "ordre": 10002
+  },
+  {
+   "id": "R-008",
+   "section": "Lancement et fenêtre",
+   "texte": "Réduire la fenêtre au plus petit (900×560), Options → Taille des textes « Très grande », puis ouvrir Jouer contre l'ordinateur et Jouer à deux",
+   "detail": "Tous les panneaux sont là : NIVEAU, RYTHME, DURÉE et VARIANTE (Normal / Freestyle / Tournoi) ; rien ne déborde ni ne se chevauche ; les textes rapetissent un peu au lieu de disparaître ; aucun texte minuscule.",
+   "ordre": 10003
+  },
+  {
+   "id": "R-009",
+   "section": "Lancement et fenêtre",
+   "texte": "Fenêtre plus haute que large (étirer la fenêtre vers le bas et la rétrécir en largeur) : partie, revue, analyse libre",
+   "detail": "Le panneau passe SOUS l'échiquier ; tout reste visible et cliquable ; en revenant à une fenêtre large, le panneau repasse à droite.",
+   "ordre": 10004
   },
   {
    "id": "R-004",
    "section": "Lancement et fenêtre",
    "texte": "F1 dans une partie",
    "detail": "L'aide des raccourcis s'affiche par-dessus ; F1 ou Échap la ferme.",
-   "ordre": 10003
+   "ordre": 10005
   },
   {
    "id": "R-006",
    "section": "Lancement et fenêtre",
    "texte": "Premier lancement (dézipper la version amis dans un dossier neuf, ou renommer profil.json)",
    "detail": "Accueil : ton nom, ton niveau (4 choix), puis « Trois choses à savoir » ; ensuite le menu ; il ne revient plus. (Remettre profil.json.)",
-   "ordre": 10004
+   "ordre": 10006
   },
   {
    "id": "R-005",
    "section": "Lancement et fenêtre",
    "texte": "Quitter par le bouton Quitter puis par la croix de la fenêtre",
    "detail": "Le jeu se ferme tout de suite (moins d'une seconde, même pendant une revue ou quand l'ordinateur réfléchit), sans message d'erreur ; journal_du_jeu.txt finit par « Fin normale ».",
-   "ordre": 10005
+   "ordre": 10007
   },
   {
    "id": "R-007",
    "section": "Lancement et fenêtre",
    "texte": "Au menu principal, appuyer sur Échap ; essayer Non, puis Échap, puis un clic à côté ; enfin Échap puis Oui (ou Entrée)",
    "detail": "Une fenêtre « Quitter SickChess ? » avec Oui / Non s'ouvre ; Non, Échap ou un clic à côté la ferment et on reste au menu ; Oui ou Entrée ferment le jeu (journal « Fin normale ») ; le bouton Quitter du menu ferme toujours directement, sans question ; en anglais la fenêtre est traduite.",
-   "ordre": 10006
+   "ordre": 10008
   },
   {
    "id": "R-010",
@@ -1150,25 +1164,39 @@
    "ordre": 11606
   },
   {
+   "id": "R-170",
+   "section": "Graphisme et textes",
+   "texte": "Revue en petite fenêtre (900×560) avec les 4 tailles de textes (Options → Affichage)",
+   "detail": "Les deux pourcentages de précision restent lisibles (en « Très grande », version compacte sur une ligne) ; les boutons ne recouvrent jamais la courbe ni la liste des coups ; au moins 3 lignes de coups visibles ; l'évaluation dans la barre se lit.",
+   "ordre": 11700
+  },
+  {
+   "id": "R-171",
+   "section": "Graphisme et textes",
+   "texte": "Petite fenêtre (900×560), textes « Très grande » : Problèmes, Options, Mes parties, Jouer en ligne, Mise à jour",
+   "detail": "Tous les boutons sont dans la fenêtre (Classements Steam et Retour compris) ; le salon en ligne suit la taille de la fenêtre (plus grand en 4K).",
+   "ordre": 11701
+  },
+  {
    "id": "R-130",
    "section": "Graphisme et textes",
    "texte": "Passer sur tous les écrans (menu, réglages, partie, fin, revue, mes parties, problèmes, options, en ligne)",
    "detail": "Style Onyx & Or partout, accents corrects, aucun texte coupé ou qui dépasse.",
-   "ordre": 11700
+   "ordre": 11702
   },
   {
    "id": "R-132",
    "section": "Graphisme et textes",
    "texte": "Prendre une pièce ; faire mat ; se faire mater ; ouvrir les écrans",
    "detail": "Petite onde blanche sur la case de la prise ; au mat : halo rouge sur le roi maté et confettis si tu gagnes (pas si tu perds) ; chaque écran arrive en fondu.",
-   "ordre": 11701
+   "ordre": 11703
   },
   {
    "id": "R-131",
    "section": "Graphisme et textes",
    "texte": "Essayer les 6 jeux de pièces sur les damiers clairs et sombres",
    "detail": "Toutes les pièces se lisent bien, blanches comme noires.",
-   "ordre": 11702
+   "ordre": 11704
   }
  ]
 }

@@ -348,7 +348,7 @@ def mesure(cle, ech=1.0):
 
 def taille_texte(cle, ech=1.0):
     """Une taille de texte de la gamme, ajustee a la fenetre."""
-    return max(9, int(round(TYPO.get(cle, cle if isinstance(cle, int) else 14)
+    return max(11, int(round(TYPO.get(cle, cle if isinstance(cle, int) else 14)
                             * ech)))
 
 

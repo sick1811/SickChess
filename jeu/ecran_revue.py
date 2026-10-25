@@ -33,14 +33,14 @@ import pygame
 
 import annotations
 import apparence
-import board_geometry as geo
 import retournement
 import threading
 
+import mise_en_page as mep
 import notation
 import ui
 from board import ChessBoard
-from layout import MARGE, Disposition
+from layout import Disposition
 
 # Les pastilles comptees sous la precision de chaque joueur.
 PASTILLES_COMPTEES = ["brillant", "tres_bon", "meilleur", "excellent",
@@ -55,23 +55,25 @@ _VERROU_VARIANTE = threading.Lock()
 
 
 class DispositionRevue(Disposition):
-    """La disposition de la partie, avec la place pour la barre d'avantage."""
+    """La disposition de la partie, avec la place pour la barre d'avantage.
+
+    25/10 : la barre est reservee DANS le calcul commun (layout.py), au lieu de
+    redecaler l'echiquier apres coup ; ca marche aussi quand le panneau passe
+    sous l'echiquier (fenetre en hauteur)."""
+
+    PANNEAU_HAUTEUR_MIN = 620
+
+    def _barre(self):
+        ech = min(self.echelle, self.echelle_fenetre * 1.3)
+        return max(18, int(22 * ech)), max(6, int(8 * ech))  # 17/10 : assez large pour « 0.3 »
+
+    def reserve_gauche(self):
+        self.barre_l, self._ecart_barre = self._barre()
+        return self.barre_l + self._ecart_barre
 
     def recalculer(self, largeur, hauteur):
         Disposition.recalculer(self, largeur, hauteur)
-        ech = self.echelle
-        self.barre_l = max(18, int(22 * ech))   # 17/10 : assez large pour « 0.3 »
-        ecart = max(6, int(8 * ech))
-        besoin = MARGE + self.barre_l + ecart
-        if self.plateau_x < besoin:
-            largeur_dispo = self.panneau_x - MARGE - besoin
-            cote = max(240, min(self.cote_plateau, largeur_dispo))
-            self.taille_case = int(cote // 8)
-            self.cote_plateau = self.taille_case * 8
-            self.plateau_x = besoin + max(0, (largeur_dispo - self.cote_plateau) // 2)
-            self.plateau_y = MARGE + (self.hauteur - 2 * MARGE
-                                      - self.cote_plateau) // 2
-            geo.configurer(self.plateau_x, self.plateau_y, self.taille_case)
+        ecart = self._ecart_barre
         self.barre = pygame.Rect(self.plateau_x - ecart - self.barre_l,
                                  self.plateau_y, self.barre_l, self.cote_plateau)
         return self
@@ -418,10 +420,25 @@ class EcranRevue:
             p.load_piece_images()
         p.disposition = self.disposition
 
-        ech = ui.echelle(self.screen)
-        self.ech = ech
         panneau = pygame.Rect(*self.disposition.rect_panneau())
         self.panneau = panneau
+        # 25/10 (petites fenetres) : une seule echelle, celle du calcul commun,
+        # reduite tant que le panneau ne tient pas. Si meme reduite il manque de
+        # la place : version compacte (precisions sur une ligne, courbe basse).
+        # Les boutons, les pourcentages et le coup affiche restent TOUJOURS.
+        voulue = self.disposition.echelle
+
+        def besoin(e, compacte):
+            return sum(self._hauteurs(e, compacte).values())
+
+        ech = mep.echelle_qui_tient(lambda e: besoin(e, False), panneau.height, voulue,
+                                    mini=0.8)
+        self.precision_compacte = besoin(ech, False) > panneau.height
+        if self.precision_compacte:
+            ech = mep.echelle_qui_tient(lambda e: besoin(e, True), panneau.height, voulue,
+                                        mini=0.75)
+        self.ech = ech
+        h = self._hauteurs(ech, self.precision_compacte)
         x = panneau.x + int(14 * ech)
         l = panneau.width - int(28 * ech)
         self.x, self.l = x, l
@@ -444,22 +461,25 @@ class EcranRevue:
         bas -= h_bouton + espace
 
         y = panneau.y + int(12 * ech)
-        h_titre = ui.police(ui.t(17, ech), True).get_height() \
-            + ui.police(ui.t(12, ech)).get_height() + int(6 * ech)
-        self.zone_titre = pygame.Rect(x, y, l, h_titre)
-        y += h_titre + espace
-        self.zone_precision = pygame.Rect(x, y, l, int(104 * ech))
-        y += self.zone_precision.height + espace
+        self.zone_titre = pygame.Rect(x, y, l, h["titre"] - espace)
+        y += h["titre"]
+        self.zone_precision = pygame.Rect(x, y, l, h["precision"] - espace)
+        y += h["precision"]
         # 24/10 (Cowork, t51 : explication d'une gaffe coupee) : le cadre du coup
         # grandit (jusqu'a 2 lignes de plus) tant que la feuille garde 6 lignes.
-        h_detail = int(118 * ech)  # 17/10 : + meilleurs coups
+        h_detail = h["detail"] - espace
         ligne_coup = ui.police(ui.t(14, ech), mono=True).get_height() + int(5 * ech)
-        reste = bas - (y + h_detail + espace + int(58 * ech) + espace) - int(10 * ech)
+        reste = bas - (y + h["detail"] + h["courbe"]) - int(10 * ech)
         h_detail += max(0, min(int(46 * ech), reste - 5 * ligne_coup))
         self.zone_detail = pygame.Rect(x, y, l, h_detail)
         y += self.zone_detail.height + espace
-        self.zone_courbe = pygame.Rect(x, y, l, int(58 * ech))
-        y += self.zone_courbe.height + espace
+        # 25/10 : place serree -> la courbe s'aplatit (jusqu'a 60 %) pour que la
+        # feuille garde 5 lignes.
+        h_courbe = h["courbe"] - espace
+        manque = 5 * ligne_coup + int(10 * ech) - (bas - y - h_courbe - espace)
+        h_courbe -= max(0, min(manque, int(h_courbe * 0.4)))
+        self.zone_courbe = pygame.Rect(x, y, l, h_courbe)
+        y += h_courbe + espace
         self.zone_coups = pygame.Rect(x, y, l, max(int(40 * ech), bas - y))
 
         self.taille_coup = ui.t(14, ech)
@@ -468,6 +488,27 @@ class EcranRevue:
         self.lignes_visibles = max(1, (self.zone_coups.height - int(10 * ech))
                                    // self.hauteur_ligne)
         self._suivre_le_coup()
+
+    @staticmethod
+    def _hauteurs(ech, compacte=False):
+        """Ce que demande chaque bloc du panneau (ecart compris), du haut en bas."""
+        espace = int(8 * ech)
+        petite = ui.police(ui.t(12, ech)).get_height()
+        grande = ui.police(ui.t(16, ech), True).get_height()
+        if compacte:
+            precision = ui.police(ui.t(20, ech), True).get_height() + int(12 * ech)
+            detail = grande + ui.police(ui.t(13, ech), True).get_height() + 2 * petite                 + int(27 * ech)
+            courbe = int(30 * ech)
+        else:
+            precision, detail, courbe = int(104 * ech), int(118 * ech), int(58 * ech)
+        ligne_coup = ui.police(ui.t(14, ech), mono=True).get_height() + int(5 * ech)
+        return {"haut": int(12 * ech),
+                "titre": ui.police(ui.t(17, ech), True).get_height() + petite
+                + int(6 * ech) + espace,
+                "precision": precision + espace, "detail": detail + espace,
+                "courbe": courbe + espace,
+                "coups": 3 * ligne_coup + int(10 * ech) + espace,
+                "boutons": int(42 * ech) + 2 * int(36 * ech) + 3 * espace + int(12 * ech)}
 
     def _ligne_du_coup(self, index):
         return (index + (1 if self.noirs_commencent else 0)) // 2
@@ -677,6 +718,25 @@ class EcranRevue:
         # finie : un chiffre affiche ne change plus.
         pret = self.analyseur.terminee()
         colonne = zone.width // 2
+        if getattr(self, "precision_compacte", False):
+            # 25/10 : version compacte (petite fenetre) : « Toi  97.6 % » sur une
+            # ligne par camp, sans les compteurs de pastilles.
+            for n, camp in enumerate(("blancs", "noirs")):
+                precision = rapport[camp]["precision"]
+                texte = ("%.1f %%" % precision) if (pret and precision is not None)                     else "..."
+                gauche = zone.x + n * colonne + int(10 * ech)
+                droite = zone.x + (n + 1) * colonne - int(10 * ech)
+                taille = ui.t(20, ech)
+                y = zone.centery - ui.police(taille, True).get_height() // 2
+                r = ui.texte(ecran, texte, droite, y, taille, t["texte"], gras=True,
+                             ancre="droite", largeur_max=droite - gauche, ajuster=True)
+                ui.texte(ecran, self.noms[n], gauche,
+                         zone.centery - ui.police(ui.t(12, ech)).get_height() // 2,
+                         ui.t(12, ech), t["texte_discret"],
+                         largeur_max=max(1, r.x - gauche - int(6 * ech)))
+            pygame.draw.line(ecran, t["bord"], (zone.x + colonne, zone.y + int(6 * ech)),
+                             (zone.x + colonne, zone.bottom - int(6 * ech)), 1)
+            return
         for n, camp in enumerate(("blancs", "noirs")):
             x = zone.x + n * colonne + int(10 * ech)
             l = colonne - int(16 * ech)
@@ -699,7 +759,7 @@ class EcranRevue:
                 nombre = rapport[camp]["pastilles"].get(cle, 0)
                 if nombre:
                     annotations.dessiner_pastille(ecran, (cx, cy), rayon, cle,
-                                                  ui.police(max(9, rayon), True))
+                                                  ui.police(max(ui.TEXTE_MINI, rayon), True))
                 else:
                     pygame.draw.circle(ecran, t["bord"], (cx, cy), rayon, 1)
                 ui.texte(ecran, str(nombre), cx + rayon + int(3 * ech),
@@ -777,7 +837,7 @@ class EcranRevue:
         if infos["pret"] and infos["note"]:
             annotations.dessiner_pastille(
                 ecran, (x + rayon, y + ui.police(grande, True).get_height() // 2),
-                rayon, infos["note"], ui.police(max(10, rayon), True))
+                rayon, infos["note"], ui.police(max(ui.TEXTE_MINI, rayon), True))
             decalage = 2 * rayon + int(8 * ech)
         trait = "." if infos["par_les_blancs"] else "..."
         titre = "%d%s %s" % (infos["numero"] + self.numero_depart - 1, trait,
@@ -916,7 +976,7 @@ class EcranRevue:
                 infos = self.analyseur.detail(index)
                 if infos["pret"] and infos["note"]:
                     annotations.dessiner_pastille(ecran, centre, rayon, infos["note"],
-                                                  ui.police(max(9, int(rayon * 1.3)), True),
+                                                  ui.police(max(ui.TEXTE_MINI, int(rayon * 1.3)), True),
                                                   fond=t["accent"] if courant else t["fond"])
                 else:
                     annotations.dessiner_pastille_en_attente(ecran, centre, rayon - 1)
@@ -925,7 +985,7 @@ class EcranRevue:
                 texte_ev = self.analyseur.texte_evaluation(index + 1)
                 larg_ev = 0
                 if texte_ev and texte_ev != "...":
-                    petite = max(9, taille - 3)
+                    petite = max(ui.TEXTE_MINI, taille - 3)
                     if infos["pret"] and infos["note"] in NOTES_A_CORRIGER:
                         couleur_ev = annotations.couleur(infos["note"])
                     else:

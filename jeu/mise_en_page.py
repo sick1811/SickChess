@@ -99,6 +99,35 @@ def colonnes(zone, parts=(1, 1), ech=1.0):
     return sortie
 
 
+# 25/10 (petites fenetres) : quand la place manque, on reduit l'echelle d'un
+# ecran jusqu'a ce que tout tienne - mais jamais en dessous de ceci (les textes
+# passent de toute facon par ui.t, qui ne descend pas sous ui.TEXTE_MINI).
+ECHELLE_MINI = 0.7
+
+
+def echelle_qui_tient(besoin, place, ech, mini=ECHELLE_MINI):
+    """La plus grande echelle (au plus 'ech') pour laquelle tout tient.
+
+    besoin : fonction echelle -> pixels demandes ; place : pixels disponibles.
+    C'est LA regle commune des ecrans : on rapetisse au lieu de cacher un
+    panneau ou de laisser un bloc deborder. Si meme 'mini' ne tient pas, on
+    rend 'mini' : l'appelant rogne alors ce qui peut l'etre (liste des coups).
+    """
+    mini = min(mini, ech)
+    if besoin(ech) <= place:
+        return ech
+    if besoin(mini) > place:
+        return mini
+    bas, haut = mini, ech
+    for _ in range(12):
+        milieu = (bas + haut) / 2.0
+        if besoin(milieu) <= place:
+            bas = milieu
+        else:
+            haut = milieu
+    return bas
+
+
 def bandeau_titre(largeur, ech=1.0, avec_rappel=True):
     """La bande du titre, sur UNE ligne. Renvoie (zone du titre, y du dessous).
 
