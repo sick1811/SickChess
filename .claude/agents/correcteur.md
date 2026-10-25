@@ -25,3 +25,10 @@ aucun autre. S'il faut vraiment en changer un autre, arrête-toi et dis lequel e
    commit, de push ni de publication.
 7. Rends : la cause en une phrase, les fichiers modifiés, le test ajouté (rouge avant,
    vert après), le résultat des séries lancées, et le test à faire par Julien sur son PC.
+
+## Règles d'échecs intouchables
+Mat, pat, matériel insuffisant, position morte, 3 et 5 répétitions, 50 et 75 coups, chute
+au temps sans matériel de mat = nulle, roque (et roque Freestyle), prise en passant,
+promotion (4 pièces) : valables dans tous les modes. Ne jamais les supprimer, les
+affaiblir ni retirer leurs contrôles (`tests/test_regles.py`, `tests/test_freestyle.py`).
+Un test de règle rouge = c'est le code qu'on corrige, jamais le test qu'on retire.

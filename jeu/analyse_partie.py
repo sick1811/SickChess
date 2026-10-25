@@ -22,6 +22,7 @@ import threading
 import time
 
 import chess
+import freestyle
 
 import annotations
 
@@ -383,7 +384,7 @@ class AnalyseurPartie:
             self.definir_fichier_cache(fichier_cache)
 
     def _construire_positions(self, coups):
-        plateau = chess.Board(self.fen_initiale)
+        plateau = freestyle.plateau(self.fen_initiale)
         self._noter(plateau)
         for uci in coups:
             try:
@@ -490,7 +491,7 @@ class AnalyseurPartie:
 
         On ajoute d'abord les cases des tableaux, puis les positions : le fil
         d'analyse ne voit jamais une position sans sa case."""
-        plateau = chess.Board(self.fens[-1])
+        plateau = freestyle.plateau(self.fens[-1])
         for uci in coups_uci:
             uci = str(uci)
             try:
@@ -709,7 +710,7 @@ class AnalyseurPartie:
     def _analyser(self, moteur, k, niveau):
         if self.finie[k]:
             # Mat ou nulle : rien a demander au moteur.
-            if chess.Board(self.fens[k]).is_checkmate():
+            if freestyle.plateau(self.fens[k]).is_checkmate():
                 self.evaluations[k] = -EVAL_MAT if self.trait[k] else EVAL_MAT
                 self.mats[k] = 0
             else:
@@ -854,7 +855,7 @@ class AnalyseurPartie:
                 return False                    # « Tres bien » ou pas ?
         if perte <= annotations.PERTE_QUASI_MEILLEUR + m:
             try:
-                if annotations.est_un_sacrifice(chess.Board(self.fens[i]),
+                if annotations.est_un_sacrifice(freestyle.plateau(self.fens[i]),
                                                 chess.Move.from_uci(self.coups[i])):
                     return False                # « Brillant » ou pas ?
             except Exception:
@@ -1211,7 +1212,7 @@ class AnalyseurPartie:
         if not 0 <= k < len(self.meilleurs) or not self.meilleurs[k]:
             return None
         try:
-            return chess.Board(self.fens[k]).san(
+            return freestyle.plateau(self.fens[k]).san(
                 chess.Move.from_uci(self.meilleurs[k]))
         except Exception:
             return None
@@ -1222,7 +1223,7 @@ class AnalyseurPartie:
         Avant, le 1er coup d'une partie commencee ailleurs (« e3 » au milieu
         d'une partie) etait pris pour le 1.e3 d'une ouverture : une gaffe
         devenait « Theorique »."""
-        if chess.Board(self.fen_initiale).board_fen() != chess.Board().board_fen():
+        if freestyle.plateau(self.fen_initiale).board_fen() != chess.Board().board_fen():
             return False
         try:
             import ouvertures
@@ -1267,7 +1268,7 @@ class AnalyseurPartie:
     def _juger(self, i, avant, apres, blancs):
         joue = self.coups[i]
         meilleur = self.meilleurs[i]
-        plateau = chess.Board(self.fens[i])
+        plateau = freestyle.plateau(self.fens[i])
         coup = chess.Move.from_uci(joue)
 
         def du_joueur(evaluation):
@@ -1355,7 +1356,7 @@ class AnalyseurPartie:
 def lignes_du_moteur(fen, details):
     """Les lignes classees d'une reponse du moteur, au format de l'analyse :
     [uci, evaluation (pions, Blancs), mat (Blancs), suite], meilleure d'abord."""
-    signe = 1.0 if chess.Board(fen).turn == chess.WHITE else -1.0
+    signe = 1.0 if freestyle.plateau(fen).turn == chess.WHITE else -1.0
     classees = []
     for ligne in (details or {}).get("lignes") or []:
         v = _en_pions(None if ligne.get("cp") is None else ligne["cp"] / 100.0,
@@ -1395,13 +1396,13 @@ def meilleurs_depuis_lignes(fen, lignes, maximum=3):
 
 def _calculer_meilleurs(fen, lignes, maximum):
     texte_eval = AnalyseurPartie.texte_d_une_evaluation
-    blancs = chess.Board(fen).turn == chess.WHITE
+    blancs = freestyle.plateau(fen).turn == chess.WHITE
 
     def du_joueur(v):
         c = annotations.chances_de_gagner(v)
         return c if blancs else 100.0 - c
 
-    plateau = chess.Board(fen)
+    plateau = freestyle.plateau(fen)
     # 24/10 (Cowork, t65) : « Meilleur ici : e4 (+0.33)  aussi bon : Nf3 (+0.35),
     # Nf3 (+0.35) » : des lignes de deux calculs melangees. Un coup une seule
     # fois (la premiere ligne qui le donne), et le mieux note d'abord.

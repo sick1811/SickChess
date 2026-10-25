@@ -17,6 +17,7 @@
 import chess
 
 import apparence
+import freestyle
 from layout import Disposition
 from board_render import BoardRender
 from board_input import BoardInput
@@ -47,7 +48,13 @@ class ChessBoard:
                                                apparence.THEME_PAR_DEFAUT)
         self.jeu_pieces = self.reglages.get("jeu_pieces", apparence.JEU_PAR_DEFAUT)
 
-        self.board = chess.Board()
+        # Freestyle (echecs 960) : reglages["freestyle"] = numero de la position
+        # de depart (0 a 959), None pour une partie normale.
+        self.numero_freestyle = self.reglages.get("freestyle")
+        if self.numero_freestyle is not None:
+            self.board = freestyle.plateau_de_depart(self.numero_freestyle)
+        else:
+            self.board = chess.Board()
         from effets import Effets
         self.effets = Effets()           # 17/10 (p13) : onde de prise, mat
         self.selected_square = None
@@ -108,7 +115,7 @@ class ChessBoard:
         self.ui_manager = UIManager(self)
         self.captured_pieces = CapturedPieces(self)
         self.game_buttons = GameButtons(self)
-        self.move_history = MoveHistory()
+        self.move_history = MoveHistory(self.board.fen())
 
         self.piece_images = {}
         self.load_piece_images()
@@ -176,10 +183,8 @@ class ChessBoard:
                     if arbitre is not None \
                             and perdant == getattr(arbitre, "couleur_locale", None):
                         arbitre.annoncer_notre_defaite()
-                    gagnant = "0-1" if perdant == chess.WHITE else "1-0"
-                    camp = "BLANCS" if perdant == chess.WHITE else "NOIRS"
-                    self.terminer_partie(
-                        "TEMPS ÉCOULÉ - les %s perdent au temps" % camp, gagnant)
+                    # Regle FIDE 6.9 : nulle si l'adversaire ne peut plus mater.
+                    self.terminer_partie(*ChessRules.fin_au_temps(self.board, perdant))
                     return
 
         if not self.game_over and self.board.is_check():
@@ -359,6 +364,12 @@ class ChessBoard:
         couleur_joueuse = self.board.turn
         fen_avant = self.board.fen()
 
+        # Roque : le roi « prend » sa propre tour (notation Freestyle) - ce
+        # n'est pas une prise. Le roi arrive en g / c, la tour en f / d.
+        roque = freestyle.cases_du_roque(self.board, move) if est_roque else None
+        if roque is not None:
+            capturee = None
+
         if est_en_passant and capturee is None:
             direction = -8 if piece_deplacee.color == chess.WHITE else 8
             capturee = self.board.piece_at(move.to_square + direction)
@@ -373,17 +384,22 @@ class ChessBoard:
             self.captured_pieces.add_captured(capturee)
             self.effets.prise(move.to_square)
 
-        self.last_move_highlight.set_last_move(move.from_square, move.to_square)
-        self.highlights.set_last_move(move.from_square, move.to_square)
+        arrivee = roque[0] if roque is not None else move.to_square
+        self.last_move_highlight.set_last_move(move.from_square, arrivee)
+        self.highlights.set_last_move(move.from_square, arrivee)
         self.highlights.clear_legal_moves()
         self.indice = None
 
         if self.right_click_manager is not None:
             self.right_click_manager.clear()
 
-        piece_arrivee = self.board.piece_at(move.to_square)
-        self.animation.start_animation(move.from_square, move.to_square,
+        piece_arrivee = self.board.piece_at(arrivee)
+        self.animation.start_animation(move.from_square, arrivee,
                                        piece_arrivee, self.SQ_SIZE)
+        if roque is not None and roque[1] != roque[2]:
+            self.animation.start_animation(roque[1], roque[2],
+                                           self.board.piece_at(roque[2]),
+                                           self.SQ_SIZE)
 
         self._jouer_son_du_coup(move, piece_deplacee, capturee,
                                 est_roque, est_en_passant)

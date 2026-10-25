@@ -74,6 +74,8 @@ EN = {
     "Position vue 3 fois - nulle par répétition": "Position seen 3 times - draw by repetition",
     "Règle des 50 coups : %d / %d   (encore %d coups)": "50-move rule: %d / %d   (%d moves left)",
     "TEMPS ÉCOULÉ - les %s perdent au temps": "TIME OUT - %s lose on time",
+    "TEMPS ÉCOULÉ - mais l'adversaire ne peut plus mater : match nul":
+        "TIME OUT - but the opponent can no longer checkmate: draw",
     "BLANCS": "WHITE", "NOIRS": "BLACK", "Blanc": "White", "Noir": "Black",
     "Pause": "Pause", "La pendule est arrêtée": "The clock is stopped",
     "Reprendre": "Resume", "Proposer la nulle": "Offer a draw", "Abandonner": "Resign",

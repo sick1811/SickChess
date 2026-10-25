@@ -20,6 +20,7 @@ import threading
 import time
 
 import chess
+import freestyle
 import chess.pgn
 import chess.syzygy
 
@@ -155,7 +156,7 @@ class AnalyseContinue:
                 if not self._actif or not fen or (deja and deja["fini"]):
                     continue
             try:
-                plateau = chess.Board(fen)
+                plateau = freestyle.plateau(fen)
             except ValueError:
                 continue
             if plateau.is_game_over():
@@ -175,7 +176,10 @@ class AnalyseContinue:
         with self._verrou:
             if fen != self._cible or not self._actif or self._fin:
                 return
-            moteur.send_command("position fen " + fen)
+            if hasattr(moteur, "envoyer_position"):     # Freestyle : UCI_Chess960
+                moteur.envoyer_position(fen)
+            else:
+                moteur.send_command("position fen " + fen)
             moteur.send_command("go depth %d movetime %d" % (PROFONDEUR_MAX, DUREE_MAX_S * 1000))
             self._en_recherche = fen
         lignes, profondeur, derniere = {}, 0, 0.0
@@ -236,7 +240,7 @@ def lignes_en_clair(fen, details, longueur=10):
     """Les lignes du moteur, en notation lisible, meilleure d'abord."""
     import analyse_partie
     texte_eval = analyse_partie.AnalyseurPartie.texte_d_une_evaluation
-    plateau = chess.Board(fen)
+    plateau = freestyle.plateau(fen)
     sortie = []
     for uci, valeur, mat, suite in analyse_partie.lignes_du_moteur(fen, details):
         try:
@@ -274,7 +278,7 @@ def lire_fen_ou_pgn(texte):
     if premiere.count("/") == 7 and "[" not in premiere:
         # Un FEN sans les compteurs (ou sans le trait) est accepte.
         try:
-            plateau = chess.Board(" ".join(premiere.split()[:6]))
+            plateau = freestyle.plateau(" ".join(premiere.split()[:6]))
         except ValueError:
             return None, [], "Ce FEN n'est pas valable."
         probleme = probleme_de_position(plateau)

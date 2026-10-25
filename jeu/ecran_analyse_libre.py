@@ -18,6 +18,7 @@
 import os
 
 import chess
+import freestyle
 import pygame
 
 import analyse_continue
@@ -48,7 +49,7 @@ class EditeurPosition:
     trait et les roques, puis on valide."""
 
     def __init__(self, fen):
-        self.plateau = chess.Board(fen)
+        self.plateau = freestyle.plateau(fen)
         self.plateau.ep_square = None
         self.outil = None            # symbole de piece ("Q", "n"...), gomme, ou None
         self.prise = None            # case de la piece qu'on deplace (sans outil)
@@ -178,7 +179,7 @@ class EcranAnalyseLibre:
 
     def charger(self, fen, coups=(), index=None):
         """Nouvelle position de depart (collage, editeur, revue)."""
-        self.fen_depart = chess.Board(fen).fen()
+        self.fen_depart = freestyle.plateau(fen).fen()
         self.coups = [c if isinstance(c, chess.Move) else chess.Move.from_uci(c)
                       for c in coups]
         self.index = -1
@@ -187,7 +188,7 @@ class EcranAnalyseLibre:
     def aller_a(self, index, son=False):
         index = max(0, min(len(self.coups), int(index)))
         p = self.plateau
-        avant = chess.Board(self.fen_depart)
+        avant = freestyle.plateau(self.fen_depart)
         for coup in self.coups[:max(0, index - 1)]:
             avant.push(coup)
         p.board = avant.copy()
@@ -380,7 +381,7 @@ class EcranAnalyseLibre:
         self._suivre_le_coup()
 
     def _ligne_du_coup(self, index):
-        noirs = chess.Board(self.fen_depart).turn == chess.BLACK
+        noirs = freestyle.plateau(self.fen_depart).turn == chess.BLACK
         return (index + (1 if noirs else 0)) // 2
 
     def _suivre_le_coup(self):
@@ -706,7 +707,7 @@ class EcranAnalyseLibre:
                                       zone.height - int(10 * ech)),
                           ui.t(13, ech), t["texte_discret"])
             return
-        depart = chess.Board(self.fen_depart)
+        depart = freestyle.plateau(self.fen_depart)
         noirs = depart.turn == chess.BLACK
         sans = self._sans()
         larg_num = ui.mesurer("999.", taille, mono=True)[0] + int(4 * ech)
@@ -734,7 +735,7 @@ class EcranAnalyseLibre:
         """La notation des coups joues, gardee tant que les coups ne changent pas."""
         cle = (self.fen_depart, tuple(self.coups))
         if getattr(self, "_cache_sans", (None,))[0] != cle:
-            b, sans = chess.Board(self.fen_depart), []
+            b, sans = freestyle.plateau(self.fen_depart), []
             for coup in self.coups:
                 sans.append(b.san(coup))
                 b.push(coup)

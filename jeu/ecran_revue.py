@@ -28,6 +28,7 @@
 #   - « Exporter » ecrit un PGN annote (export_revue.py).
 
 import chess
+import freestyle
 import pygame
 
 import annotations
@@ -126,7 +127,7 @@ class EcranRevue:
         self.fen = analyseur.fen_initiale
         self.coups = [chess.Move.from_uci(u) for u in analyseur.coups]
         self.sans = list(analyseur.sans)
-        depart = chess.Board(self.fen)
+        depart = freestyle.plateau(self.fen)
         self.numero_depart = depart.fullmove_number
         self.noirs_commencent = depart.turn == chess.BLACK
 
@@ -189,7 +190,7 @@ class EcranRevue:
         index = max(0, min(len(self.coups), int(index)))
         avance_d_un = index == self.index + 1
         p = self.plateau
-        avant = chess.Board(self.fen)
+        avant = freestyle.plateau(self.fen)
         for coup in self.coups[:max(0, index - 1)]:
             avant.push(coup)
         p.board = avant.copy()
@@ -284,7 +285,7 @@ class EcranRevue:
         Calcules en tache de fond, une seule fois par position."""
         if fen in self._conseils:
             return self._conseils[fen]
-        if fen not in self._en_calcul and not chess.Board(fen).is_game_over():
+        if fen not in self._en_calcul and not freestyle.plateau(fen).is_game_over():
             self._en_calcul.add(fen)
             chemin = getattr(self.analyseur, "chemin", None)
             moteur_fourni = getattr(self.analyseur, "_moteur_fourni", None)
@@ -358,7 +359,7 @@ class EcranRevue:
         """'12... Cf6 13. Dxf7#' : la variante, en notation choisie."""
         if not self.variante:
             return ""
-        plateau = chess.Board(self.fen)
+        plateau = freestyle.plateau(self.fen)
         for coup in self.coups[:self.index]:
             plateau.push(coup)
         morceaux = []

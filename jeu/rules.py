@@ -66,6 +66,21 @@ class ChessRules:
         return False, ""
 
     @staticmethod
+    def fin_au_temps(board, perdant):
+        """Le drapeau du camp `perdant` est tombe : (raison, resultat).
+
+        Regle FIDE 6.9 : si l'adversaire ne peut mater par AUCUNE suite de
+        coups legaux (roi seul, roi + fou, roi + cavalier...), c'est nulle.
+        Roi + deux cavaliers peuvent mater : la defaite reste.
+        """
+        camp = "BLANCS" if perdant == chess.WHITE else "NOIRS"
+        if board.has_insufficient_material(not perdant):
+            return ("TEMPS ÉCOULÉ - mais l'adversaire ne peut plus mater : match nul",
+                    "1/2-1/2")
+        return ("TEMPS ÉCOULÉ - les %s perdent au temps" % camp,
+                "0-1" if perdant == chess.WHITE else "1-0")
+
+    @staticmethod
     def _compte_repetitions(board, combien):
         """La position a-t-elle DÉJÀ été vue `combien` fois ?
 

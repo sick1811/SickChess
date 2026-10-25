@@ -10,6 +10,7 @@
 # Un clic sur un coup de la feuille y saute directement.
 
 import chess
+import freestyle
 import pygame
 
 import apparence
@@ -35,12 +36,12 @@ class EcranRevoir:
 
         # Notation lisible de chaque coup, calculee une fois.
         self.sans = []
-        b = chess.Board(self.fen)
+        b = freestyle.plateau(self.fen)
         for coup in self.coups:
             self.sans.append(b.san(coup))
             b.push(coup)
-        self.numero_depart = chess.Board(self.fen).fullmove_number
-        self.noirs_commencent = chess.Board(self.fen).turn == chess.BLACK
+        self.numero_depart = freestyle.plateau(self.fen).fullmove_number
+        self.noirs_commencent = freestyle.plateau(self.fen).turn == chess.BLACK
 
         self.plateau = ChessBoard(screen, {"pendule_active": False,
                                            "son_de_depart": False,
@@ -78,7 +79,7 @@ class EcranRevoir:
         index = max(0, min(len(self.coups), int(index)))
         avance_d_un = index == self.index + 1
         p = self.plateau
-        p.board = chess.Board(self.fen)
+        p.board = freestyle.plateau(self.fen)
         for coup in self.coups[:index]:
             p.board.push(coup)
         self.index = index
@@ -95,7 +96,7 @@ class EcranRevoir:
         if avance_d_un and son:
             # Le dernier coup glisse et sonne, comme pendant la partie.
             dernier = self.coups[index - 1]
-            avant = chess.Board(self.fen)
+            avant = freestyle.plateau(self.fen)
             for coup in self.coups[:index - 1]:
                 avant.push(coup)
             piece = avant.piece_at(dernier.from_square)

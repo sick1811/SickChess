@@ -17,6 +17,7 @@
 # get_evaluation_at_move, export_pgn et clear sont conservees.
 
 import chess
+import freestyle
 
 # Seuils en pions pour l'annotation automatique.
 SEUIL_GAFFE = 1.5        # perte >= 1.5 pion  -> ?
@@ -35,7 +36,7 @@ class MoveHistory:
         self.evaluations = []    # evaluation Stockfish apres chaque coup
         self.best_moves = []     # meilleur coup suggere par Stockfish
         self.horodatage = []     # temps de reflexion en millisecondes
-        self.board = chess.Board(self.fen_initiale)   # plateau interne
+        self.board = freestyle.plateau(self.fen_initiale)   # plateau interne
 
     # ------------------------------------------------------------------ ecriture
 
@@ -57,10 +58,10 @@ class MoveHistory:
             # Aucun coup encore joue : c'est simplement une autre position
             # de depart, on l'adopte sans rien perdre.
             self.fen_initiale = fen_avant
-            self.board = chess.Board(fen_avant)
+            self.board = freestyle.plateau(fen_avant)
         else:
             print("[HISTORIQUE] position modifiee en cours de partie, recalage")
-            self.board = chess.Board(fen_avant)
+            self.board = freestyle.plateau(fen_avant)
 
     def add_move(self, uci_move, evaluation=None, best_move=None, temps_ms=None,
                  fen_avant=None):
@@ -118,7 +119,7 @@ class MoveHistory:
         self.evaluations.clear()
         self.best_moves.clear()
         self.horodatage.clear()
-        self.board = chess.Board(self.fen_initiale)
+        self.board = freestyle.plateau(self.fen_initiale)
 
     # ------------------------------------------------------------------ lecture
 
@@ -153,7 +154,7 @@ class MoveHistory:
     def lignes_lisibles(self):
         """[(numero, coup blanc, coup noir), ...] pour l'affichage du replay."""
         lignes = []
-        depart = chess.Board(self.fen_initiale)
+        depart = freestyle.plateau(self.fen_initiale)
         numero = depart.fullmove_number
         blancs_commencent = depart.turn == chess.WHITE
         i = 0

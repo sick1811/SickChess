@@ -115,6 +115,8 @@ def appliquer(board, donnees):
         return False
     fen = donnees.get("fen_initiale")
     if fen and fen != chess.STARTING_FEN:
+        import freestyle
+        board.board.chess960 = freestyle.est_freestyle_fen(fen)
         board.board.set_fen(fen)
         board.move_history.set_fen_initiale(fen)
 

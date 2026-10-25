@@ -19,6 +19,7 @@ import datetime
 import os
 
 import chess
+import freestyle
 import chess.pgn
 
 
@@ -40,13 +41,14 @@ class PGNExporter:
         game.headers["White"] = white_name
         game.headers["Black"] = black_name
         game.headers["Result"] = result
-        game.headers["Variant"] = "Standard"
+        game.headers["Variant"] = ("Chess960" if freestyle.est_freestyle_fen(fen_initiale)
+                                   else "Standard")
         if fen_initiale != chess.STARTING_FEN:
             game.headers["FEN"] = fen_initiale
             game.headers["SetUp"] = "1"
 
         node = game
-        plateau = chess.Board(fen_initiale)
+        plateau = freestyle.plateau(fen_initiale)
         for i, uci in enumerate(move_history.moves):
             try:
                 move = chess.Move.from_uci(uci)

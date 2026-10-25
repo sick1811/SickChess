@@ -26,6 +26,17 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
 - Tables Syzygy gardées (évaluation, finales, apprentissage).
 - Analyse : doit être **puissante, rapide et surtout juste**. Un sacrifice correct n'est
   pas une gaffe : on juge le coup sur l'évaluation du moteur, pas sur le matériel donné.
+- **Règles d'échecs intouchables** (FIDE, dans TOUS les modes : ordinateur, à deux, en
+  ligne, problèmes quand une partie se joue, Freestyle) : mat, pat, matériel insuffisant,
+  position morte, 3 et 5 répétitions, 50 et 75 coups, chute au temps sans matériel de mat
+  pour l'adversaire = nulle (6.9), roque (et roque Freestyle), prise en passant, promotion
+  (dame, tour, fou, cavalier). **Interdit de les supprimer ou de les affaiblir.** Chacune a
+  son contrôle dans `tests/test_regles.py` (et `tests/test_freestyle.py`) ; **un test de
+  règle ne se supprime jamais**. Ordre : le mat l'emporte sur toute nulle.
+- Freestyle (échecs 960) : `jeu/freestyle.py`. Toute position relue (revue, analyse, PGN,
+  sauvegarde) passe par `freestyle.plateau(fen)`, jamais `chess.Board(fen)` tout court
+  (sinon le roque Freestyle est perdu) ; Stockfish passe seul en `UCI_Chess960`
+  (`engine.envoyer_position`).
 - Multijoueur par Steam (relais Valve). `MODE_TEST = True` dans `jeu/salon_en_ligne.py`
   tant qu'on teste ; **le passer à False avant la sortie**.
 

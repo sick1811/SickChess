@@ -13,6 +13,7 @@ import time
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SERIES = [
     ("test_noyau.py", False),
+    ("test_regles.py", False),
     ("test_options.py", False),
     ("test_mes_parties.py", False),
     ("test_problemes.py", False),

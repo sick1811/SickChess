@@ -20,6 +20,7 @@ import json
 import os
 
 import chess
+import freestyle
 
 import annotations
 
@@ -175,7 +176,7 @@ def coup_presque_aussi_bon(fen_avant, coup, puzzle, chemin_stockfish=None):
         moteur = moteurs.moteur_d_analyse(chemin_stockfish, threads=None, hash_mb=256)
         if moteur is None:
             return False
-        plateau = chess.Board(fen_avant)
+        plateau = freestyle.plateau(fen_avant)
 
         def apres(c):
             """Evaluation (pions) pour le joueur apres le coup c, ou None."""

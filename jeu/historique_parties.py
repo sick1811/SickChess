@@ -85,6 +85,9 @@ def enregistrer(move_history, blancs="Blancs", noirs="Noirs", resultat="*",
     if fen:
         import chess
         if fen != chess.STARTING_FEN:
+            import freestyle
+            if freestyle.est_freestyle_fen(fen):
+                entetes.append(("Variant", "Chess960"))
             entetes.append(("SetUp", "1"))
             entetes.append(("FEN", fen))
     # Ouverture : les deux etiquettes normalisees ECO et Opening.

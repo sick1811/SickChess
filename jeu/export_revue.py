@@ -15,6 +15,7 @@ import os
 import re
 
 import chess
+import freestyle
 import chess.pgn
 
 # pastille -> symbole PGN (NAG)
@@ -48,7 +49,7 @@ def construire_pgn(analyseur, blancs="Blancs", noirs="Noirs", resultat="*",
     jeu.headers["Black"] = noirs
     jeu.headers["Result"] = resultat if resultat in ("1-0", "0-1", "1/2-1/2") else "*"
     if a.fen_initiale != chess.STARTING_FEN:
-        jeu.setup(chess.Board(a.fen_initiale))
+        jeu.setup(freestyle.plateau(a.fen_initiale))
     rapport = a.rapport()
     pb, pn = rapport["blancs"]["precision"], rapport["noirs"]["precision"]
     jeu.headers["Annotator"] = "SickChess / Stockfish (%s)" % a.description()

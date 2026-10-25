@@ -39,3 +39,10 @@ Point de départ : `python outils/banc_essai.py --sections menage,conflits` puis
 ## Après
 Banc `--sections menage,vitesse` pour voir le gain, ligne dans `docs/JOURNAL.md`
 (« Ménage : −N lignes, −X Mo »), recette : rien à changer sauf fonction retirée.
+
+## Règles d'échecs intouchables
+Mat, pat, matériel insuffisant, position morte, 3 et 5 répétitions, 50 et 75 coups, chute
+au temps sans matériel de mat = nulle, roque (et roque Freestyle), prise en passant,
+promotion (4 pièces) : valables dans tous les modes. Ne jamais les supprimer, les
+affaiblir ni retirer leurs contrôles (`tests/test_regles.py`, `tests/test_freestyle.py`).
+Un test de règle rouge = c'est le code qu'on corrige, jamais le test qu'on retire.

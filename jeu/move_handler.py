@@ -17,6 +17,7 @@ import chess
 import pygame
 
 import board_geometry as geo
+import freestyle
 import retournement
 
 
@@ -196,6 +197,13 @@ class MoveHandler:
         for m in coups:
             if m.to_square not in plateau.legal_moves:
                 plateau.legal_moves.append(m.to_square)
+        if freestyle.est_freestyle(plateau.board):
+            # Freestyle : le roque se joue aussi en posant le roi sur g / c.
+            for m in [m for m in coups if plateau.board.is_castling(m)]:
+                roi = freestyle.arrivee_du_roi(plateau.board, m)
+                if roi not in plateau.legal_moves:
+                    plateau.legal_moves.append(roi)
+                    coups.append(chess.Move(square, roi))
         plateau.dragging = True
         plateau.drag_piece = piece
         plateau.drag_pos = pos
@@ -215,8 +223,8 @@ class MoveHandler:
 
     def _preparer_premouvement(self, depart, arrivee):
         plateau = self.chessboard
-        coups = [m for m in self._coups_depuis(depart, True)
-                 if m.to_square == arrivee]
+        coups = freestyle.coups_vers(plateau.board, self._coups_depuis(depart, True),
+                                     depart, arrivee)
         if not coups:
             self._annuler_selection()
             return False
@@ -228,8 +236,8 @@ class MoveHandler:
 
     def _jouer(self, from_square, to_square, engine, piece_promotion=None):
         plateau = self.chessboard
-        candidats = [m for m in plateau.board.legal_moves
-                     if m.from_square == from_square and m.to_square == to_square]
+        candidats = freestyle.coups_vers(plateau.board, list(plateau.board.legal_moves),
+                                         from_square, to_square)
         if not candidats:
             plateau.sounds.play("illegal")
             self._annuler_selection()

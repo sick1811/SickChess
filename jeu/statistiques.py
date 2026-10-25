@@ -15,6 +15,7 @@
 import os
 
 import chess
+import freestyle
 
 FAUTES = ("imprecision", "erreur", "gaffe", "manque")
 DEMI_COUPS_OUVERTURE = 20
@@ -26,7 +27,7 @@ def phase(fen, demi_coup):
     """'ouverture', 'milieu' ou 'finale' pour la position avant le coup."""
     if demi_coup < DEMI_COUPS_OUVERTURE:
         return "ouverture"
-    plateau = chess.Board(fen)
+    plateau = freestyle.plateau(fen)
     materiel = sum(v * len(plateau.pieces(p, c)) for p, v in VALEURS.items()
                    for c in (chess.WHITE, chess.BLACK))
     return "finale" if materiel <= MATERIEL_FINALE else "milieu"

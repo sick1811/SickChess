@@ -169,10 +169,9 @@ class ModeEnLigne:
         elif genre == "temps_ecoule":
             perdant = self.arbitre.temps_ecoule_annonce(message)
             if perdant is not None and not self.board.game_over:
-                gagnant = "0-1" if perdant == chess.WHITE else "1-0"
-                camp = "BLANCS" if perdant == chess.WHITE else "NOIRS"
-                self.board.terminer_partie("TEMPS ÉCOULÉ - les %s perdent au temps"
-                                           % camp, gagnant)
+                from rules import ChessRules
+                self.board.terminer_partie(*ChessRules.fin_au_temps(self.board.board,
+                                                                    perdant))
 
         elif genre == "nulle":
             action = message.get("action")

@@ -12,6 +12,7 @@
 # explication_puzzle.py) ; le meilleur coup vient de l'analyse Stockfish.
 
 import chess
+import freestyle
 
 import explication_puzzle as ep
 
@@ -113,7 +114,7 @@ def expliquer(fen_avant, joue_uci, meilleur_uci=None):
     """Une ou deux phrases. '' si on ne voit rien de clair (la pastille et
     « Il fallait jouer ... » suffisent alors)."""
     try:
-        plateau = chess.Board(fen_avant)
+        plateau = freestyle.plateau(fen_avant)
         joue = chess.Move.from_uci(joue_uci)
         if joue not in plateau.legal_moves:
             return ""

@@ -296,6 +296,20 @@ class StockfishEngine:
             print("ENGINE : ecriture impossible (" + str(e) + ")")
             return False
 
+    def envoyer_position(self, fen):
+        """« position fen ... », en passant Stockfish en règles Freestyle
+        (UCI_Chess960) quand la position en a besoin, et en le remettant en
+        règles normales sinon. En Freestyle, il note le roque « roi prend
+        tour » (b1a1), comme python-chess."""
+        import freestyle
+        libre = freestyle.est_freestyle_fen(fen)
+        if libre != getattr(self, "chess960_courant", False):
+            if self._option_existe("UCI_Chess960"):
+                self._send_command("setoption name UCI_Chess960 value %s"
+                                   % ("true" if libre else "false"))
+            self.chess960_courant = libre
+        return self._send_command("position fen " + fen)
+
     def interrompre(self):
         """24/10 : arrete TOUT DE SUITE la recherche en cours (« stop »), sans
         attendre qu'elle finisse. Le fil qui l'a lancee recoit son « bestmove »
@@ -678,7 +692,7 @@ class StockfishEngine:
             if not self.est_vivant():
                 return None
             try:
-                self._send_command("position fen " + fen)
+                self.envoyer_position(fen)
                 # 18/10 : les limites se cumulent, Stockfish s'arrete a la
                 # premiere atteinte (le temps reste un garde-fou).
                 commande = "go"
@@ -794,7 +808,7 @@ class StockfishEngine:
                 # V7.2 : niveau debutant - Stockfish classe, nous choisissons.
                 return self._coup_bride(fen, max_time_ms)
             try:
-                self._send_command("position fen " + fen)
+                self.envoyer_position(fen)
                 if self.profondeur_max:
                     self._send_command("go movetime %d depth %d"
                                        % (max_time_ms, self.profondeur_max))
@@ -835,7 +849,7 @@ class StockfishEngine:
         ([{coup, cp, mat, profondeur}, ...], coup_de_secours) ou (None, None)
         si le moteur n'a pas repondu. Le verrou doit deja etre pris.
         """
-        self._send_command("position fen " + fen)
+        self.envoyer_position(fen)
         self._send_command("go movetime %d depth %d"
                            % (max_time_ms, self.profondeur_max or 4))
         lignes = {}
