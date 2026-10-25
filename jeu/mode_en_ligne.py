@@ -20,6 +20,8 @@ import time
 
 import chess
 
+import freestyle
+
 from chat import Chat
 from pendule_reseau import PenduleReseau
 from revanche import Revanche
@@ -70,6 +72,8 @@ class ModeEnLigne:
         self._coups_a_la_proposition = -10
         self.partie_enregistree = False
         self.chemin_pgn = ""            # la partie dans parties/ (revue, Mes erreurs)
+        # Tournoi Freestyle : la preparation finit quand les deux sont prets.
+        board.quand_pret = lambda: self._envoyer({"type": "pret"})
 
     # ------------------------------------------------------------ boucle
 
@@ -109,8 +113,11 @@ class ModeEnLigne:
         maintenant = self._horloge()
         if maintenant - self._dernier_etat >= PERIODE_ETAT:
             self._dernier_etat = maintenant
-            self._envoyer({"type": "etat",
-                                    "nb": len(self.board.board.move_stack)})
+            etat = {"type": "etat", "nb": len(self.board.board.move_stack)}
+            preparation = getattr(self.board, "preparation", None)
+            if preparation is not None and "local" in preparation.prets:
+                etat["pret"] = True          # Tournoi Freestyle : renvoye au cas ou
+            self._envoyer(etat)
         paquet = self.arbitre.battement()
         if paquet is not None and not self.board.game_over:
             self._envoyer(paquet)
@@ -147,6 +154,9 @@ class ModeEnLigne:
         if message.get("partie", self.numero) != self.numero:
             return                      # reste d'une autre partie de la serie
 
+        if message.get("pret"):
+            self._adversaire_pret()
+
         if genre == "coups":
             self._recevoir_coups(message.get("coups") or [])
 
@@ -155,6 +165,9 @@ class ModeEnLigne:
                 self._envoyer_liste()           # il lui manque des coups
             elif int(message.get("nb", 0)) > len(self.board.board.move_stack):
                 self._envoyer({"type": "renvoyer"})
+
+        elif genre == "pret":
+            self._adversaire_pret()
 
         elif genre == "renvoyer":
             self._envoyer_liste()
@@ -198,6 +211,13 @@ class ModeEnLigne:
             if self.revanche.a_repondre():
                 self.afficher("%s demande une revanche." % self.nom_adverse, 15000)
 
+    def _adversaire_pret(self):
+        preparation = getattr(self.board, "preparation", None)
+        if preparation is not None and "adverse" not in preparation.prets:
+            preparation.pret("adverse")
+            if preparation.en_cours():
+                self.afficher("%s est prêt." % self.nom_adverse)
+
     def _recevoir_coups(self, recue):
         recue = [str(c) for c in recue][:600]
         locale = self._liste_locale()
@@ -229,6 +249,11 @@ class ModeEnLigne:
         """Bouton NULLE : accepte la proposition recue, sinon en propose une
         (au plus une fois tous les deux coups)."""
         if self.board.game_over:
+            return None
+        refus = freestyle.nulle_refusee(self.board.board,
+                                        getattr(self.board, "tournoi_fide", False))
+        if refus:
+            self.afficher(refus)
             return None
         if self.nulle_recue:
             self.nulle_recue = False

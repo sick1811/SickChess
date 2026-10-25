@@ -46,7 +46,7 @@ def est_freestyle_fen(fen):
         libre = chess.Board(fen, chess960=True)
     except ValueError:
         return False
-    return libre.castling_rights != classique.castling_rights
+    return libre.clean_castling_rights() != classique.clean_castling_rights()
 
 
 def plateau(fen=None):
@@ -88,3 +88,124 @@ def coups_vers(board, coups, depart, arrivee):
         return directs
     return [m for m in coups if m.from_square == depart and board.is_castling(m)
             and arrivee_du_roi(board, m) == arrivee]
+
+
+# ------------------------------------------------------------ tournoi FIDE
+#
+# Règlement du championnat du monde FIDE Freestyle 2026 : position tirée au
+# hasard, la 518 exclue, une position tirée ne revient pas ; position montrée
+# 10 minutes avant la partie ; pas de nulle avant le 40e coup des Noirs.
+
+PREPARATION_TOURNOI_S = 600
+COUP_MINI_POUR_NULLE = 40
+FICHIER_TIRAGES = "freestyle_tirages.json"
+
+
+def _chemin_tirages():
+    import os
+    import asset_manager
+    return os.path.join(asset_manager.dossier_ecriture(), FICHIER_TIRAGES)
+
+
+def positions_deja_tirees():
+    import json
+    try:
+        with open(_chemin_tirages(), "r", encoding="utf-8") as f:
+            deja = json.load(f)
+        return {int(n) for n in deja if 0 <= int(n) < NOMBRE_DE_POSITIONS}
+    except (OSError, ValueError, TypeError):
+        return set()
+
+
+def tirer_numero_tournoi():
+    """Comme tirer_numero(), sans jamais redonner une position déjà jouée en
+    tournoi. Quand les 959 y sont passées, on recommence à zéro."""
+    import json
+    deja = positions_deja_tirees()
+    libres = [n for n in range(NOMBRE_DE_POSITIONS)
+              if n != POSITION_CLASSIQUE and n not in deja]
+    if not libres:
+        deja, libres = set(), [n for n in range(NOMBRE_DE_POSITIONS)
+                               if n != POSITION_CLASSIQUE]
+    numero = random.choice(libres)
+    try:
+        with open(_chemin_tirages(), "w", encoding="utf-8") as f:
+            json.dump(sorted(deja | {numero}), f)
+    except OSError as souci:
+        print("[FREESTYLE] tirage non retenu : %s" % souci)
+    return numero
+
+
+def nulle_refusee(board, tournoi):
+    """Message si le règlement du tournoi interdit encore la nulle, sinon None."""
+    if tournoi and board.fullmove_number <= COUP_MINI_POUR_NULLE:
+        return "Tournoi Freestyle : pas de nulle avant le 40e coup des Noirs."
+    return None
+
+
+def libelle(numero, tournoi=False):
+    """« Freestyle n° 412 » (+ « - Tournoi Freestyle »), affiché pendant la partie."""
+    texte = "Freestyle n° %d" % int(numero)
+    return texte + "  -  Tournoi" if tournoi else texte
+
+
+class Preparation:
+    """Les minutes où l'on regarde la position avant de jouer (tournoi FIDE).
+
+    Personne ne joue tant qu'elle dure ; la pendule ne part qu'au premier coup.
+    Elle finit au bout du temps, ou quand chacun s'est dit prêt (`joueurs` =
+    nombre d'accords attendus : 1 contre l'ordinateur ou à deux sur ce PC,
+    2 en ligne).
+    """
+
+    def __init__(self, duree_s=PREPARATION_TOURNOI_S, joueurs=1, horloge=None):
+        import time
+        self._horloge = horloge or time.monotonic
+        self.fin = self._horloge() + float(duree_s)
+        self.joueurs = int(joueurs)
+        self.prets = set()
+
+    def reste_s(self):
+        return max(0.0, self.fin - self._horloge())
+
+    def en_cours(self):
+        return self.reste_s() > 0 and len(self.prets) < self.joueurs
+
+    def pret(self, qui="local"):
+        self.prets.add(qui)
+
+    def texte(self):
+        reste = int(self.reste_s() + 0.999)
+        return "Préparation : %s" % ("%d:%02d" % (reste // 60, reste % 60))
+
+
+def numero_de_depart(fen):
+    """Le numero (0-959) d'une position de depart Freestyle, sinon None."""
+    if not fen or not est_freestyle_fen(fen):
+        return None
+    try:
+        return plateau(fen).chess960_pos()
+    except ValueError:
+        return None
+
+
+def reglages_de_partie(reglages, fen_reprise=None):
+    """Les reglages du plateau pour UNE partie : tire la position Freestyle.
+
+    variante « normal » / « freestyle » (au hasard ou n° choisi) / « tournoi ».
+    Une partie reprise garde sa position (et ne refait pas la preparation).
+    """
+    reglages = dict(reglages or {})
+    variante = reglages.get("variante", "normal")
+    reglages["tournoi_fide"] = variante == "tournoi"
+    if fen_reprise:
+        reglages["freestyle"] = numero_de_depart(fen_reprise)
+        reglages["preparation_s"] = 0
+    elif variante == "tournoi":
+        reglages["freestyle"] = tirer_numero_tournoi()
+    elif variante == "freestyle":
+        reglages["freestyle"] = tirer_numero() if reglages.get("freestyle_hasard", True) \
+            else int(reglages.get("freestyle_numero", 0)) % NOMBRE_DE_POSITIONS
+    else:
+        reglages["freestyle"] = None
+    return reglages

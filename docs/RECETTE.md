@@ -79,6 +79,33 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
   → Le temps augmente de 3 s après chaque coup joué.
 - [ ] **R-043** – Partie « Sans limite »  
   → Les pendules affichent « --:-- » et ne bougent pas.
+- [ ] **R-150** – Partie à deux 1 min : capturer tout sauf le roi adverse, puis laisser TON temps tomber  
+  → « TEMPS ÉCOULÉ - mais l'adversaire ne peut plus mater : match nul » (règle FIDE 6.9).
+
+## Freestyle (échecs 960)
+
+- [ ] **R-151** – Réglages d'une partie : panneau VARIANTE  
+  → Deux modes seulement : Normal et Freestyle ; sous Freestyle : Au hasard / Choisir le n° / Tournoi.
+- [ ] **R-152** – Freestyle au hasard contre l'ordinateur, plusieurs parties  
+  → Pièces de la dernière rangée mélangées, Noirs en miroir ; « Freestyle n° … » en haut des coups ; jamais la position normale.
+- [ ] **R-153** – Freestyle, Choisir le n° : régler 518 puis 0 avec le curseur et − / +  
+  → N° 518 = position normale ; n° 0 = BBQNNRKR ; − sous 0 passe à 959.
+- [ ] **R-154** – Roquer en posant le roi sur sa tour (petit et grand roque)  
+  → Roi en g1 / c1, tour en f1 / d1, son du roque, « O-O » / « O-O-O » dans les coups, la tour ne compte pas comme prise.
+- [ ] **R-155** – Roquer en posant le roi sur g1 / c1 quand ce n'est pas un coup normal du roi  
+  → Le roque se joue ; si la case est un coup normal du roi, c'est un coup normal.
+- [ ] **R-156** – Roque où seul le roi bouge, puis où seule la tour bouge  
+  → Animation juste : seule la pièce qui change de case glisse.
+- [ ] **R-157** – L'ordinateur roque en Freestyle ; indice H au moment d'un roque possible  
+  → Ses coups sont toujours légaux, la partie ne bloque jamais.
+- [ ] **R-158** – Revue et « Mes parties » d'une partie Freestyle  
+  → La revue rejoue la partie (roques compris), pastilles présentes, aucun nom d'ouverture ; PGN : [Variant "Chess960"], [SetUp], [FEN].
+- [ ] **R-159** – Freestyle → Tournoi, contre l'ordinateur  
+  → Cadence 10 min + 5 s, bandeau « Préparation : 10:00 », on ne peut pas jouer ; « Je suis prêt » (ou Espace) lance la partie.
+- [ ] **R-160** – Tournoi : Échap → Proposer la nulle avant le 40e coup des Noirs  
+  → Refusée : « Tournoi Freestyle : pas de nulle avant le 40e coup des Noirs. »
+- [ ] **R-161** – Menu en pleine partie Freestyle, puis Reprendre  
+  → Même position Freestyle, même numéro, le roque marche encore.
 
 ## Pendant la partie
 
@@ -268,6 +295,10 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 24/10
   → Message clair « Ouvre Steam… », le jeu ne plante pas.
 - [ ] **R-101** – Lancer le jeu deux fois : Test : héberger / Test : rejoindre  
   → Les deux fenêtres se connectent, la partie démarre.
+- [ ] **R-162** – Salon : VARIANTE Freestyle (Au hasard puis Tournoi), lancer  
+  → L'ami voit « Variante : Freestyle » ; même position chez les deux ; en Tournoi, la préparation finit quand les deux ont cliqué « Je suis prêt ».
+- [ ] **R-163** – Revanche après une partie Freestyle en ligne  
+  → Même position, couleurs inversées, sans nouvelle préparation.
 - [ ] **R-102** – Avec un ami (deux PC) : inviter, choisir cadence et couleur, jouer  
   → Coups, pendules et chat synchronisés ; overlay Maj+Tab.
 - [ ] **R-104** – En ligne : bouton NULLE (à la place de MENU), l'ami accepte avec son bouton NULLE  

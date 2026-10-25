@@ -603,4 +603,29 @@ EN = {
     "Ordinateur (%s)": "Computer (%s)",
     "Contre l'ordinateur": "Against the computer",
     "Partir d'une position chargée (FEN ou PGN)": "Start from a loaded position (FEN or PGN)",
+
+    # --- Freestyle (echecs 960) et tournoi FIDE (25/10)
+    "VARIANTE": "VARIANT", "Freestyle": "Freestyle", "Freestyle (tournoi)": "Freestyle (tournament)",
+    "Les échecs classiques (règles FIDE), position de départ habituelle.":
+        "Classical chess (FIDE rules), the usual starting position.",
+    "Choisir le n°": "Pick the number", "N° %d": "No. %d",
+    "Freestyle n° %d": "Freestyle No. %d", "Variante : %s": "Variant: %s",
+    "Règlement FIDE Freestyle : position au hasard, jamais la même, 10 min de préparation, "
+    "pas de nulle avant le 40e coup des Noirs.":
+        "FIDE Freestyle rules: random position, never the same twice, 10 min of preparation, "
+        "no draw before Black's 40th move.",
+    "Pièces de la dernière rangée mélangées (échecs 960). Pour roquer, pose le roi sur sa tour.":
+        "Back-rank pieces shuffled (Chess960). To castle, drop the king on its rook.",
+    "Tournoi Freestyle : pas de nulle avant le 40e coup des Noirs.":
+        "Freestyle tournament: no draw before Black's 40th move.",
+    "Préparation : %s": "Preparation: %s", "Je suis prêt": "I'm ready",
+    "Regarde la position. La pendule part au premier coup.":
+        "Study the position. The clock starts on the first move.",
+    "Prêt : on attend ton adversaire...": "Ready: waiting for your opponent...",
+    "%s est prêt.": "%s is ready.",
+    "FREESTYLE (échecs 960)": "FREESTYLE (Chess960)", "Roi posé sur sa tour": "King dropped on its rook",
+    "Roquer (aussi : roi posé en g1 / c1 si ce n'est pas un coup normal)":
+        "Castle (also: king dropped on g1 / c1 when that is not a normal move)",
+    "Espace / Entrée": "Space / Enter",
+    "Tournoi : « Je suis prêt », fin de la préparation": "Tournament: \"I'm ready\", ends the preparation",
 }

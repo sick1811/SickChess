@@ -22,6 +22,7 @@ import pygame
 
 import apparence
 import design
+import freestyle
 import steam as module_steam
 import ui
 from reseau_transport import TransportLocal, TransportSteam
@@ -30,6 +31,12 @@ MODE_TEST = True
 
 CADENCES = [(3, 2), (5, 3), (10, 5), (15, 10), (30, 0), (0, 0)]
 COULEURS = [("blanc", "Blancs"), ("hasard", "Au hasard"), ("noir", "Noirs")]
+# Deux modes, Normal (regles FIDE) et Freestyle ; « Tournoi » = Freestyle joue
+# au reglement du championnat FIDE Freestyle.
+VARIANTES = [("normal", "Normal"), ("freestyle", "Freestyle")]
+FACONS_960 = [("freestyle", "Au hasard"), ("tournoi", "Tournoi")]
+NOMS_VARIANTES = {"normal": "Normal", "freestyle": "Freestyle",
+                  "tournoi": "Freestyle (tournoi)"}
 DELAI_STEAM = 20.0
 
 MESSAGES_ENTREE = {
@@ -38,6 +45,15 @@ MESSAGES_ENTREE = {
     6: "Tu ne peux pas entrer dans cette partie.",
     7: "Ton compte Steam est limite : les salons lui sont fermes.",
 }
+
+
+def _numero_valide(numero):
+    """Numero Freestyle recu par le reseau : 0 a 959, sinon partie normale."""
+    try:
+        numero = int(numero)
+    except (TypeError, ValueError):
+        return None
+    return numero if 0 <= numero < freestyle.NOMBRE_DE_POSITIONS else None
 
 
 def libelle_cadence(minutes, increment):
@@ -70,6 +86,9 @@ class SalonEnLigne:
         self.cadence = (minutes, increment) if (minutes, increment) in CADENCES \
             else (10, 5)
         self.couleur = "hasard"
+        self.variante = self.config.get("variante", "normal")
+        if self.variante not in NOMS_VARIANTES:
+            self.variante = "normal"
         self.reglages_hote = None       # vus par l'invite
         self._dernier_envoi_salon = 0.0
 
@@ -193,7 +212,8 @@ class SalonEnLigne:
         self._dernier_envoi_salon = maintenant
         self.transport.envoyer({"type": "salon", "minutes": self.cadence[0],
                                 "increment": self.cadence[1],
-                                "couleur_hote": self.couleur})
+                                "couleur_hote": self.couleur,
+                                "variante": self.variante})
 
     def lancer(self):
         """L'hote lance la partie."""
@@ -202,8 +222,11 @@ class SalonEnLigne:
         couleur = self.couleur
         if couleur == "hasard":
             couleur = random.choice(["blanc", "noir"])
+        # Freestyle : l'hote tire la position, les deux jouent la meme.
+        reglages = freestyle.reglages_de_partie({"variante": self.variante})
         message = {"type": "debut", "minutes": self.cadence[0],
-                   "increment": self.cadence[1], "couleur_hote": couleur}
+                   "increment": self.cadence[1], "couleur_hote": couleur,
+                   "variante": self.variante, "freestyle": reglages["freestyle"]}
         self.transport.envoyer(message)
         if self.salon:
             self.steam.fermer_salon(self.salon)
@@ -216,6 +239,10 @@ class SalonEnLigne:
             "increment": int(message.get("increment", 0) or 0),
             "pendule_active": minutes > 0,
             "couleur_locale": couleur_locale,
+            "variante": message.get("variante", "normal"),
+            "freestyle": _numero_valide(message.get("freestyle")),
+            "tournoi_fide": message.get("variante") == "tournoi",
+            "joueurs_preparation": 2,
         })
 
     def _suivre_salon(self):
@@ -344,6 +371,11 @@ class SalonEnLigne:
             self._envoyer_reglages(force=True)
         elif cle.startswith("couleur:"):
             self.couleur = cle.split(":")[1]
+            self._envoyer_reglages(force=True)
+        elif cle.startswith("variante:") or cle.startswith("facon:"):
+            self.variante = cle.split(":")[1]
+            if self.variante == "tournoi":
+                self.cadence = (10, 5)      # cadence de poule FIDE Freestyle 2026
             self._envoyer_reglages(force=True)
         elif cle.startswith("invitation:"):
             import invitations
@@ -515,6 +547,20 @@ class SalonEnLigne:
                         (x0 + i * (l_puce + 8), y, l_puce, 38),
                         selectionne=cle == self.couleur, taille=15)
             y += 58
+            ui.texte(ecran, "VARIANTE", x0, y, 13, t["texte_discret"], gras=True)
+            y += 22
+            for i, (cle, libelle) in enumerate(VARIANTES):
+                self._b("variante:" + cle, libelle,
+                        (x0 + i * (l_puce + 8), y, l_puce, 38),
+                        selectionne=cle == ("normal" if self.variante == "normal"
+                                            else "freestyle"), taille=15)
+            if self.variante != "normal":
+                for i, (cle, libelle) in enumerate(FACONS_960):
+                    self._b("facon:" + cle, libelle,
+                            (x0 + i * (l_puce + 8), y + 46, l_puce, 38),
+                            selectionne=cle == self.variante, taille=15)
+                y += 46
+            y += 58
             self._b("lancer", "Lancer la partie" if tr.connecte()
                     else "En attente de ton ami...",
                     (x0, y, gauche - 10, 54), tr.connecte(), taille=20)
@@ -540,6 +586,7 @@ class SalonEnLigne:
                 lignes = ["Cadence : %s" % libelle_cadence(int(r.get("minutes", 0)),
                                                           int(r.get("increment", 0))),
                           "Ta couleur : %s" % couleur,
+                          "Variante : %s" % NOMS_VARIANTES.get(r.get("variante"), "Normal"),
                           "",
                           "%s va lancer la partie." % (tr.nom_adverse or "L'hôte")]
                 for ligne in lignes:

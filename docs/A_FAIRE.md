@@ -207,6 +207,15 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t110 (42) : **Freestyle** (Fonctionne / Ne fonctionne pas + commentaire) :
+      a) Partie contre l'ordinateur → panneau VARIANTE : Normal / Freestyle ; Freestyle → Au hasard : pièces
+         mélangées, « Freestyle n° … » au-dessus des coups ; b) roquer en posant le roi SUR sa tour, puis en le
+         posant sur g1 / c1 ; c) Choisir le n° → 518 = position normale ; d) Freestyle → Tournoi : 10 min + 5 s,
+         « Préparation : 10:00 », « Je suis prêt » ; Échap → nulle refusée avant le 40e coup des Noirs ;
+         e) revue de la partie (roques rejoués) et Mes parties ; f) en ligne avec un ami : Freestyle, même position
+         chez les deux, revanche = même position couleurs inversées ; g) à deux sur ce PC en Freestyle.
+- [ ] t111 (42) : **chute au temps sans matériel de mat** : partie à deux 1 min, prends tout sauf le roi adverse,
+      laisse TON temps tomber : « TEMPS ÉCOULÉ - mais l'adversaire ne peut plus mater : match nul ».
 - [ ] t109 (41) : **Signaler dans la n° 7** : Menu → Signaler → un bug, puis une idée : ils arrivent dans ton salon
       Discord en rouge / vert, avec la version 0.3.0.
 - [ ] t108 (41) : **revue plus fiable** : fais deux revues à la suite (dont une partie finie par un mat rapide), et une

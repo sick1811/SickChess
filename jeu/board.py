@@ -55,6 +55,15 @@ class ChessBoard:
             self.board = freestyle.plateau_de_depart(self.numero_freestyle)
         else:
             self.board = chess.Board()
+        # Freestyle, reglement de tournoi : pas de nulle avant le 40e coup des Noirs
+        # et quelques minutes pour regarder la position avant de jouer.
+        self.tournoi_fide = bool(self.reglages.get("tournoi_fide"))             and self.numero_freestyle is not None
+        self.preparation = None
+        duree = self.reglages.get("preparation_s", freestyle.PREPARATION_TOURNOI_S)
+        if self.tournoi_fide and duree:
+            self.preparation = freestyle.Preparation(
+                duree, self.reglages.get("joueurs_preparation", 1))
+        self.bouton_pret = None
         from effets import Effets
         self.effets = Effets()           # 17/10 (p13) : onde de prise, mat
         self.selected_square = None
@@ -217,9 +226,64 @@ class ChessBoard:
 
     def draw(self):
         self.renderer.draw()
+        if self.en_preparation():
+            self._dessiner_preparation()
 
     def handle_event(self, event, engine=None):
+        if self.en_preparation():
+            self._evenement_preparation(event)
+            return
         self.input.handle_event(event, engine or self.engine)
+
+    # ------------------------------------------------------ preparation (FIDE)
+
+    def en_preparation(self):
+        return self.preparation is not None and not self.game_over             and self.preparation.en_cours()
+
+    def _evenement_preparation(self, event):
+        """Pendant la preparation, on ne joue pas : seul « Je suis prêt »
+        (clic, Entree ou Espace) compte."""
+        import pygame
+        touche = event.type == pygame.KEYDOWN and event.key in (
+            pygame.K_SPACE, pygame.K_RETURN, pygame.K_KP_ENTER)
+        clic = (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1
+                and self.bouton_pret is not None
+                and self.bouton_pret.contient(event.pos))
+        if self.bouton_pret is not None and event.type == pygame.MOUSEMOTION:
+            self.bouton_pret.maj_survol(event.pos)
+        if (touche or clic) and "local" not in self.preparation.prets:
+            self.preparation.pret("local")
+            rappel = getattr(self, "quand_pret", None)
+            if rappel is not None:
+                rappel()
+
+    def _dessiner_preparation(self):
+        import ui
+        d = self.disposition
+        ech = ui.echelle(self.screen)
+        t = apparence.theme(self.theme_plateau)
+        zone = (d.plateau_x, d.plateau_y, d.cote_plateau, d.cote_plateau)
+        hauteur = int(150 * ech)
+        bandeau = (zone[0] + int(20 * ech), zone[1] + (zone[3] - hauteur) // 2,
+                   zone[2] - int(40 * ech), hauteur)
+        ui.cadre(self.screen, bandeau, t.get("fond"), t.get("accent"), 2, 12)
+        x, y, largeur, _ = bandeau
+        ui.texte(self.screen, self.preparation.texte(), x + largeur // 2,
+                 y + int(14 * ech), ui.t(26, ech), t.get("texte"), gras=True,
+                 ancre="centre", mono=True, largeur_max=largeur - 20)
+        attente = "local" in self.preparation.prets
+        ui.texte(self.screen, "Prêt : on attend ton adversaire..." if attente
+                 else "Regarde la position. La pendule part au premier coup.",
+                 x + largeur // 2, y + int(52 * ech), ui.t(15, ech),
+                 t.get("texte_discret"), ancre="centre", largeur_max=largeur - 20)
+        if self.bouton_pret is None:
+            self.bouton_pret = ui.Bouton((0, 0, 10, 10), "Je suis prêt", "pret")
+        l_bouton = min(largeur - 40, int(240 * ech))
+        self.bouton_pret.placer((x + (largeur - l_bouton) // 2,
+                                 y + hauteur - int(58 * ech), l_bouton, int(44 * ech)))
+        self.bouton_pret.taille = ui.t(18, ech)
+        self.bouton_pret.actif = not attente
+        self.bouton_pret.dessiner(self.screen, t)
 
     # ------------------------------------------------------ premouvement / indice
 

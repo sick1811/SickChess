@@ -101,6 +101,17 @@ RYTHMES = [
     ("Posé", "pose", 1500, 9000, 2500),
 ]
 
+# Deux modes (ta demande du 25/10 : « FIDE = normal, freestyle = freestyle »).
+# Le reglement de tournoi est une facon de jouer le Freestyle.
+VARIANTES = [("Normal", "normal"), ("Freestyle", "freestyle")]
+POSITIONS_960 = [("Au hasard", "hasard"), ("Choisir le n°", "choisir"),
+                 ("Tournoi", "tournoi")]
+TEXTE_NORMAL = "Les échecs classiques (règles FIDE), position de départ habituelle."
+TEXTE_TOURNOI = ("Règlement FIDE Freestyle : position au hasard, jamais la même, "
+                 "10 min de préparation, pas de nulle avant le 40e coup des Noirs.")
+TEXTE_FREESTYLE = ("Pièces de la dernière rangée mélangées (échecs 960). Pour roquer, "
+                   "pose le roi sur sa tour.")
+
 DESCRIPTIONS = [
     (600, "Laisse des pièces en prise. Pour apprendre les règles."),
     (1000, "Joue des coups corrects mais rate les tactiques."),
@@ -164,6 +175,9 @@ def enregistrer_config(reglages):
     config["ia_temps_moteur_max_ms"] = reglages["ia_temps_moteur_max_ms"]
     config["ia_temps_humain"] = reglages["ia_temps_humain"]
     config["hotseat_retourner_plateau"] = reglages.get("retourner_plateau", False)
+    config["variante"] = reglages.get("variante", "normal")
+    config["freestyle_hasard"] = bool(reglages.get("freestyle_hasard", True))
+    config["freestyle_numero"] = int(reglages.get("freestyle_numero", 0))
     try:
         with open(_chemin_config(), "w", encoding="utf-8") as f:
             json.dump(config, f, indent=4, ensure_ascii=False)
@@ -309,6 +323,12 @@ class SettingsScreen:
         self.retourner_plateau = bool(config.get("hotseat_retourner_plateau", True))
         self.charger_position = False
         self.retenir = False
+        # Freestyle (echecs 960) : variante, tirage au hasard ou numero choisi.
+        self.variante = config.get("variante", "normal")
+        if self.variante not in ("normal", "freestyle", "tournoi"):
+            self.variante = "normal"
+        self.freestyle_hasard = bool(config.get("freestyle_hasard", True))
+        self.freestyle_numero = max(0, min(959, int(config.get("freestyle_numero", 0) or 0)))
 
         self.running = True
         self.resultat = None
@@ -347,6 +367,12 @@ class SettingsScreen:
         self.chips_plateau = [Chip(0, 0, 10, 10, "Plateau fixe", False),
                               Chip(0, 0, 10, 10, "Il tourne à chaque coup", True)]
         self.slider = Slider(0, 0, 100, 100, 3200, 25, self.elo)
+        self.chips_variante = [Chip(0, 0, 10, 10, libelle, valeur)
+                               for libelle, valeur in VARIANTES]
+        self.chips_position = [Chip(0, 0, 10, 10, libelle, valeur)
+                               for libelle, valeur in POSITIONS_960]
+        self.chips_pas_960 = [Chip(0, 0, 10, 10, "-", -1), Chip(0, 0, 10, 10, "+", 1)]
+        self.slider_960 = Slider(0, 0, 100, 0, 959, 1, self.freestyle_numero)
         self.btn_commencer = _Bouton("Commencer la partie", primaire=True)
         self.btn_retour = _Bouton("Retour au menu")
         self.case_retenir = pygame.Rect(0, 0, 22, 22)
@@ -513,10 +539,42 @@ class SettingsScreen:
             self.pos_resume_temps = pygame.Rect(x_int_d, y, interieur_d,
                                                 h_ligne * 2)
 
+        # ---- panneau VARIANTE (Normal / Freestyle)
+        self.panneau_variante = None
+        if self.mode in ("stockfish", "hotseat"):
+            h_petite = int(34 * ech)
+            hauteur_variante = (h_section + h_chip + int(10 * ech) + h_petite
+                                + int(10 * ech) + h_petite + int(16 * ech))
+            if droite.reste() >= hauteur_variante:
+                self.panneau_variante = droite.bloc(hauteur_variante)
+            if self.panneau_variante is not None:
+                y = self.panneau_variante.y + int(10 * ech)
+                self.titre_variante = (x_int_d, y)
+                y += h_section
+                self._grille(self.chips_variante, x_int_d, y, interieur_d, h_chip,
+                             ecart, int(90 * ech))
+                y += h_chip + int(10 * ech)
+                self.rect_texte_variante = pygame.Rect(x_int_d, y, interieur_d,
+                                                       2 * h_petite + int(10 * ech))
+                self._grille(self.chips_position, x_int_d, y, interieur_d, h_petite,
+                             ecart, int(110 * ech))
+                y += h_petite + int(10 * ech)
+                l_pas = int(36 * ech)
+                l_numero = ui.mesurer("N° 000", ui.t(18, ech), gras=True, mono=True)[0] + int(16 * ech)
+                self.pos_numero_960 = (x_int_d, y + (h_petite - ui.t(18, ech)) // 2 - 2)
+                x_curseur = x_int_d + l_numero
+                largeur_curseur = max(40, interieur_d - l_numero - 2 * l_pas - 2 * ecart)
+                self.slider_960.placer((x_curseur, y + (h_petite - int(26 * ech)) // 2,
+                                        largeur_curseur, int(26 * ech)))
+                self.chips_pas_960[0].placer((x_curseur + largeur_curseur + ecart, y,
+                                              l_pas, h_petite))
+                self.chips_pas_960[1].placer((x_curseur + largeur_curseur + 2 * ecart
+                                              + l_pas, y, l_pas, h_petite))
+
         # LE CORRECTIF DU QUART DE FENETRE VIDE : le dernier panneau de chaque
         # colonne s'etire jusqu'a la bande du bas au lieu de flotter en haut.
         mep.etirer([self.panneau_niveau, self.panneau_rythme], bas)
-        mep.etirer([self.panneau_temps], bas)
+        mep.etirer([self.panneau_temps, self.panneau_variante], bas)
 
         self.x_int_g, self.x_int_d, self.interieur = x_int_g, x_int_d, interieur
         self.interieur_d = interieur_d
@@ -534,7 +592,13 @@ class SettingsScreen:
             chip.actif = (chip.valeur == self.rythme)
         for chip in self.chips_plateau:
             chip.actif = (chip.valeur == self.retourner_plateau)
+        for chip in self.chips_variante:
+            chip.actif = (chip.valeur == ("normal" if self.variante == "normal"
+                                          else "freestyle"))
+        for chip in self.chips_position:
+            chip.actif = (chip.valeur == self._facon_960())
         self.slider.valeur = self.elo
+        self.slider_960.valeur = self.freestyle_numero
 
     # ------------------------------------------------------------------ resultat
 
@@ -553,6 +617,9 @@ class SettingsScreen:
             "retourner_plateau": self.retourner_plateau,
             "charger_position": self.charger_position,
             "elo_suit_profil": self.suivre_profil,
+            "variante": self.variante,
+            "freestyle_hasard": self.freestyle_hasard,
+            "freestyle_numero": self.freestyle_numero,
         }
 
     def _description(self):
@@ -585,6 +652,11 @@ class SettingsScreen:
             self.elo = self.slider.valeur
             self.suivre_profil = False      # choix manuel : on ne suit plus le profil
             self._synchroniser_chips()
+            return
+
+        if self._choix_du_numero() and event.type != pygame.KEYDOWN \
+                and self.slider_960.handle_event(event):
+            self.freestyle_numero = self.slider_960.valeur
             return
 
         if event.type == pygame.KEYDOWN:
@@ -633,6 +705,9 @@ class SettingsScreen:
                     self.increment = chip.valeur
                     self._synchroniser_chips()
                     return
+            if self.panneau_variante is not None and self._clic_variante(event.pos):
+                self._synchroniser_chips()
+                return
             if self.zone_retenir.collidepoint(event.pos):
                 self.retenir = not self.retenir
                 return
@@ -646,8 +721,50 @@ class SettingsScreen:
                 self.running = False
                 return
 
+    def _facon_960(self):
+        """« hasard », « choisir » ou « tournoi » (Freestyle seulement)."""
+        if self.variante == "tournoi":
+            return "tournoi"
+        return "hasard" if self.freestyle_hasard else "choisir"
+
+    def _choix_du_numero(self):
+        return (self.panneau_variante is not None and self.variante == "freestyle"
+                and not self.freestyle_hasard)
+
+    def _clic_variante(self, pos):
+        """Clic dans le panneau VARIANTE. True s'il a servi."""
+        for chip in self.chips_variante:
+            if chip.clique(pos):
+                if chip.valeur == "normal" or self.variante == "normal":
+                    self.variante = chip.valeur
+                return True
+        if self.variante == "normal":
+            return False
+        for chip in self.chips_position:
+            if chip.clique(pos):
+                if chip.valeur == "tournoi":
+                    self.variante = "tournoi"
+                    # Cadence de la poule du championnat FIDE Freestyle 2026.
+                    self.minutes, self.increment = 10, 5
+                else:
+                    self.variante = "freestyle"
+                    self.freestyle_hasard = chip.valeur == "hasard"
+                return True
+        if self._choix_du_numero():
+            for chip in self.chips_pas_960:
+                if chip.clique(pos):
+                    self.freestyle_numero = (self.freestyle_numero + chip.valeur) % 960
+                    return True
+        return False
+
     def _toutes_les_chips(self):
         chips = list(self.chips_duree) + list(self.chips_increment)
+        if self.panneau_variante is not None:
+            chips += list(self.chips_variante)
+            if self.variante != "normal":
+                chips += list(self.chips_position)
+                if self._choix_du_numero():
+                    chips += list(self.chips_pas_960)
         if self.afficher_niveau:
             chips += list(self.chips_niveau) + list(self.chips_rythme)
         if self.mode == "hotseat":
@@ -783,6 +900,32 @@ class SettingsScreen:
                                                                   self.increment)
             ui.paragraphe(self.screen, info, self.pos_resume_temps,
                           ui.t(15, ech), TEXTE)
+
+        # ---- variante
+        self._panneau(self.panneau_variante, "VARIANTE",
+                      getattr(self, "titre_variante", (0, 0)))
+        if self.panneau_variante is not None:
+            for chip in self.chips_variante:
+                chip.draw(self.screen)
+            if self.variante != "normal":
+                for chip in self.chips_position:
+                    chip.draw(self.screen)
+                if self.variante == "tournoi" or self.freestyle_hasard:
+                    zone = pygame.Rect(self.pos_numero_960[0], self.pos_numero_960[1],
+                                       self.interieur_d,
+                                       self.panneau_variante.bottom - self.pos_numero_960[1])
+                    ui.paragraphe(self.screen, TEXTE_TOURNOI if self.variante == "tournoi"
+                                  else TEXTE_FREESTYLE, zone, ui.t(14, ech), DISCRET)
+                else:
+                    ui.texte(self.screen, "N° %d" % self.freestyle_numero,
+                             self.pos_numero_960[0], self.pos_numero_960[1],
+                             ui.t(18, ech), TEXTE, gras=True, mono=True)
+                    self.slider_960.draw(self.screen)
+                    for chip in self.chips_pas_960:
+                        chip.draw(self.screen)
+            else:
+                ui.paragraphe(self.screen, TEXTE_NORMAL, self.rect_texte_variante,
+                              ui.t(15, ech), DISCRET)
 
         # ---- cases a cocher et boutons
         self._case_a_cocher(self.case_retenir, self.retenir, "Retenir ces réglages")

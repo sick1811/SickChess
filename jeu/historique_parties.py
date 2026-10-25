@@ -90,11 +90,13 @@ def enregistrer(move_history, blancs="Blancs", noirs="Noirs", resultat="*",
                 entetes.append(("Variant", "Chess960"))
             entetes.append(("SetUp", "1"))
             entetes.append(("FEN", fen))
-    # Ouverture : les deux etiquettes normalisees ECO et Opening.
+    # Ouverture : les deux etiquettes normalisees ECO et Opening (seulement
+    # depuis la position normale : pas en Freestyle ni depuis une position chargee).
     try:
+        import chess
         import ouvertures
-        for cle, valeur in sorted(ouvertures.entetes_pgn(
-                list(getattr(move_history, "sans", []) or [])).items()):
+        sans = list(getattr(move_history, "sans", []) or [])             if not fen or fen == chess.STARTING_FEN else []
+        for cle, valeur in sorted(ouvertures.entetes_pgn(sans).items()):
             entetes.append((cle, valeur))
     except Exception as souci:
         print("[HISTORIQUE] ouverture non reconnue : %s" % souci)

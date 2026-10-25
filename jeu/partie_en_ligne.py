@@ -198,6 +198,9 @@ def lancer(manager):
                 return "menu"
             numero += 1
             reglages = dict(reglages)
+            # Revanche : meme position Freestyle, couleurs inversees, sans
+            # nouvelle preparation (on connait deja la position).
+            reglages["preparation_s"] = 0
             reglages["couleur_locale"] = ("noir" if reglages["couleur_locale"] == "blanc"
                                           else "blanc")
     finally:

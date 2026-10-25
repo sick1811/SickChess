@@ -18,6 +18,7 @@ import pygame
 
 import analyse_partie
 import apparence
+import freestyle
 import invitations
 import sauvegarde
 import mise_a_jour
@@ -487,7 +488,10 @@ class GameManager:
         import musique
         musique.arreter()                   # jamais de musique en partie
         """Cree le plateau et le mode avec self.reglages. False = echec."""
-        self.board = ChessBoard(self.screen, self.reglages, self.disposition)
+        reprise = self.reprise
+        reglages_plateau = freestyle.reglages_de_partie(
+            self.reglages, reprise.get("fen_initiale") if reprise else None)
+        self.board = ChessBoard(self.screen, reglages_plateau, self.disposition)
         self._appliquer_preferences(self.board)
         self.board.competitive = False
         self.board.end_screen = EcranFin(self.board, self.game_mode)
@@ -706,6 +710,9 @@ class GameManager:
             self._appliquer_preferences(self.board)
             self.pause.screen = self.screen
             self.pause.theme_plateau = self.board.theme_plateau
+        elif action == "nulle" and freestyle.nulle_refusee(
+                self.board.board, getattr(self.board, "tournoi_fide", False)):
+            self.pause.message = freestyle.nulle_refusee(self.board.board, True)
         elif action == "nulle":
             if self.game_mode == "hotseat":
                 self.pause.fermer()

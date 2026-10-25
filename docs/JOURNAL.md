@@ -1565,3 +1565,40 @@ Fait :
   Pas besoin de retirer les anciennes règles : l'installeur normal les retire et les refait lui-même.
 - [ ] t106 (suite) : jouer en ligne avec un ami sur un Wi-Fi public.
 - [ ] t105, t107, t108, t109, t104, t103 ; R-117 (à la n° 8), R-119.
+
+
+## 25/10/2026 (42) – Règles officielles protégées, chute au temps (FIDE 6.9), mode Freestyle (Claude Code)
+Fait :
+- **Règles intouchables** : bloc dans CLAUDE.md (« Décisions à respecter »), dans l'agent `correcteur` et la skill
+  `menage-code` : mat, pat, matériel insuffisant, position morte, 3 / 5 répétitions, 50 / 75 coups, chute au temps,
+  roque, prise en passant, promotion, dans tous les modes ; un test de règle ne se supprime jamais.
+- `tests/test_regles.py` (rapide, 41 contrôles) : une vérification par règle FIDE (FEN précises : pat, mat au 75e
+  coup qui l'emporte, R+2C contre R pas nul, b1 attaquée au grand roque, en passant trop tard / cloué, 4 promotions…).
+- **Chute au temps (6.9)** : rouge d'abord, puis corrigé hors ligne (`board.update`) et en ligne
+  (`mode_en_ligne`, message « temps_ecoule ») par `ChessRules.fin_au_temps` : nulle si l'adversaire n'a plus de
+  quoi mater (roi seul, roi + fou, roi + cavalier). Roi + 2 cavaliers, ou roi + cavalier contre roi + tour : défaite
+  (un mat reste possible). Limite connue : les positions mortes à pions bloqués ne sont pas détectées (comme Lichess).
+- **Mode Freestyle (échecs 960)** – `jeu/freestyle.py`. Demande de Julien : deux modes seulement, **Normal (règles
+  FIDE) et Freestyle** ; sous Freestyle : Au hasard (jamais la 518) / Choisir le n° (curseur 0-959, − / +) /
+  Tournoi (règlement FIDE Freestyle 2026 : 518 exclue, position jamais rejouée – `freestyle_tirages.json` dans le
+  dossier de données –, 10 min de préparation avec « Je suis prêt », pas de nulle avant le 40e coup des Noirs,
+  cadence 10 + 5 proposée). Ordinateur, à deux et en ligne (l'hôte tire la position et l'envoie ; revanche = même
+  position, couleurs inversées, sans préparation ; en ligne la préparation finit quand les deux sont prêts).
+- Roque : roi posé sur sa tour (Lichess), ou sur g1 / c1 si ce n'est pas un coup normal du roi ; roi et tour
+  glissent chacun vers leur case ; la tour n'est plus comptée comme prise. Numéro affiché au-dessus des coups,
+  ouvertures coupées (livre, noms, en-têtes PGN). PGN : [Variant "Chess960"], [SetUp], [FEN].
+- Relecture : toute position relue passe par `freestyle.plateau(fen)` (revue, analyse, analyse libre, Mes erreurs,
+  sauvegarde, PGN) – `chess.Board(fen)` perd le roque Freestyle. Stockfish passe seul en `UCI_Chess960`
+  (`engine.envoyer_position`, aussi l'analyse continue).
+- Tests : `tests/test_freestyle.py` (rapide : 960 positions bien formées et toutes différentes, 4 formes de roque,
+  roque gêné / interdit, roque au 1er coup possible, souris, animation, PGN, préparation, écrans) et
+  `tests/test_freestyle_moteur.py` (Stockfish joue 120 coups Freestyle légaux avec roques, revue complète).
+- Aide F1 (section FREESTYLE), textes anglais, recette R-150 à R-163.
+
+- Suite complète : 1421 contrôles verts, sauf `test_analyse_de_fond.py` (« les deux revues sont prêtes (240 s) »,
+  6 échecs) – **rouge aussi sur le code d'avant cette séance** (vérifié dans une copie propre à d68fef8) : défaut
+  déjà là, pas lié au Freestyle. Version amis NON publiée tant qu'il reste rouge.
+
+À vérifier par Julien :
+- [ ] t110 (Freestyle, tous les modes) et t111 (chute au temps) dans « À tester par Julien ».
+

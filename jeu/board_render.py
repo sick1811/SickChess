@@ -470,6 +470,18 @@ class BoardRender:
         plateau = self.chessboard
         if zone.height < int(20 * ech):
             return 0
+        numero = getattr(plateau, "numero_freestyle", None)
+        if numero is not None:
+            # Freestyle : pas de theorie d'ouverture, on montre le numero de
+            # la position de depart a la place.
+            import freestyle
+            taille = ui.t(12, ech)
+            ui.texte(plateau.screen,
+                     freestyle.libelle(numero, getattr(plateau, "tournoi_fide", False)),
+                     zone.x + int(8 * ech), zone.y, taille,
+                     t.get("accent", (200, 165, 90)),
+                     largeur_max=zone.width - int(16 * ech))
+            return ui.police(taille).get_height() + int(4 * ech)
         historique = getattr(plateau, "move_history", None)
         sans = list(getattr(historique, "sans", [])) if historique else []
         if not sans:

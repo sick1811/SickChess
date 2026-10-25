@@ -118,7 +118,9 @@ class ModeStockfish:
         return chess.WHITE if self.ia_joue_blancs else chess.BLACK
 
     def cest_le_tour_de_lia(self):
-        return (not self.board.game_over) and self.board.board.turn == self.couleur_ia()
+        # Freestyle, reglement de tournoi : l'ordinateur attend la fin de la preparation.
+        en_preparation = getattr(self.board, "en_preparation", lambda: False)()
+        return (not self.board.game_over) and not en_preparation             and self.board.board.turn == self.couleur_ia()
 
     def update(self):
         if self.ai_manager is None:
