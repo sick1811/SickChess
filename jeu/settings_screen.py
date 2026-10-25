@@ -400,7 +400,7 @@ class SettingsScreen:
         besoin = (h_case + 12
                   + ui.mesurer("Retenir ces réglages", taille_case_texte)[0]
                   + mep.xl(ech) + h_case + 12
-                  + ui.mesurer("Partir d'une position chargee (FEN ou PGN)",
+                  + ui.mesurer("Partir d'une position chargée (FEN ou PGN)",
                                taille_case_texte)[0])
         self.cases_sur_la_ligne = besoin <= zone_cases.width
         if self.cases_sur_la_ligne:
@@ -414,7 +414,7 @@ class SettingsScreen:
         largeur_libelle = ui.mesurer("Retenir ces réglages", taille_case_texte)[0]
         self.zone_retenir = pygame.Rect(self.case_retenir.x, y_cases - 4,
                                         h_case + 12 + largeur_libelle, h_case + 8)
-        libelle_position = "Partir d'une position chargee (FEN ou PGN)"
+        libelle_position = "Partir d'une position chargée (FEN ou PGN)"
         largeur_position = ui.mesurer(libelle_position, taille_case_texte)[0]
         x_position = min(droite_cases - h_case - 12 - largeur_position,
                          self.zone_retenir.right + mep.xl(ech))

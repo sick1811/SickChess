@@ -130,6 +130,54 @@ verifier("Debut / Fin" not in aide and " a ce coup" not in textes,
          "accents de l'aide (« à ce coup », « Début / Fin »)")
 verifier(len([k for k in aide if k]) >= 6, "l'aide de la revue a ses lignes (%d en tout)" % len(aide))
 
+print("6. Salon en ligne : la phrase d'accueil tient en entier (Cowork, 24/10)")
+import salon_en_ligne
+
+
+class SteamFactice:
+    actif = False
+    erreur = "Steam n'est pas disponible."
+    conseil = "Ouvre Steam puis réessaie."
+
+    def demarrer(self):
+        return False
+
+
+PHRASE_SALON = "Joue contre un ami Steam. Crée une partie"
+for code in ("fr", "en"):
+    for taille in ((1366, 768), (1920, 1080)):
+        langue.regler(code)
+        lignes_vues = []
+        vrai_texte = ui.texte
+
+        def espion_salon(surface, chaine, *args, _vues=lignes_vues, _vrai=vrai_texte,
+                         **reste):
+            _vues.append(str(chaine))
+            return _vrai(surface, chaine, *args, **reste)
+        ui.texte = espion_salon
+        try:
+            ecran = pygame.display.set_mode(taille)
+            salon = salon_en_ligne.SalonEnLigne(ecran, None, steam=SteamFactice())
+            salon.draw()
+        finally:
+            ui.texte = vrai_texte
+            langue.regler("fr")
+        attendu = PHRASE_SALON + " et invite-le, ou entre le code qu'il t'a donné."
+        if code == "en":
+            langue.regler("en")
+            attendu = langue.traduire(attendu)
+            langue.regler("fr")
+        premier = attendu.split(" ")[0] + " "
+        debut = next((i for i, l in enumerate(lignes_vues) if l.startswith(premier)), None)
+        affiche = ""
+        if debut is not None:
+            for ligne in lignes_vues[debut:]:
+                affiche = (affiche + " " + ligne).strip()
+                if len(affiche) >= len(attendu) or ligne.endswith("..."):
+                    break
+        verifier(affiche == attendu, "%s %dx%d : « %s » (attendu « %s »)"
+                 % (code, taille[0], taille[1], affiche, attendu))
+
 print()
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))
 sys.exit(1 if echecs else 0)

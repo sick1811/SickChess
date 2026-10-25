@@ -332,6 +332,10 @@ class AnalyseurPartie:
         # seconde) : le temps restant affiche dans la revue.
         self._durees = {1: [], 2: [], 3: []}
         self._vitesses = []             # (noeuds, ms) des vraies recherches
+        # 25/10 (t71 / t99) : duree de chaque recherche par (position, passe)
+        # et debut des recherches en cours (position -> (debut, passe)).
+        self._duree_de = {}
+        self._depuis = {}
         self.allegees = set()           # positions sans passe profonde (inutile)
         self._moteur_fourni = moteur          # les tests passent le leur
 
@@ -740,7 +744,7 @@ class AnalyseurPartie:
                     self.temps_max_ms * (1 + self._essais[k]))
             lignes = 1 if self.lignes_spec else LIGNES_FINES
         details = self._chercher(moteur, self.fens[k], spec, lignes,
-                                 min(niveau, self.niveau_final))
+                                 min(niveau, self.niveau_final), k)
         if self._stop:
             # 24/10 : recherche interrompue par arreter() : resultat incomplet,
             # on ne le garde pas (la position sera refaite si l'analyse reprend).
@@ -806,18 +810,19 @@ class AnalyseurPartie:
         return [p for k, (p, fini) in enumerate(zip(self.profondeurs, self.finie))
                 if p and not fini and k not in self.allegees]
 
-    def _coup_sur(self, i):
+    def _coup_sur(self, i, niveau_min=2):
         """La pastille du coup i est-elle SURE avec l'analyse rapide ?
         True / False, ou None tant que les deux positions ne sont pas passees.
         Pas sure quand la perte est a moins de MARGE_VERDICT points d'un seuil
         de pastille (5 / 10 / 20), ou d'un seuil en pions, ou quand le coup
         peut etre « Tres bien », « Brillant » ou « Manque » : la, une analyse
         plus profonde peut changer le verdict ; ailleurs, non (de 22 a 30,
-        l'evaluation bouge de 0,05 pion : 1 a 2 points de chances)."""
+        l'evaluation bouge de 0,05 pion : 1 a 2 points de chances).
+        niveau_min=1 (25/10, temps restant) : un avis provisoire des le survol."""
         if not 0 <= i < len(self.coups):
             return True
         for k in (i, i + 1):
-            if self.niveau[k] < 2 and not self.finie[k]:
+            if self.niveau[k] < niveau_min and not self.finie[k]:
                 return None
         avant, apres = self.evaluations[i], self.evaluations[i + 1]
         if avant is None or apres is None:
@@ -859,11 +864,12 @@ class AnalyseurPartie:
             return False                        # « Manque » ou pas ?
         return True
 
-    def _verdicts_surs(self, k):
+    def _verdicts_surs(self, k, niveau_min=2):
         """Les deux coups qui touchent la position k ont une pastille sure."""
-        return self._coup_sur(k - 1) is True and self._coup_sur(k) is True
+        return self._coup_sur(k - 1, niveau_min) is True \
+            and self._coup_sur(k, niveau_min) is True
 
-    def _inutile_de_creuser(self, k):
+    def _inutile_de_creuser(self, k, niveau_min=2):
         """La passe profonde ne changerait rien pour la position k :
           - la partie y est jouee (au moins 8 pions d'avance, ou un mat) :
             les chances de gagner sont deja a 95 % et plus, aucune pastille ne
@@ -882,7 +888,7 @@ class AnalyseurPartie:
         # Excellent. Ces positions passent maintenant par _coup_sur, qui
         # surveille aussi les seuils en pions.
         # 18/10 (16) : en calcul fixe, on ne verifie que ce qui peut changer.
-        if self.mode == "calcul" and self._verdicts_surs(k):
+        if self.mode == "calcul" and self._verdicts_surs(k, niveau_min):
             return True
         try:
             import ouvertures
@@ -895,10 +901,12 @@ class AnalyseurPartie:
             pass
         return False
 
-    def _chercher(self, moteur, fen, spec, lignes, niveau):
+    def _chercher(self, moteur, fen, spec, lignes, niveau, k=None):
         """Une recherche de Stockfish ; note sa duree et sa vitesse."""
         profondeur, noeuds, temps = spec
         debut = time.time()
+        if k is not None:
+            self._depuis[k] = (debut, niveau)
         self._moteurs_en_cours.add(moteur)
         try:
             if noeuds:
@@ -913,8 +921,11 @@ class AnalyseurPartie:
                 details = moteur.analyser_position(fen, profondeur, temps, lignes=lignes)
         finally:
             self._moteurs_en_cours.discard(moteur)
+            self._depuis.pop(k, None)
         duree = time.time() - debut
         self._durees.setdefault(niveau, []).append(duree)
+        if k is not None:
+            self._duree_de[(k, niveau)] = duree
         # 18/10 : la vitesse ne se mesure que sur les vraies recherches (au
         # moins un million de noeuds) : les toutes petites (survol) demarrent
         # lentement et faisaient annoncer un temps restant trop long.
@@ -943,51 +954,111 @@ class AnalyseurPartie:
         return reste
 
     def _calculer_temps_restant(self):
+        """25/10 (t71 / t99, « temps annonce faux » : 17 coups en 7 min) : avant,
+        le calcul fixe prenait la vitesse annoncee par Stockfish et jamais les
+        durees vraiment mesurees, supposait 30 % de positions a verifier,
+        comptait les recherches en cours pour entieres et divisait la fin par
+        le nombre de moteurs meme quand il en restait moins a faire. Maintenant
+        chaque recherche qui reste a sa duree prevue (la passe profonde d'une
+        position = sa passe des trois coups x le rapport mesure), on devine
+        des le survol les positions a verifier, les recherches en cours ne
+        comptent que ce qui leur reste et les moteurs se partagent le travail
+        comme pour de vrai."""
         ouvriers = max(1, self._ouvriers)
+        final = self.niveau_final
+        n = len(self.niveau)
+        duree_de = dict(self._duree_de)
+        en_cours = dict(self._depuis)
+        maintenant = time.time()
         vitesse = None
         if len(self._vitesses) >= 2:
             recentes = self._vitesses[-20:]
             vitesse = sum(n for n, _t in recentes) * 1000.0 / max(
                 1, sum(t for _n, t in recentes))
-        total = 0.0
-        n = len(self.niveau)
-        for niveau in range(1, self.niveau_final + 1):
-            if niveau == self.niveau_final and niveau > 2:
-                # Passe profonde : seules les positions a verifier comptent.
-                # Pour celles dont l'analyse rapide n'est pas encore faite, on
-                # suppose la meme part qu'ailleurs (30 % au debut).
-                connues = [k for k in range(n) if self.niveau[k] >= 2 and not self.finie[k]]
-                a_faire = [k for k in connues if self.niveau[k] < niveau
-                           and not self._inutile_de_creuser(k)]
-                faites = [k for k in connues if self.niveau[k] >= niveau
-                          and k not in self.allegees]
-                inconnues = sum(1 for k in range(n)
-                                if self.niveau[k] < 2 and not self.finie[k])
-                part = (len(a_faire) + len(faites)) / float(len(connues)) \
-                    if connues else 0.3
-                reste = len(a_faire) + inconnues * part
-            else:
-                reste = sum(1 for k, v in enumerate(self.niveau)
-                            if v < niveau and not self.finie[k])
-            if not reste:
-                continue
-            mesures = self._durees.get(niveau) or []
-            if niveau == self.niveau_final:
+
+        def moyenne(niveau):
+            mesures = (self._durees.get(niveau) or [])[-20:]
+            return sum(mesures) / len(mesures) if mesures else None
+
+        def sans_mesure(niveau):
+            """Duree d'une recherche de cette passe quand rien n'est mesure."""
+            if niveau == final:
                 spec = (self.profondeur, self.noeuds, self.temps_max_ms)
             elif niveau == 1:
-                spec = (PROFONDEUR_SURVOL, 0, TEMPS_SURVOL_MS)
+                return TEMPS_SURVOL_MS / 1000.0
             else:
                 spec = self.lignes_spec
             if spec[1] and vitesse:
-                moyenne = spec[1] / vitesse          # calcul fixe : previsible
-            elif len(mesures) >= 2:
-                moyenne = sum(mesures[-20:]) / len(mesures[-20:])
-            elif self.mode == "temps" and niveau == self.niveau_final:
-                moyenne = self.temps_max_ms / 1000.0
-            else:
+                return spec[1] / vitesse             # calcul fixe : previsible
+            if self.mode == "temps" and niveau == final:
+                return self.temps_max_ms / 1000.0
+            return None
+
+        # Passe profonde / passe des trois coups, pour la meme position : le
+        # rapport mesure, ou celui des quantites de calcul (calcul fixe).
+        rapport = None
+        if final == 3:
+            paires = [(duree_de[(k, 2)], duree_de[(k, 3)]) for k in range(n)
+                      if (k, 2) in duree_de and (k, 3) in duree_de][-20:]
+            if len(paires) >= 2:
+                rapport = sum(b for _a, b in paires) / max(1e-6, sum(a for a, _b in paires))
+            elif self.noeuds and self.lignes_spec and self.lignes_spec[1]:
+                rapport = self.noeuds / float(self.lignes_spec[1])
+            elif moyenne(3) and moyenne(2):
+                rapport = moyenne(3) / moyenne(2)
+
+        def prevue(k, niveau):
+            if niveau == 3 and rapport:
+                if (k, 2) in duree_de:
+                    return duree_de[(k, 2)] * rapport
+                if moyenne(2):
+                    return moyenne(2) * rapport
+            return moyenne(niveau) or sans_mesure(niveau)
+
+        # Ce qui reste aux recherches en cours.
+        charges = []
+        for k, (debut, niveau) in en_cours.items():
+            d = prevue(k, niveau)
+            if d is None:
                 return None
-            total += reste * moyenne
-        return total / ouvriers
+            charges.append(max(0.0, d - (maintenant - debut)))
+        # Les recherches a faire, dans l'ordre ou les moteurs les prennent.
+        surveillees = [k for k in range(n) if self.niveau[k] >= 1 and not self.finie[k]]
+        taches = []
+        for niveau in range(1, final + 1):
+            a_creuser = None
+            if niveau == final and final > 2:
+                # Passe profonde : seules les positions a verifier comptent,
+                # devinees avec la meilleure evaluation deja connue (survol
+                # compris). Sans survol : la meme part qu'ailleurs.
+                a_creuser = set(k for k in surveillees
+                                if self.niveau[k] < final
+                                and not self._inutile_de_creuser(k, niveau_min=1))
+                faites = sum(1 for k in surveillees if self.niveau[k] >= final
+                             and k not in self.allegees)
+                part = (len(a_creuser) + faites) / float(len(surveillees)) \
+                    if surveillees else 0.3
+            for k in range(n):
+                if self.finie[k] or self.niveau[k] >= niveau \
+                        or en_cours.get(k, (0, 0))[1] == niveau:
+                    continue
+                poids = 1.0
+                if a_creuser is not None:
+                    if self.niveau[k] >= 1:
+                        if k not in a_creuser:
+                            continue
+                    else:
+                        poids = part
+                d = prevue(k, niveau)
+                if d is None:
+                    return None
+                taches.append(d * poids)
+        charges = sorted(charges)[:ouvriers]
+        charges += [0.0] * (ouvriers - len(charges))
+        for d in taches:
+            i = charges.index(min(charges))
+            charges[i] += d
+        return max(charges)
 
     def limites_variante(self):
         """(profondeur, noeuds, temps_ms) pour les conseils d'une variante :

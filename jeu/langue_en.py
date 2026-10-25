@@ -599,4 +599,5 @@ EN = {
     "Contre l'ordinateur (%s Elo)": "Against the computer (%s Elo)",
     "Ordinateur (%s)": "Computer (%s)",
     "Contre l'ordinateur": "Against the computer",
+    "Partir d'une position chargée (FEN ou PGN)": "Start from a loaded position (FEN or PGN)",
 }

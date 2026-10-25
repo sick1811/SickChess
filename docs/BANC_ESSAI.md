@@ -1,52 +1,54 @@
 # Banc d'essai – SickChess
 
-Dernier passage : 2026-10-24 20:46 · Windows 11 · 12 cœurs · Python 3.13.7 · pygame 2.6.1 · complet
+Dernier passage : 2026-10-25 14:18 · Windows 11 · 12 cœurs · Python 3.13.7 · pygame 2.6.1 · rapide
 
 Fabriqué par `python outils/banc_essai.py` (ne pas modifier à la main).
 
 ## 🟢 Bugs (tests automatiques)
 
-871 contrôles OK sur 35 séries (sans Stockfish), en 76 s
+1021 contrôles OK sur 39 séries (sans Stockfish), en 137 s
 
 
-## 🟢 Vitesse d'affichage
+## 🟠 Vitesse d'affichage
 
-Démarrage 0.68 s · écran le plus lent : Mes parties (4.1 ms/image)
+Démarrage 1.22 s · écran le plus lent : Mes parties (7.0 ms/image)
 
+- **Écran « Mes parties » lent à dessiner** (moyen) – 7.0 ms par image (budget conseillé : 5 ms). Chaque image redessine tout : mettre en cache ce qui ne bouge pas (fond, textes, cases). ·  · Où passe le temps d'une image : · 'blit' of 'pygame.surface.Surface' objects : 61 % (113 appels par image) · pygame.draw.rect : 4 % (36 appels par image) · ecran_mes_parties.py:374 _dessiner_liste : 3 % (1 appels par image) · design.py:146 melanger : 3 % (56 app
 
-## 🟢 Charge du processeur au repos
+## 🟠 Charge du processeur au repos
 
-Menu : 5 % d'un cœur (60 img/s) · Partie : 10 % d'un cœur (40 img/s) · 12 cœurs logiques
+Menu : 9 % d'un cœur (59 img/s) · Partie : 14 % d'un cœur (53 img/s) · 12 cœurs logiques
 
+- **« Partie » occupe le processeur sans rien faire** (moyen) – 14 % d'un cœur à 53 images/s alors que rien ne bouge. Pistes : ne redessiner que si quelque chose change, descendre à 30 images/s au repos, mettre en cache le fond et les textes (skill performance-pygame).
 
 ## 🟢 Mémoire
 
-Jeu au menu : 73.1 Mo
+Jeu au menu : 76.0 Mo
 
 
 ## 🟢 Moteur d'analyse (Stockfish)
 
-6 514 586 nœuds/s avec 10 fils de calcul (sur 12)
+4 863 276 nœuds/s avec 10 fils de calcul (sur 12)
 
 
 ## 🟠 Ménage (code et fichiers inutiles)
 
-29830 lignes de jeu · 0 imports/variables inutiles · 101 éléments peut-être morts · 1 fichier(s) jamais importé(s) · 1698 Mo de restes
+31196 lignes de jeu · 0 imports/variables inutiles · 103 éléments peut-être morts · 1 fichier(s) jamais importé(s) · 3204 Mo de restes
 
 - **Fonctions et méthodes peut-être jamais utilisées** (moyen) – 98 élément(s) dans 37 fichier(s), à vérifier un par un avant de retirer (skill menage-code) : · jeu/steam.py : SALON_PRIVE (l.40), SALON_PUBLIC (l.42), CB_SALON_INFOS (l.57), SCORE_REMPLACER (l.71), DEMANDE_MONDIAL (l.72), DEMANDE_AUTOUR_DE_MOI (l.73), DEMANDE_AMIS (l.74), presence (l.671) · jeu/design.py : contraste (l.161), filet (l.285), jauge (l.292), puce (l.309), mesure (l.343), vignette (l.
-- **Valeurs rangées mais jamais relues (attributs)** (faible) – 3 élément(s) dans 2 fichier(s), à vérifier un par un avant de retirer (skill menage-code) : · jeu/ecran_revue.py : analyse_libre (l.572), analyse_libre (l.578) · jeu/ecran_analyse_libre.py : ep_square (l.52)
+- **Valeurs rangées mais jamais relues (attributs)** (faible) – 5 élément(s) dans 3 fichier(s), à vérifier un par un avant de retirer (skill menage-code) : · jeu/analyse_de_fond.py : terminees (l.52), terminees (l.175) · jeu/ecran_revue.py : analyse_libre (l.582), analyse_libre (l.588) · jeu/ecran_analyse_libre.py : ep_square (l.52)
 - **Fichier jamais importé : jeu/fond_anime.py** (moyen) – Aucun autre fichier ne l'utilise. Probablement un reste de V8.
 - **Fichiers en double** (faible) – 4 fichier(s) identiques (0.6 Mo) : · sounds/fifty_moves.wav = sounds/repetition.wav · sounds/fifty_moves.wav = sounds/stalemate.wav · sounds/feutre/repetition.wav = sounds/feutre/stalemate.wav · assets_src/steam/header_capsule_920x430.png = assets_src/steam/library_header_920x430.png
-- **Restes de fabrication et de tests sur le disque** (info) – 1698 Mo au total (rien de tout ça n'est sur GitHub) : · build_amis : 52 Mo · publier : 1637 Mo · tests/ecrans : 2 Mo · tests/ecrans_en : 2 Mo · tests/ecrans_revue : 0 Mo · __pycache__ (tous) : 3 Mo · tests/capture_*.png : 3 Mo · « publier » et « build_amis » se refont à chaque version amis.
+- **Restes de fabrication et de tests sur le disque** (info) – 3204 Mo au total (rien de tout ça n'est sur GitHub) : · build_amis : 52 Mo · publier : 3142 Mo · tests/ecrans : 2 Mo · tests/ecrans_en : 2 Mo · tests/ecrans_revue : 0 Mo · __pycache__ (tous) : 4 Mo · tests/capture_*.png : 3 Mo · « publier » et « build_amis » se refont à chaque version amis.
 
 ## 🟢 Conflits et santé du projet
 
-0 conflit(s) Git · 0 erreur(s) de syntaxe · dépendances OK · 2 fichier(s) non enregistré(s)
+0 conflit(s) Git · 0 erreur(s) de syntaxe · dépendances OK · 10 fichier(s) non enregistré(s)
 
 
 ## 🟢 Précision des pastilles (banque de positions)
 
-114 coups justes sur 114 (calcul_forte, 626 s)
+114 coups justes sur 114 (calcul_rapide, 442 s)
 
 
 ## ⚪ Endurance (un robot joue 2 heures)

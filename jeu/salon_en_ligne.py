@@ -407,10 +407,13 @@ class SalonEnLigne:
         colonne = min(460, largeur - 40)
         x = (largeur - colonne) // 2
         y = 100
-        ui.paragraphe(ecran, "Joue contre un ami Steam. Crée une partie et "
-                      "invite-le, ou entre le code qu'il t'a donné.",
-                      (x, y, colonne, 50), 16, t["texte_discret"])
-        y += 60
+        # 25/10 (Cowork, 24/10 : phrase coupée « ou entre... ») : les 50 px ne
+        # laissaient qu'une ligne ; jusqu'à 3 lignes, toute la phrase (FR et EN).
+        hauteur_phrase = ui.paragraphe(ecran, "Joue contre un ami Steam. Crée une partie et "
+                                       "invite-le, ou entre le code qu'il t'a donné.",
+                                       (x, y, colonne, 0), 16, t["texte_discret"],
+                                       max_lignes=3)
+        y += max(60, hauteur_phrase + 12)
         actif = self.steam.actif
         self._b("creer", "Créer une partie", (x, y, colonne, 54), actif, taille=20)
         y += 80

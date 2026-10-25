@@ -54,12 +54,12 @@ Mis à jour le 25/10/2026.
       - [ ] t71 / t99 : revue lente (17 coups : 7 min) et temps annoncé faux ; précision définitive ~2 min 30.
       - [ ] t100 : petites pastilles « ?! » / « ! » peu lisibles dans la feuille de coups.
       - [ ] t56 : une partie à deux compte dans « Tes ouvertures » (voulu ?) ; t68 : Enregistrer pas réagi une fois.
-      - [ ] Accents manquants : « Aucun coup joue » (panneau de partie), « Jouer d'avance pendant que l'adversaire
-            reflechit » (Options → Partie), « %d problèmes joues » (écran Problèmes), « Cree une partie » (en ligne).
+      - [x] Accents manquants (séance 36) : « Aucun coup joué », « … l'adversaire réfléchit », « %d problèmes
+            joués », « Crée une partie » → corrigés, surveillés par `tests/test_textes_affiches.py`.
       - [ ] Texte coupé : « Joue contre un ami Steam. Cree une partie et invite-le, ou entre… » (Jouer en ligne).
       - [ ] Au menu principal, Échap ferme le jeu sans demander (deux fois par accident pendant les tests).
-      - [ ] Ne pas mettre dans Git : `_sauvegarde_cowork_2026-10-24/` (sauvegarde des données de Julien faite par
-            Cowork, à garder ou supprimer par Julien) et `rapports/` (ajouté au .gitignore le 25/10).
+      - [x] Ne pas mettre dans Git : `_sauvegarde_cowork_2026-10-24/` et `rapports/` → dans `.gitignore` (25/10),
+            aucun fichier suivi. Reste à Julien : garder ou supprimer la sauvegarde de Cowork.
 - [x] Analyses gardées (fichier `.analyse.json` à côté du PGN), pastilles stables, analyse
       pendant la partie, revue au coup 1, sacrifices non punis – faits et validés le 17/10.
 - [x] Sons des pièces : chocs de bois enregistrés (Kenney CC0) – validés.
