@@ -1603,6 +1603,11 @@ Fait :
   Pas de défaut dans le jeu. À retenir : ne pas lancer la suite complète pendant un banc d'une autre session.
 - Suite complète refaite PC au repos (avec le commit t71 de l'autre session) : 1426 contrôles, tout vert.
   VERSION 0.4.0 (nouveauté : Freestyle).
+- Vérification avant version : rien de bloquant (licences « à revoir » : seulement pour Steam), tests 1426 verts,
+  banc vert. **Version amis n° 8 (0.4.0) publiée** : https://github.com/sick1811/SickChess-amis/releases/tag/v0.4.0-n8
+  (programme 18,6 Mo, jeu 8,0 Mo ; moteur, problèmes et finales inchangés ; installeur 664 Mo).
+  Installation silencieuse dans %TEMP%\SickChessEssai : jeu ouvert 22 s, journal sans erreur, 4 180 151 problèmes,
+  « [MAJ] installee : n° 8 », `jeu/freestyle.py` présent ; verifier_en_ligne.py (Steam ouvert) : tout OK ; désinstallé.
 
 À vérifier par Julien :
 - [ ] t110 (Freestyle, tous les modes) et t111 (chute au temps) dans « À tester par Julien ».

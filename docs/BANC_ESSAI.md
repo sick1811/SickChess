@@ -1,6 +1,6 @@
 # Banc d'essai – SickChess
 
-Dernier passage : 2026-10-25 14:39 · Windows 11 · 12 cœurs · Python 3.13.7 · pygame 2.6.1 · complet
+Dernier passage : 2026-10-25 19:43 · Windows 11 · 12 cœurs · Python 3.13.7 · pygame 2.6.1 · complet
 
 Fabriqué par `python outils/banc_essai.py` (ne pas modifier à la main).
 
@@ -11,17 +11,17 @@ Fabriqué par `python outils/banc_essai.py` (ne pas modifier à la main).
 
 ## 🟢 Vitesse d'affichage
 
-Démarrage 1.03 s · écran le plus lent : Mes parties (4.2 ms/image)
+Démarrage 1.18 s · écran le plus lent : Mes parties (4.4 ms/image)
 
 
 ## 🟢 Charge du processeur au repos
 
-Menu : 4 % d'un cœur (60 img/s) · Partie : 8 % d'un cœur (40 img/s) · 12 cœurs logiques
+Menu : 4 % d'un cœur (60 img/s) · Partie : 9 % d'un cœur (40 img/s) · 12 cœurs logiques
 
 
 ## 🟢 Mémoire
 
-Jeu au menu : 75.3 Mo
+Jeu au menu : 77.4 Mo
 
 
 ## 🟢 Moteur d'analyse (Stockfish)
@@ -41,12 +41,12 @@ Jeu au menu : 75.3 Mo
 
 ## 🟢 Conflits et santé du projet
 
-0 conflit(s) Git · 0 erreur(s) de syntaxe · dépendances OK · 2 fichier(s) non enregistré(s)
+0 conflit(s) Git · 0 erreur(s) de syntaxe · dépendances OK · 0 fichier(s) non enregistré(s)
 
 
 ## 🟢 Précision des pastilles (banque de positions)
 
-114 coups justes sur 114 (calcul_forte, 534 s)
+114 coups justes sur 114 (calcul_forte, 337 s)
 
 
 ## ⚪ Endurance (un robot joue 2 heures)
