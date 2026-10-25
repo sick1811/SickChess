@@ -321,6 +321,7 @@ EN = {
     "Coups possibles": "Legal moves", "Des points sur les cases où la pièce peut aller": "Dots on the squares the piece can reach",
     "Flèche du cavalier": "Knight arrow", "Au clic droit : en L ou droite": "On right-click: L-shaped or straight",
     "En L": "L-shaped", "Droite": "Straight", "Oui": "Yes", "Non": "No",
+    "Quitter SickChess ?": "Quit SickChess?",          # 25/10 : Échap au menu
     "Déplacement des pièces": "Piece movement", "Le temps qu'une pièce met à glisser": "How long a piece takes to slide",
     "Normal": "Normal", "Lent": "Slow", "Aucun": "None",
     "Retournement du plateau": "Board flip", "Quand le plateau tourne": "When the board turns",

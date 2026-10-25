@@ -52,6 +52,11 @@ class MainMenu:
                 if not bouton.actif:
                     bouton.libelle = "Problèmes  (base absente)"
         self.detail_reprise = ""
+        # 25/10 (Julien) : Echap au menu demande « Quitter SickChess ? » au lieu
+        # de fermer le jeu tout de suite (deux fermetures par accident).
+        self.confirmer_quitter = False
+        self.boutons_quitter = {}
+        self._rect_quitter = None
         self.redimensionner(*screen.get_size())
 
     def annoncer_reprise(self, presente, detail=""):
@@ -82,9 +87,71 @@ class MainMenu:
 
     def handle_event(self, event):
         """Renvoie la cle de l'entree choisie, ou None."""
+        if self.confirmer_quitter:
+            return self._evenement_quitter(event)
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-            return "quitter"
+            self.confirmer_quitter = True      # 25/10 : on demande avant de fermer
+            self._placer_quitter()
+            return None
         return ui.gerer_boutons(self.boutons, event)
+
+    # ------------------------------------------------- « Quitter SickChess ? »
+    # Pas de boucle a elle : F11 et le redimensionnement (traites avant par
+    # game_manager) continuent de marcher pendant que la fenetre est ouverte.
+
+    def _evenement_quitter(self, event):
+        """La fenetre prend clavier et souris. Oui / Entree = 'quitter' ;
+        Non, Echap ou clic a cote = on reste au menu."""
+        if event.type == pygame.MOUSEMOTION:
+            ui.gerer_boutons(list(self.boutons_quitter.values()), event)
+            return None
+        if event.type == pygame.KEYDOWN:
+            if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
+                self.confirmer_quitter = False
+                return "quitter"
+            if event.key == pygame.K_ESCAPE:
+                self.confirmer_quitter = False
+            return None
+        if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            cle = ui.gerer_boutons(list(self.boutons_quitter.values()), event)
+            if cle == "oui":
+                self.confirmer_quitter = False
+                return "quitter"
+            if cle == "non" or not self._rect_quitter.collidepoint(event.pos):
+                self.confirmer_quitter = False
+        return None
+
+    def _placer_quitter(self):
+        """Fenetre centree, a l'echelle de l'ecran (recalculee a chaque dessin)."""
+        largeur, hauteur = self.screen.get_size()
+        ech = ui.echelle(self.screen)
+        rect = pygame.Rect(0, 0, min(largeur - 40, int(400 * ech)), int(150 * ech))
+        rect.center = (largeur // 2, hauteur // 2)
+        self._rect_quitter = rect
+        marge = int(20 * ech)
+        hb = int(44 * ech)
+        lb = (rect.width - 2 * marge - int(12 * ech)) // 2
+        y = rect.bottom - marge - hb
+        if not self.boutons_quitter:
+            self.boutons_quitter = {"non": ui.Bouton((0, 0, 10, 10), "Non", "non"),
+                                    "oui": ui.Bouton((0, 0, 10, 10), "Oui", "oui")}
+            self.boutons_quitter["oui"].selectionne = True     # Entree = Oui
+        for bouton in self.boutons_quitter.values():
+            bouton.taille = ui.t(17, ech)
+        self.boutons_quitter["non"].placer((rect.x + marge, y, lb, hb))
+        self.boutons_quitter["oui"].placer((rect.right - marge - lb, y, lb, hb))
+
+    def _dessiner_quitter(self, ecran, t):
+        self._placer_quitter()
+        rect = self._rect_quitter
+        ech = ui.echelle(ecran)
+        ui.voile(ecran, opacite=150)
+        ui.cadre(ecran, rect, t["panneau"], t["accent"], 2, 16, ombre=True)
+        ui.texte(ecran, "Quitter SickChess ?", rect.centerx, rect.y + int(24 * ech),
+                 ui.t(24, ech), t["texte"], gras=True, ancre="centre",
+                 largeur_max=rect.width - int(40 * ech), ajuster=True)
+        for bouton in self.boutons_quitter.values():
+            bouton.dessiner(ecran, t, rayon=10)
 
     # ------------------------------------------------------------ dessin
 
@@ -177,6 +244,8 @@ class MainMenu:
                      hauteur - 26, 13, t["texte_discret"], ancre="droite")
         import effets
         effets.fondu(ecran, "menu", t["fond"])
+        if self.confirmer_quitter:
+            self._dessiner_quitter(ecran, t)
         import succes
         succes.dessiner_annonce(ecran)
 
