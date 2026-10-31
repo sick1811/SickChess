@@ -3,7 +3,7 @@
 Fichier partagé entre Cowork et Claude Code. **À relire au début de chaque séance,
 à mettre à jour à la fin.** La page « SickChess – À faire »
 (https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5) en est la version à cocher pour Julien.
-Mis à jour le 25/10/2026 (fin de séance (44) – arbre des ouvertures).
+Mis à jour le 31/10/2026 (séance (48) – installeur sous 1 Go, version amis n° 11, 0.6.0).
 
 ## Demande de Julien du 31/10 – itch.io : jeu en ligne et classements sans le n° 480 (Claude Code) – EN PREMIER
 Constat (Cowork, 31/10) : tout le jeu en ligne et les classements passent par Steam avec le numéro de
@@ -251,7 +251,7 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
-Séance du 31/10 (48) · installeur sous 1 Go – **Fonctionne / Ne fonctionne pas + commentaire** (à la prochaine version amis).
+Séance du 31/10 (48) · installeur sous 1 Go – **Fonctionne / Ne fonctionne pas + commentaire** (version amis n° 11, 0.6.0).
 - [ ] t136 (48) : **taille de l'installeur** : après CONSTRUIRE_VERSION_AMIS.bat, `SickChess_Installation.exe` fait
       **moins de 1 Go** (environ 100 Mo) ; la fenêtre noire dit « telecharges a l'installation : puzzles, syzygy ».
 - [ ] t137 (48) : **installation chez un ami (Internet branché)** : double-clic sur l'installeur : une page montre le
@@ -261,7 +261,7 @@ Séance du 31/10 (48) · installeur sous 1 Go – **Fonctionne / Ne fonctionne p
 - [ ] t138 (48) : **sans Internet** : coupe Internet, lance l'installeur : il dit qu'il n'arrive pas à télécharger et
       propose de réessayer ; rien de cassé (Annuler ne laisse pas de jeu à moitié installé).
 
-Séance du 31/10 (46) · tables de finales DTZ – **Fonctionne / Ne fonctionne pas + commentaire** (pas encore en version amis).
+Séance du 31/10 (46) · tables de finales DTZ – **Fonctionne / Ne fonctionne pas + commentaire** (version amis n° 11, 0.6.0).
 - [ ] t129 (46) : **Stockfish voit les DTZ** : lance le jeu, ouvre l'analyse libre, quitte ; dans `journal_du_jeu.txt`
       (dossier SickChess) : « tables de finale Syzygy branchees … : 145 WDL et 145 DTZ ».
 - [ ] t130 (46) : **règle des 50 coups** : analyse libre, colle `8/8/8/4k3/8/8/8/1BN1K3 w - - 0 1` → « Tables de finale :
@@ -272,7 +272,7 @@ Séance du 31/10 (46) · tables de finales DTZ – **Fonctionne / Ne fonctionne 
 - [ ] t132 (46) : **revue d'une partie qui finit en finale** (tour + pion contre tour, roi + pions…) : la revue va aussi
       vite qu'avant et les pastilles de la finale te semblent justes.
 
-Séance du 31/10 (47) · pré-mouvements à la suite – **Fonctionne / Ne fonctionne pas + commentaire**.
+Séance du 31/10 (47) · pré-mouvements à la suite – **Fonctionne / Ne fonctionne pas + commentaire** (version amis n° 11, 0.6.0).
 - [ ] t133 (47) : **plusieurs coups d'avance** : contre l'ordinateur (niveau fort, il réfléchit un peu), pendant son
       tour prépare 3 ou 4 coups à la suite (ex. d4, Cf3, Fc4, petit roque). Chaque coup prévu se voit **presque
       transparent** avec son numéro, la vraie pièce reste à sa place **un peu plus visible**. Un coup part à chaque

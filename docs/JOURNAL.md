@@ -1820,3 +1820,21 @@ Fait :
   (« Ruy Lopez » au lieu de « Partie espagnole ») ; vert avec la langue française. Le test lit le vrai config.json.
 À vérifier par Julien :
 - [ ] t136 à t138 dans `docs/A_FAIRE.md` (« À tester par Julien »).
+
+## 31/10/2026 (48 suite) – Version amis n° 11 (0.6.0) publiée et vérifiée (Claude Code)
+Fait :
+- `VERSION` 0.5.1 → **0.6.0** (nouveautés : pré-mouvements à la suite, tables DTZ, licences, installeur léger).
+- `tests/test_resume_coach.py` : se met en français lui-même (il était rouge quand le `config.json` de Julien est en anglais).
+- Avant : `python tests/lancer_tous.py` → 1528 contrôles, tout vert ; `verifier_version.py --amis` → rien de bloquant
+  (banc orange connu : 11 % d'un cœur en partie au repos).
+- Publiée : https://github.com/sick1811/SickChess-amis/releases/tag/v0.6.0-n11 (programme 18,6 Mo, jeu 8,1 Mo,
+  syzygy 938 Mo ; moteur et problèmes inchangés). **`SickChess_Installation.exe` : 92,5 Mo** (avant : 696 Mo).
+  Essai du .exe dans un dossier neuf : OK (25 s sans erreur).
+- Essai de l'installeur publié (téléchargé depuis « latest », identique au fichier local), en silencieux dans un dossier
+  d'essai : problèmes (223 Mo) et finales (145 WDL + 145 DTZ) téléchargés depuis GitHub et décompressés, en ~70 s ;
+  `paquets_installes.json` n° 11 avec les 5 paquets ; le jeu démarre en 0.6.0, « 4180151 problemes », « a installer :
+  rien » ; tables lues (KBN-K : gain, DTZ 56) ; `verifier_en_ligne.py --dossier` : tout OK (Steam, salon, réseau).
+  Désinstallé : il ne reste que les données du joueur.
+À vérifier par Julien :
+- [ ] t129 à t138 dans `docs/A_FAIRE.md` (finales DTZ, pré-mouvements, installeur), sur la n° 11.
+- [ ] Mise à jour chez un ami resté à la n° 10 : « Mise à jour » télécharge ~970 Mo (surtout les finales) et redémarre en 0.6.0.
