@@ -61,6 +61,38 @@ def est_freestyle(board):
     return bool(getattr(board, "chess960", False))
 
 
+def options_moteur(board):
+    """Ce qu'il faut ajouter à un appel du moteur pour ce plateau :
+    {"chess960": True} en Freestyle, rien sinon (les moteurs de test ne
+    connaissent pas ce réglage). 31/10 : la FEN seule ne dit pas toujours
+    si la partie est Freestyle (n° 77, roi en e1, droits « KQkq »)."""
+    return {"chess960": True} if est_freestyle(board) else {}
+
+
+def lire_coup(board, uci):
+    """Coup UCI du moteur lu sur ce plateau. 31/10 : en Freestyle, un roque
+    noté à la mode classique (e1g1) devient « roi prend tour » (e1h1), et
+    inversement sur un plateau classique. Coup inconnu du plateau : lecture
+    brute, comme avant (l'appelant garde ses contrôles)."""
+    try:
+        return board.parse_uci(uci)
+    except (ValueError, AttributeError):
+        return chess.Move.from_uci(uci)
+
+
+def meme_coup(board, uci_a, uci_b):
+    """Deux coups UCI désignent-ils le même coup sur ce plateau (roque noté
+    e1g1 ou e1h1 compris) ?"""
+    if not uci_a or not uci_b:
+        return False
+    if uci_a == uci_b:
+        return True
+    try:
+        return lire_coup(board, uci_a) == lire_coup(board, uci_b)
+    except ValueError:
+        return False
+
+
 def cases_du_roque(board, coup):
     """(arrivée du roi, départ de la tour, arrivée de la tour) d'un roque."""
     rangee = chess.square_rank(coup.from_square)

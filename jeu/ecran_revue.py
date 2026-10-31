@@ -301,6 +301,9 @@ class EcranRevue:
                 import os
                 threads = max(1, (os.cpu_count() or 2) - 1)
 
+            # 31/10 : partie Freestyle (n° 77) meme quand la FEN a l'air classique.
+            libre = {"chess960": True} if getattr(self.analyseur, "chess960", False) else {}
+
             def travail():
                 details = None
                 try:
@@ -317,15 +320,15 @@ class EcranRevue:
                                     details = moteur.analyser_position(
                                         fen, profondeur, temps,
                                         lignes=analyse_partie.LIGNES_FINES,
-                                        noeuds=noeuds)
+                                        noeuds=noeuds, **libre)
                                 except TypeError:   # moteur de test
                                     details = moteur.analyser_position(
                                         fen, profondeur or 22, temps,
-                                        lignes=analyse_partie.LIGNES_FINES)
+                                        lignes=analyse_partie.LIGNES_FINES, **libre)
                             else:
                                 details = moteur.analyser_position(
                                     fen, profondeur, temps,
-                                    lignes=analyse_partie.LIGNES_FINES)
+                                    lignes=analyse_partie.LIGNES_FINES, **libre)
                 except Exception as souci:
                     print("[REVUE] Stockfish indisponible : %s" % souci)
                 self._ranger_conseil(fen, details)
@@ -388,11 +391,13 @@ class EcranRevue:
         if self.fleches_visibles:
             for n, c in enumerate(self.coups_conseilles()):
                 try:
-                    coup = chess.Move.from_uci(c["uci"])
+                    coup = freestyle.lire_coup(p.board, c["uci"])
                 except ValueError:
                     continue
+                # 31/10 (arbitre) : un roque « roi prend tour » (Freestyle) :
+                # la fleche va a la case du roi (g1 / c1), pas sur la tour.
                 p.fleches_conseil.append(
-                    (coup.from_square, coup.to_square,
+                    (coup.from_square, freestyle.arrivee_du_roi(p.board, coup),
                      BLEU_MEILLEUR if n == 0 else BLEU_AUSSI_BON,
                      0.12 if n == 0 else 0.08))
         if self.index == 0 or self.variante is not None:
@@ -404,8 +409,14 @@ class EcranRevue:
         p.pastille_case = self.coups[self.index - 1].to_square
         meilleur = infos.get("meilleur_uci")
         if infos["note"] in NOTES_A_CORRIGER and meilleur and self.fleches_visibles:
-            coup = chess.Move.from_uci(meilleur)
-            p.indice = (coup.from_square, coup.to_square)
+            avant = p.board.copy()
+            if avant.move_stack:
+                avant.pop()
+            try:
+                coup = freestyle.lire_coup(avant, meilleur)
+            except ValueError:
+                return
+            p.indice = (coup.from_square, freestyle.arrivee_du_roi(avant, coup))
 
     # ------------------------------------------------------------- placement
 

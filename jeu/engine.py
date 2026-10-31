@@ -298,13 +298,22 @@ class StockfishEngine:
             print("ENGINE : ecriture impossible (" + str(e) + ")")
             return False
 
-    def envoyer_position(self, fen):
+    def envoyer_position(self, fen, chess960=None):
         """« position fen ... », en passant Stockfish en règles Freestyle
         (UCI_Chess960) quand la position en a besoin, et en le remettant en
         règles normales sinon. En Freestyle, il note le roque « roi prend
-        tour » (b1a1), comme python-chess."""
+        tour » (b1a1), comme python-chess.
+        chess960 = la PARTIE est-elle Freestyle (board.chess960) ; None = on
+        le devine d'après la FEN seule."""
         import freestyle
-        libre = freestyle.est_freestyle_fen(fen)
+        # 31/10 (n° 77) : la FEN seule ne suffit pas. Roi en e1 et tour en h1,
+        # droits « KQkq » : elle a l'air classique, Stockfish rendait e1g1 au
+        # lieu de e1h1, coup absent du plateau Freestyle (l'ordinateur ne
+        # jouait plus). L'appelant qui a le plateau le dit donc lui-même.
+        if chess960 is None:
+            libre = freestyle.est_freestyle_fen(fen)
+        else:
+            libre = bool(chess960)
         if libre != getattr(self, "chess960_courant", False):
             if self._option_existe("UCI_Chess960"):
                 self._send_command("setoption name UCI_Chess960 value %s"
@@ -687,16 +696,18 @@ class StockfishEngine:
         return self
 
     def analyser_position(self, fen, profondeur=0, temps_max_ms=8000,
-                          lignes=None, noeuds=0):
+                          lignes=None, noeuds=0, chess960=None):
         """Voir la vraie methode juste en dessous : 'lignes' est le nombre de
         coups a classer pour CETTE position (1 = le plus rapide, 2 = on veut
         aussi le deuxieme meilleur coup). 18/10 : 'noeuds' = quantite de
         calcul fixe (comme lichess), voir analyse_partie.REGLAGES."""
         if lignes is not None:
             self._regler_multipv(max(1, int(lignes)))
-        return self._analyser_position(fen, profondeur, temps_max_ms, noeuds)
+        return self._analyser_position(fen, profondeur, temps_max_ms, noeuds,
+                                       chess960)
 
-    def _analyser_position(self, fen, profondeur=0, temps_max_ms=8000, noeuds=0):
+    def _analyser_position(self, fen, profondeur=0, temps_max_ms=8000, noeuds=0,
+                           chess960=None):
         """Analyse une position. Deux facons de s'arreter, au choix :
 
         profondeur > 0 : le moteur s'arrete a cette profondeur. Le resultat est
@@ -714,7 +725,7 @@ class StockfishEngine:
             if not self.est_vivant():
                 return None
             try:
-                self.envoyer_position(fen)
+                self.envoyer_position(fen, chess960)
                 # 18/10 : les limites se cumulent, Stockfish s'arrete a la
                 # premiere atteinte (le temps reste un garde-fou).
                 commande = "go"
@@ -807,12 +818,12 @@ class StockfishEngine:
 
     # ------------------------------------------------------------------ analyse
 
-    def get_best_move(self, fen, max_time_ms=1500):
+    def get_best_move(self, fen, max_time_ms=1500, chess960=None):
         """Renvoie le meilleur coup en notation UCI, ou None."""
-        resultat = self.get_best_move_details(fen, max_time_ms)
+        resultat = self.get_best_move_details(fen, max_time_ms, chess960)
         return resultat["coup"] if resultat else None
 
-    def get_best_move_details(self, fen, max_time_ms=1500):
+    def get_best_move_details(self, fen, max_time_ms=1500, chess960=None):
         """Comme get_best_move, mais renvoie aussi l'evaluation et la profondeur.
 
         {'coup': 'e2e4', 'evaluation': 0.34, 'mat': None, 'profondeur': 12}
@@ -828,9 +839,9 @@ class StockfishEngine:
                 return None
             if self.elo_bride is not None and self.multipv_courant > 1:
                 # V7.2 : niveau debutant - Stockfish classe, nous choisissons.
-                return self._coup_bride(fen, max_time_ms)
+                return self._coup_bride(fen, max_time_ms, chess960)
             try:
-                self.envoyer_position(fen)
+                self.envoyer_position(fen, chess960)
                 if self.profondeur_max:
                     self._send_command("go movetime %d depth %d"
                                        % (max_time_ms, self.profondeur_max))
@@ -865,13 +876,13 @@ class StockfishEngine:
                 print("ENGINE : erreur get_best_move = " + str(e))
                 return None
 
-    def _lire_les_coups_classes(self, fen, max_time_ms):
+    def _lire_les_coups_classes(self, fen, max_time_ms, chess960=None):
         """Demande le classement des coups et le renvoie, meilleur en premier.
 
         ([{coup, cp, mat, profondeur}, ...], coup_de_secours) ou (None, None)
         si le moteur n'a pas repondu. Le verrou doit deja etre pris.
         """
-        self.envoyer_position(fen)
+        self.envoyer_position(fen, chess960)
         self._send_command("go movetime %d depth %d"
                            % (max_time_ms, self.profondeur_max or 4))
         lignes = {}
@@ -942,7 +953,7 @@ class StockfishEngine:
                 "mat": choix.get("mat"),
                 "profondeur": choix.get("profondeur", 0)}
 
-    def _coup_bride(self, fen, max_time_ms):
+    def _coup_bride(self, fen, max_time_ms, chess960=None):
         """Le coup d'un DEBUTANT : Stockfish classe, nous choisissons mal.
 
         Appelee seulement quand le classement vise est sous le minimum du
@@ -950,7 +961,8 @@ class StockfishEngine:
         Le verrou est deja pris par get_best_move_details.
         """
         try:
-            classes, secours = self._lire_les_coups_classes(fen, max_time_ms)
+            classes, secours = self._lire_les_coups_classes(fen, max_time_ms,
+                                                            chess960)
             if classes is None:
                 return None
             choix = faiblesse.choisir(classes, self.elo_bride)
@@ -963,7 +975,7 @@ class StockfishEngine:
             print("ENGINE : erreur choix bride = " + str(e))
             return None
 
-    def meilleur_coup_honnete(self, fen, max_time_ms=1500):
+    def meilleur_coup_honnete(self, fen, max_time_ms=1500, chess960=None):
         """LE MEILLEUR COUP, meme quand le moteur joue en debutant.
 
         POURQUOI ELLE EXISTE : l'indice (touche H) passe par le moteur de JEU.
@@ -978,7 +990,8 @@ class StockfishEngine:
                 return None            # le chemin normal donne deja le meilleur
             try:
                 classes, secours = self._lire_les_coups_classes(fen,
-                                                                max_time_ms)
+                                                                max_time_ms,
+                                                                chess960)
                 if classes is None:
                     return None
                 return self._en_details(classes[0] if classes else None,

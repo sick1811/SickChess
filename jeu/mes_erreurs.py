@@ -182,7 +182,8 @@ def coup_presque_aussi_bon(fen_avant, coup, puzzle, chemin_stockfish=None):
             """Evaluation (pions) pour le joueur apres le coup c, ou None."""
             p = plateau.copy()
             p.push(c)
-            details = moteur.analyser_position(p.fen(), 14, 5000)
+            details = moteur.analyser_position(p.fen(), 14, 5000,
+                                               **freestyle.options_moteur(p))
             if not details:
                 return None
             import analyse_partie
@@ -196,7 +197,7 @@ def coup_presque_aussi_bon(fen_avant, coup, puzzle, chemin_stockfish=None):
         joue_meilleur = None
         if meilleur:
             try:
-                m = chess.Move.from_uci(meilleur)
+                m = freestyle.lire_coup(plateau, meilleur)   # 31/10 : roque e1g1 / e1h1
                 if m in plateau.legal_moves:
                     joue_meilleur = apres(m)
             except ValueError:

@@ -42,17 +42,23 @@ roques = 0
 for numero in (0, 77, 254):
     b = freestyle.plateau_de_depart(numero)
     illegal = None
+    fautif = ""
     for _ in range(40):
         if b.is_game_over():
             break
-        uci = moteur.get_best_move(b.fen(), 50)
+        # 31/10 : comme le jeu (background_ai), on dit au moteur que la partie
+        # est Freestyle ; sans ca, n° 77 ressemblait a une partie classique.
+        uci = moteur.get_best_move(b.fen(), 50, **freestyle.options_moteur(b))
         coup = chess.Move.from_uci(uci) if uci else None
         if coup not in b.legal_moves:
-            illegal = uci
+            illegal = uci or "None"
+            fautif = " ; coup rendu %s, FEN %s, roques legaux %s" % (
+                illegal, b.fen(), [c.uci() for c in b.legal_moves if b.is_castling(c)])
             break
         roques += b.is_castling(coup)
         b.push(coup)
-    verifier(illegal is None, "n° %d : Stockfish joue %d coups legaux" % (numero, len(b.move_stack)))
+    verifier(illegal is None, "n° %d : Stockfish joue %d coups legaux%s"
+             % (numero, len(b.move_stack), fautif))
 verifier(roques > 0, "Stockfish a roque a la mode Freestyle (%d roque(s))" % roques)
 
 # Petit roque ou seul le roi bouge vers g1 : Stockfish doit le connaitre.

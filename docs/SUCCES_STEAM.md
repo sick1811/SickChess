@@ -11,6 +11,8 @@ Mis à jour le 24/10/2026 (travail p37).
   (`succes.rattraper`), donc personne ne perd ce qu'il a obtenu avant.
 
 ## Le jour où SickChess a son numéro Steam
+0. Écrire le vrai numéro dans `APPID_STEAM_REEL` (`jeu/distribution.py`) : c'est le seul chiffre du
+   code à changer ; `verifier_version.py --steam` bloque tant qu'il vaut `None`.
 1. `steam_appid.txt` : remplacer 480 par le vrai numéro (et `MODE_TEST = False` dans
    `jeu/salon_en_ligne.py`).
 2. Steamworks → App Admin → **Stats & Achievements → Achievements** : créer les 14 succès ci-dessous,
@@ -55,6 +57,9 @@ projet et police Barlow : aucune licence extérieure). Aperçu : `docs/steam_suc
 
 Tri : du plus grand au plus petit ; affichage : nombre. Trois vues dans le jeu : Mondial (10 premiers),
 Amis, Autour de moi. Sans Steam, les scores restent dans le jeu et partent à la connexion suivante.
+
+Version itch.io (31/10) : jamais de Steam ; le bouton s'appelle « Classements » et montre seulement les
+records gardés dans le jeu, sous le message « Les classements mondiaux passent par Steam ».
 
 Avec le numéro de test 480, ces classements sont partagés avec tous les développeurs qui testent sur
 « Spacewar » : nos noms sont propres à SickChess, donc on n'y voit que des joueurs de SickChess. Ils

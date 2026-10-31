@@ -88,13 +88,9 @@ REGLAGES = {
     "forte": _r("profondeur", 26, 0, 12000, 26, 3, None),
     "maximale": _r("profondeur", 30, 0, 30000, 30, 5, _LIGNES_22),
 }
-# Compatibilite : (profondeur visee, temps) par nom.
-PUISSANCES = dict((nom, (r["profondeur"] or r["profondeur_min"], r["temps_ms"]))
-                  for nom, r in REGLAGES.items())
 MODES = ("calcul", "profondeur", "temps")
 NIVEAUX = ("rapide", "forte", "maximale")
 PUISSANCE_PAR_DEFAUT = "calcul_forte"   # 18/10 (14) : Forte, choix de Julien
-TEMPS_LIGNES_MS = 6000
 
 
 def puissance_de(config):
@@ -192,13 +188,6 @@ def _petit_pc():
 # partie est jouee, et un mat (20) ne doit pas compter comme "15 pions de plus".
 BORNE_PIONS = 15.0
 
-# Au survol on calcule toujours deux lignes (c'est presque gratuit a faible
-# profondeur). A la passe fine, seulement si le meilleur coup devancait
-# nettement le deuxieme : ce sont les seules positions ou "Tres bien" (le seul
-# coup qui tenait) est possible. Partout ailleurs, une ligne : deux fois plus
-# rapide.
-ECART_CANDIDAT = 15.0
-
 # Un mat force compte pour +/- 20 pions : les chances de gagner sont alors a
 # 100 %, et un mat ne fausse pas l'echelle de la courbe.
 EVAL_MAT = 20.0
@@ -209,10 +198,6 @@ NOMBRE_MOMENTS_CLES = 3
 # en dessous de laquelle un coup est verifie en profondeur.
 MARGE_VERDICT = 3.0
 MARGE_PIONS = 0.3
-
-# 18/10 (13) : au-dela de 8 pions d'avance (95 % de chances de gagner) ou d'un
-# mat, la passe profonde ne change aucune pastille : on s'en passe.
-PIONS_PARTIE_JOUEE = 8.0
 
 # 17/10 (Julien : « il calculera toujours le meilleur coup, et s'il y a
 # plusieurs coups aussi bons, il les propose ») : la passe fine classe TOUJOURS
@@ -306,7 +291,7 @@ class AnalyseurPartie:
 
     def __init__(self, fen_initiale, coups_uci, chemin_stockfish=None,
                  puissance=None, moteur=None, suivi=False, threads=None,
-                 fichier_cache=None, version_min=None):
+                 fichier_cache=None, version_min=None, chess960=None):
         self.chemin = chemin_stockfish
         # Les statistiques acceptent une analyse d'avant (format 1) : elle est
         # juste, il lui manque seulement les trois meilleurs coups.
@@ -341,6 +326,12 @@ class AnalyseurPartie:
         self._moteur_fourni = moteur          # les tests passent le leur
 
         self.fen_initiale = fen_initiale or chess.STARTING_FEN
+        # 31/10 (n° 77) : partie Freestyle ou pas. None = on le devine : FEN de
+        # depart, ou un roque note « roi prend tour » (e1h1) dans les coups.
+        # La FEN seule ne suffit pas (roi en e1, droits « KQkq ») : Stockfish
+        # notait alors e1g1 et le roque joue n'etait plus « le meilleur ».
+        self.chess960 = (freestyle.est_freestyle_fen(self.fen_initiale)
+                         if chess960 is None else bool(chess960))
         self.fens, self.coups, self.sans = [], [], []
         self.trait, self.finie = [], []
         self._construire_positions([str(c) for c in (coups_uci or [])])
@@ -396,10 +387,17 @@ class AnalyseurPartie:
                 break
             if coup not in plateau.legal_moves:
                 break
+            self._reperer_le_freestyle(plateau, coup)
             self.sans.append(plateau.san(coup))
             self.coups.append(uci)
             plateau.push(coup)
             self._noter(plateau)
+
+    def _reperer_le_freestyle(self, plateau, coup):
+        """Un roque « roi prend tour » (e1h1) n'existe qu'en Freestyle."""
+        if not self.chess960 and plateau.is_castling(coup):
+            pris = plateau.piece_at(coup.to_square)
+            self.chess960 = bool(pris and pris.piece_type == chess.ROOK)
 
     def _noter(self, plateau):
         self.fens.append(plateau.fen())
@@ -503,6 +501,7 @@ class AnalyseurPartie:
                 break
             if coup not in plateau.legal_moves:
                 break
+            self._reperer_le_freestyle(plateau, coup)
             for tableau, vide in ((self.evaluations, None), (self.mats, None),
                                   (self.meilleurs, None), (self.premiers, None),
                                   (self.seconds, None), (self.niveau, 0),
@@ -940,6 +939,7 @@ class AnalyseurPartie:
     def _chercher(self, moteur, fen, spec, lignes, niveau, k=None):
         """Une recherche de Stockfish ; note sa duree et sa vitesse."""
         profondeur, noeuds, temps = spec
+        libre = {"chess960": True} if self.chess960 else {}   # 31/10 : n° 77
         debut = time.time()
         if k is not None:
             self._depuis[k] = (debut, niveau)
@@ -948,13 +948,15 @@ class AnalyseurPartie:
             if noeuds:
                 try:
                     details = moteur.analyser_position(fen, profondeur, temps,
-                                                       lignes=lignes, noeuds=noeuds)
+                                                       lignes=lignes, noeuds=noeuds,
+                                                       **libre)
                 except TypeError:
                     # Un moteur de test qui ne connait pas les noeuds.
                     details = moteur.analyser_position(fen, profondeur or 22, temps,
-                                                       lignes=lignes)
+                                                       lignes=lignes, **libre)
             else:
-                details = moteur.analyser_position(fen, profondeur, temps, lignes=lignes)
+                details = moteur.analyser_position(fen, profondeur, temps, lignes=lignes,
+                                                   **libre)
         finally:
             self._moteurs_en_cours.discard(moteur)
             self._depuis.pop(k, None)
@@ -1137,9 +1139,6 @@ class AnalyseurPartie:
     def avancement_lignes(self):
         n = float(len(self.fens) or 1)
         return sum(1 for v in self.niveau if v >= 2) / n
-
-    def survol_fini(self):
-        return all(v >= 1 for v in self.niveau)
 
     def terminee(self):
         return all(v >= self.niveau_final for v in self.niveau)
@@ -1325,12 +1324,14 @@ class AnalyseurPartie:
                         - du_joueur(self.seconds[i]))
         theorique = self.coup_de_livre(i)
         dernier = chess.Move.from_uci(self.coups[i - 1]) if i > 0 else None
-        est_le_meilleur = bool(meilleur) and meilleur == joue
+        # 31/10 : un roque peut etre note e1g1 ou e1h1 (Freestyle) : on
+        # compare les coups sur le plateau, pas les textes.
+        est_le_meilleur = freestyle.meme_coup(plateau, meilleur, joue)
         if not est_le_meilleur and self.lignes[i]:
             # Deux coups de meme valeur : le coup joue est AUSSI un meilleur coup.
             meilleure = du_joueur(self.lignes[i][0][1])
             for uci, valeur, _mat, _suite in self.lignes[i][1:]:
-                if uci == joue and meilleure - du_joueur(valeur) <= SEUIL_MEME_VALEUR:
+                if freestyle.meme_coup(plateau, uci, joue) and meilleure - du_joueur(valeur) <= SEUIL_MEME_VALEUR:
                     est_le_meilleur = True
         note = annotations.classer(
             perte, est_le_meilleur,

@@ -27,6 +27,7 @@ import time
 
 import chess
 
+import freestyle
 import rythme
 
 
@@ -336,6 +337,7 @@ class BackgroundAI:
                 return
             board = self.chessboard.board
             fen = board.fen()
+            plateau_du_calcul = board.copy(stack=False)  # lire le coup rendu
             budget_ms = self._tirer_temps_de_reflexion(board)
             # V7.2 : le temps de CALCUL suit le budget. En bullet on ne laisse
             # pas le moteur chercher une seconde et demie sur un coup qui doit
@@ -358,11 +360,16 @@ class BackgroundAI:
             coup_de_livre = self._coup_du_livre(board)
             if coup_de_livre is not None:
                 best_uci = coup_de_livre.uci()
+            # 31/10 : le moteur doit savoir si la PARTIE est Freestyle. La FEN
+            # seule ne suffit pas (n° 77 : roi en e1, droits « KQkq ») : il
+            # rendait e1g1, absent du plateau Freestyle, et ne jouait plus.
             elif hasattr(self.engine, "get_best_move_details"):
-                details = self.engine.get_best_move_details(fen, temps_moteur)
+                details = self.engine.get_best_move_details(
+                    fen, temps_moteur, **freestyle.options_moteur(board))
                 best_uci = details["coup"] if details else None
             else:
-                best_uci = self.engine.get_best_move(fen, temps_moteur)
+                best_uci = self.engine.get_best_move(
+                    fen, temps_moteur, **freestyle.options_moteur(board))
 
             if not best_uci or best_uci == "(none)":
                 return
@@ -373,7 +380,7 @@ class BackgroundAI:
             if reste > 0 and not self._attendre(reste):
                 return
 
-            move = chess.Move.from_uci(best_uci)
+            move = freestyle.lire_coup(plateau_du_calcul, best_uci)
             with self.lock:
                 if self._stop:
                     return

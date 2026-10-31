@@ -56,13 +56,33 @@ Proposition de périmètre (à valider) – le reste arrive en mises à jour gra
 - [ ] Prix : petit prix, à fixer en regardant 3 ou 4 jeux d'échecs vendus sur Steam.
 - [ ] Envoyer en relecture → publier → la page reste en ligne au moins 2 semaines.
 
+## Version itch.io (prête depuis le 31/10/2026)
+Un acheteur itch.io n'a pas forcément Steam : la version itch ne démarre **jamais** Steam.
+- **Un seul réglage** : `distribution.json`, écrit à côté du jeu au moment de la fabrication
+  (`amis`, `steam` ou `itch` ; fichier absent = `amis`, comme avant). Le code qui le lit :
+  `jeu/distribution.py`. Pour essayer sans compiler : `set SICKCHESS_DISTRIBUTION=itch` puis
+  `python SickChess.py`.
+- **Ce que voit l'acheteur itch** : « Jouer en ligne » montre un message clair (« Le jeu en ligne
+  passe par Steam ») et conseille « Jouer à deux sur ce PC » ; « Classements » montre ses records
+  gardés dans le jeu. Pas de règle de pare-feu, pas de demande de droits Windows.
+- **Fabriquer** : double-clic sur `CONSTRUIRE_VERSION_ITCH.bat` → `outils/verifier_version.py --itch`
+  (BLOQUANT si `MODE_TEST = True` ou s'il reste un fichier Steam), puis `outils/publier_maj.py --itch`
+  → `publier/itch/SickChess_<version>_itch.zip`. Le zip contient le jeu, Stockfish et les problèmes,
+  **sans** `steam_api64.dll`, `steam_appid.txt`, `LISEZ-MOI_AMIS.txt` ni `paquets_installes.json`
+  (pas de mise à jour par GitHub). Rien n'est envoyé sur Internet : le zip se dépose à la main sur itch.io.
+- **Le jour où Steam donne le vrai numéro du jeu** : le seul chiffre à changer est `APPID_STEAM_REEL`
+  dans `jeu/distribution.py` (tant qu'il vaut `None`, `verifier_version.py --steam` bloque).
+  La version amis garde le numéro de test 480.
+- Encore à décider par Julien : clé Steam offerte aux acheteurs itch (pour jouer en ligne), tables de
+  finales dans le zip (plus de 1 Go), bouton « Signaler » dans la version itch.
+
 ## Phase E – Mise en ligne
 - [ ] Envoyer le .exe sur Steam (outil SteamPipe fourni par Valve) et le tester via Steam
       sur le PC de Julien, puis si possible sur un 2e PC.
 - [ ] Envoyer le jeu en relecture (1 à 5 jours).
 - [ ] Choisir le jour : plutôt un mardi, mercredi ou jeudi.
 - [ ] Remise de lancement (facultative) la première semaine.
-- [ ] Publier aussi sur itch.io le même jour.
+- [ ] Publier aussi sur itch.io le même jour (zip de `CONSTRUIRE_VERSION_ITCH.bat`, voir plus haut).
 - [ ] Facultatif : une démo gratuite pour le Steam Next Fest (dates sur partner.steamgames.com).
 
 ## Ordre conseillé

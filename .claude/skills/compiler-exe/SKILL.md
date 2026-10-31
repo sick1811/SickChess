@@ -20,7 +20,10 @@ tels quels : plus de bore.exe / ngrok, nouvelle structure `jeu/`).
 ## Ce qui doit être embarqué (datas)
 `assets/`, `sounds/`, `polices/`, `ouvertures/`, `config.json` (réglages par défaut,
 pas celui de Julien), `moteur/stockfish.exe` + `moteur/COPYING-Stockfish.txt`,
-`docs/CREDITS.md`, `steam_appid.txt` et `steam_api64.dll` pour la version Steam.
+`docs/CREDITS.md`, `steam_appid.txt` et `steam_api64.dll` pour les versions amis et Steam
+(**jamais** dans la version itch.io). Réglage « distribution » (31/10) : `distribution.json`
+à côté de l'exe (`amis` / `steam` / `itch`, absent = `amis`), lu par `jeu/distribution.py` ;
+version itch : `CONSTRUIRE_VERSION_ITCH.bat` (`verifier_version.py --itch` puis `publier_maj.py --itch`).
 Optionnels selon la version : `puzzles/` (223 Mo) et `syzygy/` (940 Mo : WDL + DTZ).
 
 ## Points à vérifier dans le code avant de compiler
@@ -36,6 +39,6 @@ Optionnels selon la version : `puzzles/` (223 Mo) et `syzygy/` (940 Mo : WDL + D
    (Stockfish répond), son, Options, Problèmes, revue.
 2. Copier le dossier ailleurs (ex. Bureau) et relancer : rien ne doit dépendre du
    dossier source.
-3. Taille du dossier, et zip `SickChess_<version>_windows.zip` pour itch.io.
+3. Taille du dossier, et zip `publier/itch/SickChess_<version>_itch.zip` pour itch.io (sans fichier Steam).
 4. Noter dans `docs/JOURNAL.md` la version, la taille et ce que Julien doit tester
    (idéalement sur un autre PC sans Python).

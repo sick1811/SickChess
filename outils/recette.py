@@ -113,6 +113,8 @@ RECETTE = [
          "Animation juste : seule la pièce qui change de case glisse."),
         ("R-157", "L'ordinateur roque en Freestyle ; indice H au moment d'un roque possible",
          "Ses coups sont toujours légaux, la partie ne bloque jamais."),
+        ("R-180", "Freestyle n° 77 (NNRBKQBR : roi en e1, tour en h1) contre l'ordinateur : jouer jusqu'à ce qu'il roque ; roquer soi-même (roi posé sur sa tour) ; indice H quand le roque est possible ; puis revue de la partie",
+         "L'ordinateur roque et ne reste jamais bloqué sans jouer ; l'indice peut montrer le roque ; la revue rejoue les deux roques et ton roque a une pastille normale (pas « Gaffe »)."),
         ("R-158", "Revue et « Mes parties » d'une partie Freestyle",
          "La revue rejoue la partie (roques compris), pastilles présentes, aucun nom d'ouverture ; PGN : [Variant \"Chess960\"], [SetUp], [FEN]."),
         ("R-159", "Freestyle → Tournoi, contre l'ordinateur",
@@ -237,6 +239,8 @@ RECETTE = [
          "Ton nouveau score y est (Actualiser si besoin) ; un moins bon record ne remplace pas le meilleur ; le classement des problèmes suit ta valeur du jour."),
         ("R-08C", "Steam fermé : Problèmes → « Classements Steam » ; jouer un contre la montre ; puis relancer le jeu avec Steam ouvert",
          "Sans Steam : message clair et tes scores du jeu ; une fois Steam ouvert, ton record apparaît dans le classement sans rien refaire."),
+        ("R-177", "Version itch.io (zip itch, ou set SICKCHESS_DISTRIBUTION=itch avant python SickChess.py), Steam ouvert ou non : Problèmes → « Classements »",
+         "Le bouton s'appelle « Classements » (sans « Steam ») ; l'écran dit « Les classements mondiaux passent par Steam » puis montre tes 3 records gardés dans le jeu (problèmes, contre la montre, survie) ; Échap revient aux Problèmes ; rien ne plante."),
     ]),
     ("Entraînement aux ouvertures", [
         ("R-097", "Menu → Entraînement aux ouvertures : choisir un coup dans l'arbre (ex. 1.e4 › 1...e5 › 2.Nf3 › 2...Nc6 › 3.Bb5), Blancs ou Noirs, puis « S'entraîner ici »",
@@ -317,6 +321,8 @@ RECETTE = [
          "La ligne dit tes cœurs, ta mémoire et « PC normal » (ton i7) ; en Petit PC, la revue n'ouvre qu'un seul stockfish.exe (Gestionnaire des tâches) et reste fluide ; un choix de puissance d'analyse fait à la main est gardé."),
     ]),
     ("En ligne (Steam)", [
+        ("R-176", "Version itch.io (zip itch, ou set SICKCHESS_DISTRIBUTION=itch avant python SickChess.py), avec Steam OUVERT sur le PC : Menu → Jouer en ligne",
+         "Au menu « Jouer en ligne » sans « (Steam) » ; l'écran montre un cadre doré « Le jeu en ligne passe par Steam » et une phrase entière qui conseille « Jouer à deux sur ce PC » ; seul bouton Retour ; Steam n'est jamais démarré (journal_du_jeu.txt sans ligne [STEAM]) ; en version normale, « Jouer en ligne (Steam) » comme avant."),
         ("R-100", "Jouer en ligne sans Steam lancé",
          "Message clair « Ouvre Steam… », le jeu ne plante pas."),
         ("R-101", "Lancer le jeu deux fois : Test : héberger / Test : rejoindre",
@@ -375,6 +381,10 @@ RECETTE = [
          "Windows demande une fois « Autoriser cette application à apporter des modifications ? » ; Oui : pare-feu Windows → règles « SickChess » (entrée et sortie, tous les profils) ; relancer : plus aucune demande ; Non : le jeu marche, il redemandera à la version suivante."),
         ("R-174", "Taille de SickChess_Installation.exe dans la release GitHub, puis double-clic chez un ami (Internet branché)",
          "Le fichier fait moins de 1 Go (~100 Mo) ; pendant l'installation, une page montre le téléchargement des problèmes et des tables de finales (~1,2 Go) ; à la fin, Problèmes et finales marchent tout de suite, sans passer par Mise à jour."),
+        ("R-178", "Double-clic sur CONSTRUIRE_VERSION_ITCH.bat (après MODE_TEST = False), puis ouvrir publier/itch/SickChess_<version>_itch.zip",
+         "D'abord la vérification « --itch » : BLOQUANT si le mode test est allumé ou s'il reste un fichier Steam ; sinon le zip se fabrique ; il ne contient ni steam_api64.dll, ni steam_appid.txt, ni LISEZ-MOI_AMIS.txt, ni paquets_installes.json, mais un distribution.json qui dit « itch » ; rien n'est envoyé sur GitHub."),
+        ("R-179", "Dézipper le zip itch dans un dossier neuf sur un PC (sans Steam si possible), lancer SickChess.exe",
+         "Le jeu démarre sans demande de droits Windows ni règle de pare-feu ; partie contre l'ordinateur, Jouer à deux sur ce PC, problèmes et revue marchent ; aucune mise à jour automatique par GitHub ne se lance."),
         ("R-119", "Sur un réseau dont le DNS ne marche pas (Paramètres réseau → DNS manuel 10.255.255.1), laisser le jeu au menu",
          "La mise à jour passe quand même ; journal_du_jeu.txt : « [MAJ] DNS du PC sans reponse pour github.com : adresse obtenue par DNS securise » ; remettre le DNS automatique ensuite."),
     ]),
@@ -405,6 +415,8 @@ RECETTE = [
          "Petite onde blanche sur la case de la prise ; au mat : halo rouge sur le roi maté et confettis si tu gagnes (pas si tu perds) ; chaque écran arrive en fondu."),
         ("R-131", "Essayer les 6 jeux de pièces sur les damiers clairs et sombres",
          "Toutes les pièces se lisent bien, blanches comme noires."),
+        ("R-181", "Lire les textes sur plusieurs lignes (explications de la revue, salon en ligne, aide F1), en français puis en anglais, en petite fenêtre",
+         "Aucune ligne ne finit par un « ou », « : », « ; », « ! » ou « ? » laissé seul ; le thème « Découverte » s'écrit « Discovery » en anglais, entier."),
     ]),
 ]
 

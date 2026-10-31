@@ -3,9 +3,13 @@
 Fichier partagé entre Cowork et Claude Code. **À relire au début de chaque séance,
 à mettre à jour à la fin.** La page « SickChess – À faire »
 (https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5) en est la version à cocher pour Julien.
-Mis à jour le 31/10/2026 (séance (48) – installeur sous 1 Go, version amis n° 11, 0.6.0).
+Mis à jour le 31/10/2026 (séance (50) – version itch.io sans Steam, ménage, bug du roque Freestyle).
 
 ## Demande de Julien du 31/10 – itch.io : jeu en ligne et classements sans le n° 480 (Claude Code) – EN PREMIER
+**Où on en est (31/10, séance (50))** : étapes 1 à 7 faites côté code et docs, vérifiées à l'écran en mode itch
+(`set SICKCHESS_DISTRIBUTION=itch`). Reste : le vrai zip itch (pas encore fabriqué : il faut d'abord
+`MODE_TEST = False`, sinon `verifier_version.py --itch` bloque, ce qui est voulu), les tests t143 et t146, et
+les questions à Julien ci-dessous.
 Constat (Cowork, 31/10) : tout le jeu en ligne et les classements passent par Steam avec le numéro de
 test **480** (« Spacewar » de Valve). C'est bien pour les tests entre amis, **pas pour un jeu vendu** :
 classements partagés avec tous les développeurs qui testent sur 480 (scores mélangés, peuvent être
@@ -14,25 +18,25 @@ acheteur itch.io n'a pas forcément Steam. Le vrai numéro Steam arrivera avec l
 (démarche de Julien, 100 $) : ce travail-ci prépare tout pour que ce jour-là il n'y ait qu'un chiffre à changer.
 
 Travail (petites étapes, jeu jouable après chacune, tests verts, journal, commit) :
-1. [ ] **Audit d'abord, sans rien changer** : lister tout ce qui dépend de Steam / 480 /
+1. [x] **Audit d'abord, sans rien changer** : lister tout ce qui dépend de Steam / 480 /
        `steam_appid.txt` / `steam_api64.dll` (`jeu/steam.py`, `partie_en_ligne.py` qui démarre Steam
        dès que le jeu est compilé, `classements.py`, succès, `salon_en_ligne.py`, `outils/publier_maj.py`,
        `outils/verifier_version.py`, skill `compiler-exe`). Résumer à Julien en 5 lignes simples.
-2. [ ] **Un seul réglage « distribution »** : `amis` / `steam` / `itch`, à un seul endroit, écrit au
+2. [x] **Un seul réglage « distribution »** : `amis` / `steam` / `itch`, à un seul endroit, écrit au
        moment de la compilation. Le numéro Steam lu à un seul endroit (480 pour `amis`, le vrai numéro
        pour `steam`, aucun pour `itch`).
-3. [ ] **Version itch** : ni `steam_api64.dll` ni `steam_appid.txt` dans le paquet ; Steam jamais démarré,
+3. [x] **Version itch** : ni `steam_api64.dll` ni `steam_appid.txt` dans le paquet ; Steam jamais démarré,
        même si Steam est ouvert sur le PC. « Jouer en ligne » et « Classements » : un message clair
        et joli (pas d'erreur), partie à deux sur le même PC toujours là. Records et classement
        personnels gardés dans le jeu et visibles. Ne pas supprimer le code Steam.
-4. [ ] **Version amis** : rien ne change (480, comme aujourd'hui). **Version Steam** : rien ne change
+4. [x] **Version amis** : rien ne change (480, comme aujourd'hui). **Version Steam** : rien ne change
        sauf le numéro ; `verifier_version.py --steam` bloque toujours 480 et `MODE_TEST = True`.
-5. [ ] `outils/verifier_version.py --itch` : bloquant si un fichier Steam est dans le paquet ou si
+5. [x] `outils/verifier_version.py --itch` : bloquant si un fichier Steam est dans le paquet ou si
        `MODE_TEST = True`. Compilation : zip `SickChess_<version>_itch.zip` à part.
-6. [ ] Tests (faux Steam) : `tests/test_distribution.py` dans `SERIES` : en `itch`, Steam n'est jamais
+6. [x] Tests (faux Steam) : `tests/test_distribution.py` dans `SERIES` : en `itch`, Steam n'est jamais
        démarré, les écrans en ligne / classements s'ouvrent et se ferment sans planter ; en `amis` et
        `steam`, tout comme avant. `python tests/lancer_tous.py` tout vert.
-7. [ ] Textes : accents, clés dans `langue_en.py`. Docs : `SORTIE.md`, `MULTIJOUEUR_STEAM.md`,
+7. [x] Textes : accents, clés dans `langue_en.py`. Docs : `SORTIE.md`, `MULTIJOUEUR_STEAM.md`,
        `SUCCES_STEAM.md`, recette (`outils/recette.py`), `CREDITS` si un import change, journal,
        tests pour Julien dans « À tester par Julien ».
 Ne PAS faire sans l'accord de Julien : créer un serveur à nous (coût, entretien, triche), toucher aux
@@ -42,8 +46,22 @@ aussi en ligne, soit on leur donne **une clé Steam** avec leur achat (itch.io s
 le vrai numéro Steam obtenu ; rien à coder de plus), soit on fait **notre propre serveur** (plus long,
 payant, à surveiller). Conseil : la clé Steam.
 
+**Questions pour Julien (31/10, séance (50))** – réponds dans la page « À faire » :
+- [ ] Acheteurs itch.io et jeu en ligne : **clé Steam offerte** avec l'achat (conseillé, rien à coder) ou
+      **notre propre serveur** (long, payant, à surveiller) ?
+- [ ] Mettre les **tables de finales** (plus de 1 Go) dans le zip itch ? Aujourd'hui le zip contient le jeu,
+      Stockfish et les problèmes, mais pas les tables (l'analyse marche sans, un peu moins juste en finale).
+- [ ] Garder le bouton **« Signaler »** dans la version itch ? L'adresse du salon Discord (`signalement.json`)
+      serait lisible par n'importe qui en ouvrant le zip (quelqu'un pourrait y envoyer des messages).
+- [ ] Le réglage `config.json` du dossier de développement est resté **en anglais** (laissé par Cowork) :
+      on le remet en français ?
+- [ ] **Sons en double** : la nulle par 50 coups, par répétition et le pat ont le même son. Un son différent
+      pour chacun, ou c'est bien comme ça ?
+- [ ] Vider les **anciennes versions** du dossier `publier/` (environ 3 Go sur ton disque) ? Elles sont toutes
+      déjà sur GitHub.
+
 ## Retours de Julien à traiter (priorité)
-- [ ] **Claude Code (31/10, musique)** : la musique du jeu est maintenant `music/zugzwang.ogg` (choisie par Julien).
+- [x] (31/10, séance (50), commit 2042d45 ; reste : version amis, et l'écoute t141 / t142) **Claude Code (31/10, musique)** : la musique du jeu est maintenant `music/zugzwang.ogg` (choisie par Julien).
   Faire `python tests/lancer_tous.py`, puis commit (`jeu/musique.py`, `music/zugzwang.ogg`, `tests/test_sons_musique.py`,
   `outils/musique/`, CREDITS, recette) – **pas** `music/essais/` (à mettre dans `.gitignore`). Version amis ensuite.
   Question pour Julien plus tard : mettre aussi Zugzwang dans la vidéo de présentation (elle utilise encore `calme.wav`).
@@ -131,7 +149,7 @@ payant, à surveiller). Conseil : la clé Steam.
       par défaut (journal (13)). À valider : t67, t68 ; mesure t69 par Claude Code.
 
 ## Recette complète (stabilité)
-- `docs/RECETTE.md` : 161 tests à la main sur tout le jeu (version du 25/10/2026), source dans
+- `docs/RECETTE.md` : 181 tests à la main sur tout le jeu (version du 31/10/2026), source dans
   `outils/recette.py`. Recopiés dans la page, groupe « Recette complète »
   (Fonctionne / Ne fonctionne pas + commentaire, bouton « Nouvelle passe »).
 - Tenue à jour à chaque séance ; passe complète avant chaque version amis / Steam.
@@ -160,8 +178,13 @@ Mesures faites dans Cowork (machine Linux plus lente) : à refaire sur le PC de 
 - [x] (23/10, journal 17-19 : 30 images/s au repos, partie 9 % d'un cœur) **Ne pas redessiner au repos** : une partie arrêtée prend ~50 % d'un cœur (machine
       Cowork) ; redessiner seulement si quelque chose change, 30 images/s au repos.
 - [x] (23/10, journal 19) Stockfish d'analyse en priorité basse (le jeu reste fluide pendant une revue).
-- [ ] Ménage : ~~8 imports/variables inutiles~~ faits le 23/10 ; `jeu/fond_anime.py` jamais
+- [x] Ménage : ~~8 imports/variables inutiles~~ faits le 23/10 ; `jeu/fond_anime.py` jamais
       importé, ~100 fonctions peut-être mortes à vérifier une par une (skill `menage-code`).
+      (31/10, séance (50) : `fond_anime.py` supprimé, 74 fonctions mortes retirées, −929 lignes,
+      vulture 109 → 18 ; les 18 restants sont voulus, notés dans `outils/vulture_liste_blanche.py`.)
+- [ ] Petite tâche (31/10) : `jeu/sauvegarde.py` (ligne 119) devine encore si la partie est Freestyle à partir de
+      la position de départ quand on **reprend une partie sauvegardée**. Le n° 518 en Freestyle (position normale)
+      serait repris comme une partie normale. Garder « Freestyle oui / non » dans la sauvegarde, avec un test.
 - [x] (23/10, retiré) Réglage `ia_suivre_la_pendule` de config.json lu nulle part : le reprendre ou l'enlever.
 - [x] (23/10) Commit : 34 fichiers modifiés non enregistrés + 1 commit pas encore envoyé sur GitHub.
 → Avant de commencer, lire les décisions de Julien dans la page (Corriger / OK / Ignorer).
@@ -255,6 +278,29 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+Séance du 31/10 (50) · version itch.io, ménage, roque Freestyle – **Fonctionne / Ne fonctionne pas + commentaire**.
+Ces essais se font depuis le dossier de développement (pas dans la version installée : rien n'est encore publié).
+Claude Code a déjà vérifié la version itch **en anglais** ; il reste à la voir en français.
+- [ ] t143 (50) : **version itch.io, en français** : dans le dossier du jeu, ouvre une fenêtre de commandes et tape
+      `set SICKCHESS_DISTRIBUTION=itch` puis `python SickChess.py` (Options → Langue : Français). On doit voir :
+      au menu « Jouer en ligne » **sans** « (Steam) » ; dedans, un cadre doré « Le jeu en ligne passe par Steam » et
+      une phrase entière qui conseille « Jouer à deux sur ce PC », seul bouton Retour. Problèmes → bouton
+      « Classements » (sans « Steam ») : « Les classements mondiaux passent par Steam » puis tes 3 records.
+      « Jouer à deux sur ce PC » marche normalement. Aucun texte coupé, aucune demande de Windows.
+      Puis ferme, relance par `LANCER.bat` (version normale) : « Jouer en ligne (Steam) » comme avant.
+- [ ] t144 (50) : **Freestyle n° 77 (NNRBKQBR)** : Jouer contre l'ordinateur → Freestyle → Choisir le n° → 77.
+      Joue jusqu'à ce que l'ordinateur roque : il roque et **ne reste jamais bloqué sans jouer**. À ton tour, quand
+      tu peux roquer, touche H (indice) : le roque peut être montré. Roque toi-même (roi posé sur sa tour), finis la
+      partie puis ouvre sa revue : ton roque est bien rejoué et a une pastille normale (pas « Gaffe »).
+- [ ] t145 (50) : **partie normale avec roque** : contre l'ordinateur, position normale : petit roque et grand roque
+      marchent comme avant, l'ordinateur roque aussi, la revue les rejoue.
+- [ ] t146 (50) : **tour rapide du jeu après le grand ménage** (929 lignes retirées) : ouvre un par un le menu, une
+      partie contre l'ordinateur, sa revue, l'analyse libre, les problèmes, les ouvertures, les options, les
+      statistiques, Mes parties. Rien ne plante, rien ne manque, `journal_du_jeu.txt` sans « Traceback ».
+- [ ] t147 (50) : **réinstaller SickChess** (Claude Code n'a pas pu) : double-clic sur
+      `publier\v0.6.1-n12\SickChess_Installation.exe`. À la fin : SickChess est dans Paramètres → Applications, l'icône
+      est sur le Bureau et dans le menu Démarrer, le jeu démarre en 0.6.1, tes parties et réglages sont toujours là.
+
 - [ ] t141 (musique) : **nouvelle musique « Zugzwang »** : dans le menu, elle démarre en fondu ; laisse tourner plus
   d'1 min 30 : elle repart du début sans coupure ni « clic ». Elle s'arrête quand une partie commence.
 - [ ] t142 (musique) : Options → Son : volume de la musique et Musique Non ; touche M dans le menu ; problèmes et
@@ -516,5 +562,6 @@ SickChess dans `%TEMP%\SickChessEssai` avec le MÊME AppId que la copie de Julie
 L'essai remplace l'entrée « SickChess » de Windows et le raccourci du menu Démarrer ; sa
 désinstallation les supprime. `CloseApplications=yes` ferme aussi le jeu s'il est ouvert.
 Correctif écrit dans `.claude/skills/version-amis/SKILL.md` (nouvelle étape 5 : réinstaller la copie de Julien).
-- [ ] Claude Code : réinstaller SickChess 0.6.1 n° 12 chez Julien (`/VERYSILENT /CURRENTUSER /DIR="%LOCALAPPDATA%\Programs\SickChess" /TASKS="bureau"`), vérifier raccourcis + Applications, commit du SKILL.md.
+- [ ] (31/10, séance (50) : **pas fait**, bloqué par la sécurité de Claude Code → c'est Julien qui le fait, voir t147)
+      Claude Code : réinstaller SickChess 0.6.1 n° 12 chez Julien (`/VERYSILENT /CURRENTUSER /DIR="%LOCALAPPDATA%\Programs\SickChess" /TASKS="bureau"`), vérifier raccourcis + Applications, commit du SKILL.md.
 - [ ] Julien : à la prochaine version amis, vérifier que SickChess est toujours là après la publication.

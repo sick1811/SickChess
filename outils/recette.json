@@ -289,32 +289,39 @@
    "ordre": 10506
   },
   {
+   "id": "R-180",
+   "section": "Freestyle (échecs 960)",
+   "texte": "Freestyle n° 77 (NNRBKQBR : roi en e1, tour en h1) contre l'ordinateur : jouer jusqu'à ce qu'il roque ; roquer soi-même (roi posé sur sa tour) ; indice H quand le roque est possible ; puis revue de la partie",
+   "detail": "L'ordinateur roque et ne reste jamais bloqué sans jouer ; l'indice peut montrer le roque ; la revue rejoue les deux roques et ton roque a une pastille normale (pas « Gaffe »).",
+   "ordre": 10507
+  },
+  {
    "id": "R-158",
    "section": "Freestyle (échecs 960)",
    "texte": "Revue et « Mes parties » d'une partie Freestyle",
    "detail": "La revue rejoue la partie (roques compris), pastilles présentes, aucun nom d'ouverture ; PGN : [Variant \"Chess960\"], [SetUp], [FEN].",
-   "ordre": 10507
+   "ordre": 10508
   },
   {
    "id": "R-159",
    "section": "Freestyle (échecs 960)",
    "texte": "Freestyle → Tournoi, contre l'ordinateur",
    "detail": "Cadence 10 min + 5 s, bandeau « Préparation : 10:00 », on ne peut pas jouer ; « Je suis prêt » (ou Espace) lance la partie.",
-   "ordre": 10508
+   "ordre": 10509
   },
   {
    "id": "R-160",
    "section": "Freestyle (échecs 960)",
    "texte": "Tournoi : Échap → Proposer la nulle avant le 40e coup des Noirs",
    "detail": "Refusée : « Tournoi Freestyle : pas de nulle avant le 40e coup des Noirs. »",
-   "ordre": 10509
+   "ordre": 10510
   },
   {
    "id": "R-161",
    "section": "Freestyle (échecs 960)",
    "texte": "Menu en pleine partie Freestyle, puis Reprendre",
    "detail": "Même position Freestyle, même numéro, le roque marche encore.",
-   "ordre": 10510
+   "ordre": 10511
   },
   {
    "id": "R-050",
@@ -695,6 +702,13 @@
    "ordre": 10912
   },
   {
+   "id": "R-177",
+   "section": "Problèmes",
+   "texte": "Version itch.io (zip itch, ou set SICKCHESS_DISTRIBUTION=itch avant python SickChess.py), Steam ouvert ou non : Problèmes → « Classements »",
+   "detail": "Le bouton s'appelle « Classements » (sans « Steam ») ; l'écran dit « Les classements mondiaux passent par Steam » puis montre tes 3 records gardés dans le jeu (problèmes, contre la montre, survie) ; Échap revient aux Problèmes ; rien ne plante.",
+   "ordre": 10913
+  },
+  {
    "id": "R-097",
    "section": "Entraînement aux ouvertures",
    "texte": "Menu → Entraînement aux ouvertures : choisir un coup dans l'arbre (ex. 1.e4 › 1...e5 › 2.Nf3 › 2...Nc6 › 3.Bb5), Blancs ou Noirs, puis « S'entraîner ici »",
@@ -940,130 +954,137 @@
    "ordre": 11311
   },
   {
+   "id": "R-176",
+   "section": "En ligne (Steam)",
+   "texte": "Version itch.io (zip itch, ou set SICKCHESS_DISTRIBUTION=itch avant python SickChess.py), avec Steam OUVERT sur le PC : Menu → Jouer en ligne",
+   "detail": "Au menu « Jouer en ligne » sans « (Steam) » ; l'écran montre un cadre doré « Le jeu en ligne passe par Steam » et une phrase entière qui conseille « Jouer à deux sur ce PC » ; seul bouton Retour ; Steam n'est jamais démarré (journal_du_jeu.txt sans ligne [STEAM]) ; en version normale, « Jouer en ligne (Steam) » comme avant.",
+   "ordre": 11400
+  },
+  {
    "id": "R-100",
    "section": "En ligne (Steam)",
    "texte": "Jouer en ligne sans Steam lancé",
    "detail": "Message clair « Ouvre Steam… », le jeu ne plante pas.",
-   "ordre": 11400
+   "ordre": 11401
   },
   {
    "id": "R-101",
    "section": "En ligne (Steam)",
    "texte": "Lancer le jeu deux fois : Test : héberger / Test : rejoindre",
    "detail": "Les deux fenêtres se connectent, la partie démarre.",
-   "ordre": 11401
+   "ordre": 11402
   },
   {
    "id": "R-162",
    "section": "En ligne (Steam)",
    "texte": "Salon : VARIANTE Freestyle (Au hasard puis Tournoi), lancer",
    "detail": "L'ami voit « Variante : Freestyle » ; même position chez les deux ; en Tournoi, la préparation finit quand les deux ont cliqué « Je suis prêt ».",
-   "ordre": 11402
+   "ordre": 11403
   },
   {
    "id": "R-163",
    "section": "En ligne (Steam)",
    "texte": "Revanche après une partie Freestyle en ligne",
    "detail": "Même position, couleurs inversées, sans nouvelle préparation.",
-   "ordre": 11403
+   "ordre": 11404
   },
   {
    "id": "R-102",
    "section": "En ligne (Steam)",
    "texte": "Avec un ami (deux PC) : inviter, choisir cadence et couleur, jouer",
    "detail": "Coups, pendules et chat synchronisés ; overlay Maj+Tab.",
-   "ordre": 11404
+   "ordre": 11405
   },
   {
    "id": "R-104",
    "section": "En ligne (Steam)",
    "texte": "En ligne : bouton NULLE (à la place de MENU), l'ami accepte avec son bouton NULLE",
    "detail": "Partie nulle des deux côtés ; si l'ami joue un coup au lieu d'accepter, la proposition est oubliée.",
-   "ordre": 11405
+   "ordre": 11406
   },
   {
    "id": "R-105",
    "section": "En ligne (Steam)",
    "texte": "Après une partie en ligne : Mes parties",
    "detail": "La partie y est (avec ton camp et le résultat) et se revoit avec l'analyse ; l'Elo ne bouge pas.",
-   "ordre": 11406
+   "ordre": 11407
   },
   {
    "id": "R-103",
    "section": "En ligne (Steam)",
    "texte": "Revanche, abandon, un joueur qui ferme le jeu",
    "detail": "Revanche couleurs inversées ; abandon et départ donnent le bon résultat.",
-   "ordre": 11407
+   "ordre": 11408
   },
   {
    "id": "R-106",
    "section": "En ligne (Steam)",
    "texte": "Ton ami (SickChess déjà OUVERT) accepte ton invitation Steam, ou tape le code",
    "detail": "Il arrive dans ton salon en quelques secondes ; avec le numéro de test 480, accepter quand SickChess est fermé ouvrirait « Spacewar » : c'est normal.",
-   "ordre": 11408
+   "ordre": 11409
   },
   {
    "id": "R-107",
    "section": "En ligne (Steam)",
    "texte": "Claude Code : python outils/verifier_en_ligne.py (Steam ouvert)",
    "detail": "Fichiers, connexion Steam, salon créé avec son code, tests réseau : tout en ✅ dans docs/VERIFICATION_EN_LIGNE.md.",
-   "ordre": 11409
+   "ordre": 11410
   },
   {
    "id": "R-108",
    "section": "En ligne (Steam)",
    "texte": "Fin d'une partie en ligne : regarder la carte de fin, puis cliquer « Revue de la partie »",
    "detail": "Carte : résultat, raison, « Précision : toi … – <ami> … » (après « Analyse en cours… »), boutons Revue, Revanche, Menu ; la revue s'ouvre de ton côté (plateau dans ton sens, noms « Toi » et ton ami), pastilles, flèches et variantes comme contre l'ordinateur ; l'ami ne voit pas ta revue.",
-   "ordre": 11410
+   "ordre": 11411
   },
   {
    "id": "R-109",
    "section": "En ligne (Steam)",
    "texte": "Pendant ta revue, l'ami demande une revanche ou écrit dans le chat ; puis Retour",
    "detail": "Un bandeau en haut de la revue annonce la revanche ; au retour, la carte propose « Accepter la revanche » et le chat contient son message ; la partie compte dans Statistiques et ses fautes dans « Mes erreurs » une fois l'analyse finie.",
-   "ordre": 11411
+   "ordre": 11412
   },
   {
    "id": "R-10A",
    "section": "En ligne (Steam)",
    "texte": "SickChess ouvert au menu : un ami Steam t'invite (depuis son salon SickChess ou Maj+Tab)",
    "detail": "Un petit son, et en haut « <ami> t'invite à jouer » avec Rejoindre / Plus tard ; Rejoindre : tu arrives dans son salon.",
-   "ordre": 11412
+   "ordre": 11413
   },
   {
    "id": "R-10B",
    "section": "En ligne (Steam)",
    "texte": "Même chose pendant les Problèmes, une revue ou l'analyse libre ; cliquer Rejoindre",
    "detail": "L'écran se ferme et tu arrives dans le salon de l'ami.",
-   "ordre": 11413
+   "ordre": 11414
   },
   {
    "id": "R-10C",
    "section": "En ligne (Steam)",
    "texte": "Même chose pendant une partie contre l'ordinateur ; Rejoindre, puis « Rester » ; recommencer et confirmer « Rejoindre »",
    "detail": "Une fenêtre demande « Rejoindre <ami> ? », la pendule s'arrête ; Rester : la partie continue ; Rejoindre : salon de l'ami, et plus tard « Reprendre la partie » dans le menu la retrouve.",
-   "ordre": 11414
+   "ordre": 11415
   },
   {
    "id": "R-10D",
    "section": "En ligne (Steam)",
    "texte": "« Plus tard » sur le bandeau (ou ne rien faire 45 s), puis Menu → Jouer en ligne",
    "detail": "Le bandeau disparaît ; « INVITATIONS REÇUES » liste l'invitation (« il y a N min ») avec Rejoindre, pendant 10 minutes.",
-   "ordre": 11415
+   "ordre": 11416
   },
   {
    "id": "R-10E",
    "section": "En ligne (Steam)",
    "texte": "Sans ami : Jouer en ligne → « Test : invitation », puis Retour au menu",
    "detail": "« Ami de test t'invite à jouer » apparaît dans le menu (Rejoindre mène à un salon qui n'existe pas : message clair).",
-   "ordre": 11416
+   "ordre": 11417
   },
   {
    "id": "R-10F",
    "section": "En ligne (Steam)",
    "texte": "Menu → Jouer en ligne : lire la phrase sous le titre, en français puis en English (Options → Langue)",
    "detail": "La phrase « Joue contre un ami Steam. Crée une partie et invite-le, ou entre le code qu'il t'a donné. » est entière (2 ou 3 lignes), rien n'est coupé ni ne touche le bouton « Créer une partie » ; pareil en anglais.",
-   "ordre": 11417
+   "ordre": 11418
   },
   {
    "id": "R-110",
@@ -1136,11 +1157,25 @@
    "ordre": 11509
   },
   {
+   "id": "R-178",
+   "section": "Version amis et mises à jour",
+   "texte": "Double-clic sur CONSTRUIRE_VERSION_ITCH.bat (après MODE_TEST = False), puis ouvrir publier/itch/SickChess_<version>_itch.zip",
+   "detail": "D'abord la vérification « --itch » : BLOQUANT si le mode test est allumé ou s'il reste un fichier Steam ; sinon le zip se fabrique ; il ne contient ni steam_api64.dll, ni steam_appid.txt, ni LISEZ-MOI_AMIS.txt, ni paquets_installes.json, mais un distribution.json qui dit « itch » ; rien n'est envoyé sur GitHub.",
+   "ordre": 11510
+  },
+  {
+   "id": "R-179",
+   "section": "Version amis et mises à jour",
+   "texte": "Dézipper le zip itch dans un dossier neuf sur un PC (sans Steam si possible), lancer SickChess.exe",
+   "detail": "Le jeu démarre sans demande de droits Windows ni règle de pare-feu ; partie contre l'ordinateur, Jouer à deux sur ce PC, problèmes et revue marchent ; aucune mise à jour automatique par GitHub ne se lance.",
+   "ordre": 11511
+  },
+  {
    "id": "R-119",
    "section": "Version amis et mises à jour",
    "texte": "Sur un réseau dont le DNS ne marche pas (Paramètres réseau → DNS manuel 10.255.255.1), laisser le jeu au menu",
    "detail": "La mise à jour passe quand même ; journal_du_jeu.txt : « [MAJ] DNS du PC sans reponse pour github.com : adresse obtenue par DNS securise » ; remettre le DNS automatique ensuite.",
-   "ordre": 11510
+   "ordre": 11512
   },
   {
    "id": "R-120",
@@ -1225,6 +1260,13 @@
    "texte": "Essayer les 6 jeux de pièces sur les damiers clairs et sombres",
    "detail": "Toutes les pièces se lisent bien, blanches comme noires.",
    "ordre": 11704
+  },
+  {
+   "id": "R-181",
+   "section": "Graphisme et textes",
+   "texte": "Lire les textes sur plusieurs lignes (explications de la revue, salon en ligne, aide F1), en français puis en anglais, en petite fenêtre",
+   "detail": "Aucune ligne ne finit par un « ou », « : », « ; », « ! » ou « ? » laissé seul ; le thème « Découverte » s'écrit « Discovery » en anglais, entier.",
+   "ordre": 11705
   }
  ]
 }

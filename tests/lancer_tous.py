@@ -16,6 +16,7 @@ SERIES = [
     ("test_regles.py", False),
     ("test_freestyle.py", False),
     ("test_freestyle_moteur.py", True),
+    ("test_freestyle_coup_illegal.py", True),   # 31/10 : n° 77, roque e1h1 et non e1g1
     ("test_options.py", False),
     ("test_mes_parties.py", False),
     ("test_problemes.py", False),
@@ -37,6 +38,7 @@ SERIES = [
     ("test_plantage.py", False),
     ("test_endurance.py", False),
     ("test_verifier_version.py", False),
+    ("test_distribution.py", False),     # 31/10 : amis / steam / itch (sans Steam)
     ("test_petit_pc.py", False),
     ("test_resume_coach.py", False),
     ("test_lisibilite.py", False),

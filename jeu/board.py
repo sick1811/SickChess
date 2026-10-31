@@ -392,28 +392,28 @@ class ChessBoard:
             # V7.2 : a bas classement, le moteur de JEU choisit expres un coup
             # de debutant (faiblesse.py). L'indice, lui, doit donner le MEILLEUR
             # coup - sinon il souffle une betise. On le lui demande explicitement.
+            # 31/10 : le moteur doit savoir si la partie est Freestyle (la FEN
+            # seule ne le dit pas toujours, n° 77) ; le roque se lit sur le plateau.
             uci = None
+            libre = freestyle.options_moteur(self.board)
             if hasattr(moteur, "meilleur_coup_honnete"):
                 honnete = moteur.meilleur_coup_honnete(self.board.fen(),
-                                                       temps_ms)
+                                                       temps_ms, **libre)
                 if honnete:
                     uci = honnete.get("coup")
             if not uci:
-                uci = moteur.get_best_move(self.board.fen(), temps_ms)
+                uci = moteur.get_best_move(self.board.fen(), temps_ms, **libre)
         except Exception as e:
             print("[INDICE] impossible : %s" % e)
             return None
         if not uci:
             return None
-        coup = chess.Move.from_uci(uci)
+        coup = freestyle.lire_coup(self.board, uci)
         self.indice = (coup.from_square, coup.to_square)
         self.indices_utilises += 1
         print("[INDICE] meilleur coup : %s (%d indices utilises)"
               % (uci, self.indices_utilises))
         return coup
-
-    def effacer_indice(self):
-        self.indice = None
 
     def annuler_selection(self):
         """Annule le deplacement en cours et remet la piece a sa place."""

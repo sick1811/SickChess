@@ -1933,3 +1933,51 @@ Julien, et sa désinstallation les efface. Les parties et réglages (dans %APPDA
 Fait : étape 5 ajoutée au skill version-amis (réinstaller la copie de Julien après l'essai) ; tâche dans A_FAIRE.md.
 À vérifier par Julien :
 - [ ] Après la prochaine version amis, SickChess est toujours installé (icône Bureau, menu Démarrer, Applications).
+
+## 31/10/2026 (50) – Version itch.io sans Steam, grand ménage, bug du roque Freestyle (Claude Code, tous les agents)
+Demande de Julien : « fais les à faire avec tous les agents ».
+Fait :
+- Musique « Zugzwang » (travail de Cowork) enregistrée dans Git après les tests (commit 2042d45). L'écoute reste à
+  Julien (t141, t142).
+- **Version itch.io (étapes 1 à 6 de « EN PREMIER »)** : le jeu sait maintenant s'il est la version amis, Steam ou
+  itch.io (fichier `distribution.json` écrit à la fabrication ; sans ce fichier = version amis, comme avant).
+  - Version itch : Steam n'est **jamais** démarré, même s'il est ouvert sur le PC.
+  - Menu : « Jouer en ligne » (sans « (Steam) ») ; l'écran montre un cadre or « Le jeu en ligne passe par Steam » et
+    conseille « Jouer à deux sur ce PC ». Problèmes : le bouton s'appelle « Classements » et montre tes 3 records
+    gardés dans le jeu. Pas de règle de pare-feu ni de demande de droits Windows.
+  - `CONSTRUIRE_VERSION_ITCH.bat` fabrique `publier/itch/SickChess_<version>_itch.zip` **sans aucun fichier Steam**
+    (ni `steam_api64.dll`, ni `steam_appid.txt`), sans le mode d'emploi des amis ni la mise à jour par GitHub.
+    Rien n'est envoyé sur Internet : le zip se dépose à la main sur itch.io.
+  - `verifier_version.py --itch` bloque s'il reste un fichier Steam dans le zip ou si le mode test est allumé ;
+    `--steam` bloque aussi tant que le vrai numéro Steam n'est pas écrit.
+  - Le jour où Steam donne le vrai numéro du jeu : **un seul chiffre à changer**, `APPID_STEAM_REEL` dans
+    `jeu/distribution.py`.
+  - Version amis : rien ne change (numéro de test 480). Anglais : « Online play requires Steam »,
+    « Global leaderboards require Steam ».
+  - Vérifié à l'écran par Claude Code (vrai jeu en mode itch, en anglais) : menu sans « Steam », écran Jouer en ligne
+    (cadre or, seul bouton Retour), Problèmes → « Leaderboards » avec les 3 records, aucune trace de Steam dans le
+    journal du jeu. En version normale : « Play online (Steam) » comme avant.
+- **Ménage** (constats « corriger » du banc d'essai) : `jeu/fond_anime.py` supprimé (jamais utilisé), 74 fonctions
+  et réglages morts retirés dans 25 fichiers : **929 lignes de moins**, morceaux de code suspects **109 → 18**
+  (les 18 restants sont voulus et notés). Aucune règle d'échecs touchée.
+- **Textes coupés** : un « ou », « : », « ; », « ! », « ? » ne reste plus seul au bout d'une ligne (contrôle
+  automatique ajouté). Thème de problème « Découverte » en anglais : « Discovery » (avant : « Discovered atta… »
+  coupé en petite fenêtre).
+- **Bug Freestyle corrigé** (trouvé par la série complète de tests, 1 fois sur 2) : en Freestyle, quand le roi est
+  en e1 / e8 et une tour en a ou h (120 positions sur 960, ex. n° 77), l'ordinateur pouvait **rester bloqué sans
+  jouer** et la revue notait mal ton roque. Corrigé ; nouveau contrôle `tests/test_freestyle_coup_illegal.py`
+  (rouge avant, vert après). Série complète : **1664 contrôles verts**. Vérifié à l'écran : une partie Freestyle
+  (n° 75) se joue, l'ordinateur répond.
+- Partie à deux sur ce PC vérifiée à l'écran (plateau qui tourne, pendule, nom d'ouverture) ; Échap au menu →
+  « Quitter SickChess ? » → Oui ferme le jeu, plus aucun programme qui traîne.
+- Docs : `SORTIE.md` (version itch), `MULTIJOUEUR_STEAM.md`, `SUCCES_STEAM.md`, skill `compiler-exe`, recette
+  (R-176 à R-181).
+- Pas fait : réinstaller SickChess n° 12 chez Julien (bloqué par la sécurité de Claude Code) ; .exe itch pas encore
+  fabriqué (il faudra couper le mode test, voir A_FAIRE) ; version amis pas publiée.
+À vérifier par Julien :
+- [ ] Réinstaller SickChess : double-clic sur `publier\v0.6.1-n12\SickChess_Installation.exe` (tes parties et
+  réglages ne sont pas touchés, une sauvegarde a été faite).
+- [ ] t143 à t147 dans `docs/A_FAIRE.md` (version itch en français, Freestyle n° 77, roque normal, tour du jeu après
+  le ménage, réinstallation).
+- [ ] Répondre aux 6 questions de la section « EN PREMIER » de `docs/A_FAIRE.md` (clé Steam pour itch, tables de
+  finales dans le zip itch, Signaler, langue du dossier de dev, sons en double, vieux dossiers de `publier/`).

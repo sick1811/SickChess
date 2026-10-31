@@ -42,8 +42,11 @@ Et le **client Steam ouvert et connecté**.
    `docs/VERIFICATION_EN_LIGNE.md`.
 
 ## Avant la sortie
+- Le numéro Steam ne se lit qu'à un endroit : `jeu/distribution.py` (480 pour la version amis,
+  `APPID_STEAM_REEL` pour la version Steam, aucun pour la version itch.io, qui ne démarre jamais Steam
+  et montre « Le jeu en ligne passe par Steam » à la place du salon). Voir `docs/SORTIE.md`.
 - `MODE_TEST = False` dans `jeu/salon_en_ligne.py` (cache les boutons de test).
-- Mettre le vrai numéro du jeu, retirer `steam_appid.txt` du paquet.
+- Mettre le vrai numéro du jeu (`APPID_STEAM_REEL` dans `jeu/distribution.py`), retirer `steam_appid.txt` du paquet.
 - Prendre `steam_api64.dll` dans **son propre** Steamworks SDK.
 
 ## Fichiers
