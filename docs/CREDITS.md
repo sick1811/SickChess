@@ -39,4 +39,11 @@ Tous les textes de licence livrés avec le jeu sont dans `licenses/` (index : `l
 - `sounds/feutre/` : les sons du pack « Bois » adoucis par `outils/generer_sons.py --feutre`
   (mêmes licences que les originaux : Kenney CC0 et sons synthétisés).
 - `music/calme.wav` : musique entièrement synthétisée par `outils/generer_sons.py --musique`
-  (aucune source extérieure, propriété du projet).
+  (aucune source extérieure, propriété du projet). Plus utilisée par le jeu depuis le 31/10
+  (encore lue par `outils/video_presentation.py`).
+
+## Musique « Zugzwang » (31/10/2026)
+- `music/zugzwang.ogg` : musique du jeu (menu, problèmes, entraînement), choisie par Julien
+  parmi 5 essais (`music/essais/`, hors version amis). Entièrement synthétisée par
+  `outils/musique/pistes.py` (+ `outils/musique/synth.py`, numpy/scipy, outils de fabrication
+  non livrés dans le .exe) : aucun échantillon ni source extérieure, propriété du projet.

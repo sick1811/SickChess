@@ -43,6 +43,10 @@ le vrai numéro Steam obtenu ; rien à coder de plus), soit on fait **notre prop
 payant, à surveiller). Conseil : la clé Steam.
 
 ## Retours de Julien à traiter (priorité)
+- [ ] **Claude Code (31/10, musique)** : la musique du jeu est maintenant `music/zugzwang.ogg` (choisie par Julien).
+  Faire `python tests/lancer_tous.py`, puis commit (`jeu/musique.py`, `music/zugzwang.ogg`, `tests/test_sons_musique.py`,
+  `outils/musique/`, CREDITS, recette) – **pas** `music/essais/` (à mettre dans `.gitignore`). Version amis ensuite.
+  Question pour Julien plus tard : mettre aussi Zugzwang dans la vidéo de présentation (elle utilise encore `calme.wav`).
 - [ ] **25/10 – mise à jour chez l'ami de Julien** (version n° 4 ou 5) : « vérifie ta connexion / site
       introuvable ». Le site marche (vérifié par Cowork le 25/10 : latest → v0.2.0-n6, maj.json téléchargé). Donc
       blocage sur le PC de l'ami (antivirus, pare-feu, DNS, VPN). Attendre son journal_du_jeu.txt (ligne [MAJ]).
@@ -251,6 +255,10 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+- [ ] t141 (musique) : **nouvelle musique « Zugzwang »** : dans le menu, elle démarre en fondu ; laisse tourner plus
+  d'1 min 30 : elle repart du début sans coupure ni « clic ». Elle s'arrête quand une partie commence.
+- [ ] t142 (musique) : Options → Son : volume de la musique et Musique Non ; touche M dans le menu ; problèmes et
+  entraînement : la musique est bien là.
 Séance du 31/10 (49) · promotion en pré-mouvement – **Fonctionne / Ne fonctionne pas + commentaire** (version amis 0.6.1).
 - [ ] t139 (49) : **choisir la pièce d'une promotion préparée d'avance** : contre l'ordinateur, pendant qu'il réfléchit,
       amène ton pion sur la dernière rangée : le panneau **Dame / Tour / Fou / Cavalier** s'ouvre (avant : dame d'office).
@@ -500,3 +508,13 @@ Les points 3 à 6 ne seront dans la version installée qu'après la prochaine ve
   temps restant affiché, outil de mesure de Stockfish.
 - 17/10 : son réparé chez Julien, analyse en tâche de fond (précision immédiate),
   notation au choix (anglaise par défaut), promotion dans les problèmes, logo et icône.
+
+
+## 31/10 – Bug : « le jeu se désinstalle à chaque fois » (trouvé par Cowork)
+Cause : à chaque version amis, l'essai de l'installeur (skill version-amis, étapes 1 et 4) installe
+SickChess dans `%TEMP%\SickChessEssai` avec le MÊME AppId que la copie de Julien, puis le désinstalle.
+L'essai remplace l'entrée « SickChess » de Windows et le raccourci du menu Démarrer ; sa
+désinstallation les supprime. `CloseApplications=yes` ferme aussi le jeu s'il est ouvert.
+Correctif écrit dans `.claude/skills/version-amis/SKILL.md` (nouvelle étape 5 : réinstaller la copie de Julien).
+- [ ] Claude Code : réinstaller SickChess 0.6.1 n° 12 chez Julien (`/VERYSILENT /CURRENTUSER /DIR="%LOCALAPPDATA%\Programs\SickChess" /TASKS="bureau"`), vérifier raccourcis + Applications, commit du SKILL.md.
+- [ ] Julien : à la prochaine version amis, vérifier que SickChess est toujours là après la publication.

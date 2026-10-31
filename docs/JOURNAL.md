@@ -1901,3 +1901,35 @@ Fait :
 - Pas dans cette version : la nouvelle musique (Cowork travaillait dessus pendant la publication).
 À vérifier par Julien :
 - [ ] t139, t140 sur la n° 12 ; mise à jour chez un ami resté à la n° 11 : petite (~27 Mo), redémarre en 0.6.1.
+- 31/10 (suite) : **bande-annonce anglaise stylisée** (`outils/video_bande_annonce.py` → `docs/video/SickChess_trailer_en.mp4`,
+  1 min 32) : accroches, cartes titres animées au centre, caméra sur le vrai jeu (filmé en 2560×1440), 7 transitions
+  différentes, étiquettes courtes. **Sans musique** (demande de Julien : attendre la musique libre de droits validée
+  dans l'autre conversation) ; `--musique fichier --volume-musique 0.12` prêt (fondu + baisse sous les bruitages).
+  - [ ] Julien : valider la musique, puis « ajoute la musique à la bande-annonce ».
+
+## 31/10/2026 (suite) – « Zugzwang » devient la musique du jeu (Cowork)
+Julien : « la 5 est incroyable ».
+Fait :
+- `music/zugzwang.ogg` (85 s, boucle sans coupure, 1 Mo) ; `jeu/musique.py` la lit à la place de `music/calme.wav`
+  (même fonctionnement : menu, problèmes, entraînement, jamais en partie ; fondu, volume, M).
+- `tests/test_sons_musique.py` : vérifie Zugzwang (fichier, durée 70–100 s, lecture, arrêt) → vert.
+- `docs/CREDITS.md` et `docs/CREDITS_JOUEURS.md` à jour (musique synthétisée, aucune licence extérieure) ;
+  recette R-09B mise à jour (`outils/recette.py` → RECETTE.md).
+- `--rapide` : 1312 contrôles OK ; rouges sans rapport (Linux : stockfish.exe, test_petit_pc).
+À vérifier par Julien :
+- [ ] t141 et t142 dans `docs/A_FAIRE.md`.
+- [ ] Claude Code : tests complets + commit (sans `music/essais/`) + version amis.
+- 31/10 (suite) : bande-annonce v2 (retour de Julien : « trop de zooms, uniquement pour expliquer ; utilise la nouvelle
+  musique ») : jeu en plein écran, zooms seulement sur la gaffe + sa phrase, la précision de fin de partie et le
+  classement des problèmes ; musique **Zugzwang** (`music/zugzwang.ogg`) par défaut à 0,28 (≈ −27 LUFS, ensemble
+  −25,8 LUFS, crête −5,6 dB). `docs/video/SickChess_trailer_en.mp4` (1 min 32, 21,7 Mo).
+
+
+## 31/10/2026 – Pourquoi le jeu « se désinstalle à chaque fois » (Cowork)
+Julien : SickChess disparaît de son PC à chaque fois.
+Trouvé : l'essai d'installeur fait à chaque version amis (même AppId, dossier `%TEMP%\SickChessEssai`,
+puis `unins000.exe /VERYSILENT`) écrase l'inscription Windows et le raccourci menu Démarrer de la copie de
+Julien, et sa désinstallation les efface. Les parties et réglages (dans %APPDATA%) ne sont pas touchés.
+Fait : étape 5 ajoutée au skill version-amis (réinstaller la copie de Julien après l'essai) ; tâche dans A_FAIRE.md.
+À vérifier par Julien :
+- [ ] Après la prochaine version amis, SickChess est toujours installé (icône Bureau, menu Démarrer, Applications).

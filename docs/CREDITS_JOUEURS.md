@@ -36,7 +36,7 @@ SickChess n'est ni affilié à Lichess.org ni approuvé par lui.
 - **Police Outfit** – The Outfit Project Authors, SIL Open Font License 1.1.
 - **Police JetBrains Mono** – The JetBrains Mono Project Authors, SIL Open Font License 1.1.
 - **Bruitages de bois** – pack « Impact Sounds » de Kenney (https://kenney.nl), domaine public (CC0).
-- **Carillons et musique d'ambiance** – synthétisés pour SickChess.
+- **Carillons et musique « Zugzwang »** – synthétisés pour SickChess.
 
 ## 🖥️ Bibliothèques logicielles
 - **Python** – Python Software Foundation License.

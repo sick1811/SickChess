@@ -72,3 +72,4 @@ tests/surveillance.csv
 # Vidéo de présentation (fabriquée par outils/video_presentation.py)
 /docs/video/*.mp4
 /docs/video/apercu/
+music/essais/

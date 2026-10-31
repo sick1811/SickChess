@@ -1,13 +1,15 @@
 # musique.py - SickChess 17/10 (travail p14, demande de Julien) : une musique
-# d'ambiance douce (music/calme.wav, synthetisee par outils/generer_sons.py,
-# aucun droit a payer) dans le menu, les problemes et l'entrainement. Jamais
-# pendant une partie. Options -> Son : Musique Oui / Non et son volume.
+# d'ambiance dans le menu, les problemes et l'entrainement. Jamais pendant une
+# partie. Options -> Son : Musique Oui / Non et son volume.
+# 31/10 : nouvelle piste choisie par Julien parmi 5 essais : « Zugzwang »
+# (music/zugzwang.ogg, 85 s en boucle, synthetisee par outils/musique/pistes.py,
+# aucun droit a payer). L'ancienne music/calme.wav n'est plus utilisee par le jeu.
 
 import os
 
 import pygame
 
-FICHIER = os.path.join("music", "calme.wav")
+FICHIER = os.path.join("music", "zugzwang.ogg")
 _etat = {"joue": False}
 
 

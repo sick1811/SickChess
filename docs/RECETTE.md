@@ -303,7 +303,7 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 31/10
 - [ ] **R-09A** – Options → Son : Sons des pièces Bois / Feutre / Muet sauf alertes (cliquer pour entendre)  
   → Feutre est plus doux ; « Muet sauf alertes » : plus de bruit de pièce, mais l'échec, le temps et la fin sonnent.
 - [ ] **R-09B** – Menu : la musique d'ambiance ; Options → Son → Musique Non ; touche M dans le menu  
-  → Musique douce dans le menu, les problèmes et l'entraînement, coupée en partie ; Non ou M la coupent ; le volume change.
+  → La musique « Zugzwang » (sombre, tambours, tic-tac de pendule) tourne en boucle sans coupure dans le menu, les problèmes et l'entraînement, coupée en partie ; Non ou M la coupent ; le volume change.
 - [ ] **R-09E** – Options → Partie → Façon d'analyser (Calcul fixe / Profondeur / Temps) et Puissance (Rapide / Forte / Maximale)  
   → Calcul fixe et Forte par défaut (analyse rapide de toutes les positions, puis vérification à 15 / 25 / 50 millions des seuls coups dont la pastille hésite) ; Profondeur Maximale = l'ancienne profondeur 30 ; Temps : chaque position prend le temps choisi (3 / 7 / 15 s).
 - [ ] **R-093** – Options → Affichage : taille des textes, police, plein écran  

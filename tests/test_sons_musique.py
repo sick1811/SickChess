@@ -44,11 +44,10 @@ verifier(bois.changer_de_pack("feutre") == "feutre" and len(bois.sounds) == len(
          "changer de pack en direct")
 
 print("2. La musique")
-verifier(os.path.exists(os.path.join("music", "calme.wav")), "music/calme.wav existe")
-import wave
-with wave.open(os.path.join("music", "calme.wav"), "rb") as w:
-    duree = w.getnframes() / float(w.getframerate())
-verifier(25 <= duree <= 60, "boucle de %.0f s" % duree)
+verifier(musique.FICHIER == os.path.join("music", "zugzwang.ogg"), "la musique du jeu est Zugzwang (31/10)")
+verifier(os.path.exists(musique.FICHIER), "music/zugzwang.ogg existe")
+duree = pygame.mixer.Sound(musique.FICHIER).get_length()
+verifier(70 <= duree <= 100, "boucle de %.0f s" % duree)
 verifier(musique.jouer({"musique": True, "volume_musique": 0.3}) and musique.en_cours(), "elle se lance")
 musique.arreter(0)
 verifier(not musique.en_cours(), "elle s'arrete")

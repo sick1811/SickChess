@@ -50,6 +50,13 @@ refait l'installeur de la dernière version et le remplace dans sa release.
    Vérifier aussi que `puzzles/` et `syzygy/` sont dans le dossier d'essai et que le menu
    propose « Problèmes » (pas « base absente »).
 4. Désinstaller l'essai : `"%TEMP%\SickChessEssai\unins000.exe" /VERYSILENT`.
+5. **OBLIGATOIRE juste après (31/10, bug « le jeu se désinstalle tout seul »)** : l'essai a le
+   même AppId que la copie de Julien, donc il prend sa place dans « Applications » et dans le
+   menu Démarrer, et sa désinstallation les efface. Réinstaller tout de suite la copie de Julien :
+   `publier\<etiquette>\SickChess_Installation.exe /VERYSILENT /CURRENTUSER /DIR="%LOCALAPPDATA%\Programs\SickChess" /TASKS="bureau"`
+   puis vérifier que `%LOCALAPPDATA%\Programs\SickChess\SickChess.exe` existe, que l'icône du Bureau
+   et l'entrée du menu Démarrer lancent bien ce dossier-là, et que SickChess est dans
+   Paramètres → Applications. Ne jamais finir une publication sans cette étape.
 
 ## Mises à jour une par une et pare-feu (25/10, règles de Julien)
 - Chaque `maj.json` porte la liste `versions` : un ami à la n° 3 reçoit 4, 5 puis 6 et ne
