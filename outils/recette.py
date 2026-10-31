@@ -371,6 +371,8 @@ RECETTE = [
          "Le bouton affiche « Mise à jour n° 8 à 9 : X % » ; « Ce qui change » montre les notes de la n° 8 puis de la n° 9 ; les deux versions se téléchargent l'une après l'autre ; le jeu ne redémarre qu'une fois et affiche la n° 9 ; profil et parties gardés."),
         ("R-118", "Première installation (ou première mise à jour) de la n° 7 sur un PC qui n'a jamais eu SickChess, réseau Wi-Fi « Public »",
          "Windows demande une fois « Autoriser cette application à apporter des modifications ? » ; Oui : pare-feu Windows → règles « SickChess » (entrée et sortie, tous les profils) ; relancer : plus aucune demande ; Non : le jeu marche, il redemandera à la version suivante."),
+        ("R-174", "Taille de SickChess_Installation.exe dans la release GitHub, puis double-clic chez un ami (Internet branché)",
+         "Le fichier fait moins de 1 Go (~100 Mo) ; pendant l'installation, une page montre le téléchargement des problèmes et des tables de finales (~1,2 Go) ; à la fin, Problèmes et finales marchent tout de suite, sans passer par Mise à jour."),
         ("R-119", "Sur un réseau dont le DNS ne marche pas (Paramètres réseau → DNS manuel 10.255.255.1), laisser le jeu au menu",
          "La mise à jour passe quand même ; journal_du_jeu.txt : « [MAJ] DNS du PC sans reponse pour github.com : adresse obtenue par DNS securise » ; remettre le DNS automatique ensuite."),
     ]),

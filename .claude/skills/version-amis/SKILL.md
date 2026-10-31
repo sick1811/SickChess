@@ -31,9 +31,12 @@ une grosse nouveauté.
 4. Signature si `"signature"` est réglé dans `outils/maj_config.json` (certificat de Julien).
 5. Release GitHub avec tous les fichiers.
 
-## Installeur complet (24/10, choix de Julien)
-L'installeur contient tout : programme, jeu, Stockfish, problèmes et finales (~700 Mo).
-`SICKCHESS_INSTALLEUR_LEGER=1` pour un installeur sans problèmes ni finales.
+## Installeur sous 1 Go (31/10, demande de Julien)
+L'installeur contient programme, jeu et Stockfish (~100 Mo) ; il TÉLÉCHARGE problèmes et
+finales (~1,2 Go) pendant l'installation (lignes `[Files]` « external download
+extractarchive » écrites par `lignes_telechargement`, SHA-256 vérifié). Jamais plus de
+1 Go (`LIMITE_INSTALLEUR`, l'envoi est refusé au-delà).
+`SICKCHESS_INSTALLEUR_LEGER=1` pour un installeur qui ne télécharge rien.
 Si seul l'installeur a changé (pas le jeu) : `py outils/publier_maj.py --installeur-seul`
 refait l'installeur de la dernière version et le remplace dans sa release.
 

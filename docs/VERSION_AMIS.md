@@ -38,8 +38,12 @@ Envoie-lui une fois ce lien (il donne toujours la dernière version) :
   (`%LOCALAPPDATA%\Programs\SickChess`, un dossier où la mise à jour peut écrire) avec une
   **icône sur le Bureau** et dans le menu Démarrer. Désinstallation par Windows (Paramètres →
   Applications) ; ses parties et son profil ne sont pas effacés.
-- **Installeur complet (24/10)** : programme, jeu, Stockfish, problèmes et tables de finales
-  (~700 Mo) : tout marche dès l'installation. (Installeur léger possible :
+- **Installeur sous 1 Go (31/10, demande de Julien)** : il contient programme, jeu et
+  Stockfish (~100 Mo). Les problèmes (~220 Mo) et les tables de finales (~940 Mo) sont
+  **téléchargés par l'installeur** pendant l'installation, depuis la release GitHub, avec
+  leur somme SHA-256 vérifiée (fichier abîmé = installation refusée) : tout marche dès la
+  fin de l'installation. Il faut Internet pour installer. `publier_maj.py` refuse
+  d'envoyer un installeur de plus de 1 Go. (Sans téléchargement :
   `SICKCHESS_INSTALLEUR_LEGER=1`, problèmes et finales arrivent alors par la mise à jour.)
 - Fabriqué par `CONSTRUIRE_VERSION_AMIS.bat` si **Inno Setup** est installé
   (une fois : `winget install JRSoftware.InnoSetup`). Recette : `outils/installeur_amis.iss`.
@@ -87,7 +91,7 @@ l'heure, sans rien faire.
 Lien :
 `https://github.com/sick1811/SickChess-amis/releases/latest/download/SickChess_amis.zip`
 Il dézippe, lance SickChess.exe, clique **Mise à jour** : le moteur, les problèmes et les
-tables de finales se téléchargent (~700 Mo, une fois). Mode d'emploi : `LISEZ-MOI_AMIS.txt`.
+tables de finales se téléchargent (~1,2 Go, une fois). Mode d'emploi : `LISEZ-MOI_AMIS.txt`.
 
 ## À savoir
 - **Dépôt public** = quelqu'un qui a le lien peut télécharger le jeu. Pour des versions de

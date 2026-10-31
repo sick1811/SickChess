@@ -251,6 +251,16 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+Séance du 31/10 (48) · installeur sous 1 Go – **Fonctionne / Ne fonctionne pas + commentaire** (à la prochaine version amis).
+- [ ] t136 (48) : **taille de l'installeur** : après CONSTRUIRE_VERSION_AMIS.bat, `SickChess_Installation.exe` fait
+      **moins de 1 Go** (environ 100 Mo) ; la fenêtre noire dit « telecharges a l'installation : puzzles, syzygy ».
+- [ ] t137 (48) : **installation chez un ami (Internet branché)** : double-clic sur l'installeur : une page montre le
+      **téléchargement** des problèmes et des tables de finales (~1,2 Go, quelques minutes) ; à la fin, le jeu démarre,
+      les **Problèmes** s'ouvrent et l'analyse d'une finale (ex. `8/8/8/4k3/8/8/8/1BN1K3 w - - 0 1`) dit « Tables de finale »,
+      **sans passer par Mise à jour**.
+- [ ] t138 (48) : **sans Internet** : coupe Internet, lance l'installeur : il dit qu'il n'arrive pas à télécharger et
+      propose de réessayer ; rien de cassé (Annuler ne laisse pas de jeu à moitié installé).
+
 Séance du 31/10 (46) · tables de finales DTZ – **Fonctionne / Ne fonctionne pas + commentaire** (pas encore en version amis).
 - [ ] t129 (46) : **Stockfish voit les DTZ** : lance le jeu, ouvre l'analyse libre, quitte ; dans `journal_du_jeu.txt`
       (dossier SickChess) : « tables de finale Syzygy branchees … : 145 WDL et 145 DTZ ».

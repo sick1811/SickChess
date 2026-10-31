@@ -1802,3 +1802,21 @@ Fait :
 À vérifier par Julien :
 - [ ] Claude Code : `python tests/lancer_tous.py --rapide` vert, puis commit « Licence GPL v3 du code et crédits ».
 
+## 31/10/2026 (48) – Installeur sous 1 Go (Claude Code)
+Demande de Julien : l'installeur ne doit pas dépasser 1 Go ; les ressources se téléchargent depuis l'installeur.
+Fait :
+- Avec les tables DTZ, syzygy = 940 Mo + problèmes 223 Mo : l'installeur « complet » aurait dépassé 1,2 Go.
+- `SickChess_Installation.exe` contient maintenant programme, jeu et Stockfish (~100 Mo). Problèmes et tables
+  de finales sont **téléchargés par l'installeur** (Inno Setup 6.5, lignes `[Files]` « external download
+  extractarchive », `ArchiveExtraction=full`) depuis l'adresse du paquet dans maj.json, somme SHA-256 vérifiée.
+  `paquets_installes.json` les compte comme installés (l'installation échoue si le téléchargement échoue).
+- `outils/publier_maj.py` : `lignes_telechargement`, `DANS_L_INSTALLEUR` / `TELECHARGES`, et **refus d'envoyer** un
+  installeur de plus de 1 Go (`LIMITE_INSTALLEUR`). `SICKCHESS_INSTALLEUR_LEGER=1` : aucun téléchargement.
+- Essai réel sur ce PC : mini-installeur qui télécharge le paquet « jeu » de la n° 10 depuis GitHub → décompressé
+  au bon endroit ; avec une somme fausse → « File hash is incorrect », installation annulée (code 7). Désinstallé.
+- Contrôles ajoutés dans `tests/test_maj_une_par_une.py` ; recette R-174 ; `docs/VERSION_AMIS.md` et skill
+  `version-amis` à jour.
+- Remarque : `tests/test_resume_coach.py` est rouge quand `config.json` (celui de Julien) est en anglais
+  (« Ruy Lopez » au lieu de « Partie espagnole ») ; vert avec la langue française. Le test lit le vrai config.json.
+À vérifier par Julien :
+- [ ] t136 à t138 dans `docs/A_FAIRE.md` (« À tester par Julien »).

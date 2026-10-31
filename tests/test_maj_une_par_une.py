@@ -295,6 +295,22 @@ iss = open(os.path.join(RACINE, "outils", "installeur_amis.iss"), encoding="utf-
 verifier("profile=any" in iss and "'runas'" in iss and "not WizardSilent" in iss,
          "l'installeur autorise aussi le jeu (accord Windows, pas en silencieux)")
 
+# 31/10 (demande de Julien) : l'installeur ne depasse pas 1 Go ; problemes et tables
+# de finales sont telecharges PAR l'installeur, pas mis dedans.
+verifier(not set(publier_maj.DANS_L_INSTALLEUR) & {"puzzles", "syzygy"}
+         and set(publier_maj.TELECHARGES) == {"puzzles", "syzygy"},
+         "problemes et finales : telecharges par l'installeur, pas dedans")
+verifier(publier_maj.LIMITE_INSTALLEUR == 1024 ** 3, "limite de l'installeur : 1 Go")
+verifier("ArchiveExtraction=full" in iss and "#include Telechargements" in iss,
+         "l'installeur sait telecharger et decompresser les .zip")
+faux = {"paquets": {"syzygy": {"url": "https://github.com/x/y/releases/download/v1/syzygy-ab.zip",
+                               "sha256": "ABCDEF", "taille": 1234}}}
+lignes = publier_maj.lignes_telechargement(faux, ["puzzles", "syzygy"])
+verifier(len(lignes) == 1 and 'Source: "https://github.com/x/y/releases/download/v1/syzygy-ab.zip"'
+         in lignes[0] and 'Hash: "abcdef"' in lignes[0] and "external download extractarchive"
+         in lignes[0] and "ExternalSize: 1234" in lignes[0] and 'DestDir: "{app}"' in lignes[0],
+         "ligne de telechargement : adresse, SHA-256, decompression dans le dossier du jeu")
+
 serveur.shutdown()
 serveur.server_close()
 shutil.rmtree(base, ignore_errors=True)

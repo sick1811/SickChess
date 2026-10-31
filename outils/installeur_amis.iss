@@ -56,10 +56,14 @@ OutputBaseFilename=SickChess_Installation
 SetupIconFile=..\assets\icone.ico
 UninstallDisplayIcon={app}\SickChess.exe
 UninstallDisplayName=SickChess
-; Problemes et tables de finales (~1,2 Go) sont deja compresses : une compression
+; 31/10 (demande de Julien : installeur sous 1 Go) : problemes et tables de finales
+; (~1,2 Go) ne sont plus DANS l'installeur, il les telecharge pendant l'installation
+; (voir Telechargements plus bas). Stockfish est deja compresse : une compression
 ; normale non solide va bien plus vite pour le meme resultat.
 Compression=lzma2/normal
 SolidCompression=no
+; Les paquets telecharges sont des .zip : il faut l'extraction « full » (7-Zip).
+ArchiveExtraction=full
 WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
@@ -76,6 +80,12 @@ Name: "bureau"; Description: "Mettre une icône SickChess sur le Bureau"; GroupD
 
 [Files]
 Source: "{#Source}\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; 31/10 : les gros paquets (problemes, tables de finales) sont TELECHARGES depuis la
+; release GitHub pendant l'installation, leur somme SHA-256 verifiee, puis decompresses.
+; Les lignes sont ecrites par outils/publier_maj.py (lignes_telechargement).
+#ifdef Telechargements
+  #include Telechargements
+#endif
 
 [Icons]
 Name: "{autoprograms}\SickChess"; Filename: "{app}\SickChess.exe"; WorkingDir: "{app}"

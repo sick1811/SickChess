@@ -314,12 +314,38 @@ def dossier_d_essai(contenus, racine, dist, base=None):
     return dossier
 
 
+# 31/10 (demande de Julien) : l'installeur ne doit jamais depasser 1 Go.
+LIMITE_INSTALLEUR = 1024 ** 3
+DANS_L_INSTALLEUR = ["jeu", "moteur"]
+TELECHARGES = ["puzzles", "syzygy"]     # telecharges PAR l'installeur
+
+
+def lignes_telechargement(manifeste, noms, contenus=None):
+    """Lignes [Files] d'Inno Setup qui telechargent les paquets `noms` depuis leur
+    release GitHub (adresse du maj.json), verifient leur SHA-256 et les decompressent
+    dans le dossier du jeu. ExternalSize = taille decompressee (place sur le disque)."""
+    lignes = []
+    for nom in noms:
+        paquet = manifeste["paquets"].get(nom)
+        if not paquet:
+            continue
+        fichiers = (contenus or {}).get(nom) or []
+        taille = sum(os.path.getsize(a) for a, _ in fichiers) or paquet["taille"]
+        lignes.append(
+            'Source: "%s"; DestName: "%s.zip"; DestDir: "{app}"; Hash: "%s"; '
+            'ExternalSize: %d; Flags: external download extractarchive recursesubdirs '
+            'createallsubdirs ignoreversion'
+            % (paquet["url"], nom, paquet["sha256"].lower(), taille))
+    return lignes
+
+
 def _installeur(manifeste, contenus, racine, dist, sortie, depot):
-    """SickChess_Installation.exe : installeur Windows COMPLET pour un NOUVEL ami
-    (24/10, choix de Julien : programme, jeu, Stockfish, problemes ET tables de
-    finales - environ 700 Mo, tout marche des l'installation, rien a attendre).
-    SICKCHESS_INSTALLEUR_LEGER=1 : sans problemes ni finales (ils arrivent alors
-    par la mise a jour automatique)."""
+    """SickChess_Installation.exe : installeur Windows pour un NOUVEL ami.
+    Dedans : programme, jeu, Stockfish (~100 Mo). 31/10 : problemes et tables de
+    finales (~1,2 Go avec les DTZ) depassaient 1 Go : l'installeur les TELECHARGE
+    pendant l'installation (somme SHA-256 verifiee). Tout marche des la fin de
+    l'installation, comme avant. SICKCHESS_INSTALLEUR_LEGER=1 : pas de
+    telechargement (ils arrivent alors par la mise a jour automatique)."""
     iscc = trouver_iscc()
     if iscc is None:
         dire("  (Installeur non fabrique : Inno Setup absent. Pour l'avoir :"
@@ -335,8 +361,8 @@ def _installeur(manifeste, contenus, racine, dist, sortie, depot):
     scene = os.path.join(DOSSIER_BUILD, "installeur", "SickChess")
     shutil.rmtree(os.path.dirname(scene), ignore_errors=True)
     leger = os.environ.get("SICKCHESS_INSTALLEUR_LEGER") == "1"
-    autres = ["jeu", "moteur"] + ([] if leger else ["puzzles", "syzygy"])
-    inclus = ["programme"] + [n for n in autres if contenus.get(n)]
+    inclus = ["programme"] + [n for n in DANS_L_INSTALLEUR if contenus.get(n)]
+    telecharges = [] if leger else [n for n in TELECHARGES if n in manifeste["paquets"]]
     tous = list(programme)
     for n in inclus[1:]:
         tous += contenus[n]
@@ -347,18 +373,30 @@ def _installeur(manifeste, contenus, racine, dist, sortie, depot):
     installe = {"source": url_manifeste(depot), "numero": manifeste["numero"],
                 "version": manifeste["version"],
                 "paquets": {n: manifeste["paquets"][n]["empreinte"]
-                            for n in inclus if n in manifeste["paquets"]}}
+                            for n in inclus + telecharges if n in manifeste["paquets"]}}
     with open(os.path.join(scene, "paquets_installes.json"), "w", encoding="utf-8") as f:
         json.dump(installe, f, indent=2, ensure_ascii=False)
-    dire("  installeur %s : Inno Setup compresse %s (2 a 6 minutes)..."
-         % ("leger" if leger else "complet", ", ".join(inclus)))
-    r = subprocess.run([iscc, "/Q", "/DVersion=%s" % manifeste["version"],
-                        "/DNumero=%d" % manifeste["numero"], "/DSource=%s" % scene,
-                        "/DSortie=%s" % sortie, ISS])
+    commande = [iscc, "/Q", "/DVersion=%s" % manifeste["version"],
+                "/DNumero=%d" % manifeste["numero"], "/DSource=%s" % scene,
+                "/DSortie=%s" % sortie]
+    if telecharges:
+        include = os.path.join(os.path.dirname(scene), "telechargements.iss")
+        with open(include, "w", encoding="utf-8-sig") as f:
+            f.write("\n".join(lignes_telechargement(manifeste, telecharges, contenus)) + "\n")
+        commande.append("/DTelechargements=%s" % include)
+    dire("  installeur : Inno Setup compresse %s%s (2 a 4 minutes)..."
+         % (", ".join(inclus), " ; telecharges a l'installation : " + ", ".join(telecharges)
+            if telecharges else ""))
+    r = subprocess.run(commande + [ISS])
     chemin = os.path.join(sortie, "SickChess_Installation.exe")
     if r.returncode != 0 or not os.path.exists(chemin):
         dire("  (Installeur : Inno Setup a echoue, voir les messages au-dessus.)")
         return None
+    if os.path.getsize(chemin) > LIMITE_INSTALLEUR:
+        taille = os.path.getsize(chemin)
+        os.remove(chemin)
+        raise SystemExit("Installeur trop gros (%s, limite 1 Go) : rien n'est envoye."
+                         % _mo(taille))
     signer([chemin])
     dire("  SickChess_Installation.exe (nouvel ami) : %s" % _mo(os.path.getsize(chemin)))
     return chemin
