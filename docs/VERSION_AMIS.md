@@ -11,7 +11,7 @@ GitHub (`sick1811/SickChess-amis`, gratuit). Le jeu de tes amis y lit un petit f
 | jeu | code, images, sons, polices, ouvertures | ~10 Mo | à chaque correction |
 | moteur | Stockfish | ~110 Mo | rarement |
 | puzzles | base de problèmes | ~220 Mo | rarement |
-| syzygy | tables de finales | ~380 Mo | jamais |
+| syzygy | tables de finales (WDL + DTZ depuis le 31/10) | ~940 Mo | une fois (ajout des DTZ, 31/10) |
 
 Une correction de bug = quelques Mo à télécharger pour tes amis.
 Le code (`jeu/*.py`) reste en fichiers à côté de l'exe : pas besoin de refaire l'exe

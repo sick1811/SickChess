@@ -318,6 +318,37 @@ print("8. Version de developpement")
 verifier(not mise_a_jour.installation_geree(projet), "depuis les sources : pas de mise a jour")
 verifier(mise_a_jour.version_affichee("0.2.0", projet) == "0.2.0", "version des sources affichee")
 
+print("9. Une par une : le gros paquet « finales » (DTZ, 31/10) une seule fois")
+# Un ami en n° 10 ; le n° 11 change les finales (ajout des DTZ), le n° 12
+# seulement le jeu. Il doit telecharger finales UNE fois, au n° 11.
+def _version(n, finales, jeu):
+    return {"numero": n, "version": "0.%d" % n, "notes": [],
+            "versions": [{"numero": k, "manifeste": "http://essai/%d.json" % k}
+                         for k in (10, 11, 12)],
+            "paquets": {nom: {"empreinte": emp, "url": "http://essai/%s.zip" % emp,
+                              "sha256": "", "taille": taille}
+                        for nom, emp, taille in (("jeu", jeu, 8_000_000),
+                                                 ("syzygy", finales, 984_000_000))}}
+_sites = {"http://essai/11.json": _version(11, "dtz", "j11"),
+          "http://essai/12.json": _version(12, "dtz", "j12")}
+_ancien_lire = mise_a_jour.lire_manifeste
+mise_a_jour.lire_manifeste = lambda url: _sites[url]
+try:
+    chaine = mise_a_jour.MiseAJour(dossier=base, url="http://essai/12.json")
+    chaine.installe = {"numero": 10, "paquets": {"jeu": "j10", "syzygy": "wdl"}}
+    _ancien_installe = mise_a_jour.lire_installe
+    mise_a_jour.lire_installe = lambda dossier: chaine.installe
+    chaine._verifier()
+finally:
+    mise_a_jour.lire_manifeste = _ancien_lire
+    mise_a_jour.lire_installe = _ancien_installe
+etapes = [(m["numero"], noms) for m, noms in chaine.etapes]
+verifier(etapes == [(11, ["jeu", "syzygy"]), (12, ["jeu"])],
+         "etapes : %s (finales au n° 11 seulement)" % etapes)
+verifier(chaine.a_telecharger.count("syzygy") == 1
+         and chaine.octets_total == 2 * 8_000_000 + 984_000_000,
+         "finales comptees une fois : %d octets" % chaine.octets_total)
+
 shutil.rmtree(base, ignore_errors=True)
 print()
 if echecs:

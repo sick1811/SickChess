@@ -374,6 +374,18 @@ def finale_des_tables(plateau, dossier=None):
     return _VERDICTS[cle]
 
 
+def _hors_des_50_coups(tables, plateau):
+    """31/10 : avec les DTZ (.rtbz), une finale gagnee devient nulle quand la
+    prise ou la poussee de pion arrive trop tard pour le compteur des 50 coups.
+    Le DTZ peut etre arrondi d'un demi-coup (n veut dire n ou n + 1) : on ne
+    dit nulle que si c'est sur. Sans .rtbz : False, verdict WDL comme avant."""
+    try:
+        dtz = tables.probe_dtz(plateau)
+    except Exception:
+        return False
+    return abs(dtz) + plateau.halfmove_clock > 100
+
+
 def _lire_les_tables(plateau, dossier):
     if plateau.is_game_over():
         return None
@@ -384,6 +396,8 @@ def _lire_les_tables(plateau, dossier):
         wdl = tables.probe_wdl(plateau)
     except Exception:
         return None
+    if wdl in (2, -2) and plateau.halfmove_clock and _hors_des_50_coups(tables, plateau):
+        wdl = 0
     if wdl in (2, -2):
         blancs_gagnent = (wdl == 2) == (plateau.turn == chess.WHITE)
         return ("Tables de finale : les Blancs gagnent" if blancs_gagnent

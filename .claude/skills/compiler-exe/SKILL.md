@@ -21,7 +21,7 @@ tels quels : plus de bore.exe / ngrok, nouvelle structure `jeu/`).
 `assets/`, `sounds/`, `polices/`, `ouvertures/`, `config.json` (réglages par défaut,
 pas celui de Julien), `moteur/stockfish.exe` + `moteur/COPYING-Stockfish.txt`,
 `docs/CREDITS.md`, `steam_appid.txt` et `steam_api64.dll` pour la version Steam.
-Optionnels selon la version : `puzzles/` (223 Mo) et `syzygy/` (379 Mo).
+Optionnels selon la version : `puzzles/` (223 Mo) et `syzygy/` (940 Mo : WDL + DTZ).
 
 ## Points à vérifier dans le code avant de compiler
 - Les chemins doivent partir du dossier de l'exe (`sys._MEIPASS` / `sys.executable`)

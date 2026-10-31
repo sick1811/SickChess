@@ -69,6 +69,7 @@ SERIES = [
     ("test_mes_erreurs.py", True),
     ("test_variantes.py", True),
     ("test_analyse_libre_moteur.py", True),
+    ("test_finales_dtz.py", True),
     ("test_moteur_decale.py", True),
     ("test_precision_moteur.py", True),
 ]

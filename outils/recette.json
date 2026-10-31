@@ -1,5 +1,5 @@
 {
- "version": "25/10/2026",
+ "version": "31/10/2026",
  "tests": [
   {
    "id": "R-001",
@@ -189,6 +189,13 @@
    "texte": "Pré-mouvement : jouer pendant que l'ordinateur réfléchit",
    "detail": "Le coup part tout seul dès que c'est ton tour ; Échap l'annule.",
    "ordre": 10309
+  },
+  {
+   "id": "R-173",
+   "section": "Échiquier et règles",
+   "texte": "Pré-mouvements à la suite : préparer 3 ou 4 coups d'avance pendant que l'ordinateur réfléchit (ex. e4, Cf3, Fc4)",
+   "detail": "Chaque coup prévu se voit presque transparent avec son numéro, la vraie pièce reste un peu plus visible ; un coup part à chaque tour, dans l'ordre ; un clic droit les annule tous.",
+   "ordre": 10310
   },
   {
    "id": "R-040",
@@ -795,16 +802,23 @@
   {
    "id": "R-148",
    "section": "Analyse libre",
-   "texte": "Finale à 5 pièces ou moins (ex. coller 8/8/8/4k3/8/8/4P3/4K3 w - - 0 1 : nulle, roi noir devant le pion ; puis 8/8/8/4k3/8/8/8/3QK3 w - - 0 1 : les Blancs gagnent), dossier syzygy/ présent",
-   "detail": "Sous les lignes : « Tables de finale : nulle » pour la première, « les Blancs gagnent » pour la seconde ; sans le dossier syzygy/, rien ne s'affiche et tout marche.",
+   "texte": "Finale à 5 pièces ou moins (ex. coller 8/8/8/4k3/8/8/4P3/4K3 w - - 0 1 : nulle, roi noir devant le pion ; puis 8/8/8/4k3/8/8/8/3QK3 w - - 0 1 : les Blancs gagnent), dossier syzygy/ présent (avec ou sans les .rtbz)",
+   "detail": "Sous les lignes : « Tables de finale : nulle » pour la première, « les Blancs gagnent » pour la seconde ; sans le dossier syzygy/, rien ne s'affiche et tout marche. Dans journal_du_jeu.txt : « tables de finale Syzygy branchees … : 145 WDL et 145 DTZ » (145 WDL et 0 DTZ sans le paquet complet).",
    "ordre": 11108
+  },
+  {
+   "id": "R-172",
+   "section": "Analyse libre",
+   "texte": "Tables DTZ : coller 8/8/8/4k3/8/8/8/1BN1K3 w - - 0 1 (roi + fou + cavalier), puis la même avec 60 à la place du premier 0 (8/8/8/4k3/8/8/8/1BN1K3 w - - 60 1) ; puis jouer le meilleur coup de Stockfish à chaque fois depuis 8/8/8/4k3/8/8/8/3QK3 w - - 0 1",
+   "detail": "Première : « Tables de finale : les Blancs gagnent », évaluation très haute. Seconde : « Tables de finale : nulle » et évaluation proche de 0 (le mat arriverait après la règle des 50 coups). Roi + dame : mat en 10 coups environ, sans tourner en rond.",
+   "ordre": 11109
   },
   {
    "id": "R-149",
    "section": "Analyse libre",
    "texte": "Laisser l'analyse libre ouverte 2 minutes sur la même position, puis Retour",
    "detail": "Au bout d'une minute « analyse terminée » et le processeur redescend ; après Retour, plus de stockfish.exe d'analyse libre dans le Gestionnaire des tâches.",
-   "ordre": 11109
+   "ordre": 11110
   },
   {
    "id": "R-095",

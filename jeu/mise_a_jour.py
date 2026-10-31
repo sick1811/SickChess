@@ -9,7 +9,7 @@
 #   jeu       : le code (jeu/*.py), images, sons, polices     ~ 10 Mo, souvent
 #   moteur    : Stockfish                                     ~ 110 Mo, rarement
 #   puzzles   : la base de problemes                          ~ 220 Mo, rarement
-#   syzygy    : les tables de finales                         ~ 380 Mo, jamais
+#   syzygy    : les tables de finales (WDL + DTZ, 31/10)      ~ 940 Mo, rarement
 # Une correction de bug ne fait donc telecharger que quelques Mo.
 #
 # CHAQUE PAQUET a une "empreinte" (calculee par outils/publier_maj.py a partir

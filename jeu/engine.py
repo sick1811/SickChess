@@ -25,6 +25,7 @@
 import atexit
 import json
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -159,6 +160,7 @@ class StockfishEngine:
         self.path = self._resoudre_chemin(path)
         self.process = None
         self.verbeux = verbeux
+        self.tables_trouvees = None     # (WDL, DTZ) annonces par Stockfish
         self._verrou = threading.RLock()
         # 24/10 : _verrou est tenu pendant TOUTE une recherche (jusqu'a
         # « bestmove ») ; « stop » et « quit » ne doivent pas l'attendre. Ce
@@ -512,12 +514,14 @@ class StockfishEngine:
         arrete de deviner et sait. Tes parties finissent souvent en tour contre
         fou ou en finale de pions : c'est exactement la que ca sert.
 
-        POURQUOI SEULEMENT LES .rtbw (WDL) ET PAS LES .rtbz (DTZ) : les WDL
-        pesent 378 Mo et donnent le RESULTAT, ce dont la recherche a besoin a
-        chaque noeud. Les DTZ pesent 560 Mo de plus et ne servent qu'a compter
-        les coups jusqu'a la prise ou la poussee de pion, pour gagner sous la
-        regle des 50 coups. Trois fois moins de place pour l'essentiel du gain.
-        Si tu veux les DTZ aussi, dis-le : meme depot, meme methode.
+        31/10 : LES .rtbz (DTZ) AUSSI, quand ils sont la (145 + 145 fichiers,
+        940 Mo, miroir lichess, empreintes SHA-256 verifiees). Les WDL disent
+        gagne / nul / perdu ; les DTZ comptent les coups jusqu'a la prise ou
+        la poussee de pion : Stockfish gagne alors une finale gagnee sans
+        tourner en rond et en respectant la regle des 50 coups. Il les lit
+        tout seul dans le meme dossier ; sans eux (ami sans le paquet), il
+        garde les WDL comme avant. Ce que Stockfish a trouve est note dans
+        le journal du jeu et dans self.tables_trouvees = (WDL, DTZ).
 
         Sans le dossier, il ne se passe rien - pas de message, pas de ralenti.
         """
@@ -542,9 +546,27 @@ class StockfishEngine:
             return False
         self._send_command("setoption name SyzygyPath value %s"
                            % os.pathsep.join(dossiers))
-        print("ENGINE : tables de finale Syzygy branchees (%s)"
-              % ", ".join(dossiers))
+        self.tables_trouvees = self._lire_annonce_des_tables()
+        print("ENGINE : tables de finale Syzygy branchees (%s) : %s"
+              % (", ".join(dossiers),
+                 "%d WDL et %d DTZ" % self.tables_trouvees
+                 if self.tables_trouvees else "nombre non annonce"))
         return True
+
+    def _lire_annonce_des_tables(self, timeout=6.0):
+        """« info string Found 145 WDL and 145 DTZ tablebase files » -> (145, 145).
+        None si ce Stockfish ne l'annonce pas."""
+        self._send_command("isready")
+        trouve = None
+        debut = time.time()
+        while time.time() - debut < timeout:
+            ligne = self._lire_ligne()
+            if ligne is None or ligne.lower() == "readyok":
+                break
+            m = re.search(r"Found (\d+) WDL and (\d+) DTZ", ligne)
+            if m:
+                trouve = (int(m.group(1)), int(m.group(2)))
+        return trouve
 
     def regler_threads(self, combien):
         """Change le nombre de coeurs du moteur, et se souvient de la valeur.

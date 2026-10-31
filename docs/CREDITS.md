@@ -21,6 +21,7 @@ Rien de copié d'un autre jeu ou d'un site sans licence claire.
 | Ouvertures (noms et coups) | `ouvertures/` | Base « chess-openings » de Lichess | CC0 – **origine à confirmer** |
 | Problèmes (4 180 151) | `puzzles/` | Base de problèmes de Lichess (database.lichess.org) | CC0 (domaine public) – mention de Lichess conseillée |
 | Moteur Stockfish | `moteur/` | stockfishchess.org | GNU GPL v3 (`moteur/COPYING-Stockfish.txt`) |
+| Tables de finales Syzygy 3-4-5 pièces, WDL (`.rtbw`) et DTZ (`.rtbz`) | `syzygy/` | Ronald de Man (générateur github.com/syzygy1/tb), miroir lichess tablebase.lichess.ovh/tables/standard/ ; empreintes SHA-256 vérifiées le 31/10 (fichier `sha256` du miroir) | Libre redistribution : « All tablebase files generated using this generator may be freely redistributed » (README de syzygy1/tb, vérifié le 31/10/2026) ; sans droit d'auteur selon ce README (US : Feist ; UE : Football Dataco) |
 
 ## Retiré de V8_TURBO_3000 (ne jamais réintégrer)
 - Pièces Pokémon (`assets/*.png`, `assets/pokemon/`) – marque et personnages protégés.

@@ -1,6 +1,6 @@
 # Recette complète – SickChess
 
-Tous les tests à faire à la main pour vérifier le jeu entier. Version : 25/10/2026.
+Tous les tests à faire à la main pour vérifier le jeu entier. Version : 31/10/2026.
 
 **Règles**
 - Fichier fabriqué par `python outils/recette.py` : modifier `outils/recette.py`, pas ce fichier.
@@ -272,8 +272,10 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 25/10
   → « FEN copié » ; lichess affiche la même position.
 - [ ] **R-147** – Revue d'une partie → aller à un coup → « Analyser (A) » ; puis Retour  
   → L'analyse libre s'ouvre sur la même position (variante comprise), avec la partie dans la feuille ; Retour revient à la revue au même coup.
-- [ ] **R-148** – Finale à 5 pièces ou moins (ex. coller 8/8/8/4k3/8/8/4P3/4K3 w - - 0 1 : nulle, roi noir devant le pion ; puis 8/8/8/4k3/8/8/8/3QK3 w - - 0 1 : les Blancs gagnent), dossier syzygy/ présent  
-  → Sous les lignes : « Tables de finale : nulle » pour la première, « les Blancs gagnent » pour la seconde ; sans le dossier syzygy/, rien ne s'affiche et tout marche.
+- [ ] **R-148** – Finale à 5 pièces ou moins (ex. coller 8/8/8/4k3/8/8/4P3/4K3 w - - 0 1 : nulle, roi noir devant le pion ; puis 8/8/8/4k3/8/8/8/3QK3 w - - 0 1 : les Blancs gagnent), dossier syzygy/ présent (avec ou sans les .rtbz)  
+  → Sous les lignes : « Tables de finale : nulle » pour la première, « les Blancs gagnent » pour la seconde ; sans le dossier syzygy/, rien ne s'affiche et tout marche. Dans journal_du_jeu.txt : « tables de finale Syzygy branchees … : 145 WDL et 145 DTZ » (145 WDL et 0 DTZ sans le paquet complet).
+- [ ] **R-172** – Tables DTZ : coller 8/8/8/4k3/8/8/8/1BN1K3 w - - 0 1 (roi + fou + cavalier), puis la même avec 60 à la place du premier 0 (8/8/8/4k3/8/8/8/1BN1K3 w - - 60 1) ; puis jouer le meilleur coup de Stockfish à chaque fois depuis 8/8/8/4k3/8/8/8/3QK3 w - - 0 1  
+  → Première : « Tables de finale : les Blancs gagnent », évaluation très haute. Seconde : « Tables de finale : nulle » et évaluation proche de 0 (le mat arriverait après la règle des 50 coups). Roi + dame : mat en 10 coups environ, sans tourner en rond.
 - [ ] **R-149** – Laisser l'analyse libre ouverte 2 minutes sur la même position, puis Retour  
   → Au bout d'une minute « analyse terminée » et le processeur redescend ; après Retour, plus de stockfish.exe d'analyse libre dans le Gestionnaire des tâches.
 

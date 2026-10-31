@@ -1752,3 +1752,38 @@ Fait :
 
 À vérifier par Julien :
 - [ ] t133 à t135 dans `docs/A_FAIRE.md` (« À tester par Julien »).
+
+## 31/10/2026 (46) – Tables de finales DTZ (.rtbz, 3 à 5 pièces) (Claude Code)
+Demande de Julien : ajouter les tables DTZ pour que Stockfish gagne les finales gagnées par le plus court et respecte la
+règle des 50 coups (revue et analyse plus précises).
+Fait :
+- **Téléchargement sûr** : 145 `.rtbz` (587,9 Mo) depuis tablebase.lichess.ovh/tables/standard/3-4-5-dtz/, dans un
+  dossier temporaire, fichiers `.part` renommés une fois complets, 3 essais par fichier (aucun échec, 2 min 30).
+  Contrôles : 145 fichiers, taille = celle du site, un `.rtbz` pour chaque `.rtbw`, **145 empreintes SHA-256 = fichier
+  `sha256` officiel du miroir** ; 34 positions (roi + dame / tour / fou + cavalier / deux fous, Lucena, Philidor, pions,
+  nulles, prise en passant, 12 au hasard) sondées avec python-chess et comparées à l'API lichess : résultat identique 34/34,
+  DTZ identique 32/34 (les 2 autres à un demi-coup près : arrondi connu du format, documenté par python-chess).
+  Copiés dans `syzygy/` (hors GitHub, 940 Mo en tout) ; aucun `.rtbw` touché (empreintes avant / après identiques).
+- Constat : 3 `.rtbw` (KPvK, KQvK, KRvK) ont une empreinte différente de celles de lichess (refaites en 2021) ;
+  comparés sur **toutes** leurs positions (1,1 million) : aucune différence de résultat. Gardés.
+- **Branchement** : Stockfish lit les `.rtbz` tout seul dans le même dossier. `engine.py` note maintenant son annonce
+  dans le journal du jeu (« tables de finale Syzygy branchees … : 145 WDL et 145 DTZ ») et dans `tables_trouvees`.
+  Hachage, threads, répartition 3 × 4 et puissance d'analyse pas touchés. Sans `.rtbz` : 145 WDL et 0 DTZ, comme avant ;
+  sans `syzygy/` : rien.
+- **Défaut corrigé** (trouvé par le nouveau test) : le verdict de l'analyse libre (`analyse_continue.finale_des_tables`)
+  ignorait le compteur des 50 coups. Avec les DTZ, une finale gagnée dont la prise / poussée de pion arrive trop tard
+  devient « Tables de finale : nulle » (seulement quand c'est sûr, malgré l'arrondi d'un demi-coup). Sans DTZ : comme avant.
+- Stockfish sur roi + fou + cavalier avec le compteur à 60 : **+200 avec WDL seuls (faux), +0,22 avec les DTZ (juste)**.
+- Mesures (même PC, Stockfish 4 threads, 1 Go de hachage, 14 positions à 3 millions de nœuds, 3 passages) :
+  démarrage 0,66 s → 0,66-0,82 s ; série 10,6-11,7 s → 11,4-12,7 s (environ +7 %, dans le bruit de mesure) ;
+  mémoire 1 462 Mo → 1 462 Mo (les tables sont lues sur le disque à la demande).
+- Tests : nouvelle série `tests/test_finales_dtz.py` (dans `lancer_tous.py`, Stockfish) : annonce 145 / 145, roi + dame
+  au mat en 10 coups sans répétition, règle des 50 coups (moteur et verdict affiché), sans `.rtbz`, sans `syzygy/`.
+  `test_mise_a_jour.py` : un ami en n° 10 qui passe au n° 12 ne télécharge les finales qu'une fois.
+- Recette : R-148 modifié, R-172 ajouté. Crédits : tables Syzygy (licence vérifiée : libre redistribution, README de
+  syzygy1/tb). `VERSION_AMIS.md` : paquet syzygy ~940 Mo.
+- Pas fait (attend l'accord de Julien) : afficher « mat ou conversion en N coups » dans l'analyse libre ; version amis
+  (0.6.0) : paquet « finales » 984 Mo au lieu de 396 Mo, installeur ~1,28 Go au lieu de 696 Mo.
+
+À vérifier par Julien :
+- [ ] t129 à t132 dans `docs/A_FAIRE.md` (« À tester par Julien »).

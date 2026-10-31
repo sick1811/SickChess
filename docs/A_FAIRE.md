@@ -214,6 +214,17 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+Séance du 31/10 (46) · tables de finales DTZ – **Fonctionne / Ne fonctionne pas + commentaire** (pas encore en version amis).
+- [ ] t129 (46) : **Stockfish voit les DTZ** : lance le jeu, ouvre l'analyse libre, quitte ; dans `journal_du_jeu.txt`
+      (dossier SickChess) : « tables de finale Syzygy branchees … : 145 WDL et 145 DTZ ».
+- [ ] t130 (46) : **règle des 50 coups** : analyse libre, colle `8/8/8/4k3/8/8/8/1BN1K3 w - - 0 1` → « Tables de finale :
+      les Blancs gagnent », évaluation très haute ; colle `8/8/8/4k3/8/8/8/1BN1K3 w - - 60 1` → « Tables de finale :
+      nulle », évaluation proche de 0 (le mat arriverait trop tard pour la règle des 50 coups).
+- [ ] t131 (46) : **droit au mat** : colle `8/8/8/4k3/8/8/8/3QK3 w - - 0 1` et joue chaque fois le premier coup proposé
+      par Stockfish (pour les deux camps) : mat en 10 coups environ, sans revenir en arrière ni tourner en rond.
+- [ ] t132 (46) : **revue d'une partie qui finit en finale** (tour + pion contre tour, roi + pions…) : la revue va aussi
+      vite qu'avant et les pastilles de la finale te semblent justes.
+
 Séance du 31/10 (47) · pré-mouvements à la suite – **Fonctionne / Ne fonctionne pas + commentaire**.
 - [ ] t133 (47) : **plusieurs coups d'avance** : contre l'ordinateur (niveau fort, il réfléchit un peu), pendant son
       tour prépare 3 ou 4 coups à la suite (ex. d4, Cf3, Fc4, petit roque). Chaque coup prévu se voit **presque
