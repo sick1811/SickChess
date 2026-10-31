@@ -1,6 +1,6 @@
 # Banc d'essai – SickChess
 
-Dernier passage : 2026-10-31 14:33 · Windows 11 · 12 cœurs · Python 3.13.7 · pygame 2.6.1 · complet
+Dernier passage : 2026-10-31 21:46 · Windows 11 · 12 cœurs · Python 3.13.7 · pygame 2.6.1 · complet
 
 Fabriqué par `python outils/banc_essai.py` (ne pas modifier à la main).
 
@@ -11,18 +11,24 @@ Fabriqué par `python outils/banc_essai.py` (ne pas modifier à la main).
 
 ## 🟢 Vitesse d'affichage
 
-Démarrage 1.1 s · écran le plus lent : Mes parties (4.4 ms/image)
+Démarrage 1.17 s · écran le plus lent : Mes parties (4.4 ms/image)
 
 
-## 🟢 Charge du processeur au repos
+## 🟠 Charge du processeur au repos
 
-Menu : 5 % d'un cœur (60 img/s) · Partie : 8 % d'un cœur (40 img/s) · 12 cœurs logiques
+Menu : 7 % d'un cœur (60 img/s) · Partie : 10 % d'un cœur (40 img/s) · 12 cœurs logiques
 
+- **« Partie » occupe le processeur sans rien faire** (moyen) – 10 % d'un cœur à 40 images/s alors que rien ne bouge. Pistes : ne redessiner que si quelque chose change, descendre à 30 images/s au repos, mettre en cache le fond et les textes (skill performance-pygame).
 
 ## 🟢 Mémoire
 
-Jeu au menu : 74.9 Mo
+Jeu au menu : 75.2 Mo
 
+- **Gros fichier chargé par le jeu : music/essais/1_Horloge.mp3** (info) – 2.3 Mo. Vérifier s'il peut être plus petit (taille d'image utile, son en .ogg).
+- **Gros fichier chargé par le jeu : music/essais/2_Profondeur.mp3** (info) – 2.2 Mo. Vérifier s'il peut être plus petit (taille d'image utile, son en .ogg).
+- **Gros fichier chargé par le jeu : music/essais/3_Tournoi.mp3** (info) – 1.7 Mo. Vérifier s'il peut être plus petit (taille d'image utile, son en .ogg).
+- **Gros fichier chargé par le jeu : music/essais/4_Blitz_de_nuit.mp3** (info) – 2.2 Mo. Vérifier s'il peut être plus petit (taille d'image utile, son en .ogg).
+- **Gros fichier chargé par le jeu : music/essais/5_Zugzwang.mp3** (info) – 2.0 Mo. Vérifier s'il peut être plus petit (taille d'image utile, son en .ogg).
 
 ## 🟢 Moteur d'analyse (Stockfish)
 
@@ -40,12 +46,12 @@ Jeu au menu : 74.9 Mo
 
 ## 🟢 Conflits et santé du projet
 
-0 conflit(s) Git · 0 erreur(s) de syntaxe · dépendances OK · 9 fichier(s) non enregistré(s)
+0 conflit(s) Git · 0 erreur(s) de syntaxe · dépendances OK · 7 fichier(s) non enregistré(s)
 
 
 ## 🟢 Précision des pastilles (banque de positions)
 
-114 coups justes sur 114 (calcul_forte, 309 s)
+114 coups justes sur 114 (calcul_forte, 307 s)
 
 
 ## ⚪ Endurance (un robot joue 2 heures)

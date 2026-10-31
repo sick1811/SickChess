@@ -2020,3 +2020,8 @@ Décisions de Julien (questions de la séance 50) :
 - [ ] t148 et t149 dans `docs/A_FAIRE.md` (reprise Freestyle n° 414 / 518, clic de retour sur l'échiquier) et t147
   (réinstallation par `SickChess_Installation.exe`).
 - [ ] Claude Code : lancer la mesure des niveaux de nuit, puis recopier la table (tâche dans `docs/A_FAIRE.md`).
+- Publié : **version amis n° 13 (0.7.0)**, https://github.com/sick1811/SickChess-amis/releases/tag/v0.7.0-n13
+  (essai du .exe dans un dossier neuf : OK). Banc avant version : orange « processeur » (partie 10-12 % d'un cœur au
+  repos, contre 8 % avant ; menu aussi un peu plus haut → PC plus chargé ce soir, à remesurer au calme).
+  Essai de l'installeur en silence NON fait : il remplacerait la copie de Julien (même AppId) et Claude Code ne peut pas
+  la réinstaller ensuite → Julien met à jour sa copie par « Mise à jour » dans le menu, ou relance l'installeur.
