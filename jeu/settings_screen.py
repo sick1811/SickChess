@@ -20,6 +20,7 @@ import pygame
 import apparence
 import design
 import mise_en_page as mep
+import niveaux_elo
 import ui
 
 # ----------------------------------------------------------------- apparence
@@ -87,10 +88,9 @@ class _Bouton:
         b.dessiner(ecran, apparence.theme(), rayon=10)
 
 # ----------------------------------------------------------------- valeurs
-NIVEAUX = [
-    ("Débutant", 400), ("Facile", 800), ("Moyen", 1200), ("Club", 1600),
-    ("Fort", 2000), ("Très fort", 2400), ("Maximum", 3000),
-]
+# 31/10 (p34) : les niveaux et les bornes du curseur viennent de la table de
+# calibrage (niveaux_elo.py) : l'Elo affiché ici est celui que la table garantit.
+NIVEAUX = niveaux_elo.NIVEAUX
 DUREES = [("1 min", 1), ("3 min", 3), ("5 min", 5), ("10 min", 10),
           ("15 min", 15), ("30 min", 30), ("Sans limite", 0)]
 INCREMENTS = [("+0 s", 0), ("+1 s", 1), ("+2 s", 2), ("+3 s", 3),
@@ -366,7 +366,8 @@ class SettingsScreen:
                              for libelle, cle, _, _, _ in RYTHMES]
         self.chips_plateau = [Chip(0, 0, 10, 10, "Plateau fixe", False),
                               Chip(0, 0, 10, 10, "Il tourne à chaque coup", True)]
-        self.slider = Slider(0, 0, 100, 100, 3200, 25, self.elo)
+        self.slider = Slider(0, 0, 100, niveaux_elo.ELO_MIN, niveaux_elo.ELO_MAX, 25,
+                             self.elo)
         self.chips_variante = [Chip(0, 0, 10, 10, libelle, valeur)
                                for libelle, valeur in VARIANTES]
         self.chips_position = [Chip(0, 0, 10, 10, libelle, valeur)

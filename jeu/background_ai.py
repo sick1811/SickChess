@@ -262,8 +262,9 @@ class BackgroundAI:
         return max(int(temps_moteur), min(voulu, self.PLAFOND_CLASSEMENT_MS))
 
     def _elo_du_bot(self):
-        """Le classement auquel le bot est regle, quel que soit le chemin."""
-        for attribut in ("elo_bride", "elo_courant"):
+        """Le classement auquel le bot est regle, quel que soit le chemin.
+        31/10 (p34) : l'Elo AFFICHE d'abord ; elo_bride est la consigne du moteur."""
+        for attribut in ("elo_courant", "elo_bride"):
             valeur = getattr(self.engine, attribut, None)
             if valeur:
                 try:

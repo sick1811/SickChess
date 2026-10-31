@@ -33,6 +33,7 @@ import time
 
 # === Connexion au CacheManager (Hash / Threads) ===
 import faiblesse
+import niveaux_elo
 from cache_manager import get_cache_manager
 
 _SECOND_COUP = None
@@ -84,7 +85,8 @@ _moteurs_actifs = []
 
 
 def _tuer_les_moteurs_restants():
-    for moteur in list(_moteurs_actifs):
+    # Une copie : quit() retire le moteur de la liste pendant qu'on la parcourt.
+    for moteur in _moteurs_actifs.copy():
         try:
             moteur.quit()
         except Exception:
@@ -168,6 +170,7 @@ class StockfishEngine:
         self._verrou_ecriture = threading.Lock()
         self.options_disponibles = {}   # nom -> dict(min, max, type)
         self.elo_courant = None
+        self.elo_consigne = None        # p34 : ce qui part vraiment au moteur
         # V7.2 : quand le classement vise est SOUS le minimum de Stockfish, ce
         # n'est plus lui qui choisit le coup, c'est nous (voir faiblesse.py).
         # None = Stockfish choisit tout seul, comme avant.
@@ -416,25 +419,32 @@ class StockfishEngine:
 
     # ------------------------------------------------------------------ niveau
 
-    def set_custom_elo(self, elo):
+    def set_custom_elo(self, elo, brut=False):
         """25/10 : sous le verrou du moteur, comme une recherche. Avant, ce reglage
         attendait « readyok » pendant qu'un autre fil lisait la recherche : deux
         lecteurs sur le meme Stockfish se volaient les reponses et attendaient
-        pour toujours (revue bloquee sur une position)."""
-        with self._verrou:
-            return self._set_custom_elo(elo)
+        pour toujours (revue bloquee sur une position).
 
-    def _set_custom_elo(self, elo):
+        31/10 (p34) : `elo` est l'Elo AFFICHE ; la table niveaux_elo le change
+        en consigne pour le moteur. brut=True envoie `elo` tel quel (outil de
+        calibrage : il mesure les consignes elles-memes)."""
+        with self._verrou:
+            return self._set_custom_elo(elo, brut)
+
+    def _set_custom_elo(self, elo, brut=False):
         """Regle la force de jeu. Fonctionne a TOUS les niveaux, meme sous 1320."""
-        elo = max(100, min(3200, int(elo)))
-        print("ENGINE : configuration elo " + str(elo))
+        affiche = max(100, min(3200, int(elo)))
+        elo = affiche if brut else max(100, min(3200, niveaux_elo.consigne(affiche)))
+        print("ENGINE : configuration elo %d (consigne moteur %d)" % (affiche, elo))
+        self.elo_consigne = elo
 
         infos_elo = self.options_disponibles.get("UCI_Elo", {})
         elo_min = infos_elo.get("min", 1320)
         elo_max = infos_elo.get("max", 3190)
 
         skill = self._elo_vers_skill(elo)
-        self.elo_courant = elo
+        # L'Elo affiche : c'est lui que moteurs.moteur_de_jeu compare.
+        self.elo_courant = affiche
 
         if self._option_existe("UCI_LimitStrength") and elo >= elo_min:
             # Le moteur sait limiter sa force lui-meme : c'est le plus fidele.
@@ -687,6 +697,7 @@ class StockfishEngine:
                                % min(hash_mb, int(maxi or 33554432)))
         self.profondeur_max = int(profondeur) if profondeur else None
         self.elo_courant = None
+        self.elo_consigne = None
         self._send_command("isready")
         self._wait_response("readyok", timeout=6.0)
         self.mode_analyse = True
@@ -847,33 +858,57 @@ class StockfishEngine:
                                        % (max_time_ms, self.profondeur_max))
                 else:
                     self._send_command("go movetime %d" % max_time_ms)
-
-                evaluation, mat, profondeur = None, None, 0
-                limite = time.time() + (max_time_ms / 1000.0) + 5.0
-                while time.time() < limite:
-                    ligne = self._lire_ligne()
-                    if ligne is None:
-                        print("ENGINE : processus termine pendant la recherche")
-                        return None
-                    if ligne.startswith("info "):
-                        ev, mt, pf = self._analyser_info(ligne)
-                        if ev is not None:
-                            evaluation = ev
-                        if mt is not None:
-                            mat = mt
-                        if pf:
-                            profondeur = pf
-                    elif ligne.startswith("bestmove"):
-                        morceaux = ligne.split()
-                        best = morceaux[1] if len(morceaux) > 1 else "(none)"
-                        if best == "(none)" or best == "0000":
-                            return None
-                        return {"coup": best, "evaluation": evaluation,
-                                "mat": mat, "profondeur": profondeur}
-                self._abandonner_la_recherche()
-                return None
+                return self._lire_le_coup(time.time() + (max_time_ms / 1000.0) + 5.0)
             except Exception as e:
                 print("ENGINE : erreur get_best_move = " + str(e))
+                return None
+
+    def _lire_le_coup(self, limite):
+        """Lit la recherche jusqu'a « bestmove ». Le verrou doit etre pris.
+        {'coup', 'evaluation', 'mat', 'profondeur'} ou None."""
+        evaluation, mat, profondeur = None, None, 0
+        while time.time() < limite:
+            ligne = self._lire_ligne()
+            if ligne is None:
+                print("ENGINE : processus termine pendant la recherche")
+                return None
+            if ligne.startswith("info "):
+                ev, mt, pf = self._analyser_info(ligne)
+                if ev is not None:
+                    evaluation = ev
+                if mt is not None:
+                    mat = mt
+                if pf:
+                    profondeur = pf
+            elif ligne.startswith("bestmove"):
+                morceaux = ligne.split()
+                best = morceaux[1] if len(morceaux) > 1 else "(none)"
+                if best == "(none)" or best == "0000":
+                    return None
+                return {"coup": best, "evaluation": evaluation,
+                        "mat": mat, "profondeur": profondeur}
+        self._abandonner_la_recherche()
+        return None
+
+    def coup_a_la_pendule(self, fen, blancs_ms, noirs_ms, increment_blancs_ms=0,
+                          increment_noirs_ms=0, chess960=None):
+        """Le coup de Stockfish quand il GERE SON TEMPS lui-meme (« go wtime
+        btime winc binc »), comme dans les matchs qui ont calibre UCI_Elo.
+        31/10 (p34) : sert a l'adversaire de reference de outils/calibrer_elo.py.
+        Le jeu, lui, passe toujours par get_best_move_details."""
+        with self._verrou:
+            if not self.est_vivant():
+                return None
+            try:
+                self.envoyer_position(fen, chess960)
+                self._send_command("go wtime %d btime %d winc %d binc %d"
+                                   % (max(1, int(blancs_ms)), max(1, int(noirs_ms)),
+                                      max(0, int(increment_blancs_ms)),
+                                      max(0, int(increment_noirs_ms))))
+                reste = max(blancs_ms, noirs_ms) / 1000.0
+                return self._lire_le_coup(time.time() + reste + 10.0)
+            except Exception as e:
+                print("ENGINE : erreur coup_a_la_pendule = " + str(e))
                 return None
 
     def _lire_les_coups_classes(self, fen, max_time_ms, chess960=None):

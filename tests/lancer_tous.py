@@ -39,6 +39,9 @@ SERIES = [
     ("test_endurance.py", False),
     ("test_verifier_version.py", False),
     ("test_distribution.py", False),     # 31/10 : amis / steam / itch (sans Steam)
+    ("test_sauvegarde_freestyle.py", False),   # 31/10 : partie Freestyle reprise (n° 414, 518)
+    ("test_enregistrer_clic.py", False),       # 31/10 (t68) : Enregistrer des Options
+    ("test_niveaux_elo.py", False),       # 31/10 (p34) : table des niveaux en vrai Elo
     ("test_petit_pc.py", False),
     ("test_resume_coach.py", False),
     ("test_lisibilite.py", False),
