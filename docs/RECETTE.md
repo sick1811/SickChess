@@ -74,6 +74,8 @@ Tous les tests à faire à la main pour vérifier le jeu entier. Version : 25/10
   → Cases colorées et flèches ; clic gauche les efface.
 - [ ] **R-039** – Pré-mouvement : jouer pendant que l'ordinateur réfléchit  
   → Le coup part tout seul dès que c'est ton tour ; Échap l'annule.
+- [ ] **R-173** – Pré-mouvements à la suite : préparer 3 ou 4 coups d'avance pendant que l'ordinateur réfléchit (ex. e4, Cf3, Fc4)  
+  → Chaque coup prévu se voit presque transparent avec son numéro, la vraie pièce reste un peu plus visible ; un coup part à chaque tour, dans l'ordre ; un clic droit les annule tous.
 
 ## Pendule
 

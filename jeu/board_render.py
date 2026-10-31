@@ -30,6 +30,13 @@ import ui
 # Fleches deja dessinees (voir BoardRenderer._fleche).
 _FLECHES = {}
 _DAMIERS = {}
+# Pieces transparentes des coups prepares d'avance : (image, opacite) -> copie.
+_TRANSPARENTES = {}
+# 31/10 (ta demande) : le coup prepare est presque transparent, la vraie piece
+# qui va bouger reste un peu plus visible - on voit ou sont les pieces
+# maintenant et ou elles iront.
+OPACITE_FANTOME = 80
+OPACITE_PIECE_QUI_PART = 165
 
 
 class BoardRender:
@@ -113,7 +120,6 @@ class BoardRender:
 
     def _dessiner_pieces(self):
         plateau = self.chessboard
-        sq = plateau.SQ_SIZE
         images = plateau.piece_images
         animees = plateau.animation.cases_en_cours() if hasattr(plateau, "animation") else set()
         # V7.2 (03/09) : les pieces qui traversent le plateau pendant un
@@ -123,20 +129,41 @@ class BoardRender:
         if getattr(plateau, "retournement", None) is not None:
             animees = animees | plateau.retournement.cases_en_cours()
         case_glissee = plateau.selected_square if plateau.dragging else None
+        # Coups prepares d'avance : la position telle qu'elle sera ensuite.
+        avance = plateau.plateau_premouvements()             if getattr(plateau, "premoves", None) else None
 
         for square in chess.SQUARES:
-            if square in animees or square == case_glissee:
+            if square in animees:
                 continue
             piece = plateau.board.piece_at(square)
-            if not piece:
-                continue
-            image = images.get(piece.symbol())
-            if image is None:
-                continue
-            x, y = geo.case_vers_pixel(square, sq, plateau.flipped)
-            decalage_x = (sq - image.get_width()) // 2
-            decalage_y = (sq - image.get_height()) // 2
-            plateau.screen.blit(image, (x + decalage_x, y + decalage_y))
+            future = avance.piece_at(square) if avance is not None else piece
+            if square == case_glissee and piece == future:
+                continue                # la piece est dans la main
+            if piece:
+                bouge = avance is not None and future != piece                     and piece.color == avance.turn
+                self._poser_piece(images.get(piece.symbol()), square,
+                                  OPACITE_PIECE_QUI_PART if bouge else None)
+            if future and future != piece and square != case_glissee:
+                self._poser_piece(images.get(future.symbol()), square, OPACITE_FANTOME)
+
+    def _poser_piece(self, image, square, opacite=None):
+        """Dessine une piece sur sa case, en transparence si `opacite`."""
+        if image is None:
+            return
+        plateau = self.chessboard
+        sq = plateau.SQ_SIZE
+        if opacite is not None:
+            cle = (id(image), opacite)
+            copie = _TRANSPARENTES.get(cle)
+            if copie is None:
+                if len(_TRANSPARENTES) >= 64:
+                    _TRANSPARENTES.clear()
+                copie = _TRANSPARENTES[cle] = image.copy()
+                copie.set_alpha(opacite)
+            image = copie
+        x, y = geo.case_vers_pixel(square, sq, plateau.flipped)
+        plateau.screen.blit(image, (x + (sq - image.get_width()) // 2,
+                                    y + (sq - image.get_height()) // 2))
 
     def _dessiner_piece_glissee(self):
         plateau = self.chessboard
@@ -244,17 +271,29 @@ class BoardRender:
             rect_plateau=(geo.ORIGINE_X, geo.ORIGINE_Y, sq * 8, sq * 8))
 
     def _dessiner_premouvement(self):
-        premove = getattr(self.chessboard, "premove", None)
-        if not premove:
+        """Les cases de tous les coups prepares d'avance, en bleu. Avec plusieurs
+        coups, un petit numero dans le coin de l'arrivee donne l'ordre."""
+        premoves = getattr(self.chessboard, "premoves", None)
+        if not premoves:
             return
         plateau = self.chessboard
         sq = plateau.SQ_SIZE
         calque = pygame.Surface((8 * sq, 8 * sq), pygame.SRCALPHA)
-        for case in (premove.from_square, premove.to_square):
+        cases = set()
+        for coup in premoves:
+            cases.update((coup.from_square, coup.to_square))
+        for case in cases:
             colonne, ligne = geo.colonne_ligne_ecran(case, plateau.flipped)
             pygame.draw.rect(calque, (110, 160, 230, 120),
                              pygame.Rect(colonne * sq, ligne * sq, sq, sq))
         plateau.screen.blit(calque, (geo.ORIGINE_X, geo.ORIGINE_Y))
+        if len(premoves) < 2:
+            return
+        taille = max(10, int(sq * 0.2))
+        for numero, coup in enumerate(premoves, 1):
+            x, y = geo.case_vers_pixel(coup.to_square, sq, plateau.flipped)
+            ui.texte(plateau.screen, str(numero), x + sq - max(3, sq // 16), y + 1,
+                     taille, (235, 240, 255), gras=True, ancre="droite")
 
     def dessiner_plateau(self, avec_interaction=True):
         """L'echiquier seul : cases, surbrillances, pieces, fleches.

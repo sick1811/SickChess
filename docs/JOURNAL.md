@@ -1732,3 +1732,23 @@ Fait (uniquement l'affichage ; règles, moteur et sons pas touchés) :
 
 À vérifier par Julien :
 - [ ] t124 à t128 dans `docs/A_FAIRE.md` (« À tester par Julien »).
+
+## 31/10/2026 (47) – Pré-mouvements à la suite, autant qu'on veut (Claude Code)
+Demande de Julien : « on ne peut en faire qu'un seul ; il faudrait pouvoir en faire à l'infini ; le coup programmé
+presque transparent, la pièce actuelle un peu plus opaque ; clic droit annule tout ». Uniquement le pré-mouvement.
+Fait :
+- `board.py` : une **file** `premoves` (sans limite) ; `premove` reste le 1er coup (les écrans s'en servent).
+  `plateau_premouvements()` = la position d'avance (tous les coups prévus joués à la suite), gardée en mémoire.
+  Un coup part à chaque tour, dans l'ordre ; si un coup est devenu impossible, toute la suite est oubliée (son
+  « illégal »). Les règles ne bougent pas : le coup est contrôlé (légal) au moment où il part, et la fin de partie
+  est toujours regardée avant.
+- `move_handler.py` : on reprend une pièce **là où elle sera** (après Cf3 prévu, on reclique le cavalier en f3).
+  Coups « possibles » d'avance : une pièce clouée peut se préparer (l'adversaire peut la décrouer). Promotion
+  d'avance en dame. **Clic droit ou Échap = tout annuler** (pièce en main + tous les coups prévus).
+- `board_render.py` : pièce prévue **presque transparente** (opacité 80), vraie pièce qui va partir **un peu
+  transparente** (165) ; cases bleues de tous les coups ; petit **numéro d'ordre** dans le coin quand il y en a 2+.
+- Aide F1 (français + anglais) mise à jour. Nouveau contrôle `tests/test_premouvements.py` (27 vérifications).
+- Recette : R-173 ajouté.
+
+À vérifier par Julien :
+- [ ] t133 à t135 dans `docs/A_FAIRE.md` (« À tester par Julien »).

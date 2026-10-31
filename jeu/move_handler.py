@@ -4,9 +4,10 @@
 #   1. CLIC DROIT = ANNULER LE COUP EN COURS. Si une piece est selectionnee ou
 #      en train d'etre deplacee, le clic droit la repose a sa place. Ce n'est
 #      que si rien n'est en cours que le clic droit sert a tracer des fleches.
-#   2. PREMOUVEMENT : on peut preparer son coup pendant que l'adversaire
-#      reflechit. Il part tout seul des que c'est notre tour, et il est oublie
-#      s'il est devenu impossible, comme sur chess.com.
+#   2. PREMOUVEMENT : on peut preparer ses coups pendant que l'adversaire
+#      reflechit (31/10 : autant qu'on veut, a la suite). Le premier part tout
+#      seul des que c'est notre tour ; si un coup est devenu impossible, toute
+#      la file est oubliee. Clic droit ou Echap : on les annule tous.
 #   3. Touche H : Stockfish montre le meilleur coup avec une fleche verte.
 #   4. Touche F : retourner le plateau a la main.
 #
@@ -90,19 +91,13 @@ class MoveHandler:
                 plateau.demander_indice(engine)
                 return
             if event.key == pygame.K_ESCAPE:
-                if plateau.selected_square is not None or plateau.dragging:
-                    self._annuler_selection()
-                elif getattr(plateau, "premove", None):
-                    plateau.annuler_premouvement()
+                self._tout_annuler()
                 return
 
-        # 3. CLIC DROIT : d'abord annuler le coup en cours, sinon les fleches.
+        # 3. CLIC DROIT : d'abord annuler le coup en cours et TOUS les coups
+        # prepares d'avance, sinon les fleches.
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 3:
-            if plateau.selected_square is not None or plateau.dragging:
-                self._annuler_selection()
-                return
-            if getattr(plateau, "premove", None):
-                plateau.annuler_premouvement()
+            if self._tout_annuler():
                 return
         gestionnaire = getattr(plateau, "right_click_manager", None)
         if gestionnaire is not None:
@@ -145,13 +140,16 @@ class MoveHandler:
         piece = plateau.board.piece_at(square)
 
         # b) On clique sur une de ses pieces : selection normale ou premouvement.
+        # Pour un premouvement, la piece est celle de la position D'AVANCE :
+        # apres « Cf3 » prepare, on reprend le cavalier en f3 pour le coup suivant.
         if self.piece_jouable(piece):
             self._selectionner(square, piece, event.pos, premouvement=False)
             return
-        if (plateau.premouvement_actif and self.piece_a_nous(piece)
-                and not plateau.cest_mon_tour()):
-            self._selectionner(square, piece, event.pos, premouvement=True)
-            return
+        if plateau.premouvement_actif and not plateau.cest_mon_tour():
+            piece = plateau.plateau_premouvements().piece_at(square)
+            if self.piece_a_nous(piece):
+                self._selectionner(square, piece, event.pos, premouvement=True)
+                return
 
         # c) Clic dans le vide : on annule.
         self._annuler_selection()
@@ -177,14 +175,12 @@ class MoveHandler:
 
     def _coups_depuis(self, square, premouvement):
         """Coups possibles depuis une case. Pour un premouvement, on regarde la
-        position comme si c'etait deja notre tour."""
+        position d'avance (coups deja prepares joues) comme si c'etait a nous."""
         plateau = self.chessboard
         if not premouvement:
             return [m for m in plateau.board.legal_moves if m.from_square == square]
-        hypothese = plateau.board.copy()
-        hypothese.turn = not hypothese.turn
         try:
-            return [m for m in hypothese.legal_moves if m.from_square == square]
+            return plateau.coups_premouvement(square)
         except Exception:
             return []
 
@@ -197,10 +193,11 @@ class MoveHandler:
         for m in coups:
             if m.to_square not in plateau.legal_moves:
                 plateau.legal_moves.append(m.to_square)
-        if freestyle.est_freestyle(plateau.board):
+        position = plateau.plateau_premouvements() if premouvement else plateau.board
+        if freestyle.est_freestyle(position):
             # Freestyle : le roque se joue aussi en posant le roi sur g / c.
-            for m in [m for m in coups if plateau.board.is_castling(m)]:
-                roi = freestyle.arrivee_du_roi(plateau.board, m)
+            for m in [m for m in coups if position.is_castling(m)]:
+                roi = freestyle.arrivee_du_roi(position, m)
                 if roi not in plateau.legal_moves:
                     plateau.legal_moves.append(roi)
                     coups.append(chess.Move(square, roi))
@@ -209,6 +206,18 @@ class MoveHandler:
         plateau.drag_pos = pos
         plateau.highlights.set_legal_moves(coups)
         plateau.highlights.set_selected_square(square)
+
+    def _tout_annuler(self):
+        """Annule la piece en main et tous les coups prepares. True si il y
+        avait quelque chose a annuler."""
+        plateau = self.chessboard
+        en_main = plateau.selected_square is not None or plateau.dragging
+        prepares = bool(getattr(plateau, "premoves", None))
+        if en_main:
+            self._annuler_selection()
+        if prepares:
+            plateau.annuler_premouvement()
+        return en_main or prepares
 
     def _annuler_selection(self):
         """Repose la piece a sa place et efface les indications."""
@@ -223,15 +232,16 @@ class MoveHandler:
 
     def _preparer_premouvement(self, depart, arrivee):
         plateau = self.chessboard
-        coups = freestyle.coups_vers(plateau.board, self._coups_depuis(depart, True),
-                                     depart, arrivee)
+        coups = freestyle.coups_vers(plateau.plateau_premouvements(),
+                                     self._coups_depuis(depart, True), depart, arrivee)
         if not coups:
             self._annuler_selection()
             return False
         coup = next((m for m in coups if m.promotion == chess.QUEEN), coups[0])
         self._annuler_selection()
         plateau.definir_premouvement(coup)
-        print("[PREMOUVEMENT] %s prepare" % coup.uci())
+        print("[PREMOUVEMENT] %s prepare (%d en attente)"
+              % (coup.uci(), len(plateau.premoves)))
         return True
 
     def _jouer(self, from_square, to_square, engine, piece_promotion=None):

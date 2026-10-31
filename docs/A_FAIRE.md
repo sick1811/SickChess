@@ -214,6 +214,16 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+Séance du 31/10 (47) · pré-mouvements à la suite – **Fonctionne / Ne fonctionne pas + commentaire**.
+- [ ] t133 (47) : **plusieurs coups d'avance** : contre l'ordinateur (niveau fort, il réfléchit un peu), pendant son
+      tour prépare 3 ou 4 coups à la suite (ex. d4, Cf3, Fc4, petit roque). Chaque coup prévu se voit **presque
+      transparent** avec son numéro, la vraie pièce reste à sa place **un peu plus visible**. Un coup part à chaque
+      tour, dans l'ordre.
+- [ ] t134 (47) : **tout annuler** : prépare plusieurs coups puis **clic droit** n'importe où : tout disparaît d'un coup
+      (pas de flèche tracée). Même chose avec Échap. Un clic droit sans coup prévu trace toujours les flèches.
+- [ ] t135 (47) : **coup devenu impossible** : prépare un coup que l'ordinateur peut bloquer ou prendre : quand il
+      devient impossible, rien n'est joué, petit son, et les coups suivants sont oubliés aussi. Essaie aussi en ligne.
+
 Séance du 26/10 (45) · petites fenêtres – **Fonctionne / Ne fonctionne pas + commentaire** (version amis n° 10, 0.5.1).
 - [ ] t124 (45) : **réglages en petite fenêtre** : réduis la fenêtre au plus petit (elle s'arrête à 900×560), Options →
       Affichage → Taille des textes « Très grande », puis Jouer contre l'ordinateur : NIVEAU, RYTHME, DURÉE et

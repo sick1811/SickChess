@@ -86,7 +86,10 @@ class ChessBoard:
 
         # Nouveautes V7
         self.indice = None            # (case_depart, case_arrivee) ou None
-        self.premove = None           # chess.Move joue d'avance
+        # 31/10 (ta demande) : autant de coups d'avance qu'on veut, joues dans
+        # l'ordre. `premove` reste le premier de la file (les ecrans s'en servent).
+        self.premoves = []
+        self._cache_premoves = (None, None)
         self.premouvement_actif = bool(self.reglages.get("premouvement", True))
         self.indices_utilises = 0
         self.engine = None            # renseigne par le mode Stockfish
@@ -300,25 +303,75 @@ class ChessBoard:
             return self.board.turn != (chess.WHITE if self.ia_joue_blancs else chess.BLACK)
         return True
 
+    @property
+    def premove(self):
+        """Le prochain coup prepare d'avance (le premier de la file), ou None."""
+        return self.premoves[0] if self.premoves else None
+
+    @premove.setter
+    def premove(self, move):
+        self.premoves = [] if move is None else [move]
+
+    def couleur_premouvement(self):
+        """La couleur qui prepare ses coups : la notre, l'adversaire a le trait."""
+        couleur = self.move_handler.couleur_du_joueur()
+        return (not self.board.turn) if couleur is None else couleur
+
+    def plateau_premouvements(self):
+        """La position si tous les coups prepares passent, notre camp au trait.
+
+        On ne sait pas ce que l'adversaire jouera entre deux : chaque coup
+        prepare est joue a la suite, comme si c'etait encore a nous. Gardee en
+        memoire tant que la position et la file ne changent pas (le dessin la
+        demande a chaque image)."""
+        cle = (self.board.fen(), tuple(self.premoves))
+        if self._cache_premoves[0] == cle:
+            return self._cache_premoves[1]
+        couleur = self.couleur_premouvement()
+        hypothese = self.board.copy(stack=False)
+        for coup in self.premoves:
+            hypothese.turn = couleur
+            hypothese.ep_square = None
+            hypothese.push(coup)
+        hypothese.turn = couleur
+        hypothese.ep_square = None
+        self._cache_premoves = (cle, hypothese)
+        return hypothese
+
+    def coups_premouvement(self, case):
+        """Coups qu'on peut preparer depuis une case de la position d'avance.
+
+        Coups « possibles » et non « legaux » : un clouage ou un echec peut
+        disparaitre avec le coup adverse. Le vrai controle se fait quand le coup
+        part (jouer_premouvement)."""
+        hypothese = self.plateau_premouvements()
+        return [m for m in hypothese.generate_pseudo_legal_moves(
+                    from_mask=chess.BB_SQUARES[case])
+                if hypothese.piece_type_at(m.to_square) != chess.KING]
+
     def definir_premouvement(self, move):
+        """Ajoute un coup au bout de la file des coups prepares d'avance."""
         if not self.premouvement_actif:
             return False
-        self.premove = move
+        self.premoves.append(move)
         return True
 
     def annuler_premouvement(self):
-        self.premove = None
+        """Oublie TOUS les coups prepares d'avance (clic droit, Echap)."""
+        self.premoves = []
 
     def jouer_premouvement(self):
-        """Joue le coup prepare d'avance, s'il est devenu legal."""
-        if self.premove is None or self.game_over or not self.cest_mon_tour():
+        """Joue le premier coup prepare d'avance, s'il est devenu legal.
+
+        Les suivants attendent nos prochains tours. Si le coup est devenu
+        impossible, toute la file est oubliee : la suite reposait dessus."""
+        if not self.premoves or self.game_over or not self.cest_mon_tour():
             return False
-        coup = self.premove
-        self.premove = None
+        coup = self.premoves.pop(0)
         if coup in self.board.legal_moves:
             self.make_move(coup, self.engine)
             return True
-        # Coup devenu impossible : on l'oublie, comme sur chess.com.
+        self.premoves = []
         self.sounds.play("illegal")
         return False
 
