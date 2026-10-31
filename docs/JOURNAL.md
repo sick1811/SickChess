@@ -1886,3 +1886,18 @@ Fait :
 - Rien de changé dans le jeu : `jeu/musique.py` lit toujours `music/calme.wav`.
 À vérifier par Julien :
 - [ ] Écouter les 5 essais et choisir (ou dire quoi changer) ; ensuite brancher la piste choisie dans `jeu/musique.py`.
+
+## 31/10/2026 (49 suite) – Version amis n° 12 (0.6.1) publiée et vérifiée (Claude Code)
+Fait :
+- Contenu : promotion en pré-mouvement avec choix de la pièce ; raisons de fin de partie traduites en anglais
+  (travail de Cowork, commité avant la fabrication).
+- Avant : `verifier_version.py --amis` → 1543 contrôles verts, banc vert, rien de bloquant.
+- `outils/publier_maj.py` : les dossiers « essais » (ex. `music/essais`, 17 Mo d'essais de musique) ne partent plus
+  dans le paquet « jeu ».
+- Publiée : https://github.com/sick1811/SickChess-amis/releases/tag/v0.6.1-n12 (programme 18,6 Mo, jeu 8,1 Mo ;
+  moteur, problèmes et finales inchangés). Installeur 92,5 Mo. Essai du .exe : OK (25 s sans erreur).
+- Essai de l'installeur en silencieux : problèmes (223 Mo) et finales téléchargés en ~70 s ; le jeu démarre en 0.6.1,
+  « 4180151 problemes », « a installer : rien » ; `verifier_en_ligne.py --dossier` : tout OK. Désinstallé.
+- Pas dans cette version : la nouvelle musique (Cowork travaillait dessus pendant la publication).
+À vérifier par Julien :
+- [ ] t139, t140 sur la n° 12 ; mise à jour chez un ami resté à la n° 11 : petite (~27 Mo), redémarre en 0.6.1.

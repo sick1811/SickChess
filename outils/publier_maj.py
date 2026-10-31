@@ -57,7 +57,9 @@ PAQUETS = {
 }
 ORDRE = ["programme", "jeu", "moteur", "puzzles", "syzygy"]
 DEJA_COMPRESSES = (".gz", ".zip", ".rtbw", ".rtbz", ".png", ".jpg", ".ogg", ".mp3")
-IGNORES = ("__pycache__", ".pyc", ".pyo", "Thumbs.db", ".DS_Store")
+# 31/10 : « essais » = pistes de musique a l'essai (music/essais, 17 Mo), pas
+# encore dans le jeu : elles ne partent pas chez les amis.
+IGNORES = ("__pycache__", ".pyc", ".pyo", "Thumbs.db", ".DS_Store", "essais")
 
 
 def dire(texte=""):

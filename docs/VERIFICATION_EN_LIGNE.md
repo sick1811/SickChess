@@ -1,6 +1,6 @@
 # Vérification du jeu en ligne
 
-Le 31/10/2026 12:23 · dossier vérifié : `C:\Users\mesck\AppData\Local\Temp\essai_n11\SickChessEssai`
+Le 31/10/2026 13:42 · dossier vérifié : `C:\Users\mesck\AppData\Local\Temp\SickChessEssai061`
 
 Fabriqué par `python outils/verifier_en_ligne.py`.
 
@@ -10,8 +10,8 @@ Fabriqué par `python outils/verifier_en_ligne.py`.
 - ✅ SickChess.exe présent (version installée)
 - ✅ Connexion à Steam
 - ✅ Compte : Sick · numéro du jeu : 480
-- ✅ 37 ami(s) Steam visibles (dont 9 en ligne)
-- ✅ Salon créé, code U0W2-QFA5-BJ6
+- ✅ 37 ami(s) Steam visibles (dont 8 en ligne)
+- ✅ Salon créé, code U0W2-QFF8-FNZ
 - ✅ Le code redonne bien le même salon
 - ✅ Écriture / lecture des informations du salon
 - ✅ Tu es bien l'hôte du salon
