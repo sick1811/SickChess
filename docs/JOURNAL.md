@@ -1849,3 +1849,40 @@ Fait :
   part bien en cavalier, Échap) ; recette R-175. `python tests/lancer_tous.py` : 1535 contrôles, tout vert.
 À vérifier par Julien :
 - [ ] t139 et t140 dans `docs/A_FAIRE.md` (« À tester par Julien »).
+
+## 31/10/2026 – Vidéo de présentation de 90 s pour YouTube (Cowork)
+Demande de Julien : « une vidéo de 90 s, propre, avec de VRAIES captures du jeu, rien d'inventé ».
+Fait :
+- `outils/video_presentation.py` : filme le vrai jeu (fenêtre invisible 1600×900 dans un cadre 1920×1080, 30 i/s),
+  avec le vrai Stockfish et la vraie base de problèmes ; horloge virtuelle pour des animations fluides (Stockfish
+  reste en temps réel ; l'analyse libre est filmée au rythme réel). Sons du jeu notés à chaque coup + musique
+  `music/calme.wav`. Dossier temporaire : config.json, profil et parties de Julien jamais touchés.
+- Deux vraies parties de Julien dans `outils/video/parties/` : 24/10 (mat 33.Qb8#, précision 97,1 %) et 23/10
+  (revue : gaffe 6.Bg5, « Ce coup laisse ta dame sans défense »). Mode d'emploi : `outils/video/LISEZ-MOI.md`.
+- Résultat : `docs/video/SickChess_presentation.mp4` (90,0 s, H.264 + AAC, 7,8 Mo) et `.srt` des légendes.
+  Revue 24 s, partie 12 s, problèmes 12 s, analyse 11 s, ouvertures 7 s, Freestyle 6 s, menu 5 s, options 4 s.
+- `.gitignore` : la vidéo et les aperçus restent hors GitHub (le script, lui, y va).
+À vérifier par Julien :
+- [ ] Regarder la vidéo (son compris) ; dire ce qu'il faut changer (textes, durées, ordre).
+- [ ] Claude Code : relancer `python outils/video_presentation.py` sur le PC (ffmpeg doit être installé) et commit du script.
+- 31/10 (suite) : **version anglaise** (`--langue en`) : jeu filmé en anglais + titres traduits (mots repris de
+  `jeu/langue_en.py`) → `docs/video/SickChess_presentation_en.mp4` (+ `.srt`).
+- **Défaut trouvé en la faisant et corrigé** : en anglais, la carte de fin affichait « ÉCHEC ET MAT ! Blanc gagne »
+  (8 raisons de fin de `rules.py` sans traduction : mat, pat, matériel insuffisant, 3 / 5 répétitions, 50 / 75 coups).
+  Ajoutées dans `jeu/langue_en.py` ; contrôle « 2 bis » dans `tests/test_anglais.py` (rouge avant, vert après).
+  `--rapide` : tout vert sauf `test_petit_pc.py` (connu sous Linux). Pas de commit (Cowork).
+  - [ ] Claude Code : `python tests/lancer_tous.py`, commit (langue_en, test_anglais, script vidéo), version amis.
+
+## 31/10/2026 – 5 essais de nouvelle musique (Cowork)
+Demande de Julien : la musique actuelle (`music/calme.wav`) est « très nulle » ; il veut plus chill, plus
+atmosphérique, mais qui fasse sentir un jeu ultra compétitif. 3 à 5 essais à écouter avant de changer.
+Fait :
+- `outils/musique/synth.py` + `outils/musique/pistes.py` : 5 pistes 100 % synthétisées (aucun droit), stéréo 44,1 kHz,
+  bouclables sans coupure (la réverbération de fin revient au début), volume égalisé (-16 LUFS).
+- `music/essais/` (.mp3 pour écouter, .ogg pour le jeu) : 1_Horloge (76 bpm, ré mineur, tic-tac de pendule +
+  battement de cœur), 2_Profondeur (60 bpm, ambient très calme, cloches lointaines), 3_Tournoi (104 bpm, arpèges
+  et pulsation, la pendule accélère), 4_Blitz_de_nuit (lo-fi jazzy, 82 bpm), 5_Zugzwang (90 bpm, sombre et
+  cinématique, ostinato et tambours).
+- Rien de changé dans le jeu : `jeu/musique.py` lit toujours `music/calme.wav`.
+À vérifier par Julien :
+- [ ] Écouter les 5 essais et choisir (ou dire quoi changer) ; ensuite brancher la piste choisie dans `jeu/musique.py`.

@@ -159,6 +159,21 @@ import premier_lancement
 from profil import Profil
 pl = premier_lancement.EcranPremierLancement(ecran, Profil()); pl.draw(); pl.etape = 2; pl.draw(); photo("accueil")
 
+print("2 bis. Raisons de fin de partie (31/10 : restaient en francais sur la carte de fin)")
+import chess as _chess
+from rules import ChessRules
+for _fen in ("R5k1/5ppp/8/8/8/8/8/6K1 b - - 0 1",      # mat, les Blancs gagnent
+             "6k1/8/8/8/8/8/5PPP/r5K1 w - - 0 1",      # mat, les Noirs gagnent
+             "7k/5Q2/6K1/8/8/8/8/8 b - - 0 1",         # pat
+             "8/8/4k3/8/8/3K4/8/8 w - - 0 1",          # materiel insuffisant
+             "8/8/4k3/8/8/3K4/3R4/8 w - - 100 80"):    # 50 coups
+    _fin, _raison = ChessRules.check_game_over(_chess.Board(_fen))
+    verifier(_fin and langue.traduire(_raison) != _raison,
+             "raison traduite : %r -> %r" % (_raison, langue.traduire(_raison)))
+for _raison in ("CINQ RÉPÉTITIONS - Match nul", "RÈGLE DES 75 COUPS - Match nul",
+                "RÉPÉTITION TRIPLE - Match nul"):
+    verifier(langue.traduire(_raison) != _raison, "raison traduite : %r" % _raison)
+
 print("3. Ce qui reste en francais")
 mots_fr = re.compile(r"\b(le|la|les|des|du|une|est|pas|pour|avec|sur|ton|ta|tes|tu|à|é|è|ê|ç|coup|partie|joue|pièce)\b|[éèêàçôû]", re.I)
 print("      TOUS :", sorted(langue.manquants()))

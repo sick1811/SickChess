@@ -68,3 +68,7 @@ tests/surveillance.csv
 /tests/verification_tests.txt
 /rapports/
 /_sauvegarde_cowork_*/
+
+# Vidéo de présentation (fabriquée par outils/video_presentation.py)
+/docs/video/*.mp4
+/docs/video/apercu/

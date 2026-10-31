@@ -104,6 +104,15 @@ EN = {
     "Analyse terminée (profondeur %d)": "Analysis complete (depth %d)",
     "ÉCHEC ET MAT !": "CHECKMATE!", "ECHEC ET MAT": "CHECKMATE", "Échec et mat": "Checkmate",
     "PAT": "STALEMATE", "Abandon": "Resignation",
+    # 31/10 (vidéo anglaise) : les raisons de fin de partie de rules.py restaient en français.
+    "ÉCHEC ET MAT ! Blanc gagne": "CHECKMATE! White wins",
+    "ÉCHEC ET MAT ! Noir gagne": "CHECKMATE! Black wins",
+    "PAT ! Match nul": "STALEMATE! Draw",
+    "MATÉRIEL INSUFFISANT - Match nul": "INSUFFICIENT MATERIAL - Draw",
+    "CINQ RÉPÉTITIONS - Match nul": "FIVEFOLD REPETITION - Draw",
+    "RÈGLE DES 75 COUPS - Match nul": "75-MOVE RULE - Draw",
+    "RÈGLE DES 50 COUPS - Match nul": "50-MOVE RULE - Draw",
+    "RÉPÉTITION TRIPLE - Match nul": "THREEFOLD REPETITION - Draw",
     "%s a abandonne": "%s resigned", "%s a quitte la partie": "%s left the game",
 
     # --- revue
