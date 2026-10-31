@@ -216,7 +216,7 @@ EN = {
     "Ce coup n'était pas jouable ici.": "This move wasn't playable here.",
     "Theme : %s.": "Theme: %s.",
     "Mat en 1": "Mate in 1", "Mat en 2": "Mate in 2", "Mat en 3": "Mate in 3",
-    "Fourchette": "Fork", "Clouage": "Pin", "Enfilade": "Skewer", "Découverte": "Discovered attack",
+    "Fourchette": "Fork", "Clouage": "Pin", "Enfilade": "Skewer", "Découverte": "Discovery",
     "Sacrifice": "Sacrifice", "Déviation": "Deflection", "Pièce en prise": "Hanging piece",
     "Mat du couloir": "Back-rank mate", "Finale": "Endgame", "Attraction": "Attraction",
     "Attaque aux rayons X": "X-ray attack", "Coup calme": "Quiet move", "Coup défensif": "Defensive move",
@@ -645,4 +645,15 @@ EN = {
         "Castle (also: king dropped on g1 / c1 when that is not a normal move)",
     "Espace / Entrée": "Space / Enter",
     "Tournoi : « Je suis prêt », fin de la préparation": "Tournament: \"I'm ready\", ends the preparation",
+    # 31/10 : version itch.io (sans Steam)
+    "Cette version de SickChess fonctionne sans Steam.": "This version of SickChess works without Steam.",
+    "Le jeu en ligne passe par Steam": "Online play requires Steam",
+    "Cette version de SickChess fonctionne sans Steam : le jeu en ligne n'y est pas disponible. "
+    "Pour jouer avec un ami, choisis « Jouer à deux sur ce PC » dans le menu principal.":
+        "This version of SickChess works without Steam, so online play is not available. "
+        "To play with a friend, choose \"Two players on this PC\" in the main menu.",
+    "Classements": "Leaderboards",
+    "Les classements mondiaux passent par Steam": "Global leaderboards require Steam",
+    "Cette version de SickChess fonctionne sans Steam. Tes records sont gardés dans le jeu :":
+        "This version of SickChess works without Steam. Your records are kept in the game:",
 }

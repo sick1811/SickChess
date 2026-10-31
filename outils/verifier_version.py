@@ -2,14 +2,17 @@
 
     python outils/verifier_version.py --amis     avant une version amis (CONSTRUIRE_VERSION_AMIS.bat)
     python outils/verifier_version.py --steam    avant d'envoyer sur Steam (plus strict)
+    python outils/verifier_version.py --itch     avant de deposer sur itch.io (31/10 : sans Steam)
     options : --sans-tests (ne relance pas tests/lancer_tous.py), --sans-banc,
               --exe DOSSIER (essaie le .exe fabrique, dans un dossier neuf)
 
 Un seul passage, une liste claire OK / A REVOIR / BLOQUANT :
   1. tests          tests/lancer_tous.py tout vert
   2. banc d'essai   pas de section rouge (vitesse, processeur, memoire, conflits, precision)
-  3. mode test      MODE_TEST de jeu/salon_en_ligne.py : permis pour les amis, coupe pour Steam
-  4. numero Steam   steam_appid.txt : 480 (test de Valve) pour les amis, le vrai numero pour Steam
+  3. mode test      MODE_TEST de jeu/salon_en_ligne.py : permis pour les amis, coupe pour Steam et itch
+  4. numero Steam   steam_appid.txt : 480 (test de Valve) pour les amis ; pour Steam, le vrai numero
+                    (APPID_STEAM_REEL de jeu/distribution.py) ; itch : aucun
+  4b. paquet itch   (--itch) aucun fichier Steam dans le zip, distribution.json = itch
   5. licences       fichiers de licence presents ; docs/CREDITS.md sans ligne « a verifier » (Steam)
   6. version        VERSION de SickChess.py jamais plus petite que la derniere version publiee
   7. Git            tout est enregistre (rien d'oublie dans la version)
@@ -25,9 +28,12 @@ import subprocess
 import sys
 import tempfile
 import time
+import zipfile
 
 RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APPID_DE_TEST = "480"
+VENDUES = ("steam", "itch")            # versions vendues : controles stricts
+FICHIERS_STEAM = ("steam_api64.dll", "steam_api.dll", "steam_appid.txt")
 OK, A_REVOIR, BLOQUANT = "OK", "A REVOIR", "BLOQUANT"
 LICENCES = ["moteur/COPYING-Stockfish.txt", "polices/BarlowSemiCondensed-OFL.txt",
             "polices/JetBrainsMono-OFL.txt", "polices/Outfit-OFL.txt", "docs/CREDITS.md",
@@ -52,7 +58,7 @@ def controle_mode_test(racine, cible):
     if not m:
         return BLOQUANT, "MODE_TEST introuvable dans jeu/salon_en_ligne.py."
     actif = m.group(1) == "True"
-    if cible == "steam" and actif:
+    if cible in VENDUES and actif:
         return BLOQUANT, ("MODE_TEST = True : les boutons de test du jeu en ligne seraient visibles "
                           "des joueurs. Le passer à False dans jeu/salon_en_ligne.py.")
     if actif:
@@ -60,23 +66,99 @@ def controle_mode_test(racine, cible):
     return OK, "MODE_TEST = False."
 
 
+def appid_steam_reel(racine):
+    """APPID_STEAM_REEL de jeu/distribution.py : le numero (texte), "" s'il vaut
+    None, ou None si la ligne est introuvable."""
+    texte = _lire(racine, os.path.join("jeu", "distribution.py")) or ""
+    m = re.search(r"^APPID_STEAM_REEL\s*=\s*([^#\n]+)", texte, re.M)
+    if not m:
+        return None
+    valeur = m.group(1).strip()
+    return "" if valeur == "None" else valeur
+
+
 def controle_numero_steam(racine, cible):
     texte = _lire(racine, "steam_appid.txt")
     numero = (texte or "").strip()
+    if cible == "itch":
+        return OK, "Version itch : aucun numéro Steam (Steam n'est jamais démarré)."
     if cible == "steam":
+        reel = appid_steam_reel(racine)
+        if reel is None:
+            return BLOQUANT, "APPID_STEAM_REEL introuvable dans jeu/distribution.py."
+        if not reel:
+            return BLOQUANT, ("APPID_STEAM_REEL = None dans jeu/distribution.py : y mettre le vrai "
+                              "numéro de SickChess (compte Steamworks).")
+        if reel == APPID_DE_TEST or not reel.isdigit():
+            return BLOQUANT, ("APPID_STEAM_REEL = %s dans jeu/distribution.py : il faut le vrai "
+                              "numéro de SickChess, pas 480." % reel[:30])
+        if numero and numero.isdigit() and numero not in (reel, APPID_DE_TEST):
+            return BLOQUANT, ("steam_appid.txt (%s) et APPID_STEAM_REEL (%s) ne disent pas le même "
+                              "numéro." % (numero, reel))
         if numero == APPID_DE_TEST:
             return BLOQUANT, ("steam_appid.txt contient 480 (le numéro de test de Valve) : mettre le "
                               "vrai numéro de SickChess (compte Steamworks).")
         if numero and not numero.isdigit():
             return BLOQUANT, "steam_appid.txt ne contient pas un numéro : « %s »." % numero[:30]
         return OK, ("Numéro Steam %s. Rappel : le paquet envoyé à Steam ne doit PAS contenir "
-                    "steam_appid.txt (Steam lance le jeu avec son numéro)." % (numero or "absent"))
+                    "steam_appid.txt (Steam lance le jeu avec son numéro)." % reel)
     if not numero:
         return A_REVOIR, ("steam_appid.txt absent : le jeu en ligne ne marchera pas chez les amis "
                           "(il doit contenir 480 pour l'instant).")
     if numero != APPID_DE_TEST:
         return A_REVOIR, "steam_appid.txt contient %s (et pas 480) : c'est voulu ?" % numero
     return OK, "steam_appid.txt = 480 (numéro de test, normal pour les amis)."
+
+
+def _publier_maj():
+    dossier = os.path.join(RACINE, "outils")
+    if dossier not in sys.path:
+        sys.path.insert(0, dossier)
+    import publier_maj
+    return publier_maj
+
+
+def fichiers_steam_dans(noms):
+    return sorted(n for n in noms
+                  if os.path.basename(n.replace("\\", "/")).lower() in FICHIERS_STEAM)
+
+
+def controle_paquet_itch(racine, cible, zip_itch=None):
+    """31/10 : la version itch.io ne contient AUCUN fichier Steam, et son
+    distribution.json dit « itch » (sinon le jeu essaierait Steam)."""
+    if cible != "itch":
+        return OK, "(pas une version itch)"
+    publier_maj = _publier_maj()
+    trouves = fichiers_steam_dans(n for _a, n in publier_maj.fichiers_itch(racine))
+    if trouves:
+        return BLOQUANT, "Fichiers Steam prévus dans la version itch : %s." % ", ".join(trouves)
+    if zip_itch is None:
+        zip_itch = os.path.join(racine, "publier", "itch",
+                                publier_maj.nom_zip_itch(publier_maj.lire_version(racine)))
+        if not os.path.exists(zip_itch):
+            return OK, "Aucun fichier Steam prévu (le zip itch sera contrôlé à sa fabrication)."
+    nom = os.path.basename(zip_itch)
+    try:
+        with zipfile.ZipFile(zip_itch) as archive:
+            noms = archive.namelist()
+            choix = None
+            if "SickChess/distribution.json" in noms:
+                try:
+                    choix = json.loads(archive.read("SickChess/distribution.json")
+                                       .decode("utf-8")).get("distribution")
+                except (ValueError, AttributeError):
+                    choix = None
+    except (OSError, zipfile.BadZipFile) as souci:
+        return BLOQUANT, "Zip itch illisible (%s) : %s" % (nom, souci)
+    trouves = fichiers_steam_dans(noms)
+    if trouves:
+        return BLOQUANT, "Fichiers Steam dans %s : %s." % (nom, ", ".join(trouves))
+    if choix != "itch":
+        return BLOQUANT, ("%s : distribution.json absent ou faux (%s) : le jeu essaierait Steam."
+                          % (nom, choix))
+    if not any(n.lower().endswith("sickchess.exe") for n in noms):
+        return BLOQUANT, "%s : SickChess.exe absent." % nom
+    return OK, "%s : aucun fichier Steam, distribution = itch." % nom
 
 
 def controle_licences(racine, cible):
@@ -88,7 +170,7 @@ def controle_licences(racine, cible):
                   if ligne.startswith("|") and re.search(r"à vérifier|à confirmer", ligne, re.I)]
     if a_verifier:
         phrase = "Licences encore « à vérifier » dans docs/CREDITS.md : %s." % ", ".join(a_verifier)
-        return (BLOQUANT if cible == "steam" else A_REVOIR), phrase
+        return (BLOQUANT if cible in VENDUES else A_REVOIR), phrase
     return OK, "Licences présentes, docs/CREDITS.md sans ligne à vérifier."
 
 
@@ -222,7 +304,7 @@ def derniere_version_publiee():
 
 
 def verifier(cible="amis", racine=RACINE, tests=True, banc=True, exe=None, version_publiee=None,
-             afficher=True):
+             afficher=True, zip_itch=None):
     controles = []
 
     def ajouter(nom, resultat):
@@ -232,6 +314,8 @@ def verifier(cible="amis", racine=RACINE, tests=True, banc=True, exe=None, versi
 
     ajouter("mode test", controle_mode_test(racine, cible))
     ajouter("numéro Steam", controle_numero_steam(racine, cible))
+    if cible == "itch":
+        ajouter("paquet itch", controle_paquet_itch(racine, cible, zip_itch))
     ajouter("licences", controle_licences(racine, cible))
     ajouter("version", controle_version(racine, cible, version_publiee))
     ajouter("Git", controle_git(racine, cible))
@@ -249,13 +333,15 @@ def verifier(cible="amis", racine=RACINE, tests=True, banc=True, exe=None, versi
 
 
 def main():
-    cible = "steam" if "--steam" in sys.argv else "amis"
+    cible = "steam" if "--steam" in sys.argv else "itch" if "--itch" in sys.argv else "amis"
     exe = sys.argv[sys.argv.index("--exe") + 1] if "--exe" in sys.argv else None
+    zip_itch = sys.argv[sys.argv.index("--paquet") + 1] if "--paquet" in sys.argv else None
     print()
-    print("  Vérification avant une version %s" % ("STEAM" if cible == "steam" else "pour les amis"))
+    print("  Vérification avant une version %s" % {"steam": "STEAM", "itch": "ITCH.IO (sans Steam)"}
+          .get(cible, "pour les amis"))
     print("  " + "-" * 60)
     controles = verifier(cible, tests="--sans-tests" not in sys.argv, banc="--sans-banc" not in sys.argv,
-                         exe=exe, version_publiee=derniere_version_publiee())
+                         exe=exe, version_publiee=derniere_version_publiee(), zip_itch=zip_itch)
     bloquants = [c for c in controles if c[1] == BLOQUANT]
     a_revoir = [c for c in controles if c[1] == A_REVOIR]
     print("  " + "-" * 60)

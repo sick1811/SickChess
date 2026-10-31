@@ -121,6 +121,11 @@ def au_demarrage(dossier=None, exe=None, numero=None):
             return "hors_exe"
         if os.environ.get("SICKCHESS_SANS_PARE_FEU"):
             return "desactive"
+        import distribution
+        if not distribution.steam_permis():
+            # 31/10 : version itch.io : ni Steam ni mise a jour automatique, donc
+            # pas de regle de pare-feu (et pas de demande de droits a l'acheteur).
+            return "itch"
         exe = os.path.abspath(exe or sys.executable)
         dossier = dossier or os.path.dirname(exe)
         if numero is None:

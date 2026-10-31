@@ -10,7 +10,15 @@ import pygame
 import apparence
 import classements
 import design
+import distribution
+import langue
 import ui
+
+# 31/10 : version itch.io (jamais de Steam). Le cadre remplace la liste
+# mondiale ; les records gardes dans le jeu restent visibles en dessous.
+SANS_STEAM_TITRE = "Les classements mondiaux passent par Steam"
+SANS_STEAM_TEXTE = ("Cette version de SickChess fonctionne sans Steam. Tes records sont "
+                    "gardés dans le jeu :")
 
 
 class EcranClassements:
@@ -19,7 +27,8 @@ class EcranClassements:
         self.config = dict(config or {})
         self.gestion = gestionnaire or classements.instance()
         self.steam = steam or self.gestion.steam()
-        if not getattr(self.steam, "actif", False):
+        self.sans_steam = not distribution.steam_permis()
+        if not self.sans_steam and not getattr(self.steam, "actif", False):
             try:
                 self.steam.demarrer()
             except Exception as e:
@@ -34,12 +43,14 @@ class EcranClassements:
         self.btn_actualiser = b((0, 0, 10, 10), "Actualiser", "actualiser", taille=15, gras=False)
         self.btn_retour = b((0, 0, 10, 10), "Retour", "retour", taille=16)
         self.boutons = self.btns_tableaux + self.btns_vues + [self.btn_actualiser, self.btn_retour]
+        if self.sans_steam:
+            self.boutons = [self.btn_retour]     # rien a choisir sans Steam
         self._noms = {}
         self._placer()
         self._demander()
 
     def _demander(self, forcer=False):
-        if getattr(self.steam, "actif", False):
+        if not self.sans_steam and getattr(self.steam, "actif", False):
             self.gestion.demander(self.tableau, self.vue, forcer)
 
     # ------------------------------------------------------------- placement
@@ -77,6 +88,8 @@ class EcranClassements:
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return "retour"
+            if self.sans_steam:
+                return None
             if event.key == pygame.K_r:
                 self._demander(forcer=True)
             if event.key in (pygame.K_LEFT, pygame.K_RIGHT):
@@ -118,6 +131,13 @@ class EcranClassements:
                 "chrono": modes_problemes.record("chrono"),
                 "survie": modes_problemes.record("survie")}
 
+    def _scores_gardes(self):
+        """mes_scores() lus une fois par ouverture de l'ecran (31/10 : plus de
+        lecture de fichier a chaque image)."""
+        if getattr(self, "_scores", None) is None:
+            self._scores = self.mes_scores()
+        return self._scores
+
     def draw(self):
         ecran, ech = self.screen, self.ech
         largeur, hauteur = ecran.get_size()
@@ -129,23 +149,27 @@ class EcranClassements:
                                     design.assombrir(t["fond"], 0.10))
             self._fond = (cle, fond)
         ecran.blit(self._fond[1], (0, 0))
-        ui.texte(ecran, "Classements Steam", largeur // 2, int(hauteur * 0.04), ui.t(40, ech),
+        ui.texte(ecran, "Classements" if self.sans_steam else "Classements Steam", largeur // 2, int(hauteur * 0.04), ui.t(40, ech),
                  t["texte"], gras=True, ancre="centre")
-        if getattr(self.steam, "actif", False):
+        steam_actif = not self.sans_steam and getattr(self.steam, "actif", False)
+        if steam_actif:
             self.gestion.suivre()
         for bouton in self.btns_tableaux:
             bouton.selectionne = bouton.cle == "tableau:" + self.tableau
         for bouton in self.btns_vues:
             bouton.selectionne = bouton.cle == "vue:" + self.vue
-        self.btn_actualiser.actif = bool(getattr(self.steam, "actif", False))
+        self.btn_actualiser.actif = bool(steam_actif)
         souris = pygame.mouse.get_pos()
         for bouton in self.boutons:
             bouton.maj_survol(souris)
             bouton.dessiner(ecran, t, rayon=10)
-        ui.cadre(ecran, self.zone, t["panneau"], t["bord"], 1, 12)
-        if getattr(self.steam, "actif", False):
+        if self.sans_steam:
+            self._dessiner_version_sans_steam(ecran, t, ech)
+        elif steam_actif:
+            ui.cadre(ecran, self.zone, t["panneau"], t["bord"], 1, 12)
             self._dessiner_liste(ecran, t, ech)
         else:
+            ui.cadre(ecran, self.zone, t["panneau"], t["bord"], 1, 12)
             self._dessiner_sans_steam(ecran, t, ech)
         import succes
         succes.dessiner_annonce(ecran)
@@ -220,12 +244,39 @@ class EcranClassements:
                              "sont gardés dans le jeu et partiront à la prochaine connexion :",
                       pygame.Rect(x, y, l, int(64 * ech)), ui.t(15, ech), t["texte"])
         y += int(78 * ech)
-        scores = self.mes_scores()
+        scores = self._scores_gardes()
         for cle, _api, titre, _m in classements.TABLEAUX:
             ui.texte(ecran, titre, x, y, ui.t(16, ech), t["texte_discret"], largeur_max=l // 2)
             ui.texte(ecran, str(scores[cle]), x + l, y, ui.t(16, ech), t["accent"], gras=True,
                      ancre="droite")
             y += int(30 * ech)
+
+    def _dessiner_version_sans_steam(self, ecran, t, ech):
+        """31/10 : version itch.io. Cadre bordé d'or (toute la zone, les boutons
+        Steam sont caches) : pourquoi, puis tes records."""
+        haut = self.btns_tableaux[0].rect.y + int(10 * ech)   # un peu d'air sous le titre
+        l = self.zone.width - int(48 * ech)
+        # Cadre a la taille de son contenu (plus de grand vide en bas).
+        lignes = len(ui.couper_en_lignes(langue.traduire(SANS_STEAM_TEXTE), ui.t(16, ech), l)[:4])
+        besoin = (int(22 * ech) + ui.police(ui.t(22, ech), True).get_height() + int(14 * ech)
+                  + lignes * int(ui.police(ui.t(16, ech)).get_height() * 1.3) + int(18 * ech)
+                  + len(classements.TABLEAUX) * int(36 * ech) + int(14 * ech))
+        zone = pygame.Rect(self.zone.x, haut, self.zone.width,
+                           max(0, min(besoin, self.zone.bottom - haut)))
+        ui.cadre(ecran, zone, t["panneau"], t.get("accent"), 2, 14, ombre=True)
+        x = zone.x + int(24 * ech)
+        y = zone.y + int(22 * ech)
+        ui.texte(ecran, SANS_STEAM_TITRE, zone.centerx, y, ui.t(22, ech), t["accent"],
+                 gras=True, ancre="centre", largeur_max=l, ajuster=True)
+        y += ui.police(ui.t(22, ech), True).get_height() + int(14 * ech)
+        y += ui.paragraphe(ecran, SANS_STEAM_TEXTE, (x, y, l, 0), ui.t(16, ech), t["texte"],
+                           max_lignes=4) + int(18 * ech)
+        scores = self._scores_gardes()
+        for cle, _api, titre, _m in classements.TABLEAUX:
+            ui.texte(ecran, titre, x, y, ui.t(18, ech), t["texte_discret"], largeur_max=l // 2)
+            ui.texte(ecran, str(scores[cle]), x + l, y, ui.t(18, ech), t["accent"], gras=True,
+                     ancre="droite")
+            y += int(36 * ech)
 
     # ------------------------------------------------------------- boucle
 

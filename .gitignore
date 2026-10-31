@@ -73,3 +73,6 @@ tests/surveillance.csv
 /docs/video/*.mp4
 /docs/video/apercu/
 music/essais/
+
+# 31/10 : reglage de distribution, ecrit seulement dans les paquets (publier_maj.py)
+/distribution.json

@@ -40,10 +40,6 @@ TAILLE_MINI = (900, 560)             # en dessous, le plateau devient illisible
 _etat_fenetre = {"plein_ecran": False, "taille": TAILLE_PAR_DEFAUT}
 
 
-def taille_fenetre():
-    return _etat_fenetre["taille"]
-
-
 def est_plein_ecran():
     return _etat_fenetre["plein_ecran"]
 
@@ -620,12 +616,28 @@ def texte_centre_dans(surface, chaine, rect, taille=17, couleur=(235, 232, 226),
     return rendu.get_rect(center=rect.center)
 
 
+_COLLES_AVANT = (":", ";", "!", "?", "»")
+
+
+def _mots_insecables(morceau):
+    """Les mots d'une ligne, ponctuation francaise collee (31/10, relecteur-textes) :
+    « reste avec le mot suivant ; : ; ! ? » restent avec le mot precedent. Sinon
+    un « ou un : pouvait finir seul au bout d'une ligne."""
+    mots = []
+    for mot in morceau.split(" "):
+        if mots and (mot in _COLLES_AVANT or mots[-1] == "«"):
+            mots[-1] += " " + mot
+        else:
+            mots.append(mot)
+    return mots
+
+
 def couper_en_lignes(chaine, taille, largeur_max, gras=False, mono=False):
     """Coupe un paragraphe aux espaces pour tenir dans la largeur."""
     pol = police(taille, gras, mono)
     lignes = []
     for morceau in str(chaine).split("\n"):
-        mots = morceau.split(" ")
+        mots = _mots_insecables(morceau)
         courante = ""
         for mot in mots:
             essai = mot if not courante else courante + " " + mot
@@ -767,18 +779,10 @@ class Pile:
         self.y += hauteur + (self.espace if espace is None else int(espace))
         return rect
 
-    def sauter(self, hauteur):
-        self.y += int(hauteur)
-        return self
-
     def reste(self):
         if self.hauteur is None:
             return 10 ** 6
         return max(0, self.depart_y + self.hauteur - self.y)
-
-    def utilisee(self):
-        return self.y - self.depart_y
-
 
 def grille(elements, x, y, largeur, hauteur, ecart, largeur_mini):
     """Repartit des pastilles sur autant de lignes qu'il faut.
@@ -797,16 +801,6 @@ def grille(elements, x, y, largeur, hauteur, ecart, largeur_mini):
         ligne, colonne = divmod(index, par_ligne)
         element.placer((x + colonne * (largeur_element + ecart),
                         y + ligne * (hauteur + ecart), largeur_element, hauteur))
-    return lignes * (hauteur + ecart) - ecart
-
-
-def hauteur_grille(nombre, largeur, hauteur, ecart, largeur_mini):
-    """Hauteur qu'occupera une grille, sans rien placer."""
-    if nombre <= 0:
-        return 0
-    par_ligne = max(1, (largeur + ecart) // (largeur_mini + ecart))
-    par_ligne = min(par_ligne, nombre)
-    lignes = (nombre + par_ligne - 1) // par_ligne
     return lignes * (hauteur + ecart) - ecart
 
 
@@ -829,14 +823,6 @@ def case_a_cocher(surface, rect, cochee, libelle, theme, taille=15,
           largeur_max=largeur_libelle)
     return pygame.Rect(rect.x, rect.y - 4, rect.width + 10 + largeur_libelle,
                        rect.height + 8)
-
-
-def colonne_centree(surface, largeur, hauteur=None, y=None):
-    """Rectangle centre horizontalement, pour les ecrans en une colonne."""
-    l, h = surface.get_size()
-    largeur = min(int(largeur), l - 40)
-    return pygame.Rect((l - largeur) // 2, int(y if y is not None else 0),
-                       largeur, int(hauteur if hauteur is not None else h))
 
 
 # ---------------------------------------------------------------- boutons
@@ -959,7 +945,7 @@ def rendre_ligne(chaine, taille, couleur, gras=False):
 
 def couper_en_lignes_riches(chaine, taille, largeur_max, gras=False):
     """Comme couper_en_lignes, mais en mesurant aussi les emoji."""
-    mots = str(chaine).split(" ")
+    mots = _mots_insecables(str(chaine))
     lignes = []
     courante = ""
     for mot in mots:

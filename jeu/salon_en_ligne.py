@@ -22,6 +22,7 @@ import pygame
 
 import apparence
 import design
+import distribution
 import freestyle
 import steam as module_steam
 import ui
@@ -38,6 +39,13 @@ FACONS_960 = [("freestyle", "Au hasard"), ("tournoi", "Tournoi")]
 NOMS_VARIANTES = {"normal": "Normal", "freestyle": "Freestyle",
                   "tournoi": "Freestyle (tournoi)"}
 DELAI_STEAM = 20.0
+
+# 31/10 (version itch.io, jamais de Steam) : le cadre affiche a la place des
+# boutons « Créer une partie » / « Rejoindre ».
+SANS_STEAM_TITRE = "Le jeu en ligne passe par Steam"
+SANS_STEAM_TEXTE = ("Cette version de SickChess fonctionne sans Steam : le jeu en ligne "
+                    "n'y est pas disponible. Pour jouer avec un ami, choisis « Jouer à deux "
+                    "sur ce PC » dans le menu principal.")
 
 MESSAGES_ENTREE = {
     2: "Cette partie n'existe plus.",
@@ -103,6 +111,9 @@ class SalonEnLigne:
         self._boutons = {}
         self._visibles = []
 
+        self.sans_steam = not distribution.steam_permis()
+        if self.sans_steam:
+            return                      # version itch : Steam jamais demarre
         if not self.steam.actif:
             self.steam.demarrer()
         if salon_a_rejoindre:
@@ -112,6 +123,8 @@ class SalonEnLigne:
 
     def creer(self):
         self.erreur = ""
+        if self.sans_steam:
+            return
         if not self.steam.demarrer():
             self.erreur = self.steam.erreur
             return
@@ -121,6 +134,8 @@ class SalonEnLigne:
 
     def rejoindre(self, salon):
         self.erreur = ""
+        if self.sans_steam:
+            return
         if not salon:
             self.erreur = "Ce code n'est pas valide."
             return
@@ -298,6 +313,8 @@ class SalonEnLigne:
         return self.resultat
 
     def update(self):
+        if self.sans_steam and not self.salon and self.transport is None:
+            return
         if self.etape in ("accueil", "attente_steam") or self.salon:
             self._suivre_steam()
         if self.etape == "salon" and self.transport is not None:
@@ -345,7 +362,7 @@ class SalonEnLigne:
         elif cle == "coller":
             self.champ_code.coller_le_presse_papiers()
             self.champ_code.activer(True)
-        elif cle == "reessayer":
+        elif cle == "reessayer" and not self.sans_steam:
             self.steam.demarrer()
             self.erreur = "" if self.steam.actif else self.steam.erreur
         elif cle == "test_hote":
@@ -447,6 +464,9 @@ class SalonEnLigne:
         colonne = min(p(460), largeur - p(40))
         x = (largeur - colonne) // 2
         y = p(100)
+        if self.sans_steam:
+            self._dessiner_sans_steam(t, x, y, colonne)
+            return
         # 25/10 (Cowork, 24/10 : phrase coupée « ou entre... ») : les 50 px ne
         # laissaient qu'une ligne ; jusqu'à 3 lignes, toute la phrase (FR et EN).
         hauteur_phrase = ui.paragraphe(ecran, "Joue contre un ami Steam. Crée une partie et "
@@ -497,6 +517,32 @@ class SalonEnLigne:
             self._b("test_invitation", "Test : invitation",
                     (x + 2 * (tiers + p(10)), y + p(22), colonne - 2 * (tiers + p(10)), p(38)),
                     taille=14)
+
+    def _dessiner_sans_steam(self, t, x, y, colonne):
+        """31/10 : version itch.io. Un cadre Onyx & Or (titre en or, phrase
+        claire) au lieu des boutons Steam ; seul « Retour » reste."""
+        ecran = self.screen
+        e, p = self.e, self._p
+        marge = p(22)
+        interieur = colonne - 2 * marge
+        police_texte = ui.t(16, e)
+        # Hauteur du cadre selon la longueur de la phrase (FR ou EN) : mesuree
+        # une fois par taille de fenetre, pas a chaque image.
+        cle = (colonne, police_texte)
+        if getattr(self, "_mesure_sans_steam", (None,))[0] != cle:
+            essai = pygame.Surface((1, 1))
+            h = ui.paragraphe(essai, SANS_STEAM_TEXTE, (0, 0, interieur, 0), police_texte,
+                              t["texte"], max_lignes=6)
+            self._mesure_sans_steam = (cle, h)
+        h_texte = self._mesure_sans_steam[1]
+        h_titre = ui.police(ui.t(22, e), True).get_height()
+        rect = pygame.Rect(x, y + p(20), colonne, marge + h_titre + p(14) + h_texte + marge)
+        ui.cadre(ecran, rect, t["panneau"], t.get("accent"), 2, 14, ombre=True)
+        ui.texte(ecran, SANS_STEAM_TITRE, rect.centerx, rect.y + marge, ui.t(22, e),
+                 t["accent"], gras=True, ancre="centre", largeur_max=interieur, ajuster=True)
+        ui.paragraphe(ecran, SANS_STEAM_TEXTE,
+                      (rect.x + marge, rect.y + marge + h_titre + p(14), interieur, 0),
+                      police_texte, t["texte"], max_lignes=6)
 
     def _dessiner_invitations(self, t, x, y, colonne):
         """24/10 (p36) : les invitations recues ces 10 dernieres minutes

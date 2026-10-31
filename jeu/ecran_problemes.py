@@ -25,6 +25,7 @@ import chess
 import pygame
 
 import apparence
+import distribution
 import explication_puzzle
 import puzzles
 import notation
@@ -129,8 +130,11 @@ class EcranProblemes:
                             for th in puzzles.THEMES_PROPOSES]
         self.btn_retour_choix = ui.Bouton((0, 0, 10, 10), "Retour", "retour", taille=16)
         # 24/10 (travail p37) : les classements Steam (ecran_classements.py).
-        self.btn_classements = ui.Bouton((0, 0, 10, 10), "Classements Steam", "classements",
-                                         taille=16)
+        # 31/10 : version itch.io (sans Steam) : simplement « Classements ».
+        self.btn_classements = ui.Bouton(
+            (0, 0, 10, 10),
+            "Classements Steam" if distribution.steam_permis() else "Classements",
+            "classements", taille=16)
         # 17/10 : les problemes tires de tes propres fautes (mes_erreurs.py).
         self.btn_erreurs = ui.Bouton((0, 0, 10, 10), "Mes erreurs", "erreurs", taille=20)
         self.nombre_erreurs = None
@@ -548,10 +552,6 @@ class EcranProblemes:
         self.index_solution = 2 * self.avance
         self.aller_au_coup(len(self.solution))
         self._dire("Voici la solution.", AMBRE)
-
-    def solution_lisible(self):
-        """'Dxh7+ Rxh7 Th3#' (sans le coup d'ouverture de l'adversaire)."""
-        return " ".join(notation.afficher(san) for san, _ in self.solution[1:])
 
     # ---------------------------------------------------------------- navigation
 

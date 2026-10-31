@@ -178,6 +178,21 @@ for code in ("fr", "en"):
         verifier(affiche == attendu, "%s %dx%d : « %s » (attendu « %s »)"
                  % (code, taille[0], taille[1], affiche, attendu))
 
+# 31/10 (relecteur-textes) : un « ou un : ne finit jamais seul au bout d'une ligne.
+print("Ponctuation francaise collee en coupant les lignes")
+phrase = ("Cette version de SickChess fonctionne sans Steam : le jeu en ligne n'y est pas "
+          "disponible. Pour jouer avec un ami, choisis « Jouer à deux sur ce PC » dans le menu.")
+for largeur in range(120, 700, 7):
+    lignes = ui.couper_en_lignes(phrase, 18, largeur)
+    mal = [lg for lg in lignes if lg.endswith(" «") or lg.startswith((": ", "» ", "»"))
+           or lg == ":"]
+    if mal:
+        verifier(False, "largeur %d : ligne mal coupée %r" % (largeur, mal[0]))
+        break
+else:
+    verifier(True, "« et : restent collés à leur mot, à toutes les largeurs")
+verifier(" ".join(ui.couper_en_lignes(phrase, 18, 200)) == phrase, "aucun mot perdu en coupant")
+
 print()
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))
 sys.exit(1 if echecs else 0)

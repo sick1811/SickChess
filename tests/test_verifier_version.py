@@ -23,9 +23,13 @@ def verifier(condition, message):
         echecs.append(message)
 
 
-def projet(mode_test=True, appid="480", version="0.2.0", licences=True, credits_propres=False):
+def projet(mode_test=True, appid="480", version="0.2.0", licences=True, credits_propres=False,
+           reel="None"):
     d = tempfile.mkdtemp(prefix="sickchess_version_")
     os.makedirs(os.path.join(d, "jeu"))
+    # 31/10 : le vrai numero Steam n'est ecrit qu'a un endroit, jeu/distribution.py.
+    with open(os.path.join(d, "jeu", "distribution.py"), "w", encoding="utf-8") as f:
+        f.write("APPID_DE_TEST = 480\nAPPID_STEAM_REEL = %s   # le jour venu\n" % reel)
     with open(os.path.join(d, "jeu", "salon_en_ligne.py"), "w", encoding="utf-8") as f:
         f.write("import os\n\nMODE_TEST = %s\n" % mode_test)
     if appid is not None:
@@ -56,8 +60,120 @@ verifier(vv.controle_numero_steam(projet(), "amis")[0] == vv.OK, "amis : 480 ok"
 verifier(vv.controle_numero_steam(projet(appid=None), "amis")[0] == vv.A_REVOIR,
          "amis : steam_appid.txt absent, a revoir")
 verifier(vv.controle_numero_steam(projet(), "steam")[0] == vv.BLOQUANT, "Steam : 480 bloque")
+etat, phrase = vv.controle_numero_steam(projet(appid="3412345", reel="3412345"), "steam")
+verifier(etat == vv.OK and "ne doit PAS contenir" in phrase and "3412345" in phrase,
+         "Steam : vrai numero ok, avec le rappel")
+verifier(vv.controle_numero_steam(projet(appid=None, reel="3412345"), "steam")[0] == vv.OK,
+         "Steam : vrai numero dans distribution.py, sans steam_appid.txt : ok")
 etat, phrase = vv.controle_numero_steam(projet(appid="3412345"), "steam")
-verifier(etat == vv.OK and "ne doit PAS contenir" in phrase, "Steam : vrai numero ok, avec le rappel")
+verifier(etat == vv.BLOQUANT and "APPID_STEAM_REEL = None" in phrase,
+         "Steam : APPID_STEAM_REEL = None bloque (meme avec un steam_appid.txt)")
+verifier(vv.controle_numero_steam(projet(appid=None, reel="480"), "steam")[0] == vv.BLOQUANT,
+         "Steam : APPID_STEAM_REEL = 480 bloque")
+verifier(vv.controle_numero_steam(projet(appid="480", reel="3412345"), "steam")[0] == vv.BLOQUANT,
+         "Steam : vrai numero mais steam_appid.txt = 480, bloque toujours")
+verifier(vv.controle_numero_steam(projet(appid="999", reel="3412345"), "steam")[0] == vv.BLOQUANT,
+         "Steam : steam_appid.txt et APPID_STEAM_REEL differents, bloque")
+verifier(vv.appid_steam_reel(projet(reel="3412345")) == "3412345"
+         and vv.appid_steam_reel(projet()) == "", "APPID_STEAM_REEL lu (commentaire ignore)")
+verifier(vv.controle_numero_steam(projet(), "itch")[0] == vv.OK
+         and vv.controle_numero_steam(projet(appid=None), "itch")[0] == vv.OK,
+         "itch : aucun numero Steam demande")
+verifier(vv.appid_steam_reel(RACINE) is not None,
+         "le vrai projet : APPID_STEAM_REEL trouve dans jeu/distribution.py")
+
+print("2b. Version itch : MODE_TEST et fichiers Steam (31/10)")
+verifier(vv.controle_mode_test(projet(), "itch")[0] == vv.BLOQUANT, "itch : MODE_TEST = True bloque")
+verifier(vv.controle_mode_test(projet(mode_test=False), "itch")[0] == vv.OK, "itch : MODE_TEST = False ok")
+import zipfile
+
+import publier_maj
+
+
+def projet_itch(avec_dll=False, distribution="itch", exe=True):
+    """Un faux projet + un faux zip itch."""
+    d = projet(mode_test=False)
+    for chemin in ("jeu/ui.py", "moteur/stockfish.exe", "steam_api64.dll", "steam_appid.txt",
+                   "LISEZ-MOI_AMIS.txt"):
+        os.makedirs(os.path.join(d, os.path.dirname(chemin)), exist_ok=True)
+        with open(os.path.join(d, chemin), "w") as f:
+            f.write("x")
+    z = os.path.join(d, "essai_itch.zip")
+    with zipfile.ZipFile(z, "w") as archive:
+        if exe:
+            archive.writestr("SickChess/SickChess.exe", "exe")
+        archive.writestr("SickChess/jeu/ui.py", "x")
+        if avec_dll:
+            archive.writestr("SickChess/steam_api64.dll", "dll")
+        if distribution:
+            archive.writestr("SickChess/distribution.json", '{"distribution": "%s"}' % distribution)
+    return d, z
+
+
+d, z = projet_itch()
+noms = [n for _a, n in publier_maj.fichiers_itch(d)]
+verifier("jeu/ui.py" in noms and "moteur/stockfish.exe" in noms
+         and not vv.fichiers_steam_dans(noms) and "LISEZ-MOI_AMIS.txt" not in noms,
+         "fichiers de la version itch : le jeu et Stockfish, sans DLL ni steam_appid.txt (%s)" % noms)
+verifier(vv.controle_paquet_itch(d, "itch", z)[0] == vv.OK, "zip itch propre : ok")
+verifier(vv.controle_paquet_itch(d, "itch")[0] == vv.OK,
+         "zip pas encore fabrique : ok (controle a la fabrication)")
+d, z = projet_itch(avec_dll=True)
+etat, phrase = vv.controle_paquet_itch(d, "itch", z)
+verifier(etat == vv.BLOQUANT and "steam_api64.dll" in phrase, "steam_api64.dll dans le zip itch : BLOQUANT")
+d, z = projet_itch(distribution="amis")
+verifier(vv.controle_paquet_itch(d, "itch", z)[0] == vv.BLOQUANT,
+         "distribution.json = amis dans le zip itch : BLOQUANT")
+d, z = projet_itch(distribution=None)
+verifier(vv.controle_paquet_itch(d, "itch", z)[0] == vv.BLOQUANT,
+         "distribution.json absent du zip itch : BLOQUANT")
+d, z = projet_itch(exe=False)
+verifier(vv.controle_paquet_itch(d, "itch", z)[0] == vv.BLOQUANT, "zip itch sans SickChess.exe : BLOQUANT")
+verifier(vv.controle_paquet_itch(d, "itch", os.path.join(d, "pas_un_zip.zip"))[0] == vv.BLOQUANT,
+         "zip itch introuvable : BLOQUANT")
+d, z = projet_itch()
+ancien = publier_maj.PAQUETS["jeu"]
+publier_maj.PAQUETS["jeu"] = ancien + ["steam/steam_api64.dll"]
+os.makedirs(os.path.join(d, "steam"), exist_ok=True)
+with open(os.path.join(d, "steam", "steam_api64.dll"), "w") as f:
+    f.write("x")
+etat, phrase = vv.controle_paquet_itch(d, "itch", z)
+publier_maj.PAQUETS["jeu"] = ancien
+verifier(etat == vv.OK, "une DLL Steam rangee ailleurs est retiree aussi (%s)" % phrase)
+
+print("2c. Le zip itch fabrique par publier_maj (sans PyInstaller, sans GitHub)")
+d, _z = projet_itch()
+dist = tempfile.mkdtemp(prefix="sickchess_dist_")
+for chemin in ("SickChess.exe", "_internal/python3.dll", "steam_api64.dll"):
+    os.makedirs(os.path.join(dist, os.path.dirname(chemin)), exist_ok=True)
+    with open(os.path.join(dist, chemin), "w") as f:
+        f.write("x")
+sortie = tempfile.mkdtemp(prefix="sickchess_itch_")
+envois = []
+reel_gh, reel_exe = publier_maj._envoyer_sur_github, publier_maj.construire_exe
+publier_maj._envoyer_sur_github = lambda *a, **k: envois.append(a) or True
+publier_maj.construire_exe = lambda *a, **k: envois.append("pyinstaller") or dist
+try:
+    chemin = publier_maj.publier_itch(d, dist=dist, sortie=sortie)
+finally:
+    publier_maj._envoyer_sur_github, publier_maj.construire_exe = reel_gh, reel_exe
+with zipfile.ZipFile(chemin) as archive:
+    contenu = archive.namelist()
+    choix = archive.read("SickChess/distribution.json").decode("utf-8")
+verifier(os.path.basename(chemin) == "SickChess_0.2.0_itch.zip",
+         "nom du zip : SickChess_<version>_itch.zip (%s)" % os.path.basename(chemin))
+verifier("SickChess/SickChess.exe" in contenu and "SickChess/jeu/ui.py" in contenu
+         and "SickChess/moteur/stockfish.exe" in contenu, "le zip contient l'exe, le code et Stockfish")
+verifier(not vv.fichiers_steam_dans(contenu),
+         "aucun fichier Steam dans le zip (%s)" % vv.fichiers_steam_dans(contenu))
+verifier('"itch"' in choix, "distribution.json = itch dans le zip")
+verifier(len(contenu) == len(set(contenu)), "aucun fichier en double dans le zip (COPYING-Stockfish)")
+verifier("SickChess/paquets_installes.json" not in contenu,
+         "pas de paquets_installes.json : la version itch ne se met pas a jour par GitHub")
+verifier(not envois, "rien n'est envoye sur GitHub en mode itch (ni exe refait quand on le donne)")
+verifier(os.path.dirname(chemin) == sortie, "le zip est a part (dossier itch), pas dans une version amis")
+for dossier in (dist, sortie):
+    shutil.rmtree(dossier, ignore_errors=True)
 
 print("3. Licences")
 verifier(vv.controle_licences(projet(licences=False), "amis")[0] == vv.BLOQUANT, "licence absente : bloque")
@@ -180,6 +296,16 @@ verifier(not [c for c in controles if c[1] == vv.BLOQUANT],
 steam = dict((c[0], c[1]) for c in vv.verifier("steam", RACINE, tests=False, banc=False,
                                                version_publiee="0.1.0", afficher=False))
 verifier(steam["mode test"] == vv.BLOQUANT, "pour Steam aujourd'hui : MODE_TEST = True bloque (normal)")
+verifier(steam["numéro Steam"] == vv.BLOQUANT,
+         "pour Steam aujourd'hui : APPID_STEAM_REEL = None bloque (normal)")
+itch = dict((c[0], c[1]) for c in vv.verifier("itch", RACINE, tests=False, banc=False,
+                                              version_publiee="0.1.0", afficher=False))
+verifier(itch["mode test"] == vv.BLOQUANT, "pour itch aujourd'hui : MODE_TEST = True bloque (normal)")
+verifier(itch["numéro Steam"] == vv.OK and "paquet itch" in itch,
+         "pour itch : pas de numero Steam, et le paquet est controle (%s)" % itch)
+amis = dict((c[0], c[1]) for c in controles)
+verifier(amis["numéro Steam"] == vv.OK and "paquet itch" not in amis,
+         "pour les amis : rien ne change (480, pas de controle itch)")
 
 print()
 print("RESULTAT : %s" % ("tout est bon" if not echecs else "%d echec(s)" % len(echecs)))

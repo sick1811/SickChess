@@ -33,7 +33,11 @@ from ctypes import (POINTER, Structure, byref, c_bool, c_char_p, c_int,
                     c_int64, c_uint16, c_uint32, c_uint64, c_ubyte, c_void_p,
                     sizeof)
 
-APPID_DE_TEST = 480                # "Spacewar" : le numero de test de Valve
+import distribution
+
+# 31/10 : le numero Steam ne se lit qu'a un endroit, jeu/distribution.py.
+APPID_DE_TEST = distribution.APPID_DE_TEST   # "Spacewar" : le numero de test de Valve
+MESSAGE_SANS_STEAM = "Cette version de SickChess fonctionne sans Steam."
 NOM_DU_JEU = "SickChess"           # ecrit dans chaque salon, verifie a l'entree
 
 # Types de salon (ELobbyType)
@@ -242,6 +246,10 @@ class Steam:
         appele plusieurs fois."""
         if self.actif:
             return True
+        if not distribution.steam_permis():
+            # 31/10 : version itch.io. La DLL n'est jamais chargee, meme si
+            # Steam est ouvert sur le PC (l'acheteur n'a pas forcement Steam).
+            return self._echec(MESSAGE_SANS_STEAM)
         if sys.platform != "win32":
             return self._echec("Le multijoueur Steam n'existe que sous Windows.")
         chemin = self._chemin_dll()
@@ -281,6 +289,10 @@ class Steam:
         self.actif = True
         self.erreur = ""
         print("[STEAM] connecte : %s (jeu %d)" % (self.mon_nom(), self.appid))
+        attendu = distribution.numero_steam()
+        if attendu and self.appid and self.appid != attendu:
+            print("[STEAM] attention : numero %d, attendu %d (distribution %s)"
+                  % (self.appid, attendu, distribution.actuelle()))
         self._rattraper()
         return True
 

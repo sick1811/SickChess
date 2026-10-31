@@ -15,6 +15,14 @@
 #   5. Si GitHub CLI (gh) est installe et connecte : cree la "release" sur
 #      GitHub et y envoie les fichiers. Sinon, explique quoi glisser ou.
 #
+# VERSION ITCH.IO (31/10, demande de Julien) :
+#     py outils/publier_maj.py --itch       (ou CONSTRUIRE_VERSION_ITCH.bat)
+#   fabrique publier/itch/SickChess_<version>_itch.zip : le jeu complet SANS
+#   Steam (ni steam_api64.dll ni steam_appid.txt), avec distribution.json
+#   = « itch » (le jeu ne demarre alors jamais Steam). Rien n'est envoye sur
+#   GitHub : le zip se depose a la main sur la page itch.io. Pas de
+#   paquets_installes.json : la version itch ne se met pas a jour par GitHub.
+#
 # OU C'EST HEBERGE : les "releases" d'un depot GitHub (gratuit, 2 Go par
 # fichier). Le depot est dans outils/maj_config.json. Le jeu des amis lit
 # toujours la meme adresse :
@@ -60,6 +68,15 @@ DEJA_COMPRESSES = (".gz", ".zip", ".rtbw", ".rtbz", ".png", ".jpg", ".ogg", ".mp
 # 31/10 : « essais » = pistes de musique a l'essai (music/essais, 17 Mo), pas
 # encore dans le jeu : elles ne partent pas chez les amis.
 IGNORES = ("__pycache__", ".pyc", ".pyo", "Thumbs.db", ".DS_Store", "essais")
+
+
+# 31/10 : les fichiers Steam, jamais dans la version itch.io.
+FICHIERS_STEAM = ("steam_api64.dll", "steam_api.dll", "steam_appid.txt")
+DOSSIER_ITCH = os.path.join(DOSSIER_PUBLIER, "itch")
+DANS_LE_ZIP_ITCH = ["jeu", "moteur", "puzzles"]
+# Le mode d'emploi des amis (Spacewar, mises a jour par GitHub) n'a rien a faire
+# chez un acheteur itch.io.
+HORS_ITCH = ("LISEZ-MOI_AMIS.txt",)
 
 
 def dire(texte=""):
@@ -404,6 +421,87 @@ def _installeur(manifeste, contenus, racine, dist, sortie, depot):
     return chemin
 
 
+# ---------------------------------------------------------------- itch.io
+
+def _distribution():
+    """jeu/distribution.py (le seul endroit qui sait ecrire distribution.json),
+    charge sans mettre tout jeu/ dans le chemin de Python."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "distribution_sickchess", os.path.join(RACINE, "jeu", "distribution.py"))
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def est_fichier_steam(nom):
+    return os.path.basename(nom.replace("\\", "/")).lower() in FICHIERS_STEAM
+
+
+def sans_steam(fichiers):
+    """[(absolu, nom)] sans les fichiers Steam ni le mode d'emploi des amis."""
+    return [(a, n) for a, n in fichiers
+            if not est_fichier_steam(n) and os.path.basename(n) not in HORS_ITCH]
+
+
+def fichiers_itch(racine=RACINE, paquets=None):
+    """Ce que la version itch prend dans le projet (sans le programme)."""
+    tous, vus = [], set()
+    for nom in paquets or DANS_LE_ZIP_ITCH:
+        for absolu, relatif in fichiers_du_paquet(racine, PAQUETS[nom]):
+            if relatif not in vus:         # COPYING-Stockfish est dans jeu ET moteur
+                vus.add(relatif)
+                tous.append((absolu, relatif))
+    return sans_steam(tous)
+
+
+def nom_zip_itch(version):
+    return "SickChess_%s_itch.zip" % version
+
+
+def zip_itch(racine, dist, sortie, version=None, paquets=None):
+    """Le zip a deposer sur itch.io : SickChess/ (programme + jeu + moteur +
+    problemes) et SickChess/distribution.json = itch."""
+    if not dist or not os.path.isfile(os.path.join(dist, "SickChess.exe")):
+        raise SystemExit("Pas de SickChess.exe dans %s : rien n'est fabrique." % dist)
+    version = version or lire_version(racine)
+    programme = sans_steam(fichiers_du_paquet(dist, sorted(os.listdir(dist))))
+    fichiers = programme + fichiers_itch(racine, paquets)
+    os.makedirs(sortie, exist_ok=True)
+    chemin = os.path.join(sortie, nom_zip_itch(version))
+    distribution = _distribution()
+    with zipfile.ZipFile(chemin, "w") as archive:
+        for absolu, nom in fichiers:
+            mode = zipfile.ZIP_STORED if nom.lower().endswith(DEJA_COMPRESSES) \
+                else zipfile.ZIP_DEFLATED
+            archive.write(absolu, "SickChess/" + nom, compress_type=mode)
+        archive.writestr("SickChess/" + distribution.FICHIER,
+                         distribution.contenu_fichier(distribution.ITCH))
+    return chemin
+
+
+def publier_itch(racine=RACINE, dist=None, sans_construire=False, sortie=DOSSIER_ITCH):
+    """Fabrique le zip itch.io, le controle, et s'arrete la (jamais GitHub)."""
+    version = lire_version(racine)
+    dire("SickChess %s  -  version itch.io (sans Steam)" % version)
+    if dist is None:
+        dist = os.path.join(DOSSIER_BUILD, "dist", "SickChess")
+        if not sans_construire:
+            dist = construire_exe(racine)
+    chemin = zip_itch(racine, dist, sortie, version)
+    import verifier_version
+    etat, phrase = verifier_version.controle_paquet_itch(racine, "itch", chemin)
+    dire("  controle du zip : %s - %s" % (etat, phrase))
+    if etat == verifier_version.BLOQUANT:
+        os.remove(chemin)
+        raise SystemExit("Zip itch refuse : rien n'est garde.")
+    dire("  %s : %s" % (os.path.basename(chemin), _mo(os.path.getsize(chemin))))
+    dire()
+    dire("Rien n'est envoye sur GitHub (version itch). A deposer a la main sur itch.io :")
+    dire("  %s" % chemin)
+    return chemin
+
+
 # ---------------------------------------------------------------- publication
 
 def publier(notes, racine=RACINE, dossier_publier=DOSSIER_PUBLIER, dist=None,
@@ -630,7 +728,14 @@ def main():
                         help="prepare les fichiers sans les envoyer sur GitHub")
     parser.add_argument("--installeur-seul", action="store_true",
                         help="refait seulement l'installeur de la derniere version publiee")
+    parser.add_argument("--itch", action="store_true",
+                        help="fabrique le zip itch.io (sans Steam), sans rien publier")
+    parser.add_argument("--sans-construire", action="store_true",
+                        help="(--itch) reprend l'exe deja fabrique dans build_amis/")
     args = parser.parse_args()
+    if args.itch:
+        publier_itch(sans_construire=args.sans_construire)
+        return
     if args.installeur_seul:
         installeur_seul(envoyer=not args.sans_envoi)
         return

@@ -12,6 +12,7 @@ import pygame
 
 import apparence
 import design
+import distribution
 import ui
 
 ENTREES = [
@@ -51,6 +52,10 @@ class MainMenu:
                 bouton.actif = _problemes_disponibles()
                 if not bouton.actif:
                     bouton.libelle = "Problèmes  (base absente)"
+            # 31/10 : la version itch.io n'a pas Steam ; le bouton reste (il
+            # explique pourquoi le jeu en ligne n'est pas la), sans « (Steam) ».
+            if bouton.cle == "en_ligne" and not distribution.steam_permis():
+                bouton.libelle = "Jouer en ligne"
         self.detail_reprise = ""
         # 25/10 (Julien) : Echap au menu demande « Quitter SickChess ? » au lieu
         # de fermer le jeu tout de suite (deux fermetures par accident).

@@ -19,6 +19,7 @@ import chess
 import pygame
 
 import apparence
+import distribution
 import steam as module_steam
 import ui
 from board import ChessBoard
@@ -37,6 +38,9 @@ def invitation_en_attente():
 
     Au premier appel : lit '+connect_lobby' (jeu lance par une invitation) et
     branche Steam si steam_appid.txt est la ou si le jeu vient de Steam."""
+    if not distribution.steam_permis():
+        # 31/10 : version itch.io, jamais de Steam (ni +connect_lobby).
+        return _INVITATION["salon"]
     s = module_steam.instance()
     if not _INVITATION["essai"]:
         _INVITATION["essai"] = True
