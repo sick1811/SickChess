@@ -25,6 +25,9 @@ ecran = pygame.display.set_mode((1024, 640))
 import langue
 import resume_coach as C
 
+# 31/10 : le test parle français, quelle que soit la langue du config.json de Julien.
+langue.regler("fr")
+
 echecs = []
 
 
