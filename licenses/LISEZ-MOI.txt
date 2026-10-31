@@ -1,0 +1,49 @@
+LICENCES DES COMPOSANTS DE SICKCHESS
+====================================
+
+SickChess - code (c) 2026 Julien (sick1811), GNU GPL v3 ou ulterieure : voir LICENSE et LICENCE.md
+a la racine du jeu. Code source : https://github.com/sick1811/SickChess
+Images, sons, musique, nom et logo de SickChess : tous droits reserves.
+
+Composant                         Licence                         Fichier
+--------------------------------  ------------------------------  ------------------------------
+Stockfish 17.1 (moteur, separe)   GNU GPL v3                      Stockfish-COPYING.txt
+  source : https://github.com/official-stockfish/Stockfish/tree/sf_17.1
+python-chess (Niklas Fiekas)      GNU GPL v3 ou ulterieure        python-chess-LICENSE.txt
+Python 3.13                       PSF License                     Python-LICENSE.txt
+Pygame                            GNU LGPL v2.1                   pygame-LGPL.txt
+  source : https://github.com/pygame/pygame
+SDL2                              zlib                            LICENSE.sdl2.txt
+SDL2_image                        zlib                            LICENSE.sdl2_image.txt
+SDL2_mixer                        zlib                            LICENSE.sdl2_mixer.txt
+SDL2_ttf                          zlib                            LICENSE.sdl2_ttf.txt
+FreeType                          FreeType License (FTL)          LICENSE.freetype.txt
+  Portions of this software are copyright (c) The FreeType Project (www.freetype.org).
+  All rights reserved.
+libjpeg                           IJG                             LICENSE.jpeg.txt
+  This software is based in part on the work of the Independent JPEG Group.
+libpng                            libpng License                  LICENSE.png.txt
+zlib                              zlib                            LICENSE.zlib.txt
+libtiff                           libtiff (type BSD)              LICENSE.tiff.txt
+libwebp                           BSD                             LICENSE.webp.txt
+libogg                            BSD                             LICENSE.ogg-vorbis.txt
+Opus                              BSD                             LICENSE.opus.txt
+opusfile                          BSD                             LICENSE.opusfile.txt
+libmodplug                        domaine public                  LICENSE.modplug.txt
+PortMidi                          type MIT                        LICENSE.portmidi.txt
+libffi                            MIT                             libffi-LICENSE.txt
+OpenSSL 3                         Apache License 2.0              OpenSSL-LICENSE.txt
+SQLite                            domaine public                  (https://sqlite.org/copyright.html)
+Microsoft Visual C++ Runtime      redistribuable Microsoft        (VCRUNTIME140*.dll)
+Steamworks SDK (steam_api64.dll)  (c) Valve, accord Steamworks SDK
+
+Police Barlow Semi Condensed      SIL Open Font License 1.1       BarlowSemiCondensed-OFL.txt
+Police Outfit                     SIL Open Font License 1.1       Outfit-OFL.txt
+Police JetBrains Mono             SIL Open Font License 1.1       JetBrainsMono-OFL.txt
+Pieces "Classique"                GNU GPL v2 ou ulterieure        GPL-2.0.txt
+  contours de Colin M. L. Burnett (Cburnett), via lichess.org, utilises ici sous GPL v3.
+Bruitages de bois (Kenney)        CC0 1.0                         Kenney-CC0.txt
+Problemes et ouvertures Lichess   CC0 1.0                         CC0-1.0.txt
+  https://database.lichess.org/#puzzles - https://github.com/lichess-org/chess-openings
+Tables de finales Syzygy          libre redistribution            (https://github.com/syzygy1/tb)
+  generees par Ronald de Man.

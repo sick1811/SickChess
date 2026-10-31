@@ -30,7 +30,8 @@ RACINE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 APPID_DE_TEST = "480"
 OK, A_REVOIR, BLOQUANT = "OK", "A REVOIR", "BLOQUANT"
 LICENCES = ["moteur/COPYING-Stockfish.txt", "polices/BarlowSemiCondensed-OFL.txt",
-            "polices/JetBrainsMono-OFL.txt", "polices/Outfit-OFL.txt", "docs/CREDITS.md"]
+            "polices/JetBrainsMono-OFL.txt", "polices/Outfit-OFL.txt", "docs/CREDITS.md",
+            "LICENSE", "LICENCE.md", "licenses/LISEZ-MOI.txt"]
 SECTIONS_DU_BANC = "vitesse,processeur,memoire,conflits,precision"
 
 

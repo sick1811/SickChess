@@ -5,10 +5,12 @@ Rien de copié d'un autre jeu ou d'un site sans licence claire.
 
 | Ressource | Dossier | Origine | Licence |
 |---|---|---|---|
-| Code du jeu | `jeu/` | Julien (sick1811), avec Claude | Propriété du projet |
+| Code du jeu | `SickChess.py`, `jeu/`, `outils/`, `tests/` | Julien (sick1811), avec Claude | GNU GPL v3 ou ultérieure (`LICENSE`, explications `LICENCE.md`), obligatoire car python-chess est GPL v3 ; code public sur github.com/sick1811/SickChess |
+| Créations graphiques et sonores du projet | `assets/`, `sounds/`, `music/` | Julien (sick1811) | Tous droits réservés (hors GPL, voir `LICENCE.md`) |
+| python-chess | intégré au .exe | Niklas Fiekas | GNU GPL v3 ou ultérieure |
 | Bruitages – carillons (échec, mat, début/fin, problèmes) | `sounds/` | Synthétisés par `outils/generer_sons.py` | Propriété du projet |
 | Bruitages – chocs de bois (coups, prises, roque) | `sounds/`, sources dans `assets_src/sons_kenney/` | Pack « Impact Sounds » de Kenney (kenney.nl), assemblé par `outils/generer_sons.py` | CC0 (domaine public, `assets_src/sons_kenney/License.txt`) – mention de Kenney conseillée |
-| Pièces « Classique » | `jeu/pieces_vectorielles.py` | Contours inspirés des pièces « Cburnett » (Wikimedia Commons) | **À vérifier** avant la sortie : licence d'origine + mention de l'auteur, ou redessiner nos propres pièces |
+| Pièces « Classique » | `jeu/pieces_vectorielles.py` | Code écrit par Claude, contours recopiés des pièces « Cburnett » de Colin M. L. Burnett (lichess `public/piece/cburnett`) | GNU GPL v2 ou ultérieure (COPYING.md de lichess, vérifié le 31/10/2026), compatible avec la GPL v3 du jeu ; mention de l'auteur obligatoire (`licenses/GPL-2.0.txt`) |
 | Pièces Relief (Prisme, Arène, Tournoi) | `assets/pieces/relief_*` | Modèles 3D créés pour SickChess (`outils/blender/sick3d.py`), rendus dans Blender, retouchés par `outils/retoucher_pieces.py` (originaux : `assets_src/pieces_relief_origine/`) | Propriété du projet |
 | Pièces plates (Arène, Tournoi) | `assets/pieces/plat_*` | Tirées des mêmes profils (`outils/blender/gen_2d.py`) | Propriété du projet |
 | Plateaux en matière (marbre, onyx, noyer) | `assets/plateaux/` | Textures calculées (`outils/blender/gen_plateaux.py`) | Propriété du projet |
@@ -18,10 +20,12 @@ Rien de copié d'un autre jeu ou d'un site sans licence claire.
 | Police Barlow Semi Condensed | `polices/` | Google Fonts (The Barlow Project) | SIL Open Font License (`BarlowSemiCondensed-OFL.txt`) |
 | Police Outfit | `polices/` | Google Fonts | SIL Open Font License (`Outfit-OFL.txt`) |
 | Police JetBrains Mono | `polices/` | JetBrains | SIL Open Font License (`JetBrainsMono-OFL.txt`) |
-| Ouvertures (noms et coups) | `ouvertures/` | Base « chess-openings » de Lichess | CC0 – **origine à confirmer** |
+| Ouvertures (noms et coups) | `ouvertures/` | Base « chess-openings » de Lichess | CC0 (github.com/lichess-org/chess-openings, mêmes fichiers `a.tsv`…`e.tsv`) |
 | Problèmes (4 180 151) | `puzzles/` | Base de problèmes de Lichess (database.lichess.org) | CC0 (domaine public) – mention de Lichess conseillée |
 | Moteur Stockfish | `moteur/` | stockfishchess.org | GNU GPL v3 (`moteur/COPYING-Stockfish.txt`) |
 | Tables de finales Syzygy 3-4-5 pièces, WDL (`.rtbw`) et DTZ (`.rtbz`) | `syzygy/` | Ronald de Man (générateur github.com/syzygy1/tb), miroir lichess tablebase.lichess.ovh/tables/standard/ ; empreintes SHA-256 vérifiées le 31/10 (fichier `sha256` du miroir) | Libre redistribution : « All tablebase files generated using this generator may be freely redistributed » (README de syzygy1/tb, vérifié le 31/10/2026) ; sans droit d'auteur selon ce README (US : Feist ; UE : Football Dataco) |
+
+Tous les textes de licence livrés avec le jeu sont dans `licenses/` (index : `licenses/LISEZ-MOI.txt`).
 
 ## Retiré de V8_TURBO_3000 (ne jamais réintégrer)
 - Pièces Pokémon (`assets/*.png`, `assets/pokemon/`) – marque et personnages protégés.

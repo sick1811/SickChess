@@ -5,6 +5,43 @@ Fichier partagé entre Cowork et Claude Code. **À relire au début de chaque s�
 (https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5) en est la version à cocher pour Julien.
 Mis à jour le 25/10/2026 (fin de séance (44) – arbre des ouvertures).
 
+## Demande de Julien du 31/10 – itch.io : jeu en ligne et classements sans le n° 480 (Claude Code) – EN PREMIER
+Constat (Cowork, 31/10) : tout le jeu en ligne et les classements passent par Steam avec le numéro de
+test **480** (« Spacewar » de Valve). C'est bien pour les tests entre amis, **pas pour un jeu vendu** :
+classements partagés avec tous les développeurs qui testent sur 480 (scores mélangés, peuvent être
+effacés), invitation qui ouvre « Spacewar », profil Steam qui affiche « joue à Spacewar ». Et un
+acheteur itch.io n'a pas forcément Steam. Le vrai numéro Steam arrivera avec le compte Steamworks
+(démarche de Julien, 100 $) : ce travail-ci prépare tout pour que ce jour-là il n'y ait qu'un chiffre à changer.
+
+Travail (petites étapes, jeu jouable après chacune, tests verts, journal, commit) :
+1. [ ] **Audit d'abord, sans rien changer** : lister tout ce qui dépend de Steam / 480 /
+       `steam_appid.txt` / `steam_api64.dll` (`jeu/steam.py`, `partie_en_ligne.py` qui démarre Steam
+       dès que le jeu est compilé, `classements.py`, succès, `salon_en_ligne.py`, `outils/publier_maj.py`,
+       `outils/verifier_version.py`, skill `compiler-exe`). Résumer à Julien en 5 lignes simples.
+2. [ ] **Un seul réglage « distribution »** : `amis` / `steam` / `itch`, à un seul endroit, écrit au
+       moment de la compilation. Le numéro Steam lu à un seul endroit (480 pour `amis`, le vrai numéro
+       pour `steam`, aucun pour `itch`).
+3. [ ] **Version itch** : ni `steam_api64.dll` ni `steam_appid.txt` dans le paquet ; Steam jamais démarré,
+       même si Steam est ouvert sur le PC. « Jouer en ligne » et « Classements » : un message clair
+       et joli (pas d'erreur), partie à deux sur le même PC toujours là. Records et classement
+       personnels gardés dans le jeu et visibles. Ne pas supprimer le code Steam.
+4. [ ] **Version amis** : rien ne change (480, comme aujourd'hui). **Version Steam** : rien ne change
+       sauf le numéro ; `verifier_version.py --steam` bloque toujours 480 et `MODE_TEST = True`.
+5. [ ] `outils/verifier_version.py --itch` : bloquant si un fichier Steam est dans le paquet ou si
+       `MODE_TEST = True`. Compilation : zip `SickChess_<version>_itch.zip` à part.
+6. [ ] Tests (faux Steam) : `tests/test_distribution.py` dans `SERIES` : en `itch`, Steam n'est jamais
+       démarré, les écrans en ligne / classements s'ouvrent et se ferment sans planter ; en `amis` et
+       `steam`, tout comme avant. `python tests/lancer_tous.py` tout vert.
+7. [ ] Textes : accents, clés dans `langue_en.py`. Docs : `SORTIE.md`, `MULTIJOUEUR_STEAM.md`,
+       `SUCCES_STEAM.md`, recette (`outils/recette.py`), `CREDITS` si un import change, journal,
+       tests pour Julien dans « À tester par Julien ».
+Ne PAS faire sans l'accord de Julien : créer un serveur à nous (coût, entretien, triche), toucher aux
+règles, passer `MODE_TEST` à False pour les amis, `git push --force`.
+**Question à poser à Julien à la fin** (expliquer simplement) : pour que les acheteurs itch.io jouent
+aussi en ligne, soit on leur donne **une clé Steam** avec leur achat (itch.io sait le faire, une fois
+le vrai numéro Steam obtenu ; rien à coder de plus), soit on fait **notre propre serveur** (plus long,
+payant, à surveiller). Conseil : la clé Steam.
+
 ## Retours de Julien à traiter (priorité)
 - [ ] **25/10 – mise à jour chez l'ami de Julien** (version n° 4 ou 5) : « vérifie ta connexion / site
       introuvable ». Le site marche (vérifié par Cowork le 25/10 : latest → v0.2.0-n6, maj.json téléchargé). Donc

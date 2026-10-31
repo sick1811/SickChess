@@ -19,6 +19,10 @@ progresser, **ultra compétitif** – joli, facile, professionnel.
 - **On repart propre** : `../V8_TURBO_3000` est l'archive de référence. Une fonction
   est reprise **une par une**, nettoyée, testée ; le jeu reste jouable après chaque étape.
 - **Aucune ressource sans licence vérifiée** (noter dans `docs/CREDITS.md`).
+  **Chaque ajout / retrait / changement** de ressource ou de bibliothèque (y compris un
+  nouvel `import` livré dans le .exe) = `docs/CREDITS.md` **et** le texte public
+  `docs/CREDITS_JOUEURS.md` mis à jour dans la même séance (demande de Julien, 31/10),
+  et le texte de sa licence ajouté dans `licenses/` (+ une ligne dans `licenses/LISEZ-MOI.txt`).
   Stockfish = GPL v3 : livrer `moteur/COPYING-Stockfish.txt` avec le jeu.
 - Direction artistique « Onyx & Or » (`jeu/design.py`) ; pièces par défaut « Tournoi plat ».
   Police Barlow Semi Condensed. **Tous les textes affichés avec accents.**

@@ -1787,3 +1787,18 @@ Fait :
 
 À vérifier par Julien :
 - [ ] t129 à t132 dans `docs/A_FAIRE.md` (« À tester par Julien »).
+
+## 31/10/2026 – Licences (Cowork)
+Fait :
+- Code de SickChess publié sous **GNU GPL v3 ou ultérieure** (obligatoire : python-chess, intégré au .exe, est GPL v3).
+  `LICENSE` (texte officiel, identique à `moteur/COPYING-Stockfish.txt`) et `LICENCE.md` (explication en français) à la racine.
+  Images, sons, musique, nom et logo restent « tous droits réservés » (hors GPL). Dépôt GitHub public = code source disponible.
+- `docs/CREDITS.md` : code GPL, créations du projet, python-chess. Nouveau texte public `docs/CREDITS_JOUEURS.md` (itch.io / Steam).
+- `LICENSE` et `LICENCE.md` livrés dans le paquet « jeu » (`outils/publier_maj.py`) et contrôlés par `outils/verifier_version.py`.
+- Règle dans `CLAUDE.md` : chaque ressource / bibliothèque ajoutée = les deux fichiers de crédits mis à jour.
+- Dossier `licenses/` (29 textes + index `LISEZ-MOI.txt`), livré dans le paquet « jeu » et contrôlé par `verifier_version.py`.
+- Pièces « Classique » : contours Cburnett, GPL v2+ (COPYING.md de lichess), compatible GPL v3 ; plus de ligne « à vérifier ».
+- Stockfish : 17.1 (confirmé par Julien).
+À vérifier par Julien :
+- [ ] Claude Code : `python tests/lancer_tous.py --rapide` vert, puis commit « Licence GPL v3 du code et crédits ».
+

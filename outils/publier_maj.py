@@ -46,7 +46,7 @@ FORMAT = 1
 PAQUETS = {
     # Pas de config.json : c'est celui de Julien. Le jeu a ses reglages par
     # defaut et cree config.json chez l'ami au premier passage dans Options.
-    "jeu": ["jeu", "assets", "sounds", "music", "polices", "ouvertures", "docs/CREDITS.md",
+    "jeu": ["jeu", "assets", "sounds", "music", "polices", "ouvertures", "docs/CREDITS.md", "LICENSE", "LICENCE.md", "licenses",
             "moteur/COPYING-Stockfish.txt", "steam_api64.dll", "steam_appid.txt",
             "LISEZ-MOI_AMIS.txt",
             # 25/10 : l'adresse du salon Discord de « Signaler » (hors Git).
