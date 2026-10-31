@@ -83,6 +83,8 @@ RECETTE = [
          "Le coup part tout seul dès que c'est ton tour ; Échap l'annule."),
         ("R-173", "Pré-mouvements à la suite : préparer 3 ou 4 coups d'avance pendant que l'ordinateur réfléchit (ex. e4, Cf3, Fc4)",
          "Chaque coup prévu se voit presque transparent avec son numéro, la vraie pièce reste un peu plus visible ; un coup part à chaque tour, dans l'ordre ; un clic droit les annule tous."),
+        ("R-175", "Pré-mouvement d'une promotion : pendant que l'ordinateur réfléchit, amener un pion sur la dernière rangée",
+         "Le panneau Dame / Tour / Fou / Cavalier s'ouvre ; la pièce choisie (ex. cavalier) apparaît quand le coup part ; Échap annule."),
     ]),
     ("Pendule", [
         ("R-040", "Partie 1 min, laisser descendre sous 30 s",

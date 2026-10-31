@@ -75,8 +75,12 @@ class MoveHandler:
                 self._annuler_selection()
             elif reponse is not None:
                 depart, arrivee = promotion.from_square, promotion.to_square
+                d_avance = promotion.premouvement
                 promotion.fermer()
-                self._jouer(depart, arrivee, engine, piece_promotion=reponse)
+                if d_avance:
+                    self._preparer_premouvement(depart, arrivee, piece_promotion=reponse)
+                else:
+                    self._jouer(depart, arrivee, engine, piece_promotion=reponse)
             return
 
         # 2. Clavier.
@@ -230,14 +234,28 @@ class MoveHandler:
         self.selection_premouvement = False
         plateau.highlights.clear_legal_moves()
 
-    def _preparer_premouvement(self, depart, arrivee):
+    def _preparer_premouvement(self, depart, arrivee, piece_promotion=None):
         plateau = self.chessboard
         coups = freestyle.coups_vers(plateau.plateau_premouvements(),
                                      self._coups_depuis(depart, True), depart, arrivee)
         if not coups:
             self._annuler_selection()
             return False
-        coup = next((m for m in coups if m.promotion == chess.QUEEN), coups[0])
+        # 31/10 - TA REMARQUE : « en pre-mouvement, la promotion met toujours
+        # la dame ». On ouvre le meme panneau de choix que pour un coup normal.
+        promotions = [m for m in coups if m.promotion]
+        if promotions and piece_promotion is None:
+            promotion = getattr(plateau, "promotion", None)
+            if promotion is not None:
+                promotion.ouvrir(depart, arrivee, plateau.couleur_premouvement(),
+                                 premouvement=True)
+                return False
+            piece_promotion = chess.QUEEN
+        if promotions:
+            coup = next((m for m in promotions if m.promotion == piece_promotion),
+                        promotions[0])
+        else:
+            coup = coups[0]
         self._annuler_selection()
         plateau.definir_premouvement(coup)
         print("[PREMOUVEMENT] %s prepare (%d en attente)"

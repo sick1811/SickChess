@@ -32,9 +32,12 @@ class PromotionChoice:
     def __init__(self, chessboard):
         self.chessboard = chessboard
         self.actif = False
+        self.premouvement = False
         self.from_square = None
         self.to_square = None
         self.couleur = chess.WHITE
+        # 31/10 : True quand le choix est pour un coup prepare d'avance.
+        self.premouvement = False
         self.cases = []          # [(pygame.Rect, type_de_piece)]
         self.survole = None
         self.font = None
@@ -44,8 +47,9 @@ class PromotionChoice:
     def est_actif(self):
         return self.actif
 
-    def ouvrir(self, from_square, to_square, couleur):
+    def ouvrir(self, from_square, to_square, couleur, premouvement=False):
         self.actif = True
+        self.premouvement = premouvement
         self.from_square = from_square
         self.to_square = to_square
         self.couleur = couleur

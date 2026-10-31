@@ -145,8 +145,34 @@ verifier(p.board.move_stack[-1].uci() == "g8h8" and not p.premoves,
          "toujours cloue : le coup n'est pas joue (regle respectee)")
 p = partie("1k6/4P3/8/8/8/8/8/4K3 b - - 0 1")
 preparer(p, "e7e8")
+verifier(p.promotion.est_actif() and not p.premoves,
+         "promotion d'avance : le panneau de choix s'ouvre (pas de dame d'office)")
+clic(p, chess.E8)                                   # 1re case du panneau = dame
 preparer(p, "e8e4")
 verifier(ucis(p) == ["e7e8q", "e8e4"], "promotion en dame d'avance, puis la dame rejoue")
+print("5b. Promotion d'avance : on choisit la piece (31/10, remarque de Julien)")
+touches = {"r": pygame.K_t, "b": pygame.K_f, "n": pygame.K_c}
+for lettre, touche in touches.items():
+    p = partie("1k6/4P3/8/8/8/8/8/4K3 b - - 0 1")
+    preparer(p, "e7e8")
+    p.handle_event(pygame.event.Event(pygame.KEYDOWN, key=touche, mod=0, unicode=""))
+    verifier(ucis(p) == ["e7e8" + lettre] and not p.promotion.est_actif(),
+             "promotion d'avance en %s" % lettre)
+p = partie("1k6/4P3/8/8/8/8/8/4K3 b - - 0 1")
+preparer(p, "e7e8")
+_, piece = p.promotion.cases[3]
+clic(p, chess.E5)                                   # 4e case du panneau, a la souris
+verifier(piece == chess.KNIGHT and ucis(p) == ["e7e8n"],
+         "promotion d'avance en cavalier, a la souris")
+adversaire(p, "b8a8")
+verifier(p.board.move_stack[-1].uci() == "e7e8n"
+         and p.board.piece_at(chess.E8) == chess.Piece(chess.KNIGHT, chess.WHITE),
+         "le coup part : un cavalier apparait en e8")
+p = partie("1k6/4P3/8/8/8/8/8/4K3 b - - 0 1")
+preparer(p, "e7e8")
+p.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE, mod=0, unicode=""))
+verifier(not p.premoves and not p.promotion.est_actif(),
+         "Echap sur le panneau : aucune promotion preparee")
 p = partie("1k6/8/8/8/8/8/8/R3K2R b KQ - 0 1")
 preparer(p, "e1g1")
 verifier(ucis(p) == ["e1g1"], "roque prepare d'avance")

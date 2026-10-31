@@ -1838,3 +1838,14 @@ Fait :
 À vérifier par Julien :
 - [ ] t129 à t138 dans `docs/A_FAIRE.md` (finales DTZ, pré-mouvements, installeur), sur la n° 11.
 - [ ] Mise à jour chez un ami resté à la n° 10 : « Mise à jour » télécharge ~970 Mo (surtout les finales) et redémarre en 0.6.0.
+
+## 31/10/2026 (49) – Promotion en pré-mouvement : choix de la pièce (Claude Code)
+Fait :
+- Remarque de Julien : « en pré-mouvement, la promotion met automatiquement la dame, pas de choix ». Le coup préparé
+  d'avance prenait toujours la dame (`move_handler._preparer_premouvement`). Il ouvre maintenant le même panneau
+  Dame / Tour / Fou / Cavalier qu'un coup normal (`PromotionChoice.ouvrir(..., premouvement=True)`) ; Échap / clic à
+  côté = rien de préparé.
+- Contrôles ajoutés dans `tests/test_premouvements.py` (tour, fou, cavalier au clavier, cavalier à la souris, le coup
+  part bien en cavalier, Échap) ; recette R-175. `python tests/lancer_tous.py` : 1535 contrôles, tout vert.
+À vérifier par Julien :
+- [ ] t139 et t140 dans `docs/A_FAIRE.md` (« À tester par Julien »).

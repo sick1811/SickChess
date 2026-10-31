@@ -251,6 +251,12 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+Séance du 31/10 (49) · promotion en pré-mouvement – **Fonctionne / Ne fonctionne pas + commentaire** (version amis 0.6.1).
+- [ ] t139 (49) : **choisir la pièce d'une promotion préparée d'avance** : contre l'ordinateur, pendant qu'il réfléchit,
+      amène ton pion sur la dernière rangée : le panneau **Dame / Tour / Fou / Cavalier** s'ouvre (avant : dame d'office).
+      Choisis le cavalier (clic ou touche C) : quand c'est ton tour, c'est bien un **cavalier** qui apparaît.
+- [ ] t140 (49) : sur ce panneau, **Échap** (ou clic à côté) : aucun coup n'est préparé ; tu peux en préparer un autre.
+
 Séance du 31/10 (48) · installeur sous 1 Go – **Fonctionne / Ne fonctionne pas + commentaire** (version amis n° 11, 0.6.0).
 - [ ] t136 (48) : **taille de l'installeur** : après CONSTRUIRE_VERSION_AMIS.bat, `SickChess_Installation.exe` fait
       **moins de 1 Go** (environ 100 Mo) ; la fenêtre noire dit « telecharges a l'installation : puzzles, syzygy ».

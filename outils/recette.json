@@ -198,6 +198,13 @@
    "ordre": 10310
   },
   {
+   "id": "R-175",
+   "section": "Échiquier et règles",
+   "texte": "Pré-mouvement d'une promotion : pendant que l'ordinateur réfléchit, amener un pion sur la dernière rangée",
+   "detail": "Le panneau Dame / Tour / Fou / Cavalier s'ouvre ; la pièce choisie (ex. cavalier) apparaît quand le coup part ; Échap annule.",
+   "ordre": 10311
+  },
+  {
    "id": "R-040",
    "section": "Pendule",
    "texte": "Partie 1 min, laisser descendre sous 30 s",
