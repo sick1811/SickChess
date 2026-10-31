@@ -107,6 +107,13 @@
    "ordre": 10105
   },
   {
+   "id": "R-016",
+   "section": "Partie contre l'ordinateur",
+   "texte": "Jouer contre l'ordinateur → panneau NIVEAU : regarder les 7 boutons, glisser le curseur Elo jusqu'aux deux bouts, puis « Se caler sur mon classement »",
+   "detail": "Comme avant : Débutant 400, Facile 800, Moyen 1200, Club 1600, Fort 2000, Très fort 2400, Maximum 3000 ; le curseur va de 100 à 3200 ; l'ordinateur joue à la même force qu'avant (la table des niveaux en vrai Elo n'est pas encore remplie).",
+   "ordre": 10106
+  },
+  {
    "id": "R-020",
    "section": "Partie à deux sur ce PC",
    "texte": "Menu → Jouer à deux, plateau « Il tourne à chaque coup »",
@@ -322,6 +329,13 @@
    "texte": "Menu en pleine partie Freestyle, puis Reprendre",
    "detail": "Même position Freestyle, même numéro, le roque marche encore.",
    "ordre": 10511
+  },
+  {
+   "id": "R-182",
+   "section": "Freestyle (échecs 960)",
+   "texte": "Freestyle → Choisir le n° → 414 (puis refaire avec 518) : jouer quelques coups, fermer le jeu en pleine partie, le relancer, Reprendre la partie en cours",
+   "detail": "La partie reprend en Freestyle (pas en partie normale) : même position, « Freestyle n° 414 » (ou 518) en haut des coups, le roque Freestyle (roi posé sur sa tour) marche encore ; en Tournoi, le règlement du tournoi est gardé.",
+   "ordre": 10512
   },
   {
    "id": "R-050",
@@ -952,6 +966,13 @@
    "texte": "Options → Affichage → « Puissance du PC » : lire la ligne « Ce PC : … » ; essayer Petit PC puis une revue ; revenir à Automatique",
    "detail": "La ligne dit tes cœurs, ta mémoire et « PC normal » (ton i7) ; en Petit PC, la revue n'ouvre qu'un seul stockfish.exe (Gestionnaire des tâches) et reste fluide ; un choix de puissance d'analyse fait à la main est gardé.",
    "ordre": 11311
+  },
+  {
+   "id": "R-09I",
+   "section": "Options",
+   "texte": "Ouvrir Options, cliquer sur une autre fenêtre (le jeu passe derrière), changer un réglage puis cliquer UNE seule fois sur Enregistrer ; ensuite mettre config.json en lecture seule (clic droit → Propriétés) et refaire Enregistrer",
+   "detail": "Un seul clic suffit, même quand la fenêtre du jeu était derrière : les options sont enregistrées. Avec config.json en lecture seule : on reste sur l'écran et un message rouge dit « Impossible d'enregistrer les options : le fichier config.json est bloqué. » (en anglais : « Could not save the options… »). Enlever la lecture seule ensuite.",
+   "ordre": 11312
   },
   {
    "id": "R-176",

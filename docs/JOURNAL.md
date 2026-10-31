@@ -1981,3 +1981,42 @@ Fait :
   le ménage, réinstallation).
 - [ ] Répondre aux 6 questions de la section « EN PREMIER » de `docs/A_FAIRE.md` (clé Steam pour itch, tables de
   finales dans le zip itch, Signaler, langue du dossier de dev, sons en double, vieux dossiers de `publier/`).
+
+## 31/10/2026 (50, suite) – Reprise Freestyle, clic sur Enregistrer, niveaux en vrai Elo (Claude Code, agents)
+Vérifié : série complète **1742 contrôles verts** (Stockfish compris), recette automatique 32 lignes OK ; arbitre des échecs : **0 erreur**. Version passée à **0.7.0** (nouveauté : outil p34).
+Fait :
+- **Reprendre une partie Freestyle sauvegardée** : la partie repart bien en Freestyle, avec son numéro et, en Tournoi,
+  son règlement. Avant, 18 positions (n° 414, 518… : roi en e1, tours en a1 / h1) repartaient en partie normale
+  (roque Freestyle perdu). Une sauvegarde abîmée à la main ne fait plus planter la reprise.
+  Contrôle `tests/test_sauvegarde_freestyle.py` (`jeu/sauvegarde.py`).
+- **Analyse en direct d'une partie Freestyle** : elle sait maintenant que c'est du Freestyle ; les roques sont jugés
+  « meilleur » (vérifié par l'arbitre sur les n° 518 et 414) (`jeu/game_manager.py`).
+- **t68 « Enregistrer n'a pas réagi une fois »** : trouvé. Quand la fenêtre du jeu était derrière une autre, Windows
+  jetait le clic qui la ramène devant : il fallait cliquer deux fois. Maintenant ce premier clic compte (`SickChess.py`).
+  **Vérifié à l'écran** : jeu en arrière-plan, un seul clic sur Enregistrer → options enregistrées.
+  Et si `config.json` ne peut pas être écrit (antivirus, lecture seule), un message rouge le dit au lieu de perdre
+  le choix sans rien dire (`jeu/ecran_options.py`, anglais ajouté). Contrôle `tests/test_enregistrer_clic.py`.
+  Effet à surveiller : en partie, revenir sur le jeu en cliquant sur l'échiquier sélectionne (ou joue) une pièce,
+  puisque le premier clic compte partout.
+- **p34 « niveaux en vrai Elo » – l'outil est prêt, la mesure reste à faire** :
+  - `outils/calibrer_elo.py` fait jouer le vrai code du jeu contre un Stockfish bridé à un Elo connu, et écrit
+    `docs/CALIBRAGE_ELO.md` avec la table proposée. Il reprend où il s'est arrêté.
+  - `jeu/niveaux_elo.py` : la table « Elo affiché → force réelle demandée au moteur ». Pour l'instant elle ne change
+    rien : **le jeu joue exactement comme avant** (mêmes boutons, même curseur 100 à 3200).
+    Options et moteur passent par elle. Contrôle `tests/test_niveaux_elo.py`.
+  - Essai de 2 parties : l'outil marche. Mais 2 parties donnent une marge de ± 480 Elo : **inutilisable**.
+    La vraie mesure (30 parties × 7 niveaux, environ 4 min par partie) se lance de nuit :
+    `python outils/calibrer_elo.py --minutes 480`, puis on recopie la table du rapport dans `jeu/niveaux_elo.py`
+    seulement si les marges sont petites.
+- 14 remarques de style (ruff) corrigées dans les tests et le code, sans toucher à aucun contrôle.
+- Recette : R-016 (niveaux inchangés), R-182 (reprise Freestyle n° 414 / 518), R-09I (un seul clic sur Enregistrer,
+  message « config.json bloqué ») → 184 tests.
+Décisions de Julien (questions de la séance 50) :
+- Bouton **« Signaler » gardé** dans la version itch.io.
+- Zip itch.io **sans les tables de finales**.
+- `config.json` du dossier de développement **laissé en anglais**.
+- Dossier `publier/` **gardé en entier**.
+À vérifier par Julien :
+- [ ] t148 et t149 dans `docs/A_FAIRE.md` (reprise Freestyle n° 414 / 518, clic de retour sur l'échiquier) et t147
+  (réinstallation par `SickChess_Installation.exe`).
+- [ ] Claude Code : lancer la mesure des niveaux de nuit, puis recopier la table (tâche dans `docs/A_FAIRE.md`).

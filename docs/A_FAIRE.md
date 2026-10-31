@@ -3,7 +3,8 @@
 Fichier partagé entre Cowork et Claude Code. **À relire au début de chaque séance,
 à mettre à jour à la fin.** La page « SickChess – À faire »
 (https://claude.ai/artifact/PzJkQy7b8DKRs9wgksP9T5) en est la version à cocher pour Julien.
-Mis à jour le 31/10/2026 (séance (50) – version itch.io sans Steam, ménage, bug du roque Freestyle).
+Mis à jour le 31/10/2026 (séance (50) – version itch.io sans Steam, ménage, bug du roque Freestyle ;
+puis reprise Freestyle, clic sur Enregistrer (t68), outil des niveaux en vrai Elo (p34)).
 
 ## Demande de Julien du 31/10 – itch.io : jeu en ligne et classements sans le n° 480 (Claude Code) – EN PREMIER
 **Où on en est (31/10, séance (50))** : étapes 1 à 7 faites côté code et docs, vérifiées à l'écran en mode itch
@@ -49,15 +50,15 @@ payant, à surveiller). Conseil : la clé Steam.
 **Questions pour Julien (31/10, séance (50))** – réponds dans la page « À faire » :
 - [ ] Acheteurs itch.io et jeu en ligne : **clé Steam offerte** avec l'achat (conseillé, rien à coder) ou
       **notre propre serveur** (long, payant, à surveiller) ?
-- [ ] Mettre les **tables de finales** (plus de 1 Go) dans le zip itch ? Aujourd'hui le zip contient le jeu,
+- [x] (Julien, 31/10 : **non**, zip itch sans les tables) Mettre les **tables de finales** (plus de 1 Go) dans le zip itch ? Aujourd'hui le zip contient le jeu,
       Stockfish et les problèmes, mais pas les tables (l'analyse marche sans, un peu moins juste en finale).
-- [ ] Garder le bouton **« Signaler »** dans la version itch ? L'adresse du salon Discord (`signalement.json`)
+- [x] (Julien, 31/10 : **gardé**) Garder le bouton **« Signaler »** dans la version itch ? L'adresse du salon Discord (`signalement.json`)
       serait lisible par n'importe qui en ouvrant le zip (quelqu'un pourrait y envoyer des messages).
-- [ ] Le réglage `config.json` du dossier de développement est resté **en anglais** (laissé par Cowork) :
+- [x] (Julien, 31/10 : **laissé en anglais**) Le réglage `config.json` du dossier de développement est resté **en anglais** (laissé par Cowork) :
       on le remet en français ?
 - [ ] **Sons en double** : la nulle par 50 coups, par répétition et le pat ont le même son. Un son différent
       pour chacun, ou c'est bien comme ça ?
-- [ ] Vider les **anciennes versions** du dossier `publier/` (environ 3 Go sur ton disque) ? Elles sont toutes
+- [x] (Julien, 31/10 : **on garde tout**) Vider les **anciennes versions** du dossier `publier/` (environ 3 Go sur ton disque) ? Elles sont toutes
       déjà sur GitHub.
 
 ## Retours de Julien à traiter (priorité)
@@ -120,7 +121,9 @@ payant, à surveiller). Conseil : la clé Steam.
             plus grosses et contrastées, validées par Julien sur captures.)
       - [x] t56 : une partie à deux compte dans « Tes ouvertures » (voulu ?) → **pas un bug** (25/10, JOURNAL (43)) :
             en ligne contre soi-même sur un seul PC, la partie compte deux fois ; surveillé par `test_stats_a_deux`.
-      - [ ] t68 : Enregistrer pas réagi une fois (pas reproduit, reste ouvert).
+      - [x] t68 : Enregistrer pas réagi une fois. (31/10, séance (50) suite : trouvé et corrigé : Windows jetait
+            le clic qui ramène la fenêtre du jeu devant ; maintenant ce clic compte. Vérifié à l'écran par Claude Code.
+            Si config.json est bloqué, un message le dit. Reste à Julien : t149.)
       - [x] Accents manquants (séance 36) : « Aucun coup joué », « … l'adversaire réfléchit », « %d problèmes
             joués », « Crée une partie » → corrigés, surveillés par `tests/test_textes_affiches.py`.
       - [x] Texte coupé : « Joue contre un ami Steam. Cree une partie et invite-le, ou entre… » (Jouer en ligne).
@@ -149,7 +152,7 @@ payant, à surveiller). Conseil : la clé Steam.
       par défaut (journal (13)). À valider : t67, t68 ; mesure t69 par Claude Code.
 
 ## Recette complète (stabilité)
-- `docs/RECETTE.md` : 181 tests à la main sur tout le jeu (version du 31/10/2026), source dans
+- `docs/RECETTE.md` : 184 tests à la main sur tout le jeu (version du 31/10/2026), source dans
   `outils/recette.py`. Recopiés dans la page, groupe « Recette complète »
   (Fonctionne / Ne fonctionne pas + commentaire, bouton « Nouvelle passe »).
 - Tenue à jour à chaque séance ; passe complète avant chaque version amis / Steam.
@@ -182,7 +185,8 @@ Mesures faites dans Cowork (machine Linux plus lente) : à refaire sur le PC de 
       importé, ~100 fonctions peut-être mortes à vérifier une par une (skill `menage-code`).
       (31/10, séance (50) : `fond_anime.py` supprimé, 74 fonctions mortes retirées, −929 lignes,
       vulture 109 → 18 ; les 18 restants sont voulus, notés dans `outils/vulture_liste_blanche.py`.)
-- [ ] Petite tâche (31/10) : `jeu/sauvegarde.py` (ligne 119) devine encore si la partie est Freestyle à partir de
+- [x] (31/10, séance (50) suite : fait, la sauvegarde garde « Freestyle », le numéro et le Tournoi ; contrôle
+      `tests/test_sauvegarde_freestyle.py` ; reste à Julien : t148) Petite tâche (31/10) : `jeu/sauvegarde.py` (ligne 119) devine encore si la partie est Freestyle à partir de
       la position de départ quand on **reprend une partie sauvegardée**. Le n° 518 en Freestyle (position normale)
       serait repris comme une partie normale. Garder « Freestyle oui / non » dans la sauvegarde, avec un test.
 - [x] (23/10, retiré) Réglage `ia_suivre_la_pendule` de config.json lu nulle part : le reprendre ou l'enlever.
@@ -254,8 +258,16 @@ Une séance = un travail (skill `seance-sickchess`), tests + banc d'essai avant/
        CONSTRUIRE_VERSION_AMIS.bat : tests, banc, MODE_TEST, appid, licences, version, .exe neuf).
 4. [x] (24/10, séance 30) **p31 – Mode « petit PC »** (détection cœurs / mémoire au 1er lancement → puissance
        d'analyse, hachage, animations ; modifiable dans Options).
-5. [ ] **p34 – Niveaux en vrai Elo** (matchs automatiques contre des références, à lancer la nuit
+5. [x] **p34 – Niveaux en vrai Elo** (matchs automatiques contre des références, à lancer la nuit
        sur le PC de Julien ; table de calibrage dans le code, test qui la vérifie).
+       (31/10, séance (50) suite : **outil fait** : `outils/calibrer_elo.py`, table `jeu/niveaux_elo.py` branchée sur
+       Options et le moteur, contrôle `tests/test_niveaux_elo.py`. La table ne change rien pour l'instant : le jeu
+       joue comme avant. Essai de 2 parties : l'outil marche.)
+   - [ ] **Claude Code, sur le PC, de nuit** : lancer la vraie mesure `python outils/calibrer_elo.py --minutes 480`
+         (30 parties × 7 niveaux, environ 4 min par partie ; elle reprend où elle s'est arrêtée, la relancer
+         autant de nuits qu'il faut). Puis lire `docs/CALIBRAGE_ELO.md` et recopier la table proposée dans
+         `jeu/niveaux_elo.py` **seulement si les marges sont petites** (2 parties = ± 480 Elo : inutilisable),
+         relancer `tests/test_niveaux_elo.py`, et dire à Julien ce qui change pour chaque niveau.
 6. [x] **p27 – Résumé du coach immédiat** (**fait le 24/10, séance (31)**) (carte de fin : ouverture, plus gros moment, précision
        provisoire, comparaison avec les 10 dernières parties).
 7. [x] **p33 – Lisibilité pour tous** (**fait le 24/10, séance (32)**) (pastilles reconnaissables sans couleur, contrastes,
@@ -278,6 +290,19 @@ p20 page Steam (icônes des succès prêtes : `docs/steam_succes/`), p22 licence
 8. Page Steam : captures et capsules (skill `captures-steam`).
 
 ## À tester par Julien (sur son PC)
+Séance du 31/10 (50, suite) · reprise Freestyle, premier clic – **Fonctionne / Ne fonctionne pas + commentaire**.
+Depuis le dossier de développement (`LANCER.bat`) : rien n'est encore publié.
+- [ ] t148 (50) : **reprendre une partie Freestyle sauvegardée** : Jouer contre l'ordinateur → Freestyle → Choisir le n°
+      → **414**. Joue 4 ou 5 coups, puis ferme le jeu par la croix en pleine partie. Relance, clique « Reprendre la
+      partie en cours ». On doit voir : la même position, « Freestyle n° 414 » en haut des coups, et le roque Freestyle
+      marche encore (roi posé sur sa tour). Refais la même chose avec le **n° 518** (il ressemble à la position
+      normale, mais doit rester « Freestyle n° 518 »).
+- [ ] t149 (50) : **le premier clic compte** : pendant une partie, clique sur une autre fenêtre (le jeu passe derrière),
+      puis reviens sur le jeu en cliquant **sur l'échiquier**. Ce clic sélectionne (ou joue) la pièce cliquée : dis-nous
+      si ça te gêne ou si c'est bien. Puis Options : jeu derrière une autre fenêtre, change un réglage, **un seul clic**
+      sur Enregistrer : les options sont enregistrées.
+- [ ] t147 (50, toujours à faire) : réinstallation par `SickChess_Installation.exe`, voir plus bas.
+
 Séance du 31/10 (50) · version itch.io, ménage, roque Freestyle – **Fonctionne / Ne fonctionne pas + commentaire**.
 Ces essais se font depuis le dossier de développement (pas dans la version installée : rien n'est encore publié).
 Claude Code a déjà vérifié la version itch **en anglais** ; il reste à la voir en français.
@@ -538,6 +563,8 @@ Les points 3 à 6 ne seront dans la version installée qu'après la prochaine ve
       `steam_appid.txt` (480 = numéro de test de Valve).
 
 ## Fait récemment
+- 31/10 (50, suite) : reprise d'une partie Freestyle sauvegardée juste, analyse en direct du Freestyle, t68 (un seul
+  clic sur Enregistrer + message « config.json bloqué »), outil des niveaux en vrai Elo (p34, mesure à lancer de nuit).
 - 24/10 (30) : mode « petit PC » (p31) : détection, Options → Puissance du PC, analyse et effets allégés.
 - 24/10 (29) : vérification avant chaque version (p32), lancée par CONSTRUIRE_VERSION_AMIS.bat.
 - 24/10 (28) : test d'endurance (p28) : robot de 2 h, section « endurance » du banc ; essais cloud verts.

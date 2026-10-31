@@ -53,6 +53,8 @@ RECETTE = [
          "Il reprend vite une pièce qu'on vient de lui prendre, réfléchit plus longtemps quand ses pièces sont menacées, ne joue jamais en un éclair (sauf coup forcé)."),
         ("R-014", "Niveau Débutant puis Maximum",
          "Débutant laisse des pièces en prise ; Maximum ne laisse rien passer."),
+        ("R-016", "Jouer contre l'ordinateur → panneau NIVEAU : regarder les 7 boutons, glisser le curseur Elo jusqu'aux deux bouts, puis « Se caler sur mon classement »",
+         "Comme avant : Débutant 400, Facile 800, Moyen 1200, Club 1600, Fort 2000, Très fort 2400, Maximum 3000 ; le curseur va de 100 à 3200 ; l'ordinateur joue à la même force qu'avant (la table des niveaux en vrai Elo n'est pas encore remplie)."),
     ]),
     ("Partie à deux sur ce PC", [
         ("R-020", "Menu → Jouer à deux, plateau « Il tourne à chaque coup »",
@@ -123,6 +125,8 @@ RECETTE = [
          "Refusée : « Tournoi Freestyle : pas de nulle avant le 40e coup des Noirs. »"),
         ("R-161", "Menu en pleine partie Freestyle, puis Reprendre",
          "Même position Freestyle, même numéro, le roque marche encore."),
+        ("R-182", "Freestyle → Choisir le n° → 414 (puis refaire avec 518) : jouer quelques coups, fermer le jeu en pleine partie, le relancer, Reprendre la partie en cours",
+         "La partie reprend en Freestyle (pas en partie normale) : même position, « Freestyle n° 414 » (ou 518) en haut des coups, le roque Freestyle (roi posé sur sa tour) marche encore ; en Tournoi, le règlement du tournoi est gardé."),
     ]),
     ("Pendant la partie", [
         ("R-050", "Bouton Abandonner (cliquer deux fois)",
@@ -319,6 +323,8 @@ RECETTE = [
          "Tout revient aux réglages d'origine (plateau Tournoi, accent Or)."),
         ("R-09F", "Options → Affichage → « Puissance du PC » : lire la ligne « Ce PC : … » ; essayer Petit PC puis une revue ; revenir à Automatique",
          "La ligne dit tes cœurs, ta mémoire et « PC normal » (ton i7) ; en Petit PC, la revue n'ouvre qu'un seul stockfish.exe (Gestionnaire des tâches) et reste fluide ; un choix de puissance d'analyse fait à la main est gardé."),
+        ("R-09I", "Ouvrir Options, cliquer sur une autre fenêtre (le jeu passe derrière), changer un réglage puis cliquer UNE seule fois sur Enregistrer ; ensuite mettre config.json en lecture seule (clic droit → Propriétés) et refaire Enregistrer",
+         "Un seul clic suffit, même quand la fenêtre du jeu était derrière : les options sont enregistrées. Avec config.json en lecture seule : on reste sur l'écran et un message rouge dit « Impossible d'enregistrer les options : le fichier config.json est bloqué. » (en anglais : « Could not save the options… »). Enlever la lecture seule ensuite."),
     ]),
     ("En ligne (Steam)", [
         ("R-176", "Version itch.io (zip itch, ou set SICKCHESS_DISTRIBUTION=itch avant python SickChess.py), avec Steam OUVERT sur le PC : Menu → Jouer en ligne",
