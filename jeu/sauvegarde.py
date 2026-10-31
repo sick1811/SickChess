@@ -48,10 +48,8 @@ def enregistrer(board, mode_nom, reglages):
         return False                     # aucun coup joue : rien a reprendre
     try:
         import chess
-        propres = {}
-        for cle, valeur in (reglages or {}).items():
-            if isinstance(valeur, (str, int, float, bool)) or valeur is None:
-                propres[cle] = valeur
+        propres = {cle: valeur for cle, valeur in (reglages or {}).items()
+                   if isinstance(valeur, (str, int, float, bool)) or valeur is None}
         donnees = {
             "version": 1,
             "date": time.strftime("%d/%m/%Y %H:%M"),
@@ -68,6 +66,11 @@ def enregistrer(board, mode_nom, reglages):
                                            board.timer.active)),
             "increment": float(board.timer.increment),
             "indices_utilises": int(getattr(board, "indices_utilises", 0)),
+            # 31/10 (s50) : la FEN seule ne dit pas toujours Freestyle (roi en e1,
+            # tours en a1 / h1 : n° 414, 518...) ; on l'ecrit donc en clair.
+            "freestyle": bool(board.board.chess960),
+            "numero_freestyle": getattr(board, "numero_freestyle", None),
+            "tournoi_fide": bool(getattr(board, "tournoi_fide", False)),
         }
         provisoire = chemin() + ".tmp"
         with open(provisoire, "w", encoding="utf-8") as f:
@@ -113,12 +116,23 @@ def appliquer(board, donnees):
     import chess
     if not donnees:
         return False
+    import freestyle
     fen = donnees.get("fen_initiale")
-    if fen and fen != chess.STARTING_FEN:
-        import freestyle
-        board.board.chess960 = freestyle.est_freestyle_fen(fen)
+    # 31/10 (s50) : l'indicateur de la sauvegarde d'abord ; une sauvegarde
+    # d'avant (sans lui) est jugee a sa FEN, comme avant.
+    libre = donnees.get("freestyle")
+    if libre is None:
+        libre = freestyle.est_freestyle_fen(fen)
+    if fen and (fen != chess.STARTING_FEN or libre):
+        board.board.chess960 = bool(libre)
         board.board.set_fen(fen)
         board.move_history.set_fen_initiale(fen)
+    if libre and donnees.get("numero_freestyle") is not None:
+        try:
+            board.numero_freestyle = int(donnees["numero_freestyle"])
+        except (TypeError, ValueError):
+            print("[SAUVEGARDE] numero Freestyle illisible, ignore")
+        board.tournoi_fide = bool(donnees.get("tournoi_fide", board.tournoi_fide))
 
     sons, anim = board.sounds.actif, board.animation.active
     board.sounds.actif = False

@@ -53,7 +53,7 @@ for nom, fen, joue, meilleur, attendus in cas:
 
 # Regle de Julien : jamais le coup dans l'explication.
 import re
-for nom, fen, joue, meilleur, attendus in cas:
+for nom, fen, joue, meilleur, _attendus in cas:
     texte = er.expliquer(fen, joue, meilleur)
     verifier(not re.search(r"[KQRBN]?[a-h]?x?[a-h][1-8]|O-O", texte),
              "%s : aucun coup ecrit" % nom)

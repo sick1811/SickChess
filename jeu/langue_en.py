@@ -654,6 +654,8 @@ EN = {
         "To play with a friend, choose \"Two players on this PC\" in the main menu.",
     "Classements": "Leaderboards",
     "Les classements mondiaux passent par Steam": "Global leaderboards require Steam",
+    "Impossible d'enregistrer les options : le fichier config.json est bloqué.":
+        "Could not save the options: the config.json file is locked.",
     "Cette version de SickChess fonctionne sans Steam. Tes records sont gardés dans le jeu :":
         "This version of SickChess works without Steam. Your records are kept in the game:",
 }

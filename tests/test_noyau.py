@@ -69,7 +69,7 @@ for _ in range(30):                       # 3 secondes par pas de 100 ms
 verifier(plateau.timer.en_alerte(chess.BLACK), "Noirs en alerte a ~28 s")
 verifier("low_time" in joues, "son low_time joue")
 couleurs = set()
-for pas in range(4):
+for _pas in range(4):
     horloge.ms += 250
     plateau.renderer.draw() if hasattr(plateau, "renderer") else None
     couleurs.add((horloge.ms // 500) % 2)

@@ -165,7 +165,6 @@ FAMILLES = {
     "Gruenfeld Defense": "Défense Grünfeld",
     "Richter-Veresov Attack": "Attaque Richter-Veresov",
     "Rapport-Jobava System": "Système Rapport-Jobava",
-    "Queen's Pawn": "Pion dame",
     "King's Pawn": "Pion roi",
     "Horwitz Defense": "Défense Horwitz",
     "Kangaroo Defense": "Défense kangourou",
@@ -536,10 +535,9 @@ def _inverser(morceau):
     if len(mots) == 2:
         return "%s %s" % (nom, tete)
     # Plusieurs mots devant : on traduit ce qu'on connait, sans casser l'ordre.
-    morceaux = []
-    for mot in mots[:-1]:
-        morceaux.append(_accorder(mot, genre, pluriel)
-                        or COMPLEMENTS.get(mot) or NOMBRES.get(mot) or mot)
+    morceaux = [_accorder(mot, genre, pluriel)
+                or COMPLEMENTS.get(mot) or NOMBRES.get(mot) or mot
+                for mot in mots[:-1]]
     return "%s %s" % (nom, " ".join(morceaux))
 
 

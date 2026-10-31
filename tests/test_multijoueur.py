@@ -35,12 +35,11 @@ import asset_manager
 _TEMP = tempfile.mkdtemp(prefix="sickchess_multi_")
 asset_manager.dossier_ecriture = lambda: _TEMP
 
-import reseau_transport
 import salon_en_ligne
 import steam as module_steam
 from board import ChessBoard
 from mode_en_ligne import ModeEnLigne
-from reseau_transport import TransportLocal, TransportSteam
+from reseau_transport import TransportLocal
 from partie_en_ligne import EcranFinEnLigne
 
 echecs = []

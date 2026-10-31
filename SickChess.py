@@ -9,12 +9,15 @@ import os
 import sys
 import traceback
 
-VERSION = "0.6.1"
+VERSION = "0.7.0"
 
 # 17/10 (recette R-002) : en plein ecran, SDL reduisait la fenetre des qu'une
 # autre fenetre prenait la main (notification, Alt+Tab rate...), et le jeu
 # revenait tout noir. On garde la fenetre affichee.
 os.environ.setdefault("SDL_VIDEO_MINIMIZE_ON_FOCUS_LOSS", "0")
+# 31/10 (t68, « Enregistrer n'a pas reagi une fois ») : sous Windows, SDL jetait
+# le clic qui ramene la fenetre au premier plan. Ce premier clic compte aussi.
+os.environ.setdefault("SDL_MOUSE_FOCUS_CLICKTHROUGH", "1")
 
 if sys.stdout is None:          # lance sans console (pythonw ou .exe fenetre)
     class _Poubelle:

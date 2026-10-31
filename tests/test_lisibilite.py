@@ -43,7 +43,7 @@ def verifier(condition, message):
 print("1. Pastilles sans la couleur")
 symboles = [g for _n, _c, g in annotations.PASTILLES.values()]
 verifier(len(set(symboles)) == len(symboles), "un symbole different par pastille : %s" % symboles)
-for cle, (nom, couleur, _g) in annotations.PASTILLES.items():
+for nom, couleur, _g in annotations.PASTILLES.values():
     blanc = design.contraste((255, 255, 255), couleur)
     contour = design.contraste(annotations.CONTOUR_GLYPHE, couleur)
     verifier(max(blanc, contour) >= 3.0, "%s : symbole lisible (blanc %.1f, contour %.1f)" % (nom, blanc, contour))

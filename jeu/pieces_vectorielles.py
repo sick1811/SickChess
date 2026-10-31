@@ -281,8 +281,8 @@ def rendre_piece(symbole, taille, couleur_remplissage, couleur_contour,
 
     formes = []
     for chemin in CONTOURS[lettre]:
-        for contour in lire_contour(chemin):
-            formes.append([(x * echelle, y * echelle) for x, y in contour])
+        formes.extend([(x * echelle, y * echelle) for x, y in contour]
+                      for contour in lire_contour(chemin))
     cercles = []
     if lettre in CERCLES:
         centres, rayon = CERCLES[lettre]

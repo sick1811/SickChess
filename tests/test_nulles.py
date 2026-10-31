@@ -25,7 +25,6 @@ import chess
 import pygame
 pygame.init()
 import regles_nulle
-import sauvegarde
 from game_manager import GameManager
 
 echecs = []
@@ -107,7 +106,7 @@ jouer(b, ["e8d8"])
 verifier(b.game_over and "50 COUPS" in (b.game_over_reason or ""),
          "50 coups atteints par l'adversaire, pre-mouvement en attente : nulle (%s)" % b.game_over_reason)
 gm.cleanup_game()
-for essai in range(20):
+for _essai in range(20):
     b = jouer(partie(), ALLER_RETOUR[:7])
     b.premove = chess.Move.from_uci("b1c3")
     jouer(b, ALLER_RETOUR[7:])

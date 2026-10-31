@@ -16,6 +16,8 @@ puzzles/
 # Donnees du joueur, creees par le jeu
 parties/
 profil.json
+freestyle_tirages.json
+/tests/calibrage_elo/
 puzzles_score.json
 statistiques.json
 sauvegarde*.json

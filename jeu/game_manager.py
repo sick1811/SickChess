@@ -883,7 +883,7 @@ class GameManager:
                 coeurs = 2
             a = AnalyseurPartie(historique.fen_initiale, coups, self.stockfish_path,
                                 analyse_partie.puissance_de(self.config), suivi=True,
-                                threads=max(1, coeurs // 2))
+                                threads=max(1, coeurs // 2), chess960=self.board.board.chess960)
             a.plateau_id = id(self.board)
             a.demarrer()
             self.analyse_en_direct = a

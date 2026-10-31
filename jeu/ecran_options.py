@@ -22,6 +22,8 @@ import design
 import ui
 from settings_screen import charger_config, _chemin_config
 
+MESSAGE_ECHEC = "Impossible d'enregistrer les options : le fichier config.json est bloqué."
+
 OUI_NON = [("Oui", True), ("Non", False)]
 
 DEFAUTS_EN_PLUS = {
@@ -413,7 +415,12 @@ class EcranOptions:
 
     def _valider(self):
         a_ecrire = dict(self.valeurs)
-        enregistrer(a_ecrire)
+        if not enregistrer(a_ecrire):
+            # 31/10 (t68) : config.json bloque (antivirus, lecture seule) : on
+            # reste sur l'ecran et on le dit, au lieu de perdre le choix en silence.
+            self.erreur_enregistrement = MESSAGE_ECHEC
+            return None
+        self.erreur_enregistrement = ""
         if a_ecrire.get("langue") != self.avant.get("langue"):
             try:                       # les noms d'ouvertures changent de langue
                 import ouvertures
@@ -448,9 +455,14 @@ class EcranOptions:
         for b in (self.btn_defaut, self.btn_annuler, self.btn_ok):
             b.selectionne = (b is self.btn_ok)
             b.dessiner(ecran, t, rayon=int(10 * ech))
-        ui.texte(ecran, "Entrée : enregistrer   ·   Échap : annuler   ·   Tab : onglet suivant",
-                 largeur // 2, hauteur - int(18 * ech), ui.t(11, ech),
-                 t.get("texte_faible", t["texte_discret"]), ancre="centre")
+        if getattr(self, "erreur_enregistrement", ""):
+            ui.texte(ecran, self.erreur_enregistrement, largeur // 2, hauteur - int(18 * ech),
+                     ui.t(12, ech), t.get("erreur", (226, 104, 92)), gras=True, ancre="centre",
+                     largeur_max=largeur - 2 * self.marge)
+        else:
+            ui.texte(ecran, "Entrée : enregistrer   ·   Échap : annuler   ·   Tab : onglet suivant",
+                     largeur // 2, hauteur - int(18 * ech), ui.t(11, ech),
+                     t.get("texte_faible", t["texte_discret"]), ancre="centre")
         import effets
         effets.fondu(ecran, "options", t["fond"])
 

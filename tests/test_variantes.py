@@ -39,7 +39,6 @@ except Exception:
 
 from analyse_partie import AnalyseurPartie
 from ecran_revue import EcranRevue
-import board_geometry as geo
 
 BERGER = ["e2e4", "e7e5", "f1c4", "b8c6", "d1h5", "g8f6", "h5f7"]
 a = AnalyseurPartie(None, BERGER, sf, "rapide")

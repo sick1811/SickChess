@@ -2,7 +2,6 @@
 #     python tests/test_mes_erreurs.py      (Stockfish necessaire)
 # Tout se passe dans un dossier temporaire : parties/ et profil intacts.
 
-import io
 import json
 import os
 import sys

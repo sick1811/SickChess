@@ -13,7 +13,6 @@ sys.path.insert(0, os.path.join(RACINE, "jeu"))
 os.environ.setdefault("SDL_VIDEODRIVER", "dummy")
 os.environ.setdefault("SDL_AUDIODRIVER", "dummy")
 
-import json
 import pygame
 
 pygame.init()
