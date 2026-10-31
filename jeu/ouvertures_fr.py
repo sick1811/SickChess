@@ -32,7 +32,6 @@
 # tout ce qu'il avait et l'appelle seulement si la traduction est demandee.
 
 import re
-import unicodedata
 
 # ---------------------------------------------------------------- les familles
 #
@@ -599,29 +598,6 @@ def _traduire_morceau(texte):
     return reste.strip()
 
 
-def sans_accents(texte):
-    """'Grunfeld' pour 'Grünfeld', 'Samisch' pour 'Sämisch'.
-
-    POURQUOI : tout le reste du logiciel est ecrit sans accents, et pour une
-    bonne raison - une console Windows en cp1252 s'etrangle sur un caractere
-    qu'elle ne connait pas, et le jeu s'arrete au milieu d'un print. Les noms
-    de lichess, eux, en contiennent (Grünfeld, Sämisch, Réti). On les ramene
-    donc au meme alphabet que le reste, une fois pour toutes.
-    """
-    # NFKD ne sait pas defaire ces lettres-la : elles n'ont pas de forme
-    # "lettre + accent", c'est un caractere entier. Trois noms du livre en
-    # contiennent (Hjorring, Sorensen, Moller).
-    ENTIERES = {"\u00f8": "o", "\u00d8": "O", "\u00e6": "ae", "\u00c6": "AE",
-                "\u00df": "ss", "\u0142": "l", "\u0141": "L",
-                "\u0111": "d", "\u0110": "D", "\u00fe": "th", "\u00de": "Th"}
-    try:
-        texte = "".join(ENTIERES.get(c, c) for c in str(texte or ""))
-        decompose = unicodedata.normalize("NFKD", texte)
-        return "".join(c for c in decompose if not unicodedata.combining(c))
-    except Exception:
-        return str(texte or "")
-
-
 def traduire(nom):
     """'French Defense: Exchange Variation' -> 'Defense francaise, Variante d'echange'.
 
@@ -660,21 +636,6 @@ def traduire(nom):
     sortie = re.sub(r"\b([A-Z][\w-]+)'s (Défense|Variante|Gambit)\b", r"\2 \1", sortie)
     _CACHE[nom] = sortie
     return sortie
-
-
-def reste_en_anglais(nom):
-    """Les mots anglais de structure qu'on n'a PAS su traduire. Pour mesurer.
-
-    Sert au test : il compte ce qui reste, et on sait exactement ou on en est
-    au lieu de croire que "c'est traduit".
-    """
-    traduit = traduire(nom)
-    restants = []
-    for mot in MOTS:
-        if re.search(r"\b%s\b" % re.escape(mot), traduit) \
-                and MOTS[mot].lower() != mot.lower():
-            restants.append(mot)
-    return sorted(set(restants))
 
 
 def oublier():

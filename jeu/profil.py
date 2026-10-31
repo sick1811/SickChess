@@ -192,9 +192,6 @@ class Profil:
             "meilleur_elo": max([p["elo_apres"] for p in self.parties] + [self.elo]),
         }
 
-    def dernieres_parties(self, nombre=12):
-        return list(reversed(self.parties[-nombre:]))
-
     def courbe_elo(self, points=40):
         """Suite des Elo pour dessiner une petite courbe de progression."""
         valeurs = [p["elo_apres"] for p in self.parties if p.get("classee")]

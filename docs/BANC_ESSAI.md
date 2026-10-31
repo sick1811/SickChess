@@ -1,6 +1,6 @@
 # Banc d'essai – SickChess
 
-Dernier passage : 2026-10-31 13:32 · Windows 11 · 12 cœurs · Python 3.13.7 · pygame 2.6.1 · complet
+Dernier passage : 2026-10-31 14:33 · Windows 11 · 12 cœurs · Python 3.13.7 · pygame 2.6.1 · complet
 
 Fabriqué par `python outils/banc_essai.py` (ne pas modifier à la main).
 
@@ -31,13 +31,12 @@ Jeu au menu : 74.9 Mo
 
 ## 🟠 Ménage (code et fichiers inutiles)
 
-31196 lignes de jeu · 0 imports/variables inutiles · 103 éléments peut-être morts · 1 fichier(s) jamais importé(s) · 3204 Mo de restes
+32288 lignes de jeu · 6 imports/variables inutiles · 18 éléments peut-être morts · 0 fichier(s) jamais importé(s) · 7299 Mo de restes
 
-- **Fonctions et méthodes peut-être jamais utilisées** (moyen) – 98 élément(s) dans 37 fichier(s), à vérifier un par un avant de retirer (skill menage-code) : · jeu/steam.py : SALON_PRIVE (l.40), SALON_PUBLIC (l.42), CB_SALON_INFOS (l.57), SCORE_REMPLACER (l.71), DEMANDE_MONDIAL (l.72), DEMANDE_AUTOUR_DE_MOI (l.73), DEMANDE_AMIS (l.74), presence (l.671) · jeu/design.py : contraste (l.161), filet (l.285), jauge (l.292), puce (l.309), mesure (l.343), vignette (l.
-- **Valeurs rangées mais jamais relues (attributs)** (faible) – 5 élément(s) dans 3 fichier(s), à vérifier un par un avant de retirer (skill menage-code) : · jeu/analyse_de_fond.py : terminees (l.52), terminees (l.175) · jeu/ecran_revue.py : analyse_libre (l.582), analyse_libre (l.588) · jeu/ecran_analyse_libre.py : ep_square (l.52)
-- **Fichier jamais importé : jeu/fond_anime.py** (moyen) – Aucun autre fichier ne l'utilise. Probablement un reste de V8.
-- **Fichiers en double** (faible) – 4 fichier(s) identiques (0.6 Mo) : · sounds/fifty_moves.wav = sounds/repetition.wav · sounds/fifty_moves.wav = sounds/stalemate.wav · sounds/feutre/repetition.wav = sounds/feutre/stalemate.wav · assets_src/steam/header_capsule_920x430.png = assets_src/steam/library_header_920x430.png
-- **Restes de fabrication et de tests sur le disque** (info) – 3204 Mo au total (rien de tout ça n'est sur GitHub) : · build_amis : 52 Mo · publier : 3142 Mo · tests/ecrans : 2 Mo · tests/ecrans_en : 2 Mo · tests/ecrans_revue : 0 Mo · __pycache__ (tous) : 4 Mo · tests/capture_*.png : 3 Mo · « publier » et « build_amis » se refont à chaque version amis.
+- **Imports et variables inutiles** (faible) – 6 ligne(s) dans 1 fichier(s). Correction sûre et automatique : · python -m ruff check --select F401,F841 --fix jeu outils SickChess.py ·  · outils/video_bande_annonce.py : F841 Local variable `cx` is assigned to but never used ; F841 Local variable `cy` is assigned to but never used ; F841 Local variable `cx_plateau` is assigned to but never used
+- **Fonctions et méthodes peut-être jamais utilisées** (moyen) – 18 élément(s) dans 9 fichier(s), à vérifier un par un avant de retirer (skill menage-code) : · jeu/steam.py : SALON_PRIVE (l.44), SALON_PUBLIC (l.46), CB_SALON_INFOS (l.61), SCORE_REMPLACER (l.75), DEMANDE_MONDIAL (l.76), DEMANDE_AUTOUR_DE_MOI (l.77), DEMANDE_AMIS (l.78), presence (l.683) · jeu/arbre_ouvertures.py : est_une_ligne (l.46), est_une_feuille (l.50) · SickChess.py : isatty (l.23), isatt
+- **Fichiers en double** (faible) – 5 fichier(s) identiques (1.6 Mo) : · sounds/fifty_moves.wav = sounds/repetition.wav · sounds/fifty_moves.wav = sounds/stalemate.wav · sounds/feutre/repetition.wav = sounds/feutre/stalemate.wav · music/zugzwang.ogg = music/essais/5_Zugzwang.ogg · assets_src/steam/header_capsule_920x430.png = assets_src/steam/library_header_920x430.png
+- **Restes de fabrication et de tests sur le disque** (info) – 7299 Mo au total (rien de tout ça n'est sur GitHub) : · build_amis : 52 Mo · publier : 7234 Mo · tests/ecrans : 3 Mo · tests/ecrans_en : 2 Mo · tests/ecrans_revue : 0 Mo · __pycache__ (tous) : 4 Mo · tests/capture_*.png : 3 Mo · « publier » et « build_amis » se refont à chaque version amis.
 
 ## 🟢 Conflits et santé du projet
 

@@ -18,8 +18,7 @@
 #   - l'echiquier et le panneau sont centres ensemble (plus de grand vide entre
 #     les deux en 1920x1080).
 #
-# AUCUNE FONCTION SUPPRIMEE : recalculer, rect_plateau, rect_panneau et
-# dans_le_plateau existent toujours, avec les memes noms d'attributs.
+# 31/10 (menage) : dans_le_plateau, jamais appelee, est retiree.
 
 import board_geometry as geo
 import mise_en_page as mep
@@ -192,11 +191,6 @@ class Disposition:
         bas = self.panneau_y - 6 if self.mode == "hauteur" else self.hauteur - 6
         hauteur = min(int(hauteur), max(0, bas - y))
         return (self.plateau_x, y, self.cote_plateau, hauteur)
-
-    def dans_le_plateau(self, position):
-        x, y = position
-        return (self.plateau_x <= x < self.plateau_x + self.cote_plateau
-                and self.plateau_y <= y < self.plateau_y + self.cote_plateau)
 
     def __repr__(self):
         return ("Disposition(fenetre %dx%d, case %d, plateau en %d,%d, %s)"

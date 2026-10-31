@@ -181,7 +181,7 @@ class Chat:
             return
 
         y = rect.y
-        for contenu, couleur, italique in lignes[debut:fin]:
+        for contenu, couleur, _italique in lignes[debut:fin]:
             if y + hauteur_ligne > rect.bottom:
                 break
             rendu = ui.rendre_ligne(contenu, taille, couleur)

@@ -13,8 +13,7 @@
 #   4. Couleurs a la Lichess : vert par defaut, rouge avec Maj, bleu avec Ctrl.
 #   5. Les annotations s'effacent quand un coup est joue, comme sur les sites.
 #
-# AUCUNE FONCTION SUPPRIMEE : handle_event, get_square_from_mouse, draw et
-# get_center sont conservees, memes noms, memes signatures.
+# 31/10 (menage) : get_center, jamais appelee, est retiree.
 
 import math
 
@@ -99,10 +98,6 @@ class RightClickManager:
     def get_square_from_mouse(self, pos):
         return geo.pixel_vers_case(pos, self.chessboard.SQ_SIZE,
                                    self.chessboard.flipped)
-
-    def get_center(self, square):
-        return geo.centre_case(square, self.chessboard.SQ_SIZE,
-                               self.chessboard.flipped)
 
     # ------------------------------------------------------------------ dessin
 

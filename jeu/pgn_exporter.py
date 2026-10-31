@@ -12,11 +12,10 @@
 #   4. Le PGN part de la position initiale reelle (utile si la partie ne
 #      commence pas au debut).
 #
-# AUCUNE FONCTION SUPPRIMEE : export() et save_to_file() sont conservees,
-# memes noms, memes signatures.
+# 31/10 (menage) : save_to_file, jamais appelee (l'export passe par
+# export()), est retiree.
 
 import datetime
-import os
 
 import chess
 import freestyle
@@ -76,26 +75,3 @@ class PGNExporter:
         pgn_string = str(game)
         print("[PGN EXPORTER] Partie exportee (%d coups)" % len(move_history.moves))
         return pgn_string
-
-    def save_to_file(self, move_history, filename=None,
-                     white_name="White", black_name="Black", result="*"):
-        """Sauvegarde le PGN. Renvoie le chemin du fichier ecrit."""
-        pgn = self.export(move_history, white_name, black_name, result)
-
-        if filename is None:
-            dossier = os.path.join(os.getcwd(), "parties")
-            try:
-                os.makedirs(dossier, exist_ok=True)
-            except OSError:
-                dossier = os.getcwd()
-            horodatage = datetime.datetime.now().strftime("%Y-%m-%d_%Hh%M%S")
-            filename = os.path.join(dossier, "partie_%s.pgn" % horodatage)
-
-        try:
-            with open(filename, "w", encoding="utf-8") as f:
-                f.write(pgn)
-            print("[PGN EXPORTER] Fichier sauvegarde : %s" % filename)
-            return filename
-        except OSError as e:
-            print("[PGN EXPORTER] Sauvegarde impossible : %s" % e)
-            return None

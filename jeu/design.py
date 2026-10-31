@@ -282,36 +282,6 @@ def bandeau(surface, rect, theme, couleur=None, alpha=38, rayon=None):
     return rect
 
 
-def filet(surface, x, y, largeur, theme, epaisseur=TRAIT):
-    """Un trait de separation. Discret : il separe, il ne decore pas."""
-    pygame.draw.rect(surface, theme.get("trait", ARDOISE[700]),
-                     pygame.Rect(int(x), int(y), int(largeur),
-                                 int(epaisseur)))
-
-
-def jauge(surface, rect, part, theme, couleur=None, rayon=None):
-    """Une barre de progression. part va de 0 a 1."""
-    rect = pygame.Rect(rect)
-    rayon = RAYON["rond"] if rayon is None else rayon
-    rayon = min(rayon, rect.height // 2)
-    pygame.draw.rect(surface, theme.get("trait", ARDOISE[700]), rect,
-                     border_radius=rayon)
-    part = max(0.0, min(1.0, float(part)))
-    if part <= 0:
-        return rect
-    plein = pygame.Rect(rect.x, rect.y, max(rect.height, int(rect.width * part)),
-                        rect.height)
-    pygame.draw.rect(surface, couleur or theme.get("accent"), plein,
-                     border_radius=rayon)
-    return rect
-
-
-def puce(surface, centre, rayon, couleur):
-    """Un rond plein. Etat, indicateur, point de liste."""
-    pygame.draw.circle(surface, couleur, (int(centre[0]), int(centre[1])),
-                       int(rayon))
-
-
 def etiquette(surface, rect, theme, couleur=None, rayon=None):
     """Le fond d'une petite etiquette de texte (un mode, un statut)."""
     rect = pygame.Rect(rect)
@@ -338,12 +308,6 @@ def echelle(surface_ou_taille, reference=1280.0):
     except AttributeError:
         largeur = float(surface_ou_taille)
     return max(0.8, min(3.2, largeur / reference))          # 24/10 (p33) : 4K
-
-
-def mesure(cle, ech=1.0):
-    """Un espacement de l'echelle, ajuste a la taille de la fenetre."""
-    return max(1, int(round(ESPACE.get(cle, cle if isinstance(cle, int) else 8)
-                            * ech)))
 
 
 def taille_texte(cle, ech=1.0):
@@ -381,7 +345,6 @@ def taille_texte(cle, ech=1.0):
 _CACHE_OMBRES = {}
 _CACHE_DEGRADES = {}
 _CACHE_LUEURS = {}
-_CACHE_VIGNETTES = {}
 CACHE_MAXIMUM = 160
 
 
@@ -525,56 +488,9 @@ def panneau(surface, rect, theme, haute=False, rayon=None, ombre=True,
     return rect
 
 
-def vignette(surface, force=110):
-    """Les coins de l'ecran assombris. Le regard va au centre tout seul.
-
-    Un demi-pourcent de travail pour un effet que tout jeu du commerce a, et
-    dont personne ne remarque la presence - seulement l'absence.
-    """
-    taille = surface.get_size()
-    calque = _CACHE_VIGNETTES.get((taille, force))
-    if calque is None:
-        largeur, hauteur = taille
-        calque = pygame.Surface(taille, pygame.SRCALPHA)
-        couches = 22
-        for i in range(couches):
-            part = i / float(couches)
-            marge_x = int(largeur * 0.5 * part)
-            marge_y = int(hauteur * 0.5 * part)
-            alpha = int(force * part ** 3 / couches * 6.0)
-            if alpha <= 0:
-                continue
-            pygame.draw.rect(
-                calque, (0, 0, 0, alpha),
-                pygame.Rect(marge_x, marge_y, largeur - 2 * marge_x,
-                            hauteur - 2 * marge_y),
-                max(1, int(min(largeur, hauteur) * 0.5 / couches) + 1))
-        calque = _ranger(_CACHE_VIGNETTES, (taille, force), calque)
-    surface.blit(calque, (0, 0))
-
-
-def cadre_du_plateau(surface, rect, theme, epaisseur=None):
-    """Le cadre de l'echiquier : un liser sombre, un filet clair, une ombre.
-
-    Sans lui, le damier est un carre pose sur un fond. Avec, c'est un objet.
-    """
-    rect = pygame.Rect(rect)
-    epaisseur = max(3, int(epaisseur or 6))
-    exterieur = rect.inflate(epaisseur * 2, epaisseur * 2)
-    ombre_douce(surface, exterieur, RAYON["petit"], force=90, etalement=18,
-                decalage=7)
-    degrade_vertical(surface, exterieur, eclaircir(theme.get("trait_fort",
-                                                            ARDOISE[600]), 0.10),
-                     assombrir(theme.get("trait", ARDOISE[700]), 0.25),
-                     RAYON["petit"])
-    pygame.draw.rect(surface, assombrir(theme.get("fond", ARDOISE[950]), 0.35),
-                     exterieur, 1, border_radius=RAYON["petit"])
-    pygame.draw.rect(surface, avec_alpha(ARDOISE[950], 200), rect, 1)
-    return exterieur
-
-
 def vider_le_cache():
     """A appeler quand le theme change : les couleurs en cache sont perimees."""
-    for cache in (_CACHE_OMBRES, _CACHE_DEGRADES, _CACHE_LUEURS,
-                  _CACHE_VIGNETTES):
+    # 31/10 (menage) : filet, jauge, puce, mesure, vignette et cadre_du_plateau,
+    # jamais appeles, sont retires (avec le cache des vignettes).
+    for cache in (_CACHE_OMBRES, _CACHE_DEGRADES, _CACHE_LUEURS):
         cache.clear()

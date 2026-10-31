@@ -193,34 +193,6 @@ def moteur_d_analyse_role(role, chemin=None, threads=None, hash_mb=1024, creer=T
     return moteur
 
 
-def moteurs_d_analyse(combien, chemin=None, threads=None, hash_mb=1024,
-                      creer=True):
-    """Les 'combien' moteurs d'analyse, prets a travailler en parallele.
-
-    Renvoie la liste de ceux qui ont vraiment demarre - jamais None. Si la
-    machine ne peut pas en lancer quatre, on travaille avec ce qu'on a plutot
-    que d'echouer.
-    """
-    sortie = []
-    for indice in range(max(1, int(combien))):
-        moteur = moteur_d_analyse_n(indice, chemin, threads, hash_mb, creer)
-        if moteur is None:
-            if indice == 0:
-                return []
-            print("[MOTEURS] seulement %d moteur(s) d'analyse disponible(s)"
-                  % indice)
-            break
-        sortie.append(moteur)
-    return sortie
-
-
-def nombre_d_analyse():
-    """Combien de moteurs d'analyse sont vivants."""
-    with _verrou:
-        return sum(1 for role, m in _moteurs.items()
-                   if role.startswith("analyse") and _vivant(m))
-
-
 def liberer_les_renforts(combien):
     """Ferme les moteurs d'analyse de renfort (analyse-2, analyse-3...) une
     fois l'analyse de la partie finie : ils gardaient ~1,3 Go chacun jusqu'a
@@ -236,78 +208,8 @@ def liberer_la_variante():
     return liberer(ROLE_VARIANTE)
 
 
-def liberer_les_analyses(garder=1):
-    """Ferme les moteurs d'analyse en trop et rend la memoire.
-
-    On en garde toujours au moins un : sa table de hachage est ce qui rend la
-    deuxieme analyse d'une partie quasi instantanee.
-    """
-    with _verrou:
-        roles = sorted(role for role in _moteurs
-                       if role.startswith("analyse"))
-    fermes = 0
-    for role in roles[max(0, int(garder)):]:
-        if liberer(role):
-            fermes += 1
-    return fermes
-
-
-# --------------------------------------------------------------- moteur de jeu
-#
-# PENDANT L'ANALYSE, LE MOTEUR DE JEU NE FAIT RIEN - MAIS IL GARDE SES THREADS.
-#
-# Ton journal : "[CACHE MANAGER] Cache = 512 MB, Threads = 4". Ces 4 threads
-# sont reserves au moteur qui joue contre toi. Quand la partie est finie et que
-# l'analyse tourne, il ne calcule plus rien : ces 4 coeurs sur 12 sont donc
-# immobilises pour rien, pendant que l'analyse se bat pour aller vite.
-#
-# On les lui retire le temps de l'analyse, et on les lui rend apres. On ne
-# FERME pas le processus : tu peux demander une revanche a tout moment, et le
-# relancer couterait plus cher que de le laisser dormir a 1 thread.
-
-_threads_de_jeu_rendus = {}
-
-
-def mettre_le_jeu_en_veille(threads=1):
-    """Ramene le moteur de JEU a 1 thread pendant l'analyse. Reversible."""
-    with _verrou:
-        moteur = _moteurs.get("jeu")
-        if moteur is None or not _vivant(moteur) \
-                or "avant" in _threads_de_jeu_rendus:
-            return False
-        avant = getattr(moteur, "threads_courant", None)
-        if avant is None:
-            try:
-                from cache_manager import get_cache_manager
-                avant = get_cache_manager().get_threads()
-            except Exception:
-                avant = None
-        try:
-            moteur.regler_threads(max(1, int(threads)))
-        except Exception as e:
-            print("[MOTEURS] mise en veille du moteur de jeu impossible : %s" % e)
-            return False
-        _threads_de_jeu_rendus["avant"] = avant
-        print("[MOTEURS] moteur de JEU en veille (%s -> %d thread(s)) : "
-              "ses coeurs passent a l'analyse" % (avant, max(1, int(threads))))
-        return True
-
-
-def reveiller_le_jeu():
-    """Rend au moteur de JEU les threads qu'on lui avait pris."""
-    with _verrou:
-        avant = _threads_de_jeu_rendus.pop("avant", None)
-        moteur = _moteurs.get("jeu")
-        if avant is None or moteur is None or not _vivant(moteur):
-            return False
-        try:
-            moteur.regler_threads(int(avant))
-        except Exception as e:
-            print("[MOTEURS] reveil du moteur de jeu impossible : %s" % e)
-            return False
-        print("[MOTEURS] moteur de JEU reveille (%d thread(s))" % int(avant))
-        return True
-
+# 31/10 (menage) : la mise en veille du moteur de jeu pendant l'analyse
+# (mettre_le_jeu_en_veille / reveiller_le_jeu) n'etait appelee nulle part : retiree.
 
 def _vivant(moteur):
     try:
@@ -319,15 +221,7 @@ def _vivant(moteur):
 def _oublier(role):
     moteur = _moteurs.pop(role, None)
     _reglages_analyse.pop(role, None)
-    if role == "jeu":
-        _threads_de_jeu_rendus.pop("avant", None)
     return moteur
-
-
-def moteurs_vivants():
-    """Combien de processus stockfish le jeu tient ouverts. Doit valoir 2."""
-    with _verrou:
-        return sum(1 for m in _moteurs.values() if _vivant(m))
 
 
 def roles_vivants():

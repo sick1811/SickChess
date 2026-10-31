@@ -26,7 +26,6 @@
 # AUCUNE FONCTION SUPPRIMEE : ce fichier n'existait pas. PieceAnimation est
 # intacte et continue de servir aux coups joues.
 
-import math
 
 import chess
 import pygame
@@ -193,43 +192,3 @@ def orienter(proprietaire, flipped, plateau=None, taille_case=None):
         # Une animation ratee ne doit jamais empecher le retournement.
         animation.arreter()
         return False
-
-
-def duree_restante(proprietaire):
-    """Combien de temps il reste a l'animation, en millisecondes. 0 si finie."""
-    animation = getattr(proprietaire, "retournement", None)
-    if animation is None or not animation.en_cours():
-        return 0
-    reste = animation.duree * 1000.0 * (1.0 - max(0.0, animation.avancement))
-    return int(max(0, reste))
-
-
-def _sans_pygame():
-    """Vrai quand on tourne sans fenetre (tests) : l'horloge pygame est a 0."""
-    try:
-        return pygame.time.get_ticks() == 0
-    except Exception:
-        return True
-
-
-# Le sinus qui sert au clignotement d'erreur des puzzles. Il est ici parce que
-# c'est le meme genre de calcul - un effet borne dans le temps - et que ca evite
-# un troisieme fichier pour six lignes.
-def pulsation(debut, duree_ms, battements=2.0):
-    """1 -> 0 -> 1 -> 0, 'battements' fois, sur 'duree_ms'. 0 quand c'est fini.
-
-    ELLE PART DE 1, PAS DE 0. Premiere version avec un sinus : la force valait
-    exactement 0 a l'instant de l'erreur, donc le premier dixieme de seconde du
-    clignotement etait invisible - on voyait le voile arriver en retard, ce qui
-    est justement ce qu'on ne veut pas d'un signal d'erreur. Le test l'a
-    attrape en verifiant la force juste apres l'erreur. Avec un cosinus, le
-    rouge est la tout de suite, et l'enveloppe (1 - x) le fait disparaitre.
-    """
-    if not debut or duree_ms <= 0:
-        return 0.0
-    passe = pygame.time.get_ticks() - debut
-    if passe < 0 or passe >= duree_ms:
-        return 0.0
-    avance = passe / float(duree_ms)
-    battement = 0.5 + 0.5 * math.cos(2.0 * math.pi * battements * avance)
-    return max(0.0, (1.0 - avance) * battement)

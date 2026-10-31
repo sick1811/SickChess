@@ -27,7 +27,7 @@ import chess.syzygy
 LIGNES = 3
 DUREE_MAX_S = 60
 PROFONDEUR_MAX = 40
-ROLE = "libre"         # pas "analyse..." : liberer_les_analyses() ne le ferme pas
+ROLE = "libre"         # pas "analyse..." : un moteur a lui, ferme en quittant l'ecran
 
 
 # ------------------------------------------------------------------ moteur

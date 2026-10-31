@@ -16,8 +16,8 @@
 #      l'echiquier.
 #   6. Duree et increment reglables dans config.json.
 #
-# AUCUNE FONCTION SUPPRIMEE : __init__(preset_id), update(is_white_turn),
-# get_display_times(), get_time(is_white) et draw(screen) sont conservees.
+# 31/10 (menage) : appliquer_reglages, get_display_times, cadence_en_secondes
+# et zone_de, jamais appelees, sont retirees.
 
 import json
 import os
@@ -178,14 +178,6 @@ class ChessTimer:
         self.alerte_jouee = {chess.WHITE: False, chess.BLACK: False}
         self.demarree = False
 
-    def appliquer_reglages(self, reglages):
-        """Applique un dictionnaire venu de l'ecran de reglages."""
-        if not reglages:
-            return
-        self.set_time(reglages.get("minutes", 5),
-                      reglages.get("increment", 0),
-                      reglages.get("pendule_active"))
-
     def description_cadence(self):
         # On lit avec_pendule et NON active : une partie finie a sa pendule en
         # pause, ce qui ne change rien a la cadence a laquelle elle a ete jouee.
@@ -235,9 +227,6 @@ class ChessTimer:
 
     # ------------------------------------------------------------------ lecture
 
-    def get_display_times(self):
-        return self.get_time(chess.WHITE), self.get_time(chess.BLACK)
-
     def secondes_restantes(self, is_white):
         """Le temps restant EN SECONDES, pas en texte.
 
@@ -247,12 +236,6 @@ class ChessTimer:
         l'utilise continue de marcher exactement pareil.
         """
         return max(0.0, float(self.time_left[bool(is_white)]))
-
-    def cadence_en_secondes(self):
-        """(temps initial, increment) en secondes. (None, 0) sans pendule."""
-        if not getattr(self, "avec_pendule", self.active):
-            return None, 0.0
-        return float(self.initial_time), float(self.increment)
 
     def get_time(self, is_white):
         temps = max(0.0, self.time_left[is_white])
@@ -269,10 +252,6 @@ class ChessTimer:
     def camp_en_bas(self):
         """Couleur affichee en bas de l'ecran, selon l'orientation du plateau."""
         return chess.BLACK if self.flipped else chess.WHITE
-
-    def zone_de(self, couleur):
-        """Zone de l'horloge d'un camp : celui du bas est en bas, toujours."""
-        return self.zone_bas if couleur == self.camp_en_bas() else self.zone_haut
 
     def draw(self, screen, trait=None):
         import ui

@@ -292,11 +292,6 @@ def description(puzzle):
     return ", ".join(noms[:3]) if noms else "Tactique"
 
 
-def lien_lichess(puzzle):
-    identifiant = (puzzle or {}).get("id")
-    return "https://lichess.org/training/%s" % identifiant if identifiant else ""
-
-
 # ------------------------------------------------------------------ le probleme
 
 def coup_d_ouverture(puzzle):

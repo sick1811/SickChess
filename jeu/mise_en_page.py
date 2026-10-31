@@ -32,7 +32,6 @@
 
 import pygame
 
-import ui
 
 # L'unite. Tout le reste en est un multiple.
 UNITE = 8
@@ -41,11 +40,6 @@ UNITE = 8
 def pas(nombre, ech=1.0):
     """n pas de grille, a l'echelle de la fenetre. pas(2) = 16 px."""
     return max(1, int(round(nombre * UNITE * ech)))
-
-
-def xs(ech=1.0):
-    """4 px : entre deux lignes de texte serrees."""
-    return max(1, int(round(0.5 * UNITE * ech)))
 
 
 def s(ech=1.0):
@@ -128,19 +122,6 @@ def echelle_qui_tient(besoin, place, ech, mini=ECHELLE_MINI):
     return bas
 
 
-def bandeau_titre(largeur, ech=1.0, avec_rappel=True):
-    """La bande du titre, sur UNE ligne. Renvoie (zone du titre, y du dessous).
-
-    Avant : le titre sur une ligne, la ligne des raccourcis en dessous, et
-    seulement apres le contenu. Maintenant les deux partagent la meme ligne -
-    titre a gauche, rappel en petit a droite.
-    """
-    marge = l(ech)
-    hauteur = ui.police(ui.t(30, ech), True).get_height()
-    zone = pygame.Rect(marge, marge, max(1, largeur - 2 * marge), hauteur)
-    return zone, zone.bottom + m(ech)
-
-
 def bande_du_bas(largeur, hauteur_fenetre, ech=1.0, avec_cases=True):
     """La bande du bas : cases a cocher A GAUCHE, boutons A DROITE, meme ligne.
 
@@ -173,11 +154,3 @@ def etirer(blocs, bas):
     if bas > dernier.bottom:
         dernier.height = bas - dernier.y
     return blocs
-
-
-def vide_en_bas(blocs, bas):
-    """Combien de pixels restent inutilises sous le dernier bloc. Pour les tests."""
-    reels = [b for b in blocs if b is not None]
-    if not reels:
-        return bas
-    return max(0, bas - max(b.bottom for b in reels))

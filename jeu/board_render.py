@@ -59,15 +59,6 @@ class BoardRender:
     def echelle(self):
         return getattr(self.chessboard.disposition, "echelle", 1.0)
 
-    def _texte(self, texte, x, y, taille=17, couleur=None, gras=False,
-               mono=False, centre=False, droite=False, largeur_max=None):
-        """Conservee pour compatibilite avec la V7."""
-        ancre = "centre" if centre else ("droite" if droite else "gauche")
-        rect = ui.texte(self.chessboard.screen, texte, x, y, taille,
-                        couleur or self.theme()["texte"], gras, mono,
-                        largeur_max, ancre)
-        return rect.width
-
     # ------------------------------------------------------------------ plateau
 
     def _dessiner_cases(self):

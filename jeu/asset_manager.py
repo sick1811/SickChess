@@ -1,26 +1,15 @@
-# asset_manager.py - V6 : chargement et vidange des images du menu
+# asset_manager.py - ou trouver les ressources et ou ecrire les donnees
 #
-# CE QUI CHANGE PAR RAPPORT A V5 :
-#   1. IL N'ETAIT UTILISE NULLE PART. MainMenu rechargeait les memes frames de
-#      son cote : deux chemins de chargement differents pour la meme chose.
-#      MainMenu passe desormais par cette classe.
-#   2. cleanup() FAISAIT pygame.mixer.quit(), ce qui aurait coupe TOUS les
-#      bruitages du jeu, pas seulement la musique du menu. Il ne coupe plus que
-#      la musique et libere les images. (parametre fermer_mixer, False par
-#      defaut, si tu veux vraiment l'ancien comportement.)
-#   3. Les 241 frames sont chargees, pas seulement 40 : le plafond vient de
-#      config.json ("menu_frames_max", 0 = toutes).
-#   4. Les fichiers sont cherches a cote du script aussi bien que dans le
-#      dossier courant : indispensable une fois le jeu compile en .exe.
+# Les fichiers sont cherches a cote du script aussi bien que dans le dossier
+# courant : indispensable une fois le jeu compile en .exe.
 #
-# AUCUNE FONCTION SUPPRIMEE : __init__, load_menu_assets(max_frames) et
-# cleanup() sont conservees.
+# 31/10 (menage) : la classe AssetManager (fond anime et musique du menu V6)
+# n'etait plus creee nulle part : retiree. Restent les chemins (ressources,
+# donnees, dossier d'ecriture).
 
-import json
 import os
 import sys
 
-import pygame
 
 
 def dossier_ressources():
@@ -102,132 +91,3 @@ def preparer_dossier_utilisateur():
                 print("[ASSETS] %s copie a cote de l'executable" % nom)
             except OSError as e:
                 print("[ASSETS] copie de %s impossible : %s" % (nom, e))
-
-
-def _plafond_frames():
-    for dossier in (os.getcwd(), os.path.dirname(os.path.abspath(__file__))):
-        chemin = os.path.join(dossier, "config.json")
-        if os.path.exists(chemin):
-            try:
-                with open(chemin, "r", encoding="utf-8") as f:
-                    contenu = json.load(f)
-            # JOURNEE DEBUG DU 04/09 : un config.json coupe en plein
-            # milieu (coupure de courant, disque plein) contient
-            # "null" ou "[]". json.load() ne bronche pas, et le .get()
-            # qui suit levait un AttributeError QUE PERSONNE N'ATTRAPAIT :
-            # le jeu ne demarrait plus. Un fichier qui n'est pas un
-            # dictionnaire vaut desormais un fichier absent.
-                if not isinstance(contenu, dict):
-                    return 0
-                return int(contenu.get("menu_frames_max", 0))
-            except (ValueError, OSError, TypeError):
-                return 0
-    return 0
-
-
-class AssetManager:
-    def __init__(self):
-        if not pygame.get_init():
-            pygame.mixer.pre_init(44100, -16, 2, 512)
-            pygame.init()
-
-        self.frames = []
-        self.images = {}
-        self.sounds = {}
-        self.music = None
-        self.taille_ecran = (1280, 720)
-
-    # ------------------------------------------------------------------ menu
-
-    def load_menu_assets(self, max_frames=None, musique=True):
-        """Charge le fond anime et la musique du menu.
-
-        V7.1 : "musique" (nouveau, optionnel, vrai par defaut - AUCUN appel
-        existant n'est casse) permet de charger la musique SANS la jouer, quand
-        la case "couper la musique du menu" est cochee. On la charge quand meme
-        pour que decocher la case la relance tout de suite, sans rien recharger.
-        """
-        if max_frames is None:
-            max_frames = _plafond_frames()
-        print("[ASSETS] Chargement du menu...")
-
-        self.frames = []
-        dossier = chemin_ressource("assets", "menu_frames")
-        if os.path.isdir(dossier):
-            noms = sorted(f for f in os.listdir(dossier)
-                          if f.startswith("frame_") and f.lower().endswith(".png"))
-            if max_frames and max_frames > 0:
-                noms = noms[:max_frames]
-            for nom in noms:
-                try:
-                    image = pygame.image.load(os.path.join(dossier, nom)).convert()
-                    self.frames.append(pygame.transform.scale(image, self.taille_ecran))
-                except pygame.error as e:
-                    print("[ASSETS] frame illisible %s : %s" % (nom, e))
-            print("[ASSETS] %d frames de fond chargees" % len(self.frames))
-        else:
-            print("[ASSETS] Pas de dossier assets/menu_frames")
-
-        # Logo
-        for nom in ("logo.png", "logo.jpg"):
-            chemin = chemin_ressource("assets", nom)
-            if os.path.exists(chemin):
-                try:
-                    logo = pygame.image.load(chemin).convert_alpha()
-                    self.images["logo"] = pygame.transform.scale(logo, (600, 180))
-                    print("[ASSETS] Logo charge (%s)" % nom)
-                    break
-                except pygame.error as e:
-                    print("[ASSETS] logo illisible : %s" % e)
-
-        # Musique du menu : on prefere le canal 'music', fait pour les fichiers longs.
-        for nom in ("menu_music.ogg", "menu_music.mp3", "game_start.ogg", "game_start.mp3"):
-            chemin = chemin_ressource("assets", nom)
-            if os.path.exists(chemin):
-                try:
-                    pygame.mixer.music.load(chemin)
-                    pygame.mixer.music.set_volume(0.25)
-                    if musique:
-                        pygame.mixer.music.play(-1)
-                    self.music = chemin
-                    print("[ASSETS] Musique du menu : %s (%s)"
-                          % (nom, "volume 25%" if musique else "coupee"))
-                    break
-                except pygame.error as e:
-                    print("[ASSETS] musique illisible (%s) : %s" % (nom, e))
-        if self.music is None:
-            print("[ASSETS] Pas de musique de menu trouvee")
-
-        print("[ASSETS] Menu pret")
-        return self.frames
-
-    def get_frames(self):
-        return self.frames
-
-    def get_image(self, nom):
-        return self.images.get(nom)
-
-    def stop_music(self):
-        try:
-            if pygame.mixer.get_init():
-                pygame.mixer.music.stop()
-        except pygame.error:
-            pass
-
-    # ------------------------------------------------------------------ vidange
-
-    def cleanup(self, fermer_mixer=False):
-        """Libere la memoire du menu quand la partie demarre."""
-        print("[ASSETS] Vidange des ressources du menu...")
-        self.stop_music()
-        if fermer_mixer:
-            # ATTENTION : coupe TOUS les sons du jeu. C'etait le comportement
-            # de la V5, conserve seulement sur demande explicite.
-            try:
-                pygame.mixer.quit()
-            except pygame.error:
-                pass
-        self.frames = []
-        self.images.clear()
-        self.sounds.clear()
-        print("[ASSETS] Memoire du menu liberee")

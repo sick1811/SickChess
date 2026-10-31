@@ -142,10 +142,6 @@ class Revanche:
 
     # ------------------------------------------------------------- relance
 
-    def couleur_suivante(self, couleur_locale):
-        """Les couleurs s'inversent : celui qui avait les blancs prend les noirs."""
-        return "noir" if str(couleur_locale).lower() == "blanc" else "blanc"
-
     def repartir(self):
         """Remet le compteur a zero pour la partie qui commence."""
         self.parties_jouees += 1

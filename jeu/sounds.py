@@ -181,9 +181,3 @@ class SoundManager:
             self.sounds, self.formats = {}, {}
             self.load_sounds()
         return self.pack
-
-    def couper(self, coupe=True):
-        self.actif = not coupe
-
-    def est_charge(self, name):
-        return name in self.sounds

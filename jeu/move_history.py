@@ -13,8 +13,9 @@
 #   4. detect_brilliant_blunder existe vraiment : pgn_exporter la cherchait
 #      avec hasattr et ne la trouvait jamais.
 #
-# AUCUNE FONCTION SUPPRIMEE : add_move, get_move_count, get_fen_at_move,
-# get_evaluation_at_move, export_pgn et clear sont conservees.
+# 31/10 (menage) : undo, get_move, get_fen_at_move, get_evaluation_at_move,
+# get_san_at_move, lignes_lisibles et resume_annotations, jamais appelees, sont
+# retirees (le jeu lit directement moves / fens / sans).
 
 import chess
 import freestyle
@@ -99,18 +100,6 @@ class MoveHistory:
             if best_move is not None:
                 self.best_moves[index] = best_move
 
-    def undo(self):
-        """Retire le dernier coup (annulation)."""
-        if not self.moves:
-            return None
-        self.board.pop()
-        self.sans.pop()
-        self.fens.pop()
-        self.evaluations.pop()
-        self.best_moves.pop()
-        self.horodatage.pop()
-        return self.moves.pop()
-
     def clear(self):
         """Vide l'historique (nouvelle partie)."""
         self.moves.clear()
@@ -126,49 +115,6 @@ class MoveHistory:
     def get_move_count(self):
         """Nombre total de demi-coups joues."""
         return len(self.moves)
-
-    def get_move(self, index):
-        if 0 <= index < len(self.moves):
-            return self.moves[index]
-        return None
-
-    def get_fen_at_move(self, move_index):
-        """FEN APRES le coup demande. -1 = position de depart."""
-        if move_index < 0:
-            return self.fen_initiale
-        if move_index < len(self.fens):
-            return self.fens[move_index]
-        return self.fens[-1] if self.fens else self.fen_initiale
-
-    def get_evaluation_at_move(self, move_index):
-        """Evaluation apres le coup demande."""
-        if 0 <= move_index < len(self.evaluations):
-            return self.evaluations[move_index]
-        return None
-
-    def get_san_at_move(self, move_index):
-        if 0 <= move_index < len(self.sans):
-            return self.sans[move_index]
-        return None
-
-    def lignes_lisibles(self):
-        """[(numero, coup blanc, coup noir), ...] pour l'affichage du replay."""
-        lignes = []
-        depart = freestyle.plateau(self.fen_initiale)
-        numero = depart.fullmove_number
-        blancs_commencent = depart.turn == chess.WHITE
-        i = 0
-        if not blancs_commencent and self.sans:
-            lignes.append((numero, "...", self.sans[0]))
-            numero += 1
-            i = 1
-        while i < len(self.sans):
-            blanc = self.sans[i]
-            noir = self.sans[i + 1] if i + 1 < len(self.sans) else ""
-            lignes.append((numero, blanc, noir))
-            numero += 1
-            i += 2
-        return lignes
 
     # ------------------------------------------------------------------ analyse
 
@@ -196,17 +142,6 @@ class MoveHistory:
         if variation >= SEUIL_BRILLANT:
             return "!"
         return ""
-
-    def resume_annotations(self):
-        """Compte les gaffes et les bons coups des deux camps."""
-        resume = {"blancs": {"!": 0, "?!": 0, "??": 0},
-                  "noirs": {"!": 0, "?!": 0, "??": 0}}
-        for i in range(len(self.moves)):
-            note = self.detect_brilliant_blunder(i)
-            if note:
-                camp = "blancs" if i % 2 == 0 else "noirs"
-                resume[camp][note] += 1
-        return resume
 
     # ------------------------------------------------------------------ export
 

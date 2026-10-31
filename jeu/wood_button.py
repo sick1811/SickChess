@@ -200,14 +200,6 @@ class WoodButton:
         ui.texte_centre_dans(screen, self.text, zone, taille, couleur_texte,
                              gras=True, marge=14)
 
-    @staticmethod
-    def _assombrir(couleur, facteur):
-        return tuple(max(0, min(255, int(c * facteur))) for c in couleur[:3])
-
-    @staticmethod
-    def _eclaircir(couleur, facteur):
-        return tuple(max(0, min(255, int(c * facteur))) for c in couleur[:3])
-
     # ------------------------------------------------------ V7.1 : le bois
 
     def _dessiner_en_bois(self, screen):

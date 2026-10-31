@@ -73,10 +73,6 @@ PASTILLES = {
 ORDRE = ["brillant", "tres_bon", "meilleur", "theorique", "excellent", "bon",
          "imprecision", "erreur", "manque", "gaffe"]
 
-# Ce qui est compte dans le rapport de fin de partie.
-REMARQUABLES = ["brillant", "tres_bon", "theorique", "imprecision", "erreur",
-                "manque", "gaffe"]
-
 # ---------------------------------------------------------------------------
 # LES SEUILS OFFICIELS DE LICHESS (ta demande du 03/09 : "reglage officiel des
 # pastilles de lichess ou chess.com").
@@ -168,18 +164,6 @@ def chances_de_gagner(evaluation):
     # 17/10 : bornee a +/- 10 pions, exactement comme lichess.
     centipions = max(-1000.0, min(1000.0, float(evaluation) * 100.0))
     return 50.0 + 50.0 * (2.0 / (1.0 + math.exp(-0.00368208 * centipions)) - 1.0)
-
-
-def perte_en_chances(eval_avant, eval_apres, joue_par_les_blancs):
-    """Combien de chances de gagner le coup a coute a celui qui l'a joue."""
-    avant = chances_de_gagner(eval_avant)
-    apres = chances_de_gagner(eval_apres)
-    if avant is None or apres is None:
-        return None
-    if not joue_par_les_blancs:
-        avant = 100.0 - avant
-        apres = 100.0 - apres
-    return max(0.0, avant - apres)
 
 
 def est_un_sacrifice(plateau_avant, coup):
@@ -412,13 +396,6 @@ def libelle(cle):
 
 def couleur(cle):
     return PASTILLES[cle][1] if cle in PASTILLES else (150, 150, 150)
-
-
-def symbole_pgn(cle):
-    """Le symbole a ecrire dans le fichier PGN exporte."""
-    return {"brillant": "!!", "tres_bon": "!", "meilleur": "", "excellent": "",
-            "bon": "", "theorique": "", "imprecision": "?!", "erreur": "?",
-            "manque": "?", "gaffe": "??"}.get(cle, "")
 
 
 # ---------------------------------------------------------------- dessin

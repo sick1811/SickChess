@@ -17,7 +17,6 @@ import chess
 # Valeurs par defaut = comportement de la V6 ; layout.py les remplace.
 ORIGINE_X = 0
 ORIGINE_Y = 0
-TAILLE_CASE_PAR_DEFAUT = 80
 TAILLE_CASE = 80
 
 
@@ -83,10 +82,6 @@ def pixel_vers_case(pos, sq_size=None, flipped=False):
     if flipped:
         return chess.square(7 - colonne, ligne)
     return chess.square(colonne, 7 - ligne)
-
-
-def est_sur_le_plateau(pos, sq_size=None):
-    return pixel_vers_case(pos, sq_size, False) is not None
 
 
 def case_claire(square):

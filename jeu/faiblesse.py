@@ -133,13 +133,9 @@ SEUIL_GAFFE_POINTS = 30.0
 # plutot qu'a 19, une gaffe de cavalier plutot que de dame.
 SIGMA_DANS_LA_CATEGORIE = 4.0
 
-# Conserve pour separer() : l'ancien seuil, en centiemes de pion.
-SEUIL_GAFFE = 250
+# Largeur du tirage des gaffes quand le joueur n'est pas « attentif ».
+# 31/10 (menage) : separer(), SEUIL_GAFFE et SIGMA_ATTENTIF, plus utilises, retires.
 SIGMA_GAFFE = 600.0
-
-# Conserve : c'etait la largeur du mode "attentif" de la version precedente.
-# Elle n'est plus utilisee par choisir(), mais rien n'est supprime.
-SIGMA_ATTENTIF = 25.0
 
 # Combien de coups on demande a Stockfish de classer. Plus on joue faible, plus
 # il en faut : c'est parmi eux qu'on ira chercher la betise.
@@ -211,17 +207,6 @@ def taux_de_gaffe(elo):
     return max(0.0, min(0.3, _interpoler(elo, 4) * _reglage_du_joueur()))
 
 
-def taux_de_bon_coup(elo):
-    """Probabilite qu'il joue simplement un bon coup. Le reste, forcement."""
-    return max(0.0, 1.0 - taux_imprecision(elo) - taux_erreur(elo)
-               - taux_de_gaffe(elo))
-
-
-def lucidite(elo):
-    """Probabilite qu'il ne fasse AUCUNE faute a ce coup-ci."""
-    return taux_de_bon_coup(elo)
-
-
 def fautes_par_partie(elo, coups=40):
     """(imprecisions, erreurs, gaffes) attendues sur une partie. Pour le journal."""
     return (taux_imprecision(elo) * coups, taux_erreur(elo) * coups,
@@ -248,12 +233,6 @@ def _reglage_du_joueur():
     except Exception:
         _REGLAGE = 1.0
     return _REGLAGE
-
-
-def oublier_le_reglage():
-    """Relit config.json au prochain coup (sert aux tests)."""
-    global _REGLAGE
-    _REGLAGE = None
 
 
 # PROFONDEUR DU CLASSEMENT - CORRIGE LE 01/09, ET C'ETAIT MA FAUTE.
@@ -309,28 +288,6 @@ def profondeur(elo):
     if elo <= 1100:
         return 12
     return 13
-
-
-def profondeur_ancienne(elo):
-    """L'ancienne profondeur (1 a 6). CONSERVEE, RIEN N'EST SUPPRIME.
-
-    Elle n'est plus utilisee par le jeu : elle rendait le classement faux (voir
-    le commentaire ci-dessus). Elle reste ici pour les tests de non-regression
-    et pour pouvoir comparer les deux comportements.
-    """
-    try:
-        elo = int(elo)
-    except (TypeError, ValueError):
-        return 6
-    if elo <= 300:
-        return 1
-    if elo <= 600:
-        return 2
-    if elo <= 900:
-        return 3
-    if elo <= 1100:
-        return 4
-    return 6
 
 
 def multipv(elo):
@@ -515,43 +472,6 @@ def _panier_le_plus_proche(paniers, voulue):
             if 0 <= indice < len(ORDRE) and paniers.get(ORDRE[indice]):
                 return paniers[ORDRE[indice]]
     return []
-
-
-def gaffes_par_partie(elo, coups_par_partie=40):
-    """Combien de fois il lachera une piece sur une partie. Pour le journal."""
-    return taux_de_gaffe(elo) * coups_par_partie
-
-
-def separer(coups):
-    """(coups corrects, gaffes) : au-dela de SEUIL_GAFFE c'est une piece lachee."""
-    if not coups:
-        return [], []
-    meilleure = max(note(c) for c in coups)
-    corrects, mauvais = [], []
-    for coup in coups:
-        if meilleure - note(coup) >= SEUIL_GAFFE:
-            mauvais.append(coup)
-        else:
-            corrects.append(coup)
-    return corrects, mauvais
-
-
-def perte_moyenne(coups, elo, tirages=400, hasard=None):
-    """Ce que ce niveau perd en moyenne sur cette position, en centiemes de pion.
-
-    Sert aux tests et au reglage : c'est la mesure qui dit si le bot joue
-    vraiment au niveau demande.
-    """
-    coups = [c for c in (coups or []) if c and c.get("coup")]
-    if not coups:
-        return 0.0
-    tirage = hasard or random
-    meilleure = max(note(c) for c in coups)
-    total = 0.0
-    for _ in range(max(1, tirages)):
-        choix = choisir(coups, elo, tirage)
-        total += max(0.0, meilleure - note(choix))
-    return total / float(max(1, tirages))
 
 
 def description(elo):
